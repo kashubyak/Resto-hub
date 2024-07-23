@@ -31,9 +31,9 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 	const dish = dishQuery.data
 
 	return (
-		<div className='min-h-screen bg-background'>
-			<div className='flex flex-col lg:grid lg:grid-cols-3 min-h-screen'>
-				<div className='lg:col-span-2 relative flex items-center justify-center lg:sticky lg:top-0 lg:h-screen'>
+		<div className='min-h-screen bg-background p-6'>
+			<div className='flex flex-col lg:grid lg:grid-cols-3'>
+				<div className='lg:col-span-2 relative flex items-center justify-center lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:self-start'>
 					<div className='w-full h-[50vh] lg:h-[70vh] max-w-7xl relative'>
 						<ViewableImage
 							src={dish.imageUrl}
