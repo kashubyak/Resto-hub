@@ -10,40 +10,41 @@ interface IDishCardProps {
 
 export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 	return (
-		<div className='bg-background border border-border rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group'>
+		<div className='bg-background border border-border rounded-md shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group'>
 			<div className='relative w-full aspect-video bg-muted overflow-hidden'>
 				<Image src={dish.imageUrl} alt={dish.name} fill className='object-contain' />
-				<div className='absolute top-3 left-3'>
-					<span
-						className={`px-2 py-1 text-xs font-medium rounded-full stable-light ${
-							dish.available ? 'bg-success' : 'bg-destructive'
-						}`}
-					>
-						{dish.available ? 'Available' : 'Unavailable'}
-					</span>
-				</div>
-
-				{dish.category && (
-					<div className='absolute top-3 right-3'>
-						<span className='px-2 py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full'>
-							{dish.category.name}
-						</span>
-					</div>
-				)}
 			</div>
 
 			<div className='p-5 flex flex-col flex-grow'>
-				<div className='mb-4'>
-					<h3 className='text-lg font-semibold text-foreground mb-2 line-clamp-1'>
-						{dish.name}
-					</h3>
-					<p className='text-sm text-muted-foreground line-clamp-2 leading-relaxed'>
-						{dish.description}
-					</p>
-				</div>
+				<div className='flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4'>
+					<div className='flex-grow'>
+						<h3 className='text-lg font-semibold text-foreground mb-2 line-clamp-1'>
+							{dish.name}
+						</h3>
+						<p className='text-sm text-muted-foreground line-clamp-2 leading-relaxed'>
+							{dish.description}
+						</p>
+					</div>
 
-				<div className='mb-4'>
-					<span className='text-2xl font-bold text-primary'>${dish.price}</span>
+					<div className='flex flex-col items-start sm:items-end gap-2 flex-shrink-0'>
+						<span className='text-2xl font-bold text-primary'>${dish.price}</span>
+
+						<div className='flex flex-wrap gap-2'>
+							<span
+								className={`px-2 py-1 text-xs font-medium rounded-full stable-light ${
+									dish.available ? 'bg-success' : 'bg-destructive'
+								}`}
+							>
+								{dish.available ? 'Available' : 'Unavailable'}
+							</span>
+
+							{dish.category && (
+								<span className='px-2 py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full'>
+									{dish.category.name}
+								</span>
+							)}
+						</div>
+					</div>
 				</div>
 
 				<div className='grid grid-cols-2 gap-3 mb-4 text-xs'>
@@ -87,7 +88,7 @@ export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 					</div>
 				)}
 
-				<div className='mt-auto pt-4'>
+				<div className='mt-auto'>
 					<Link href={ROUTES.PRIVATE.ADMIN.DISH_ID(dish.id)}>
 						<Button
 							type='button'

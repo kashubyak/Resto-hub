@@ -10,7 +10,7 @@ interface DishListItemProps {
 
 export const DishListItem: React.FC<DishListItemProps> = ({ dish }) => {
 	return (
-		<div className='bg-background border border-border rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group'>
+		<div className='bg-background border border-border rounded-md shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group'>
 			<div className='flex flex-col sm:flex-row'>
 				<div className='relative w-full sm:w-[22rem] aspect-video bg-muted flex-shrink-0'>
 					<Image src={dish.imageUrl} alt={dish.name} fill className='object-contain' />
