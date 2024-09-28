@@ -11,8 +11,15 @@ interface IDishCardProps {
 export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 	return (
 		<div className='bg-background border border-border rounded-md shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group'>
-			<div className='relative w-full aspect-video bg-muted overflow-hidden'>
-				<Image src={dish.imageUrl} alt={dish.name} fill className='object-contain' />
+			<div className='relative w-full'>
+				<Image
+					src={dish.imageUrl}
+					alt={dish.name}
+					width={1920}
+					height={1080}
+					className='w-full h-auto block'
+					sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+				/>
 			</div>
 
 			<div className='p-5 flex flex-col flex-grow'>
