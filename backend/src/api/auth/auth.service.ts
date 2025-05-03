@@ -3,6 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
@@ -13,12 +14,23 @@ import { RegisterResponseDto } from './dto/responses/register-response.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly JWT_SECRET: string;
+  private readonly JWT_REFRESH_SECRET: string;
+  private readonly JWT_EXPIRES_IN = '1d';
+  private readonly JWT_REFRESH_EXPIRES_IN = '30d';
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.JWT_SECRET = this.configService.getOrThrow('JWT_TOKEN_SECRET');
+    this.JWT_REFRESH_SECRET = this.configService.getOrThrow(
+      'JWT_REFRESH_TOKEN_SECRET',
+    );
+  }
 
-  async register(
+  async registerUser(
     dto: RegisterDto,
     res: Response,
   ): Promise<Omit<RegisterResponseDto, 'refresh_token'>> {
@@ -26,9 +38,7 @@ export class AuthService {
       where: { email: dto.email },
     });
 
-    if (existingUser) {
-      throw new ConflictException('Email already in use');
-    }
+    if (existingUser) throw new ConflictException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
@@ -41,13 +51,12 @@ export class AuthService {
       },
     });
 
-    const accessToken = await this.getAccessToken(user.id, user.role);
+    const token = await this.getAccessToken(user.id, user.role);
     const refreshToken = await this.getRefreshToken(user.id, user.role);
-
     this.setRefreshTokenCookie(res, refreshToken);
 
     return {
-      access_token: accessToken,
+      access_token: token,
       user: {
         id: user.id,
         name: user.name,
@@ -57,81 +66,72 @@ export class AuthService {
     };
   }
 
-  async login(dto: LoginDto, res: Response): Promise<{ access_token: string }> {
+  async processLogin(dto: LoginDto, res: Response): Promise<{ token: string }> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const accessToken = await this.getAccessToken(user.id, user.role);
+    const token = await this.getAccessToken(user.id, user.role);
     const refreshToken = await this.getRefreshToken(user.id, user.role);
-
     this.setRefreshTokenCookie(res, refreshToken);
 
-    return { access_token: accessToken };
+    return { token };
   }
 
-  async refresh(
+  async processRefresh(
     req: Request,
     res: Response,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ token: string }> {
     const refreshToken = req.cookies['jid'];
-    if (!refreshToken) {
+    if (!refreshToken)
       throw new UnauthorizedException('No refresh token provided');
+
+    let payload: { sub: number; role: string };
+    try {
+      payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.JWT_REFRESH_SECRET,
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const payload = await this.verifyRefreshToken(refreshToken);
-
-    const accessToken = await this.getAccessToken(payload.sub, payload.role);
+    const token = await this.getAccessToken(payload.sub, payload.role);
     const newRefreshToken = await this.getRefreshToken(
       payload.sub,
       payload.role,
     );
-
     this.setRefreshTokenCookie(res, newRefreshToken);
 
-    return { access_token: accessToken };
+    return { token };
   }
 
-  logout(res: Response): { message: string } {
-    res.clearCookie('jid', { path: '/auth/refresh' });
+  logoutUser(res: Response): { message: string } {
+    res.clearCookie('jid', { path: '/auth', httpOnly: true });
     return { message: 'Logged out successfully' };
   }
 
   private async getAccessToken(userId: number, role: string): Promise<string> {
-    const payload = { sub: userId, role };
-    return this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_TOKEN_SECRET,
-      expiresIn: '1d',
-    });
+    return this.jwtService.signAsync(
+      { sub: userId, role },
+      { secret: this.JWT_SECRET, expiresIn: this.JWT_EXPIRES_IN },
+    );
   }
 
   private async getRefreshToken(userId: number, role: string): Promise<string> {
-    const payload = { sub: userId, role };
-    return this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
-      expiresIn: '30d',
-    });
-  }
-
-  private async verifyRefreshToken(
-    token: string,
-  ): Promise<{ sub: number; role: string }> {
-    try {
-      return await this.jwtService.verifyAsync<{ sub: number; role: string }>(
-        token,
-        { secret: process.env.JWT_REFRESH_TOKEN_SECRET },
-      );
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
+    return this.jwtService.signAsync(
+      { sub: userId, role },
+      {
+        secret: this.JWT_REFRESH_SECRET,
+        expiresIn: this.JWT_REFRESH_EXPIRES_IN,
+      },
+    );
   }
 
   private setRefreshTokenCookie(res: Response, refreshToken: string): void {
-    res.cookie('jid', String(refreshToken), {
+    res.cookie('jid', refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
