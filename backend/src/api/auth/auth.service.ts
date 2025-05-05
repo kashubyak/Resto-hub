@@ -15,7 +15,7 @@ import { RegisterResponseDto } from './dto/responses/register-response.dto';
 @Injectable()
 export class AuthService {
   private readonly JWT_SECRET: string;
-  private readonly JWT_REFRESH_SECRET: string;
+  private readonly JWT_REFRESH_TOKEN_SECRET: string;
   private readonly JWT_EXPIRES_IN = '1d';
   private readonly JWT_REFRESH_EXPIRES_IN = '30d';
 
@@ -25,7 +25,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {
     this.JWT_SECRET = this.configService.getOrThrow('JWT_TOKEN_SECRET');
-    this.JWT_REFRESH_SECRET = this.configService.getOrThrow(
+    this.JWT_REFRESH_TOKEN_SECRET = this.configService.getOrThrow(
       'JWT_REFRESH_TOKEN_SECRET',
     );
   }
@@ -92,7 +92,7 @@ export class AuthService {
     let payload: { sub: number; role: string };
     try {
       payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.JWT_REFRESH_SECRET,
+        secret: this.JWT_REFRESH_TOKEN_SECRET,
       });
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
@@ -124,7 +124,7 @@ export class AuthService {
     return this.jwtService.signAsync(
       { sub: userId, role },
       {
-        secret: this.JWT_REFRESH_SECRET,
+        secret: this.JWT_REFRESH_TOKEN_SECRET,
         expiresIn: this.JWT_REFRESH_EXPIRES_IN,
       },
     );
