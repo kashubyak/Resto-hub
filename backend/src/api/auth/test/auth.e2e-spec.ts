@@ -5,7 +5,7 @@ import * as cookieParser from 'cookie-parser';
 import { PrismaService } from 'prisma/prisma.service';
 import * as request from 'supertest';
 
-describe('AuthController (e2e)', () => {
+describe('Auth (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let server: any;

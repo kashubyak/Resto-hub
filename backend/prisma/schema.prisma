@@ -24,3 +24,27 @@ enum Role {
   COOK
   WAITER
 }
+
+model Dish {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  imageUrl    String   @map("image_url")
+  categoryId  String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  Category    Category @relation(fields: [categoryId], references: [id])
+
+  @@map("dishes")
+}
+
+model Category {
+  id        String   @id
+  name      String
+  dishes    Dish[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("categories")
+}

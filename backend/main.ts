@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
@@ -7,9 +8,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.use(cookieParser());
-
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
   const config = new DocumentBuilder()
-    .setTitle('RestoHub API')
+    .setTitle('Resto-Hub API')
     .setDescription('API for authentication and user management')
     .setVersion('1.0')
     .addBearerAuth(
