@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PrismaService } from 'prisma/prisma.service';
+import { CategoryModule } from 'src/api/category/category.module';
+import { DishModule } from 'src/api/dish/dish.module';
 import { AuthModule } from './src/api/auth/auth.module';
 
 @Module({
@@ -16,6 +18,8 @@ import { AuthModule } from './src/api/auth/auth.module';
     }),
 
     AuthModule,
+    CategoryModule,
+    DishModule,
   ],
   providers: [PrismaService],
 })

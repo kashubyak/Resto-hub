@@ -1,25 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDishDto } from './dto/create-dish.dto';
-import { Dish } from './entities/dish.entity';
+import { UpdateDishDto } from './dto/update-dish.dto';
 import { DishRepository } from './repository/dish.repository';
 
 @Injectable()
 export class DishService {
   constructor(private readonly dishRepo: DishRepository) {}
 
-  createDish(dto: CreateDishDto): Promise<Dish> {
+  createDish(dto: CreateDishDto) {
     return this.dishRepo.createDish(dto);
   }
-  findAll(): Promise<Dish[]> {
+  findAll() {
     return this.dishRepo.findAll();
   }
-  findOne(id: number): Promise<Dish> {
+  findOne(id: number) {
     return this.dishRepo.findOne(id);
   }
-  updateDish(id: number, dto: CreateDishDto): Promise<Dish> {
+  updateDish(id: number, dto: UpdateDishDto) {
     return this.dishRepo.updateDish(id, dto);
   }
-  removeDish(id: number): Promise<Dish> {
+  removeDish(id: number) {
     return this.dishRepo.removeDish(id);
   }
 }

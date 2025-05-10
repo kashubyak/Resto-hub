@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class Dish {
+export class DishEntity {
   @ApiProperty({ description: 'The unique identifier of the dish' })
   id: number;
 

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateDishDto {
   @ApiProperty({ description: 'The name of the dish' })
@@ -24,6 +24,6 @@ export class CreateDishDto {
   imageUrl: string;
 
   @ApiProperty({ description: 'The ID of the dish category (UUID)' })
-  @IsUUID()
-  categoryId: string;
+  @IsNumber()
+  categoryId?: number;
 }

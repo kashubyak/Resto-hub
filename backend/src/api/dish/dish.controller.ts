@@ -18,7 +18,8 @@ import {
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { DishService } from './dish.service';
 import { CreateDishDto } from './dto/create-dish.dto';
-import { Dish } from './entities/dish.entity';
+import { UpdateDishDto } from './dto/update-dish.dto';
+import { DishEntity } from './entities/dish.entity';
 
 @ApiTags('Dishes')
 @ApiBearerAuth()
@@ -30,20 +31,23 @@ export class DishController {
   @Roles('ADMIN')
   @ApiCreatedResponse({
     description: 'The dish has been successfully created.',
-    type: Dish,
+    type: DishEntity,
   })
   createDish(@Body() dto: CreateDishDto) {
     return this.dishService.createDish(dto);
   }
 
   @Get()
-  @ApiOkResponse({ description: 'A list of all dishes.', type: [Dish] })
+  @ApiOkResponse({ description: 'A list of all dishes.', type: [DishEntity] })
   findAll() {
     return this.dishService.findAll();
   }
 
   @Get(':id')
-  @ApiOkResponse({ description: 'Information about the dish.', type: Dish })
+  @ApiOkResponse({
+    description: 'Information about the dish.',
+    type: DishEntity,
+  })
   @ApiNotFoundResponse({ description: 'Dish not found.' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.findOne(id);
@@ -53,12 +57,12 @@ export class DishController {
   @Roles('ADMIN')
   @ApiOkResponse({
     description: 'The dish has been successfully updated.',
-    type: Dish,
+    type: DishEntity,
   })
   @ApiNotFoundResponse({ description: 'Dish not found.' })
   updateDish(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: CreateDishDto,
+    @Body() dto: UpdateDishDto,
   ) {
     return this.dishService.updateDish(id, dto);
   }

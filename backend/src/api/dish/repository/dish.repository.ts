@@ -1,21 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateDishDto } from '../dto/create-dish.dto';
-import { Dish } from '../entities/dish.entity';
+import { UpdateDishDto } from '../dto/update-dish.dto';
 
 @Injectable()
 export class DishRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createDish(dto: CreateDishDto): Promise<Dish> {
+  async createDish(dto: CreateDishDto) {
     return await this.prisma.dish.create({ data: dto });
   }
-  async findAll(): Promise<Dish[]> {
+  async findAll() {
     return await this.prisma.dish.findMany({
       include: { Category: true },
     });
   }
-  async findOne(id: number): Promise<Dish> {
+  async findOne(id: number) {
     const dish = await this.prisma.dish.findUnique({
       where: { id },
       include: { Category: true },
@@ -23,13 +23,13 @@ export class DishRepository {
     if (!dish) throw new NotFoundException('Dish not found');
     return dish;
   }
-  async updateDish(id: number, dto: CreateDishDto): Promise<Dish> {
+  async updateDish(id: number, dto: UpdateDishDto) {
     return await this.prisma.dish.update({
       where: { id },
       data: dto,
     });
   }
-  async removeDish(id: number): Promise<Dish> {
+  async removeDish(id: number) {
     return await this.prisma.dish.delete({
       where: { id },
     });
