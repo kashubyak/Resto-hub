@@ -34,4 +34,24 @@ export class DishRepository {
       where: { id },
     });
   }
+  async removeDishFromCategory(id: number) {
+    const dish = await this.prisma.dish.findUnique({
+      where: { id },
+    });
+    if (!dish) throw new NotFoundException('Dish not found');
+    return await this.prisma.dish.update({
+      where: { id },
+      data: { categoryId: null },
+    });
+  }
+  async assignDishToCategory(id: number, categoryId: number) {
+    const dish = await this.prisma.dish.findUnique({
+      where: { id },
+    });
+    if (!dish) throw new NotFoundException('Dish not found');
+    return await this.prisma.dish.update({
+      where: { id },
+      data: { categoryId },
+    });
+  }
 }

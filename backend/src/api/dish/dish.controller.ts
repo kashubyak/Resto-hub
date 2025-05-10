@@ -74,4 +74,23 @@ export class DishController {
   removeDish(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.removeDish(id);
   }
+
+  @Patch(':id/remove-category')
+  @Roles('ADMIN')
+  @ApiOkResponse({ description: 'Category removed from dish.' })
+  @ApiNotFoundResponse({ description: 'Dish not found.' })
+  removeCategoryFromDish(@Param('id', ParseIntPipe) id: number) {
+    return this.dishService.removeDishFromCategory(id);
+  }
+
+  @Patch(':id/assign-category/:categoryId')
+  @Roles('ADMIN')
+  @ApiOkResponse({ description: 'Dish assigned to category.' })
+  @ApiNotFoundResponse({ description: 'Dish not found.' })
+  assignCategory(
+    @Param('id', ParseIntPipe) dishId: number,
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ) {
+    return this.dishService.assignDishToCategory(dishId, categoryId);
+  }
 }

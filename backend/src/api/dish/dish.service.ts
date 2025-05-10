@@ -22,4 +22,10 @@ export class DishService {
   removeDish(id: number) {
     return this.dishRepo.removeDish(id);
   }
+  removeDishFromCategory(id: number) {
+    return this.dishRepo.removeDishFromCategory(id);
+  }
+  assignDishToCategory(id: number, categoryId: number) {
+    return this.dishRepo.assignDishToCategory(id, categoryId);
+  }
 }
