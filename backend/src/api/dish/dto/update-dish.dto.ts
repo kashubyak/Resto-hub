@@ -1,10 +1,18 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export class UpdateDishDto {
   @ApiPropertyOptional({
     description: 'The name of the dish',
-    example: 'New Pizza Name',
   })
   @IsOptional()
   @IsString()
@@ -12,30 +20,56 @@ export class UpdateDishDto {
 
   @ApiPropertyOptional({
     description: 'The description of the dish',
-    example: 'Updated description.',
   })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ description: 'The price of the dish', example: 15.5 })
+  @ApiPropertyOptional({ description: 'The price of the dish' })
   @IsOptional()
   @IsNumber()
+  @IsPositive()
   price?: number;
 
   @ApiPropertyOptional({
     description: 'The URL of the dish image',
-    example: 'https://example.com/new-image.jpg',
   })
   @IsOptional()
   @IsString()
+  @IsUrl()
   imageUrl?: string;
 
   @ApiPropertyOptional({
     description: 'The ID of the dish category',
-    example: 4,
   })
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   categoryId?: number;
+
+  @ApiPropertyOptional({
+    description: 'The list of ingredients',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  ingredients?: string[];
+
+  @ApiPropertyOptional({ description: 'The weight of the dish in grams' })
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  weightGr?: number;
+
+  @ApiPropertyOptional({ description: 'The number of calories in the dish' })
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  calories?: number;
+
+  @ApiPropertyOptional({
+    description: 'Indicates if the dish is available for order',
+  })
+  @IsOptional()
+  @IsBoolean()
+  available?: boolean;
 }

@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -35,6 +36,10 @@ export class DishController {
   @ApiCreatedResponse({
     description: 'The dish has been successfully created.',
     type: DishEntity,
+  })
+  @ApiConflictResponse({
+    description: 'Dish with this name already exists.',
+    type: HttpErrorResponseDto,
   })
   createDish(@Body() dto: CreateDishDto) {
     return this.dishService.createDish(dto);
@@ -86,8 +91,7 @@ export class DishController {
   @Roles('ADMIN')
   @ApiOperation({ description: 'Delete a dish by its ID' })
   @ApiOkResponse({
-    description: 'Dish has been successfully removed from the category.',
-    type: [DishEntity],
+    description: 'Dish has been successfully removed.',
   })
   @ApiNotFoundResponse({
     description: 'Dish with the given ID was not found.',
@@ -102,22 +106,7 @@ export class DishController {
   @ApiOperation({ description: 'Remove the category from a dish' })
   @ApiOkResponse({
     description: 'Category has been successfully removed from the dish.',
-    schema: {
-      example: {
-        id: 1,
-        name: 'Pizza Margherita',
-        description: 'Classic Italian pizza with tomato and mozzarella.',
-        price: 13.99,
-        imageUrl: 'https://example.com/pizza.jpg',
-        categoryId: null,
-        ingredients: ['Tomato', 'Mozzarella', 'Basil'],
-        weightGr: 300,
-        calories: 800,
-        available: true,
-        createdAt: '2024-05-05T10:00:00Z',
-        updatedAt: '2024-05-06T12:00:00Z',
-      },
-    },
+    type: DishEntity,
   })
   @ApiNotFoundResponse({
     description: 'Dish with the given ID was not found.',
@@ -136,7 +125,7 @@ export class DishController {
     type: DishEntity,
   })
   @ApiNotFoundResponse({
-    description: 'Dish or category with the given ID was not found.',
+    description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
   assignCategory(

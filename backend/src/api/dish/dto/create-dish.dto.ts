@@ -1,11 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  ArrayMinSize,
   IsArray,
   IsBoolean,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
+  IsUrl,
 } from 'class-validator';
 
 export class CreateDishDto {
@@ -27,6 +31,7 @@ export class CreateDishDto {
 
   @ApiProperty({ description: 'The price of the dish', example: 13.99 })
   @IsNumber()
+  @IsPositive()
   price: number;
 
   @ApiProperty({
@@ -35,6 +40,7 @@ export class CreateDishDto {
   })
   @IsString()
   @IsNotEmpty()
+  @IsUrl()
   imageUrl: string;
 
   @ApiPropertyOptional({
@@ -42,23 +48,35 @@ export class CreateDishDto {
     example: 3,
   })
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   categoryId?: number;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    description: 'The list of ingredients',
+    example: ['Tomato', 'Mozzarella', 'Basil'],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @ArrayMinSize(1)
   ingredients?: string[];
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({
+    description: 'The weight of the dish in grams',
+    example: 300,
+  })
   @IsOptional()
   @IsNumber()
+  @IsPositive()
   weightGr?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({
+    description: 'The number of calories in the dish',
+    example: 800,
+  })
   @IsOptional()
   @IsNumber()
+  @IsPositive()
   calories?: number;
 
   @ApiProperty({ default: true })
