@@ -26,14 +26,18 @@ enum Role {
 }
 
 model Dish {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String
   price       Float
-  imageUrl    String   @map("image_url")
+  imageUrl    String    @map("image_url")
   categoryId  Int?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  ingredients String[]
+  weightGr    Int?
+  calories    Int?
+  available   Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
   Category    Category? @relation(fields: [categoryId], references: [id])
 
   @@map("dishes")

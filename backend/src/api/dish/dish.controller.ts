@@ -13,9 +13,11 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { HttpErrorResponseDto } from 'src/common/dto/http-error.dto';
 import { DishService } from './dish.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
@@ -29,6 +31,7 @@ export class DishController {
 
   @Post('create')
   @Roles('ADMIN')
+  @ApiOperation({ description: 'Create a new dish' })
   @ApiCreatedResponse({
     description: 'The dish has been successfully created.',
     type: DishEntity,
@@ -38,28 +41,40 @@ export class DishController {
   }
 
   @Get()
-  @ApiOkResponse({ description: 'A list of all dishes.', type: [DishEntity] })
+  @ApiOperation({ description: 'Get a list of all dishes' })
+  @ApiOkResponse({
+    description: 'A list of all available dishes.',
+    type: [DishEntity],
+  })
   findAll() {
     return this.dishService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ description: 'Get a dish by its ID' })
   @ApiOkResponse({
-    description: 'Information about the dish.',
+    description: 'Returns the dish with the specified ID.',
     type: DishEntity,
   })
-  @ApiNotFoundResponse({ description: 'Dish not found.' })
+  @ApiNotFoundResponse({
+    description: 'Dish with the given ID was not found.',
+    type: HttpErrorResponseDto,
+  })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.findOne(id);
   }
 
   @Patch(':id')
   @Roles('ADMIN')
+  @ApiOperation({ description: 'Update a dish by its ID' })
   @ApiOkResponse({
-    description: 'The dish has been successfully updated.',
+    description: 'Dish has been successfully updated.',
     type: DishEntity,
   })
-  @ApiNotFoundResponse({ description: 'Dish not found.' })
+  @ApiNotFoundResponse({
+    description: 'Dish with the given ID was not found.',
+    type: HttpErrorResponseDto,
+  })
   updateDish(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateDishDto,
@@ -69,24 +84,61 @@ export class DishController {
 
   @Delete(':id')
   @Roles('ADMIN')
-  @ApiOkResponse({ description: 'The dish has been successfully deleted.' })
-  @ApiNotFoundResponse({ description: 'Dish not found.' })
+  @ApiOperation({ description: 'Delete a dish by its ID' })
+  @ApiOkResponse({
+    description: 'Dish has been successfully removed from the category.',
+    type: [DishEntity],
+  })
+  @ApiNotFoundResponse({
+    description: 'Dish with the given ID was not found.',
+    type: HttpErrorResponseDto,
+  })
   removeDish(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.removeDish(id);
   }
 
   @Patch(':id/remove-category')
   @Roles('ADMIN')
-  @ApiOkResponse({ description: 'Category removed from dish.' })
-  @ApiNotFoundResponse({ description: 'Dish not found.' })
+  @ApiOperation({ description: 'Remove the category from a dish' })
+  @ApiOkResponse({
+    description: 'Category has been successfully removed from the dish.',
+    schema: {
+      example: {
+        id: 1,
+        name: 'Pizza Margherita',
+        description: 'Classic Italian pizza with tomato and mozzarella.',
+        price: 13.99,
+        imageUrl: 'https://example.com/pizza.jpg',
+        categoryId: null,
+        ingredients: ['Tomato', 'Mozzarella', 'Basil'],
+        weightGr: 300,
+        calories: 800,
+        available: true,
+        createdAt: '2024-05-05T10:00:00Z',
+        updatedAt: '2024-05-06T12:00:00Z',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Dish with the given ID was not found.',
+    type: HttpErrorResponseDto,
+  })
   removeCategoryFromDish(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.removeDishFromCategory(id);
   }
 
   @Patch(':id/assign-category/:categoryId')
   @Roles('ADMIN')
-  @ApiOkResponse({ description: 'Dish assigned to category.' })
-  @ApiNotFoundResponse({ description: 'Dish not found.' })
+  @ApiOperation({ description: 'Assign an existing category to a dish' })
+  @ApiOkResponse({
+    description:
+      'Dish has been successfully assigned to the specified category.',
+    type: DishEntity,
+  })
+  @ApiNotFoundResponse({
+    description: 'Dish or category with the given ID was not found.',
+    type: HttpErrorResponseDto,
+  })
   assignCategory(
     @Param('id', ParseIntPipe) dishId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,

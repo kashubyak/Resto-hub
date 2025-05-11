@@ -17,7 +17,6 @@ async function bootstrap() {
   );
   const config = new DocumentBuilder()
     .setTitle('Resto-Hub API')
-    .setDescription('API for authentication and user management')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -36,7 +35,6 @@ async function bootstrap() {
     swaggerOptions: {
       persistAuthorization: true,
       displayRequestDuration: true,
-      docExpansion: 'none',
     },
   });
 
