@@ -55,7 +55,6 @@ export class CreateDishDto {
     description: 'The list of ingredients',
     example: ['Tomato', 'Mozzarella', 'Basil'],
   })
-  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   @ArrayMinSize(1)

@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsInt,
@@ -49,6 +50,7 @@ export class UpdateDishDto {
   @ApiPropertyOptional({
     description: 'The list of ingredients',
   })
+  @ArrayMinSize(1)
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

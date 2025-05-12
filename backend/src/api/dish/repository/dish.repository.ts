@@ -49,6 +49,12 @@ export class DishRepository {
       where: { id },
     });
     if (!dish) throw new NotFoundException('Dish not found');
+    const categoryExists = await this.prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+    if (!categoryExists)
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+
     return await this.prisma.dish.update({
       where: { id },
       data: { categoryId },

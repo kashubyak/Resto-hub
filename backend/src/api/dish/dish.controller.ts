@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -41,6 +43,7 @@ export class DishController {
     description: 'Dish with this name already exists.',
     type: HttpErrorResponseDto,
   })
+  @HttpCode(HttpStatus.CREATED)
   createDish(@Body() dto: CreateDishDto) {
     return this.dishService.createDish(dto);
   }
@@ -51,6 +54,7 @@ export class DishController {
     description: 'A list of all available dishes.',
     type: [DishEntity],
   })
+  @HttpCode(HttpStatus.OK)
   findAll() {
     return this.dishService.findAll();
   }
@@ -65,6 +69,7 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
+  @HttpCode(HttpStatus.OK)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.findOne(id);
   }
@@ -80,6 +85,7 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
+  @HttpCode(HttpStatus.OK)
   updateDish(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateDishDto,
@@ -97,6 +103,7 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
+  @HttpCode(HttpStatus.OK)
   removeDish(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.removeDish(id);
   }
@@ -112,6 +119,7 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
+  @HttpCode(HttpStatus.OK)
   removeCategoryFromDish(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.removeDishFromCategory(id);
   }
@@ -128,6 +136,7 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
+  @HttpCode(HttpStatus.OK)
   assignCategory(
     @Param('id', ParseIntPipe) dishId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,
