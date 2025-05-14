@@ -8,12 +8,27 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import {
+  ConflictResponseDto,
+  HttpErrorResponseDto,
+} from 'src/common/dto/http-error.dto';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CategoryEntity } from './entities/category.entity';
+import {
+  CategoryEntity,
+  CreateCategoryEntity,
+} from './entities/category.entity';
 
 @ApiTags('Categories')
 @ApiBearerAuth()
@@ -23,24 +38,52 @@ export class CategoryController {
 
   @Post('create')
   @Roles('ADMIN')
+  @ApiOperation({ description: 'Create a new category' })
   @ApiCreatedResponse({
     description: 'The category has been successfully created.',
-    type: CategoryEntity,
+    type: CreateCategoryEntity,
+  })
+  @ApiConflictResponse({
+    description: 'Category with this name already exists.',
+    type: ConflictResponseDto,
   })
   createCategory(@Body() dto: CreateCategoryDto) {
     return this.categoryService.createCategory(dto);
   }
 
+  @ApiOperation({ description: 'Get a list of all categories' })
+  @ApiOkResponse({
+    description: 'A list of all available categories.',
+    type: [CategoryEntity],
+  })
   @Get()
   getAllCategories() {
     return this.categoryService.getAllCategories();
   }
 
+  @ApiOperation({ description: 'Get a category by ID' })
+  @ApiOkResponse({
+    description: 'The category has been successfully retrieved.',
+    type: CreateCategoryEntity,
+  })
+  @ApiNotFoundResponse({
+    description: 'Category with this ID does not exist.',
+    type: HttpErrorResponseDto,
+  })
   @Get(':id')
   getCategoryById(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.getCategoryById(id);
   }
 
+  @ApiOperation({ description: 'Update a category by ID' })
+  @ApiOkResponse({
+    description: 'The category has been successfully updated.',
+    type: CreateCategoryEntity,
+  })
+  @ApiNotFoundResponse({
+    description: 'Category with the given ID was not found.',
+    type: HttpErrorResponseDto,
+  })
   @Patch(':id')
   @Roles('ADMIN')
   updateCategory(
@@ -50,6 +93,15 @@ export class CategoryController {
     return this.categoryService.updateCategory(id, dto);
   }
 
+  @ApiOperation({ description: 'Delete a category by ID' })
+  @ApiOkResponse({
+    description: 'The category has been successfully deleted.',
+    type: CreateCategoryEntity,
+  })
+  @ApiNotFoundResponse({
+    description: 'Category with the given ID was not found.',
+    type: HttpErrorResponseDto,
+  })
   @Delete(':id')
   @Roles('ADMIN')
   deleteCategory(@Param('id', ParseIntPipe) id: number) {

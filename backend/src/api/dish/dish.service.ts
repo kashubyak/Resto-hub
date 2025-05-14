@@ -10,11 +10,11 @@ export class DishService {
   createDish(dto: CreateDishDto) {
     return this.dishRepo.createDish(dto);
   }
-  findAll() {
-    return this.dishRepo.findAll();
+  getAllDishes() {
+    return this.dishRepo.getAllDishes();
   }
-  findOne(id: number) {
-    return this.dishRepo.findOne(id);
+  getDishById(id: number) {
+    return this.dishRepo.getDishById(id);
   }
   updateDish(id: number, dto: UpdateDishDto) {
     return this.dishRepo.updateDish(id, dto);

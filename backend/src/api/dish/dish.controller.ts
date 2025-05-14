@@ -20,7 +20,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { HttpErrorResponseDto } from 'src/common/dto/http-error.dto';
+import {
+  ConflictResponseDto,
+  HttpErrorResponseDto,
+} from 'src/common/dto/http-error.dto';
 import { DishService } from './dish.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
@@ -41,7 +44,7 @@ export class DishController {
   })
   @ApiConflictResponse({
     description: 'Dish with this name already exists.',
-    type: HttpErrorResponseDto,
+    type: ConflictResponseDto,
   })
   @HttpCode(HttpStatus.CREATED)
   createDish(@Body() dto: CreateDishDto) {
@@ -55,8 +58,8 @@ export class DishController {
     type: [DishEntity],
   })
   @HttpCode(HttpStatus.OK)
-  findAll() {
-    return this.dishService.findAll();
+  getAllDishes() {
+    return this.dishService.getAllDishes();
   }
 
   @Get(':id')
@@ -70,8 +73,8 @@ export class DishController {
     type: HttpErrorResponseDto,
   })
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.dishService.findOne(id);
+  getDishById(@Param('id', ParseIntPipe) id: number) {
+    return this.dishService.getDishById(id);
   }
 
   @Patch(':id')

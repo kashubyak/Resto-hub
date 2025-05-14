@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Category } from '@prisma/client';
 import { DishEntity } from 'src/api/dish/entities/dish.entity';
 
@@ -21,3 +21,7 @@ export class CategoryEntity implements Category {
   })
   dishes?: DishEntity[];
 }
+
+export class CreateCategoryEntity extends OmitType(CategoryEntity, [
+  'dishes',
+]) {}

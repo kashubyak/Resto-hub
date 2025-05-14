@@ -10,12 +10,12 @@ export class DishRepository {
   async createDish(dto: CreateDishDto) {
     return await this.prisma.dish.create({ data: dto });
   }
-  async findAll() {
+  async getAllDishes() {
     return await this.prisma.dish.findMany({
       include: { category: true },
     });
   }
-  async findOne(id: number) {
+  async getDishById(id: number) {
     const dish = await this.prisma.dish.findUnique({
       where: { id },
       include: { category: true },
