@@ -12,13 +12,13 @@ export class DishRepository {
   }
   async findAll() {
     return await this.prisma.dish.findMany({
-      include: { Category: true },
+      include: { category: true },
     });
   }
   async findOne(id: number) {
     const dish = await this.prisma.dish.findUnique({
       where: { id },
-      include: { Category: true },
+      include: { category: true },
     });
     if (!dish) throw new NotFoundException('Dish not found');
     return dish;
