@@ -41,7 +41,7 @@ describe('DishController (e2e)', () => {
     ingredients: ['New Ingredient'],
     weightGr: 600,
     calories: 700,
-    categoryId: null, // Для тесту зміни категорії
+    categoryId: null,
   };
 
   const categoryData = { name: 'Test Category' };
@@ -90,17 +90,10 @@ describe('DishController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await prisma.dish.deleteMany({ where: { name: dishData.name } });
-    const createRes = await request(server)
-      .post('/dish/create')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ ...dishData, categoryId })
-      .expect(201);
-    dishId = createRes.body.id;
+    await prisma.dish.deleteMany();
   });
 
   afterAll(async () => {
-    await prisma.dish.deleteMany();
     await prisma.category.deleteMany();
     await prisma.user.deleteMany();
     await app.close();
@@ -109,6 +102,7 @@ describe('DishController (e2e)', () => {
   it('should create a new dish and verify all its details', async () => {
     await prisma.dish.deleteMany({ where: { name: 'New Test Dish' } });
     const newDishData = { ...dishData, name: 'New Test Dish' };
+
     const res = await request(server)
       .post('/dish/create')
       .set('Authorization', `Bearer ${adminToken}`)
@@ -125,9 +119,17 @@ describe('DishController (e2e)', () => {
     expect(res.body.calories).toBe(newDishData.calories);
     expect(res.body.available).toBe(newDishData.available);
     expect(res.body.categoryId).toBe(categoryId);
+
+    dishId = res.body.id;
   });
 
   it('should return conflict when creating a duplicate dish', async () => {
+    await request(server)
+      .post('/dish/create')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ...dishData, categoryId })
+      .expect(201);
+
     const res = await request(server)
       .post('/dish/create')
       .set('Authorization', `Bearer ${adminToken}`)
@@ -139,6 +141,12 @@ describe('DishController (e2e)', () => {
   });
 
   it('should return all dishes', async () => {
+    await request(server)
+      .post('/dish/create')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ...dishData, categoryId })
+      .expect(201);
+
     const res = await request(server)
       .get('/dish')
       .set('Authorization', `Bearer ${adminToken}`)
@@ -149,6 +157,13 @@ describe('DishController (e2e)', () => {
   });
 
   it('should get dish by ID and verify all its details', async () => {
+    const createRes = await request(server)
+      .post('/dish/create')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ...dishData, categoryId })
+      .expect(201);
+    dishId = createRes.body.id;
+
     const res = await request(server)
       .get(`/dish/${dishId}`)
       .set('Authorization', `Bearer ${adminToken}`)
@@ -166,6 +181,13 @@ describe('DishController (e2e)', () => {
   });
 
   it('should update the dish and verify changes to multiple fields', async () => {
+    const createRes = await request(server)
+      .post('/dish/create')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ...dishData, categoryId })
+      .expect(201);
+    dishId = createRes.body.id;
+
     const res = await request(server)
       .patch(`/dish/${dishId}`)
       .set('Authorization', `Bearer ${adminToken}`)
@@ -185,6 +207,13 @@ describe('DishController (e2e)', () => {
   });
 
   it('should delete the dish', async () => {
+    const createRes = await request(server)
+      .post('/dish/create')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ...dishData, categoryId })
+      .expect(201);
+    dishId = createRes.body.id;
+
     await request(server)
       .delete(`/dish/${dishId}`)
       .set('Authorization', `Bearer ${adminToken}`)
@@ -225,6 +254,13 @@ describe('DishController (e2e)', () => {
   });
 
   it('should remove category from dish', async () => {
+    const createRes = await request(server)
+      .post('/dish/create')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ...dishData, categoryId })
+      .expect(201);
+    dishId = createRes.body.id;
+
     const res = await request(server)
       .patch(`/dish/${dishId}/remove-category`)
       .set('Authorization', `Bearer ${adminToken}`)
@@ -235,6 +271,13 @@ describe('DishController (e2e)', () => {
   });
 
   it('should assign a category to a dish', async () => {
+    const createRes = await request(server)
+      .post('/dish/create')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ...dishData })
+      .expect(201);
+    dishId = createRes.body.id;
+
     const res = await request(server)
       .patch(`/dish/${dishId}/assign-category/${newCategoryId}`)
       .set('Authorization', `Bearer ${adminToken}`)
@@ -245,6 +288,13 @@ describe('DishController (e2e)', () => {
   });
 
   it('should return 404 when trying to assign non-existing category to a dish', async () => {
+    const createRes = await request(server)
+      .post('/dish/create')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ...dishData, categoryId })
+      .expect(201);
+    dishId = createRes.body.id;
+
     await request(server)
       .patch(`/dish/${dishId}/assign-category/${nonExistingId}`)
       .set('Authorization', `Bearer ${adminToken}`)
@@ -252,6 +302,13 @@ describe('DishController (e2e)', () => {
   });
 
   it('should assign a new category to a dish that already has one', async () => {
+    const createRes = await request(server)
+      .post('/dish/create')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ...dishData, categoryId })
+      .expect(201);
+    dishId = createRes.body.id;
+
     const res = await request(server)
       .patch(`/dish/${dishId}/assign-category/${newCategoryId}`)
       .set('Authorization', `Bearer ${adminToken}`)
@@ -262,10 +319,12 @@ describe('DishController (e2e)', () => {
   });
 
   it('should successfully handle removing category from a dish that has no category', async () => {
-    await request(server)
-      .patch(`/dish/${dishId}/remove-category`)
+    const createRes = await request(server)
+      .post('/dish/create')
       .set('Authorization', `Bearer ${adminToken}`)
-      .expect(200);
+      .send(dishData)
+      .expect(201);
+    dishId = createRes.body.id;
 
     const res = await request(server)
       .patch(`/dish/${dishId}/remove-category`)
@@ -274,5 +333,13 @@ describe('DishController (e2e)', () => {
 
     expect(res.body.id).toBe(dishId);
     expect(res.body.categoryId).toBeNull();
+
+    const res2 = await request(server)
+      .patch(`/dish/${dishId}/remove-category`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+
+    expect(res2.body.id).toBe(dishId);
+    expect(res2.body.categoryId).toBeNull();
   });
 });
