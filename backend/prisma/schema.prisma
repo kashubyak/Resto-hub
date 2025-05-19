@@ -12,13 +12,43 @@ model User {
   name      String
   email     String   @unique
   password  String
-  role      Role     @default(WAITER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      Role
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
 }
 
 enum Role {
   ADMIN
   COOK
   WAITER
+}
+
+model Dish {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String
+  price       Float
+  imageUrl    String    @map("image_url")
+  categoryId  Int?
+  ingredients String[]
+  weightGr    Int?      @map("weight_gr")
+  calories    Int?
+  available   Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  category    Category? @relation(fields: [categoryId], references: [id])
+
+  @@map("dishes")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  dishes    Dish[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("categories")
 }

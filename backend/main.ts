@@ -1,16 +1,24 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { PrismaExceptionFilter } from 'src/common/filters/prisma-exception.filter';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.use(cookieParser());
-
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+  app.useGlobalFilters(new PrismaExceptionFilter());
   const config = new DocumentBuilder()
-    .setTitle('RestoHub API')
-    .setDescription('API for authentication and user management')
+    .setTitle('Resto-Hub API')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -29,7 +37,6 @@ async function bootstrap() {
     swaggerOptions: {
       persistAuthorization: true,
       displayRequestDuration: true,
-      docExpansion: 'none',
     },
   });
 
