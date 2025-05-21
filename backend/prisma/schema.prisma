@@ -7,6 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  COOK
+  WAITER
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
@@ -16,31 +29,10 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  waiterOrders Order[] @relation("WaiterOrders")
+  cookOrders   Order[] @relation("CookOrders")
+
   @@map("users")
-}
-
-enum Role {
-  ADMIN
-  COOK
-  WAITER
-}
-
-model Dish {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  description String
-  price       Float
-  imageUrl    String    @map("image_url")
-  categoryId  Int?
-  ingredients String[]
-  weightGr    Int?      @map("weight_gr")
-  calories    Int?
-  available   Boolean   @default(true)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  category    Category? @relation(fields: [categoryId], references: [id])
-
-  @@map("dishes")
 }
 
 model Category {
@@ -51,4 +43,74 @@ model Category {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("categories")
+}
+
+model Dish {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String
+  price       Float
+  imageUrl    String   @map("image_url")
+  categoryId  Int?
+  ingredients String[]
+  weightGr    Int?     @map("weight_gr")
+  calories    Int?
+  available   Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  category   Category?   @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+
+  @@map("dishes")
+}
+
+model Order {
+  id       Int         @id @default(autoincrement())
+  waiterId Int
+  cookId   Int?
+  status   OrderStatus @default(PENDING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  waiter     User        @relation("WaiterOrders", fields: [waiterId], references: [id])
+  cook       User?       @relation("CookOrders", fields: [cookId], references: [id])
+  orderItems OrderItem[]
+  Table      Table?      @relation(fields: [tableId], references: [id])
+  tableId    Int?
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([waiterId])
+  @@index([cookId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id       Int     @id @default(autoincrement())
+  orderId  Int
+  dishId   Int
+  quantity Int
+  price    Float
+  notes    String?
+
+  order Order @relation(fields: [orderId], references: [id])
+  dish  Dish  @relation(fields: [dishId], references: [id])
+
+  @@index([dishId])
+  @@map("order_items")
+}
+
+model Table {
+  id        Int      @id @default(autoincrement())
+  number    Int      @unique
+  seats     Int
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@map("tables")
 }
