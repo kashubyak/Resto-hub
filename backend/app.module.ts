@@ -6,6 +6,8 @@ import { join } from 'path';
 import { PrismaService } from 'prisma/prisma.service';
 import { CategoryModule } from 'src/api/category/category.module';
 import { DishModule } from 'src/api/dish/dish.module';
+import { OrderModule } from 'src/api/order/order.module';
+import { TableModule } from 'src/api/table/table.module';
 import { PrismaExceptionFilter } from 'src/common/filters/prisma-exception.filter';
 import { AuthModule } from './src/api/auth/auth.module';
 
@@ -22,6 +24,8 @@ import { AuthModule } from './src/api/auth/auth.module';
     AuthModule,
     CategoryModule,
     DishModule,
+    OrderModule,
+    TableModule,
   ],
   providers: [
     PrismaService,
