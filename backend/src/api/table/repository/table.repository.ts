@@ -21,8 +21,13 @@ export class TableRepository {
     return await this.prismaService.table.findMany();
   }
   async getTableById(id: number) {
-    return await this.prismaService.table.findUnique({ where: { id } });
+    const table = await this.prismaService.table.findUnique({ where: { id } });
+    if (!table) {
+      throw new NotFoundException(`Table with id ${id} not found`);
+    }
+    return table;
   }
+
   async updateTable(id: number, dto: UpdateTableDto) {
     const existing = await this.prismaService.table.findUnique({
       where: { id },
