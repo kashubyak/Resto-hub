@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDishDto } from './dto/create-dish.dto';
+import { FilterDishDto } from './dto/filter-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { DishRepository } from './repository/dish.repository';
 
@@ -12,6 +13,9 @@ export class DishService {
   }
   getAllDishes() {
     return this.dishRepo.getAllDishes();
+  }
+  filterDishes(query: FilterDishDto) {
+    return this.dishRepo.filterDishes(query);
   }
   getDishById(id: number) {
     return this.dishRepo.getDishById(id);

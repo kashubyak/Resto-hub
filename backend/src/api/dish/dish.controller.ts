@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -26,6 +27,7 @@ import {
 } from 'src/common/dto/http-error.dto';
 import { DishService } from './dish.service';
 import { CreateDishDto } from './dto/create-dish.dto';
+import { FilterDishDto } from './dto/filter-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { DishEntity } from './entities/dish.entity';
 
@@ -60,6 +62,16 @@ export class DishController {
   @HttpCode(HttpStatus.OK)
   getAllDishes() {
     return this.dishService.getAllDishes();
+  }
+
+  @Get('search')
+  @ApiOperation({ description: 'Search and filter dishes with pagination' })
+  @ApiOkResponse({
+    description: 'Filtered and sorted list of dishes',
+    type: [DishEntity],
+  })
+  getFilteredDishes(@Query() query: FilterDishDto) {
+    return this.dishService.filterDishes(query);
   }
 
   @Get(':id')
