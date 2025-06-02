@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'app.module';
 import { PrismaService } from 'prisma/prisma.service';
 import * as request from 'supertest';
+import { getAuthToken } from 'test/utils/auth-test';
 
 describe('Table e2e', () => {
   let app: INestApplication;
@@ -21,9 +22,6 @@ describe('Table e2e', () => {
 
     prisma = app.get(PrismaService);
 
-    await prisma.table.deleteMany();
-    await prisma.user.deleteMany();
-
     const adminDto = {
       email: 'admin@admin.com',
       password: 'adminpass',
@@ -31,21 +29,24 @@ describe('Table e2e', () => {
       role: 'ADMIN',
     };
 
-    await request(app.getHttpServer())
-      .post('/auth/register')
-      .send(adminDto)
+    access_token = await getAuthToken(app, adminDto);
+    if (!access_token)
+      throw new Error('Admin token not received for table tests');
+  });
+
+  beforeEach(async () => {
+    await prisma.table.deleteMany();
+    const dto = { number: 1, seats: 4 };
+    const res = await request(app.getHttpServer())
+      .post('/table/create')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send(dto)
       .expect(201);
-
-    const loginRes = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({ email: adminDto.email, password: adminDto.password })
-      .expect(200);
-
-    access_token = loginRes.body.token;
+    createdTableId = res.body.id;
   });
 
   it('should create a table', async () => {
-    const dto = { number: 1, seats: 4 };
+    const dto = { number: 2, seats: 5 };
 
     const res = await request(app.getHttpServer())
       .post('/table/create')
@@ -56,8 +57,6 @@ describe('Table e2e', () => {
     expect(res.body).toHaveProperty('id');
     expect(res.body.number).toBe(dto.number);
     expect(res.body.seats).toBe(dto.seats);
-
-    createdTableId = res.body.id;
   });
 
   it('should not allow duplicate table number', async () => {
@@ -77,7 +76,7 @@ describe('Table e2e', () => {
       .expect(200);
 
     expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBeGreaterThan(0);
+    expect(res.body.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should get one table by id', async () => {
@@ -104,7 +103,7 @@ describe('Table e2e', () => {
   });
 
   it('should update a table', async () => {
-    const dto = { number: 2, seats: 6 };
+    const dto = { number: 3, seats: 7 };
 
     const res = await request(app.getHttpServer())
       .patch(`/table/${createdTableId}`)
@@ -127,13 +126,21 @@ describe('Table e2e', () => {
   });
 
   it('should delete a table', async () => {
+    const newTableDto = { number: 4, seats: 2 };
+    const createRes = await request(app.getHttpServer())
+      .post('/table/create')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send(newTableDto)
+      .expect(201);
+    const tableToDeleteId = createRes.body.id;
+
     await request(app.getHttpServer())
-      .delete(`/table/${createdTableId}`)
+      .delete(`/table/${tableToDeleteId}`)
       .set('Authorization', `Bearer ${access_token}`)
       .expect(200);
 
     await request(app.getHttpServer())
-      .get(`/table/${createdTableId}`)
+      .get(`/table/${tableToDeleteId}`)
       .set('Authorization', `Bearer ${access_token}`)
       .expect(404);
   });

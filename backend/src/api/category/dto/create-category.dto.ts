@@ -6,6 +6,8 @@ export class CreateCategoryDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
-  @MinLength(3)
+  @MinLength(3, {
+    message: 'name must be longer than or equal to 3 characters',
+  })
   name: string;
 }

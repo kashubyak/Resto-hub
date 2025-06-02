@@ -4,6 +4,7 @@ import { AppModule } from 'app.module';
 import * as cookieParser from 'cookie-parser';
 import { PrismaService } from 'prisma/prisma.service';
 import * as request from 'supertest';
+import { getAuthToken } from 'test/utils/auth-test';
 
 describe('Category (e2e)', () => {
   let app: INestApplication;
@@ -18,17 +19,17 @@ describe('Category (e2e)', () => {
     name: 'Test Admin Cat',
     email: 'admincat@example.com',
     password: 'admincatpass123',
-    role: 'ADMIN',
+    role: 'ADMIN' as any,
   };
 
   const userCredentials = {
     name: 'Test User Cat',
     email: 'usercat@example.com',
     password: 'usercatpass123',
-    role: 'WAITER',
+    role: 'WAITER' as any,
   };
 
-  const categoryData = {
+  const initialCategoryData = {
     name: 'Initial Test Category',
   };
 
@@ -44,6 +45,48 @@ describe('Category (e2e)', () => {
     name: 'Updated Test Category E2E',
   };
 
+  async function cleanupUserAndRelatedData(
+    prismaInstance: PrismaService,
+    userEmail: string,
+  ) {
+    const user = await prismaInstance.user.findUnique({
+      where: { email: userEmail },
+      select: {
+        id: true,
+        waiterOrders: { select: { id: true } },
+        cookOrders: { select: { id: true } },
+      },
+    });
+
+    if (user) {
+      const orderIdsFromWaiter = user.waiterOrders.map((o) => o.id);
+      const orderIdsFromCook = user.cookOrders
+        ? user.cookOrders.map((o) => o.id)
+        : [];
+
+      const allAssociatedOrderIds = [
+        ...new Set([...orderIdsFromWaiter, ...orderIdsFromCook]),
+      ];
+
+      if (allAssociatedOrderIds.length > 0) {
+        await prismaInstance.orderItem.deleteMany({
+          where: { orderId: { in: allAssociatedOrderIds } },
+        });
+
+        await prismaInstance.order.deleteMany({
+          where: { id: { in: allAssociatedOrderIds } },
+        });
+      }
+      await prismaInstance.user.deleteMany({
+        where: { email: userEmail },
+      });
+    } else {
+      await prismaInstance.user.deleteMany({
+        where: { email: userEmail },
+      });
+    }
+  }
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -58,44 +101,19 @@ describe('Category (e2e)', () => {
       }),
     );
     app.use(cookieParser());
-
     prisma = app.get(PrismaService);
 
-    await prisma.user.deleteMany({
-      where: { email: { in: [adminCredentials.email, userCredentials.email] } },
-    });
-    await prisma.category.deleteMany();
+    await cleanupUserAndRelatedData(prisma, adminCredentials.email);
+    await cleanupUserAndRelatedData(prisma, userCredentials.email);
 
     await app.init();
     server = app.getHttpServer();
 
-    await request(server)
-      .post('/auth/register')
-      .send(adminCredentials)
-      .expect(201);
-    const adminLoginRes = await request(server)
-      .post('/auth/login')
-      .send({
-        email: adminCredentials.email,
-        password: adminCredentials.password,
-      })
-      .expect(200);
-    adminToken = adminLoginRes.body.token;
-    expect(adminToken).toBeDefined();
+    adminToken = await getAuthToken(app, adminCredentials);
+    if (!adminToken) throw new Error('Admin token not received');
 
-    await request(server)
-      .post('/auth/register')
-      .send(userCredentials)
-      .expect(201);
-    const userLoginRes = await request(server)
-      .post('/auth/login')
-      .send({
-        email: userCredentials.email,
-        password: userCredentials.password,
-      })
-      .expect(200);
-    userToken = userLoginRes.body.token;
-    expect(userToken).toBeDefined();
+    userToken = await getAuthToken(app, userCredentials);
+    if (!userToken) throw new Error('User token not received');
   });
 
   beforeEach(async () => {
@@ -103,17 +121,27 @@ describe('Category (e2e)', () => {
     const res = await request(server)
       .post('/category/create')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send(categoryData);
-    if (res.status === 201) {
-      categoryId = res.body.id;
+      .send(initialCategoryData);
+
+    if (res.status !== 201) {
+      console.error(
+        'Failed to create initial category in beforeEach for Category tests:',
+        res.status,
+        res.body,
+      );
+      throw new Error('Failed to create initial category in beforeEach');
+    }
+    categoryId = res.body.id;
+    if (!categoryId) {
+      throw new Error(
+        'Initial category ID is undefined after creation in beforeEach',
+      );
     }
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany({
-      where: { email: { in: [adminCredentials.email, userCredentials.email] } },
-    });
-    await prisma.category.deleteMany();
+    await cleanupUserAndRelatedData(prisma, adminCredentials.email);
+    await cleanupUserAndRelatedData(prisma, userCredentials.email);
     await app.close();
   });
 
@@ -136,16 +164,10 @@ describe('Category (e2e)', () => {
     });
 
     it('should return 409 Conflict when creating a category with an existing name', async () => {
-      await request(server)
-        .post('/category/create')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send(createCategoryDto)
-        .expect(201);
-
       const res = await request(server)
         .post('/category/create')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send(createCategoryDto)
+        .send(initialCategoryData)
         .expect(409);
 
       expect(res.body.message).toContain(
@@ -182,30 +204,6 @@ describe('Category (e2e)', () => {
     });
   });
 
-  describe('GET /category', () => {
-    it('should get all categories', async () => {
-      const res = await request(server)
-        .get('/category')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBeGreaterThanOrEqual(1);
-      expect(res.body.some((cat) => cat.name === categoryData.name)).toBe(true);
-    });
-
-    it('should return an empty array if no categories exist', async () => {
-      await prisma.category.deleteMany();
-      const res = await request(server)
-        .get('/category')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBe(0);
-    });
-  });
-
   describe('GET /category/:id', () => {
     it('should get a category by ID', async () => {
       expect(categoryId).toBeDefined();
@@ -215,7 +213,7 @@ describe('Category (e2e)', () => {
         .expect(200);
 
       expect(res.body.id).toBe(categoryId);
-      expect(res.body.name).toBe(categoryData.name);
+      expect(res.body.name).toBe(initialCategoryData.name);
     });
 
     it('should return 404 for non-existing category ID', async () => {
@@ -290,7 +288,9 @@ describe('Category (e2e)', () => {
     });
 
     it('should return 409 Conflict when updating name to an already existing name', async () => {
-      const secondCategoryDto = { name: 'Another Unique Category' };
+      const secondCategoryDto = {
+        name: 'Another Unique Category for Patch Test',
+      };
       const secondCatRes = await request(server)
         .post('/category/create')
         .set('Authorization', `Bearer ${adminToken}`)
@@ -301,7 +301,7 @@ describe('Category (e2e)', () => {
       await request(server)
         .patch(`/category/${secondCategoryId}`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ name: categoryData.name })
+        .send({ name: initialCategoryData.name })
         .expect(409);
     });
   });

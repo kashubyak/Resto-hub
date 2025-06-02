@@ -13,7 +13,8 @@
     "paths": {
       "src/*": ["src/*"],
       "app.module": ["app.module.ts"],
-      "prisma/*": ["prisma/*"]
+      "prisma/*": ["prisma/*"],
+      "test/*": ["test/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

@@ -11,9 +11,6 @@ export class DishService {
   createDish(dto: CreateDishDto) {
     return this.dishRepo.createDish(dto);
   }
-  getAllDishes() {
-    return this.dishRepo.getAllDishes();
-  }
   filterDishes(query: FilterDishDto) {
     return this.dishRepo.filterDishes(query);
   }

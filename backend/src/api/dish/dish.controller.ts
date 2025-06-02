@@ -53,17 +53,6 @@ export class DishController {
     return this.dishService.createDish(dto);
   }
 
-  @Get()
-  @ApiOperation({ description: 'Get a list of all dishes' })
-  @ApiOkResponse({
-    description: 'A list of all available dishes.',
-    type: [DishEntity],
-  })
-  @HttpCode(HttpStatus.OK)
-  getAllDishes() {
-    return this.dishService.getAllDishes();
-  }
-
   @Get('search')
   @ApiOperation({ description: 'Search and filter dishes with pagination' })
   @ApiOkResponse({

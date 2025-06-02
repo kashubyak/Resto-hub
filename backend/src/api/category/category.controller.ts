@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -24,6 +25,7 @@ import {
 } from 'src/common/dto/http-error.dto';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { FilterCategoryDto } from './dto/filter-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import {
   CategoryEntity,
@@ -51,14 +53,14 @@ export class CategoryController {
     return this.categoryService.createCategory(dto);
   }
 
-  @ApiOperation({ description: 'Get a list of all categories' })
+  @Get('search')
+  @ApiOperation({ description: 'Search and filter categories with pagination' })
   @ApiOkResponse({
-    description: 'A list of all available categories.',
+    description: 'Filtered and sorted list of categories',
     type: [CategoryEntity],
   })
-  @Get()
-  getAllCategories() {
-    return this.categoryService.getAllCategories();
+  getFilterCategories(@Query() query: FilterCategoryDto) {
+    return this.categoryService.filterCategories(query);
   }
 
   @ApiOperation({ description: 'Get a category by ID' })

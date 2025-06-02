@@ -11,16 +11,10 @@ export class DishRepository {
   async createDish(dto: CreateDishDto) {
     return await this.prisma.dish.create({ data: dto });
   }
-  async getAllDishes() {
-    return await this.prisma.dish.findMany({
-      include: { category: true },
-    });
-  }
 
   async filterDishes(query: FilterDishDto) {
     const {
       search,
-      categoryId,
       minPrice,
       maxPrice,
       available,
@@ -32,15 +26,9 @@ export class DishRepository {
 
     const where: any = {};
 
-    if (search) {
-      where.name = { contains: search, mode: 'insensitive' };
-    }
-    if (categoryId) {
-      where.categoryId = categoryId;
-    }
-    if (available !== undefined) {
-      where.available = available;
-    }
+    if (search) where.name = { contains: search, mode: 'insensitive' };
+    if (available !== undefined) where.available = available;
+
     if (minPrice !== undefined || maxPrice !== undefined) {
       where.price = {};
       if (minPrice !== undefined) where.price.gte = minPrice;

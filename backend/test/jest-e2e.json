@@ -2,12 +2,14 @@
   "rootDir": "../",
   "preset": "ts-jest",
   "testEnvironment": "node",
+  "setupFiles": ["<rootDir>/test/setup.ts"],
   "moduleFileExtensions": ["js", "json", "ts"],
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "testMatch": ["**/test/**/*.e2e-spec.ts"],
   "moduleNameMapper": {
+    "^test/(.*)$": "<rootDir>/test/$1",
     "^src/(.*)$": "<rootDir>/src/$1",
     "^app.module$": "<rootDir>/app.module.ts",
     "^prisma/(.*)$": "<rootDir>/prisma/$1"

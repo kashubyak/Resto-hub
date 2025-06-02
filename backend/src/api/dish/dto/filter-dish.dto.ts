@@ -15,11 +15,6 @@ export class FilterDishDto {
 
   @IsOptional()
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  @IsNumber({}, { message: 'categoryId must be a number' })
-  categoryId?: number;
-
-  @IsOptional()
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
   @IsNumber({}, { message: 'minPrice must be a number' })
   minPrice?: number;
 
