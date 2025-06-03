@@ -19,14 +19,14 @@ describe('Category (e2e)', () => {
     name: 'Test Admin Cat',
     email: 'admincat@example.com',
     password: 'admincatpass123',
-    role: 'ADMIN' as any,
+    role: 'ADMIN',
   };
 
   const userCredentials = {
     name: 'Test User Cat',
     email: 'usercat@example.com',
     password: 'usercatpass123',
-    role: 'WAITER' as any,
+    role: 'WAITER',
   };
 
   const initialCategoryData = {
@@ -201,6 +201,113 @@ describe('Category (e2e)', () => {
         .post('/category/create')
         .send(createCategoryDto)
         .expect(401);
+    });
+  });
+
+  describe('GET /category/search', () => {
+    it('should return all categories by default with pagination', async () => {
+      const res = await request(server)
+        .get('/category/search')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(res.body).toHaveProperty('items');
+      expect(res.body.items.length).toBeGreaterThanOrEqual(1);
+      expect(res.body).toHaveProperty('total');
+      expect(res.body).toHaveProperty('page', 1);
+      expect(res.body).toHaveProperty('limit', 10);
+    });
+
+    it('should filter categories by search term (case-insensitive)', async () => {
+      await prisma.category.create({
+        data: { name: 'UniqueSearchCategory' },
+      });
+
+      const res = await request(server)
+        .get('/category/search?search=search')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(res.body.items.length).toBe(1);
+      expect(res.body.items[0].name).toBe('UniqueSearchCategory');
+    });
+
+    it('should filter categories that have dishes (hasDishes=true)', async () => {
+      const categoryWithDish = await prisma.category.create({
+        data: {
+          name: 'CategoryWithDish',
+          dishes: {
+            create: {
+              name: 'Dish in Category',
+              description: 'Tasty',
+              price: 9.99,
+              imageUrl: 'http://example.com/image.jpg',
+              ingredients: ['ingredient1'],
+            },
+          },
+        },
+        include: { dishes: true },
+      });
+
+      const res = await request(server)
+        .get('/category/search?hasDishes=true')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(res.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: categoryWithDish.id }),
+        ]),
+      );
+    });
+
+    it('should filter categories without dishes (hasDishes=false)', async () => {
+      await prisma.category.create({
+        data: {
+          name: 'CategoryWithoutDish',
+        },
+      });
+
+      const res = await request(server)
+        .get('/category/search?hasDishes=false')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      for (const item of res.body.items) {
+        expect(item.dishes).toEqual([]);
+      }
+    });
+
+    it('should sort categories by name in ascending order', async () => {
+      await prisma.category.createMany({
+        data: [{ name: 'AlphaCat' }, { name: 'BetaCat' }, { name: 'GammaCat' }],
+      });
+
+      const res = await request(server)
+        .get('/category/search?sortBy=name&order=asc&limit=100')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      const names = res.body.items.map((cat: any) => cat.name);
+      const sorted = [...names].sort((a, b) => a.localeCompare(b));
+      expect(names).toEqual(sorted);
+    });
+
+    it('should respect pagination params', async () => {
+      await prisma.category.createMany({
+        data: Array.from({ length: 15 }, (_, i) => ({
+          name: `PaginatedCat${i + 1}`,
+        })),
+      });
+
+      const res = await request(server)
+        .get('/category/search?page=2&limit=5')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(res.body.page).toBe(2);
+      expect(res.body.limit).toBe(5);
+      expect(res.body.items.length).toBe(5);
     });
   });
 
