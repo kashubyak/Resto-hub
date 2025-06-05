@@ -37,7 +37,7 @@ export class DishRepository {
 
     const skip = (page - 1) * limit;
 
-    const [items, total] = await this.prisma.$transaction([
+    const [items, total] = await Promise.all([
       this.prisma.dish.findMany({
         where,
         include: { category: true },

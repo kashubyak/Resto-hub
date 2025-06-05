@@ -36,4 +36,43 @@ export class OrderRepository {
     }
     return priceMap;
   }
+
+  async findAll(
+    where: any,
+    options: { skip: number; take: number; orderBy: any },
+  ) {
+    return await this.prisma.order.findMany({
+      where,
+      skip: options.skip,
+      take: options.take,
+      orderBy: options.orderBy,
+      include: {
+        waiter: {
+          select: { id: true, name: true },
+        },
+        cook: {
+          select: { id: true, name: true },
+        },
+        Table: {
+          select: { id: true, number: true },
+        },
+        orderItems: {
+          select: {
+            dish: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            price: true,
+            quantity: true,
+          },
+        },
+      },
+    });
+  }
+
+  async count(where: any) {
+    return await this.prisma.order.count({ where });
+  }
 }
