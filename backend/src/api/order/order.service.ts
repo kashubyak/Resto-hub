@@ -74,7 +74,7 @@ export class OrderService {
         total,
         waiter: order.waiter,
         cook: order.cook,
-        table: order.Table,
+        table: order.table,
         dishes: order.orderItems.map((item) => item.dish),
       };
     });
@@ -86,5 +86,9 @@ export class OrderService {
       limit,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async getOrderById(id: number) {
+    return this.orderRepository.findById(id);
   }
 }

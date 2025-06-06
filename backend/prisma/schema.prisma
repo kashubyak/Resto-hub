@@ -79,7 +79,7 @@ model Order {
   waiter     User        @relation("WaiterOrders", fields: [waiterId], references: [id])
   cook       User?       @relation("CookOrders", fields: [cookId], references: [id])
   orderItems OrderItem[]
-  Table      Table?      @relation(fields: [tableId], references: [id])
+  table      Table?      @relation(fields: [tableId], references: [id])
 
   @@index([createdAt])
   @@index([status])

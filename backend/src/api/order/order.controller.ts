@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CreateOrderDto } from './dto/create-order-dto';
@@ -22,5 +30,11 @@ export class OrderController {
   @Roles('ADMIN')
   getAllOrders(@Query() query: OrdersQueryDto) {
     return this.orderService.getAllOrders(query);
+  }
+
+  @Roles('ADMIN')
+  @Get(':id')
+  getOrderById(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.getOrderById(id);
   }
 }

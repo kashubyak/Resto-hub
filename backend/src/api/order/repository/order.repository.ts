@@ -53,7 +53,7 @@ export class OrderRepository {
         cook: {
           select: { id: true, name: true },
         },
-        Table: {
+        table: {
           select: { id: true, number: true },
         },
         orderItems: {
@@ -74,5 +74,60 @@ export class OrderRepository {
 
   async count(where: any) {
     return await this.prisma.order.count({ where });
+  }
+
+  async findById(id: number) {
+    return this.prisma.order.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        waiter: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        cook: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        table: {
+          select: {
+            id: true,
+            number: true,
+            seats: true,
+            active: true,
+          },
+        },
+        orderItems: {
+          select: {
+            price: true,
+            quantity: true,
+            dish: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                price: true,
+                imageUrl: true,
+                ingredients: true,
+                weightGr: true,
+                calories: true,
+                available: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 }
