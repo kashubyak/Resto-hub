@@ -34,13 +34,13 @@ export class OrdersQueryDto {
   @IsNumber()
   @Type(() => Number)
   @Min(1)
-  page?: number = 1;
+  page?: number;
 
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
   @Min(1)
-  limit: number = 10;
+  limit: number;
 
   @IsOptional()
   @IsString()

@@ -7,6 +7,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { Role } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CreateOrderDto } from './dto/create-order-dto';
@@ -32,7 +33,16 @@ export class OrderController {
     return this.orderService.getAllOrders(query);
   }
 
-  @Roles('ADMIN')
+  @Get('history')
+  @Roles('WAITER', 'COOK')
+  getOrderHistory(
+    @CurrentUser('id') userId: number,
+    @CurrentUser('role') role: Role,
+    @Query() query: OrdersQueryDto,
+  ) {
+    return this.orderService.getOrderHistory(userId, role, query);
+  }
+
   @Get(':id')
   getOrderById(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.getOrderById(id);

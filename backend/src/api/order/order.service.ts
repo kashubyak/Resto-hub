@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { OrderStatus, Role } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order-dto';
 import { OrdersQueryDto } from './dto/orders-query-dto';
 import { OrderEntity } from './entities/order.entity';
@@ -78,7 +79,6 @@ export class OrderService {
         dishes: order.orderItems.map((item) => item.dish),
       };
     });
-
     return {
       data: summarizedOrders,
       total,
@@ -90,5 +90,60 @@ export class OrderService {
 
   async getOrderById(id: number) {
     return this.orderRepository.findById(id);
+  }
+  async getOrderHistory(userId: number, role: Role, query: OrdersQueryDto) {
+    const where: any = {
+      status: {
+        in: [
+          OrderStatus.COMPLETE,
+          OrderStatus.DELIVERED,
+          OrderStatus.CANCELED,
+          OrderStatus.PENDING,
+        ],
+      },
+    };
+    if (role === 'WAITER') where.waiterId = userId;
+    if (role === 'COOK') where.cookId = userId;
+
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query;
+
+    const [orders, total] = await Promise.all([
+      this.orderRepository.findAll(where, {
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { [sortBy]: sortOrder },
+      }),
+      this.orderRepository.count(where),
+    ]);
+
+    const summarizedOrders = orders.map((order) => {
+      const total = order.orderItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+      return {
+        id: order.id,
+        status: order.status,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        total,
+        waiter: order.waiter,
+        cook: order.cook,
+        table: order.table,
+        dishes: order.orderItems.map((item) => item.dish),
+      };
+    });
+    return {
+      data: summarizedOrders,
+      total,
+      limit,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }
