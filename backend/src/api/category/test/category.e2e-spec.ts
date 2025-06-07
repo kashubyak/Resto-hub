@@ -171,7 +171,7 @@ describe('Category (e2e)', () => {
         .expect(409);
 
       expect(res.body.message).toContain(
-        'Record with this unique constraint already exists. Details: name',
+        'Category with this name already exists',
       );
     });
 

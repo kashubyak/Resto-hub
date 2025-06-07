@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { FilterDishDto } from './dto/filter-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
@@ -8,25 +8,55 @@ import { DishRepository } from './repository/dish.repository';
 export class DishService {
   constructor(private readonly dishRepo: DishRepository) {}
 
-  createDish(dto: CreateDishDto) {
+  async createDish(dto: CreateDishDto) {
     return this.dishRepo.createDish(dto);
   }
-  filterDishes(query: FilterDishDto) {
-    return this.dishRepo.filterDishes(query);
+
+  async filterDishes(query: FilterDishDto) {
+    const [items, total] = await this.dishRepo.findDishes(query);
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
-  getDishById(id: number) {
-    return this.dishRepo.getDishById(id);
+
+  async getDishById(id: number) {
+    const dish = await this.dishRepo.findById(id);
+    if (!dish) throw new NotFoundException('Dish not found');
+    return dish;
   }
-  updateDish(id: number, dto: UpdateDishDto) {
+
+  async updateDish(id: number, dto: UpdateDishDto) {
+    await this.ensureDishExists(id);
     return this.dishRepo.updateDish(id, dto);
   }
-  removeDish(id: number) {
-    return this.dishRepo.removeDish(id);
+
+  async removeDish(id: number) {
+    await this.ensureDishExists(id);
+    return this.dishRepo.deleteDish(id);
   }
-  removeDishFromCategory(id: number) {
-    return this.dishRepo.removeDishFromCategory(id);
+
+  async removeDishFromCategory(id: number) {
+    await this.ensureDishExists(id);
+    return this.dishRepo.removeCategory(id);
   }
-  assignDishToCategory(id: number, categoryId: number) {
-    return this.dishRepo.assignDishToCategory(id, categoryId);
+
+  async assignDishToCategory(id: number, categoryId: number) {
+    await this.ensureDishExists(id);
+    const category = await this.dishRepo.findCategoryById(categoryId);
+    if (!category)
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    return this.dishRepo.assignCategory(id, categoryId);
+  }
+
+  private async ensureDishExists(id: number) {
+    const dish = await this.dishRepo.findById(id);
+    if (!dish) throw new NotFoundException('Dish not found');
   }
 }

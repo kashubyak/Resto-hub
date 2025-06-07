@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { OrderStatus, Role } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order-dto';
 import { OrdersQueryDto } from './dto/orders-query-dto';
@@ -7,24 +11,25 @@ import { OrderRepository } from './repository/order.repository';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(private readonly orderRepo: OrderRepository) {}
+
   async createOrder(waiterId: number, dto: CreateOrderDto) {
     const dishIds = dto.items.map((item) => item.dishId);
-    const priceMap = await this.orderRepository.getDishPrices(dishIds);
-    const items = dto.items.map((item) => {
-      const price = priceMap.get(item.dishId);
-      if (!price) {
-        throw new Error(`Dish with ID ${item.dishId} not found`);
-      }
-      return {
-        dishId: item.dishId,
-        quantity: item.quantity,
-        price: price * item.quantity,
-        notes: item.notes,
-      };
-    });
+    const priceMap = await this.orderRepo.getDishPrices(dishIds);
+
+    if (priceMap.size !== dishIds.length)
+      throw new BadRequestException('Some dishes not found');
+
+    const items = dto.items.map((item) => ({
+      dishId: item.dishId,
+      quantity: item.quantity,
+      price: priceMap.get(item.dishId)! * item.quantity,
+      notes: item.notes,
+    }));
+
     const order = new OrderEntity(waiterId, dto.tableId, items);
-    return this.orderRepository.createOrder(order);
+
+    return this.orderRepo.createOrder(order);
   }
 
   async getAllOrders(query: OrdersQueryDto) {
@@ -52,13 +57,15 @@ export class OrderService {
       if (to) where.createdAt.lte = new Date(to);
     }
 
+    const skip = (page - 1) * limit;
+
     const [orders, total] = await Promise.all([
-      this.orderRepository.findAll(where, {
-        skip: (page - 1) * limit,
+      this.orderRepo.findAll(where, {
+        skip,
         take: limit,
         orderBy: { [sortBy]: sortOrder },
       }),
-      this.orderRepository.count(where),
+      this.orderRepo.count(where),
     ]);
 
     const summarizedOrders = orders.map((order) => {
@@ -79,6 +86,7 @@ export class OrderService {
         dishes: order.orderItems.map((item) => item.dish),
       };
     });
+
     return {
       data: summarizedOrders,
       total,
@@ -89,21 +97,19 @@ export class OrderService {
   }
 
   async getOrderById(id: number) {
-    return this.orderRepository.findById(id);
+    const order = await this.orderRepo.findById(id);
+    if (!order) throw new NotFoundException(`Order with id ${id} not found`);
+    return order;
   }
+
   async getOrderHistory(userId: number, role: Role, query: OrdersQueryDto) {
     const where: any = {
       status: {
-        in: [
-          OrderStatus.COMPLETE,
-          OrderStatus.DELIVERED,
-          OrderStatus.CANCELED,
-          OrderStatus.PENDING,
-        ],
+        in: [OrderStatus.COMPLETE, OrderStatus.DELIVERED, OrderStatus.CANCELED],
       },
     };
-    if (role === 'WAITER') where.waiterId = userId;
-    if (role === 'COOK') where.cookId = userId;
+    if (role === Role.WAITER) where.waiterId = userId;
+    if (role === Role.COOK) where.cookId = userId;
 
     const {
       page = 1,
@@ -111,14 +117,15 @@ export class OrderService {
       sortBy = 'createdAt',
       sortOrder = 'desc',
     } = query;
+    const skip = (page - 1) * limit;
 
     const [orders, total] = await Promise.all([
-      this.orderRepository.findAll(where, {
-        skip: (page - 1) * limit,
+      this.orderRepo.findAll(where, {
+        skip,
         take: limit,
         orderBy: { [sortBy]: sortOrder },
       }),
-      this.orderRepository.count(where),
+      this.orderRepo.count(where),
     ]);
 
     const summarizedOrders = orders.map((order) => {
@@ -138,11 +145,12 @@ export class OrderService {
         dishes: order.orderItems.map((item) => item.dish),
       };
     });
+
     return {
       data: summarizedOrders,
       total,
-      limit,
       page,
+      limit,
       totalPages: Math.ceil(total / limit),
     };
   }

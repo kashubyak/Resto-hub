@@ -7,7 +7,7 @@ export class OrderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createOrder(order: OrderEntity) {
-    return await this.prisma.order.create({
+    return this.prisma.order.create({
       data: {
         waiterId: order.waiterId,
         tableId: order.tableId,
@@ -25,15 +25,14 @@ export class OrderRepository {
       },
     });
   }
+
   async getDishPrices(dishIds: number[]) {
     const dishes = await this.prisma.dish.findMany({
       where: { id: { in: dishIds } },
       select: { id: true, price: true },
     });
     const priceMap = new Map<number, number>();
-    for (const dish of dishes) {
-      priceMap.set(dish.id, dish.price);
-    }
+    for (const dish of dishes) priceMap.set(dish.id, dish.price);
     return priceMap;
   }
 
@@ -41,29 +40,18 @@ export class OrderRepository {
     where: any,
     options: { skip: number; take: number; orderBy: any },
   ) {
-    return await this.prisma.order.findMany({
+    return this.prisma.order.findMany({
       where,
       skip: options.skip,
       take: options.take,
       orderBy: options.orderBy,
       include: {
-        waiter: {
-          select: { id: true, name: true },
-        },
-        cook: {
-          select: { id: true, name: true },
-        },
-        table: {
-          select: { id: true, number: true },
-        },
+        waiter: { select: { id: true, name: true } },
+        cook: { select: { id: true, name: true } },
+        table: { select: { id: true, number: true } },
         orderItems: {
           select: {
-            dish: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
+            dish: { select: { id: true, name: true } },
             price: true,
             quantity: true,
           },
@@ -73,7 +61,7 @@ export class OrderRepository {
   }
 
   async count(where: any) {
-    return await this.prisma.order.count({ where });
+    return this.prisma.order.count({ where });
   }
 
   async findById(id: number) {
@@ -84,29 +72,10 @@ export class OrderRepository {
         status: true,
         createdAt: true,
         updatedAt: true,
-        waiter: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-          },
-        },
-        cook: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-          },
-        },
+        waiter: { select: { id: true, name: true, email: true, role: true } },
+        cook: { select: { id: true, name: true, email: true, role: true } },
         table: {
-          select: {
-            id: true,
-            number: true,
-            seats: true,
-            active: true,
-          },
+          select: { id: true, number: true, seats: true, active: true },
         },
         orderItems: {
           select: {
