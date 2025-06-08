@@ -54,6 +54,7 @@ export class OrderRepository {
             dish: { select: { id: true, name: true } },
             price: true,
             quantity: true,
+            notes: true,
           },
         },
       },
@@ -81,6 +82,7 @@ export class OrderRepository {
           select: {
             price: true,
             quantity: true,
+            notes: true,
             dish: {
               select: {
                 id: true,
@@ -94,6 +96,42 @@ export class OrderRepository {
                 available: true,
               },
             },
+          },
+        },
+      },
+    });
+  }
+  async findWithFullDish(
+    where: any,
+    options: { skip: number; take: number; orderBy: any },
+  ) {
+    return this.prisma.order.findMany({
+      where,
+      skip: options.skip,
+      take: options.take,
+      orderBy: options.orderBy,
+      include: {
+        waiter: { select: { id: true, name: true } },
+        cook: { select: { id: true, name: true } },
+        table: { select: { id: true, number: true } },
+        orderItems: {
+          select: {
+            dish: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                price: true,
+                imageUrl: true,
+                ingredients: true,
+                weightGr: true,
+                calories: true,
+                available: true,
+              },
+            },
+            price: true,
+            quantity: true,
+            notes: true,
           },
         },
       },

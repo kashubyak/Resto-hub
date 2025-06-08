@@ -18,6 +18,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import {
   ConflictResponseDto,
@@ -39,7 +40,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post('create')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Create a new category' })
   @ApiCreatedResponse({
     description: 'The category has been successfully created.',
@@ -87,7 +88,7 @@ export class CategoryController {
     type: HttpErrorResponseDto,
   })
   @Patch(':id')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   updateCategory(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCategoryDto,
@@ -105,7 +106,7 @@ export class CategoryController {
     type: HttpErrorResponseDto,
   })
   @Delete(':id')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   deleteCategory(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.deleteCategory(id);
   }

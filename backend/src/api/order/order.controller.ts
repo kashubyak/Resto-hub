@@ -19,7 +19,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post('create')
-  @Roles('WAITER')
+  @Roles(Role.WAITER)
   createOrder(
     @CurrentUser('id') waiterId: number,
     @Body() dto: CreateOrderDto,
@@ -28,19 +28,25 @@ export class OrderController {
   }
 
   @Get()
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   getAllOrders(@Query() query: OrdersQueryDto) {
     return this.orderService.getAllOrders(query);
   }
 
   @Get('history')
-  @Roles('WAITER', 'COOK')
+  @Roles(Role.WAITER, Role.COOK)
   getOrderHistory(
     @CurrentUser('id') userId: number,
     @CurrentUser('role') role: Role,
     @Query() query: OrdersQueryDto,
   ) {
     return this.orderService.getOrderHistory(userId, role, query);
+  }
+
+  @Get('free')
+  @Roles(Role.COOK)
+  getFreeOrders(@Query() query: OrdersQueryDto) {
+    return this.orderService.getFreeOrders(query);
   }
 
   @Get(':id')

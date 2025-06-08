@@ -83,7 +83,12 @@ export class OrderService {
         waiter: order.waiter,
         cook: order.cook,
         table: order.table,
-        dishes: order.orderItems.map((item) => item.dish),
+        orderItems: order.orderItems.map((item) => ({
+          price: item.price,
+          quantity: item.quantity,
+          notes: item.notes,
+          dish: item.dish,
+        })),
       };
     });
 
@@ -94,12 +99,6 @@ export class OrderService {
       limit,
       totalPages: Math.ceil(total / limit),
     };
-  }
-
-  async getOrderById(id: number) {
-    const order = await this.orderRepo.findById(id);
-    if (!order) throw new NotFoundException(`Order with id ${id} not found`);
-    return order;
   }
 
   async getOrderHistory(userId: number, role: Role, query: OrdersQueryDto) {
@@ -133,6 +132,7 @@ export class OrderService {
         (sum, item) => sum + item.price * item.quantity,
         0,
       );
+
       return {
         id: order.id,
         status: order.status,
@@ -142,7 +142,12 @@ export class OrderService {
         waiter: order.waiter,
         cook: order.cook,
         table: order.table,
-        dishes: order.orderItems.map((item) => item.dish),
+        orderItems: order.orderItems.map((item) => ({
+          price: item.price,
+          quantity: item.quantity,
+          notes: item.notes,
+          dish: item.dish,
+        })),
       };
     });
 
@@ -153,5 +158,64 @@ export class OrderService {
       limit,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async getFreeOrders(query: OrdersQueryDto) {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query;
+
+    const where = { cookId: null, status: OrderStatus.PENDING };
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await Promise.all([
+      this.orderRepo.findWithFullDish(where, {
+        skip,
+        take: limit,
+        orderBy: { [sortBy]: sortOrder },
+      }),
+      this.orderRepo.count(where),
+    ]);
+
+    const summarizedOrders = orders.map((order) => {
+      const total = order.orderItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+
+      return {
+        id: order.id,
+        status: order.status,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        total,
+        waiter: order.waiter,
+        cook: order.cook,
+        table: order.table,
+        orderItems: order.orderItems.map((item) => ({
+          price: item.price,
+          quantity: item.quantity,
+          notes: item.notes,
+          dish: item.dish,
+        })),
+      };
+    });
+
+    return {
+      data: summarizedOrders,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getOrderById(id: number) {
+    const order = await this.orderRepo.findById(id);
+    if (!order) throw new NotFoundException(`Order with id ${id} not found`);
+    return order;
   }
 }

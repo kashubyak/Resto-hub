@@ -17,6 +17,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import {
   BadRequestResponseDto,
@@ -34,7 +35,7 @@ export class TableController {
   constructor(private readonly tableService: TableService) {}
 
   @Post('create')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Create a new table' })
   @ApiCreatedResponse({
     description: 'Table created successfully',
@@ -81,7 +82,7 @@ export class TableController {
   }
 
   @Patch(':id')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Update table (number, seats, active)' })
   @ApiOkResponse({
     description: 'Table updated successfully',
@@ -107,7 +108,7 @@ export class TableController {
   }
 
   @Delete(':id')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Delete table by ID' })
   @ApiOkResponse({
     description: 'Table deleted successfully',

@@ -20,6 +20,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import {
   ConflictResponseDto,
@@ -38,7 +39,7 @@ export class DishController {
   constructor(private readonly dishService: DishService) {}
 
   @Post('create')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Create a new dish' })
   @ApiCreatedResponse({
     description: 'The dish has been successfully created.',
@@ -79,7 +80,7 @@ export class DishController {
   }
 
   @Patch(':id')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Update a dish by its ID' })
   @ApiOkResponse({
     description: 'Dish has been successfully updated.',
@@ -98,7 +99,7 @@ export class DishController {
   }
 
   @Delete(':id')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Delete a dish by its ID' })
   @ApiOkResponse({
     description: 'Dish has been successfully removed.',
@@ -113,7 +114,7 @@ export class DishController {
   }
 
   @Patch(':id/remove-category')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Remove the category from a dish' })
   @ApiOkResponse({
     description: 'Category has been successfully removed from the dish.',
@@ -129,7 +130,7 @@ export class DishController {
   }
 
   @Patch(':id/assign-category/:categoryId')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Assign an existing category to a dish' })
   @ApiOkResponse({
     description:
