@@ -105,6 +105,11 @@ describe('DishController (e2e)', () => {
     app.use(cookieParser());
     prisma = app.get(PrismaService);
 
+    await prisma.$transaction([
+      prisma.dish.deleteMany(),
+      prisma.user.deleteMany(),
+    ]);
+
     await cleanupUserAndRelatedData(prisma, adminUser.email);
 
     await app.init();

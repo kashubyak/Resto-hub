@@ -218,4 +218,15 @@ export class OrderService {
     if (!order) throw new NotFoundException(`Order with id ${id} not found`);
     return order;
   }
+
+  async assignOrderToCook(orderId: number, cookId: number) {
+    const order = await this.orderRepo.findPendingOrderById(orderId);
+    if (!order) throw new NotFoundException('Order not found');
+    if (order.status !== 'PENDING')
+      throw new BadRequestException('Only pending orders can be assigned');
+    if (order.cookId && order.cookId !== cookId)
+      throw new BadRequestException('Order already assigned to another cook');
+    const updatedOrder = await this.orderRepo.assignCook(orderId, cookId);
+    return updatedOrder;
+  }
 }

@@ -72,6 +72,15 @@ describe('Auth (e2e)', () => {
     app.use(cookieParser());
 
     prisma = app.get(PrismaService);
+    await prisma.$transaction([
+      prisma.orderItem.deleteMany(),
+      prisma.order.deleteMany(),
+      prisma.user.deleteMany(),
+      prisma.table.deleteMany(),
+      prisma.category.deleteMany(),
+      prisma.dish.deleteMany(),
+    ]);
+
     await app.init();
     server = app.getHttpServer();
   });

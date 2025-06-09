@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { OrderEntity } from '../entities/order.entity';
 
@@ -134,6 +135,25 @@ export class OrderRepository {
             notes: true,
           },
         },
+      },
+    });
+  }
+  async findPendingOrderById(id: number) {
+    return await this.prisma.order.findUnique({
+      where: { id },
+      include: {
+        cook: true,
+      },
+    });
+  }
+
+  async assignCook(orderId: number, cookId: number) {
+    return await this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        cookId,
+        status: OrderStatus.IN_PROGRESS,
+        updatedAt: new Date(),
       },
     });
   }

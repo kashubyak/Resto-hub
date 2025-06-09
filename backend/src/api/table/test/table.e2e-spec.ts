@@ -22,6 +22,11 @@ describe('Table e2e', () => {
 
     prisma = app.get(PrismaService);
 
+    await prisma.$transaction([
+      prisma.table.deleteMany(),
+      prisma.user.deleteMany(),
+    ]);
+
     const adminDto = {
       email: 'admin@admin.com',
       password: 'adminpass',

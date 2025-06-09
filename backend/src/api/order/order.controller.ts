@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -52,5 +53,13 @@ export class OrderController {
   @Get(':id')
   getOrderById(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.getOrderById(id);
+  }
+
+  @Patch(':id/assign')
+  assignOrder(
+    @Param('id', ParseIntPipe) orderId: number,
+    @CurrentUser('id') cookId: number,
+  ) {
+    return this.orderService.assignOrderToCook(orderId, cookId);
   }
 }

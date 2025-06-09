@@ -103,6 +103,11 @@ describe('Category (e2e)', () => {
     app.use(cookieParser());
     prisma = app.get(PrismaService);
 
+    await prisma.$transaction([
+      prisma.dish.deleteMany(),
+      prisma.category.deleteMany(),
+    ]);
+
     await cleanupUserAndRelatedData(prisma, adminCredentials.email);
     await cleanupUserAndRelatedData(prisma, userCredentials.email);
 
