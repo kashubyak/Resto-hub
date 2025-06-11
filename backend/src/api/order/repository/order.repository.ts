@@ -138,21 +138,35 @@ export class OrderRepository {
       },
     });
   }
-  async findPendingOrderById(id: number) {
+  async findPendingOrderWithCookById(id: number) {
+    return await this.prisma.order.findUnique({
+      where: { id, status: OrderStatus.PENDING },
+      include: { cook: true },
+    });
+  }
+
+  async findPendingOrderWithWaiterById(id: number) {
     return await this.prisma.order.findUnique({
       where: { id },
-      include: {
-        cook: true,
-      },
+      include: { waiter: true },
     });
   }
 
   async assignCook(orderId: number, cookId: number) {
     return await this.prisma.order.update({
-      where: { id: orderId },
+      where: { id: orderId, status: OrderStatus.PENDING },
       data: {
         cookId,
         status: OrderStatus.IN_PROGRESS,
+        updatedAt: new Date(),
+      },
+    });
+  }
+  async cancelOrder(orderId: number) {
+    return await this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: OrderStatus.CANCELED,
         updatedAt: new Date(),
       },
     });

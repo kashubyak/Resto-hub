@@ -56,10 +56,20 @@ export class OrderController {
   }
 
   @Patch(':id/assign')
+  @Roles(Role.COOK)
   assignOrder(
     @Param('id', ParseIntPipe) orderId: number,
     @CurrentUser('id') cookId: number,
   ) {
     return this.orderService.assignOrderToCook(orderId, cookId);
+  }
+
+  @Patch(':id/cancel')
+  @Roles(Role.WAITER)
+  cancelOrder(
+    @Param('id', ParseIntPipe) orderId: number,
+    @CurrentUser('id') waiterId: number,
+  ) {
+    return this.orderService.cancelOrder(orderId, waiterId);
   }
 }

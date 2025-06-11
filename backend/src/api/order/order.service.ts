@@ -12,6 +12,29 @@ import { OrderRepository } from './repository/order.repository';
 @Injectable()
 export class OrderService {
   constructor(private readonly orderRepo: OrderRepository) {}
+  private mapSummary = (order: any) => {
+    const total = order.orderItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
+
+    return {
+      id: order.id,
+      status: order.status,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+      total,
+      waiter: order.waiter,
+      cook: order.cook,
+      table: order.table,
+      orderItems: order.orderItems.map((item) => ({
+        price: item.price,
+        quantity: item.quantity,
+        notes: item.notes,
+        dish: item.dish,
+      })),
+    };
+  };
 
   async createOrder(waiterId: number, dto: CreateOrderDto) {
     const dishIds = dto.items.map((item) => item.dishId);
@@ -68,29 +91,7 @@ export class OrderService {
       this.orderRepo.count(where),
     ]);
 
-    const summarizedOrders = orders.map((order) => {
-      const total = order.orderItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      );
-
-      return {
-        id: order.id,
-        status: order.status,
-        createdAt: order.createdAt,
-        updatedAt: order.updatedAt,
-        total,
-        waiter: order.waiter,
-        cook: order.cook,
-        table: order.table,
-        orderItems: order.orderItems.map((item) => ({
-          price: item.price,
-          quantity: item.quantity,
-          notes: item.notes,
-          dish: item.dish,
-        })),
-      };
-    });
+    const summarizedOrders = orders.map(this.mapSummary);
 
     return {
       data: summarizedOrders,
@@ -127,29 +128,7 @@ export class OrderService {
       this.orderRepo.count(where),
     ]);
 
-    const summarizedOrders = orders.map((order) => {
-      const total = order.orderItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      );
-
-      return {
-        id: order.id,
-        status: order.status,
-        createdAt: order.createdAt,
-        updatedAt: order.updatedAt,
-        total,
-        waiter: order.waiter,
-        cook: order.cook,
-        table: order.table,
-        orderItems: order.orderItems.map((item) => ({
-          price: item.price,
-          quantity: item.quantity,
-          notes: item.notes,
-          dish: item.dish,
-        })),
-      };
-    });
+    const summarizedOrders = orders.map(this.mapSummary);
 
     return {
       data: summarizedOrders,
@@ -180,29 +159,7 @@ export class OrderService {
       this.orderRepo.count(where),
     ]);
 
-    const summarizedOrders = orders.map((order) => {
-      const total = order.orderItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      );
-
-      return {
-        id: order.id,
-        status: order.status,
-        createdAt: order.createdAt,
-        updatedAt: order.updatedAt,
-        total,
-        waiter: order.waiter,
-        cook: order.cook,
-        table: order.table,
-        orderItems: order.orderItems.map((item) => ({
-          price: item.price,
-          quantity: item.quantity,
-          notes: item.notes,
-          dish: item.dish,
-        })),
-      };
-    });
+    const summarizedOrders = orders.map(this.mapSummary);
 
     return {
       data: summarizedOrders,
@@ -220,13 +177,26 @@ export class OrderService {
   }
 
   async assignOrderToCook(orderId: number, cookId: number) {
-    const order = await this.orderRepo.findPendingOrderById(orderId);
+    const order = await this.orderRepo.findPendingOrderWithCookById(orderId);
     if (!order) throw new NotFoundException('Order not found');
-    if (order.status !== 'PENDING')
+    if (order.status !== OrderStatus.PENDING)
       throw new BadRequestException('Only pending orders can be assigned');
     if (order.cookId && order.cookId !== cookId)
       throw new BadRequestException('Order already assigned to another cook');
     const updatedOrder = await this.orderRepo.assignCook(orderId, cookId);
+    return updatedOrder;
+  }
+
+  async cancelOrder(orderId: number, waiterId: number) {
+    const order = await this.orderRepo.findPendingOrderWithWaiterById(orderId);
+    if (!order) throw new NotFoundException('Order not found');
+    if (order?.status !== OrderStatus.PENDING)
+      throw new BadRequestException('Only pending orders can be canceled');
+    if (order.waiterId && order.waiterId !== waiterId)
+      throw new BadRequestException(
+        'Only the waiter who created the order can cancel it',
+      );
+    const updatedOrder = await this.orderRepo.cancelOrder(orderId);
     return updatedOrder;
   }
 }
