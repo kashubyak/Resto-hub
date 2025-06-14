@@ -199,4 +199,36 @@ export class OrderService {
     const updatedOrder = await this.orderRepo.cancelOrder(orderId);
     return updatedOrder;
   }
+
+  async updateOrderStatus(
+    orderId: number,
+    userId: number,
+    role: Role,
+    newStatus: OrderStatus,
+  ) {
+    const order = await this.orderRepo.findById(orderId);
+    if (!order) throw new NotFoundException('Order not found');
+    if (role === Role.COOK) {
+      if (newStatus !== OrderStatus.COMPLETE)
+        throw new BadRequestException('Cook can only set status to COMPLETE');
+      if (order.cook?.id !== userId)
+        throw new BadRequestException('You are not assigned to this order');
+      if (order.status !== OrderStatus.IN_PROGRESS)
+        throw new BadRequestException('Order must be IN_PROGRESS to complete');
+      return this.orderRepo.updateStatus(orderId, newStatus);
+    }
+    if (role === Role.WAITER) {
+      if (newStatus !== OrderStatus.DELIVERED)
+        throw new BadRequestException(
+          'Waiter can only set status to DELIVERED',
+        );
+      if (order?.waiter.id !== userId)
+        throw new BadRequestException('You are not assigned to this order');
+      if (order.status !== OrderStatus.COMPLETE)
+        throw new BadRequestException(
+          'Order must be COMPLETE before delivering',
+        );
+      return this.orderRepo.updateStatus(orderId, newStatus);
+    }
+  }
 }

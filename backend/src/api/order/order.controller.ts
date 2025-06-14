@@ -13,6 +13,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CreateOrderDto } from './dto/create-order-dto';
 import { OrdersQueryDto } from './dto/orders-query-dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrderService } from './order.service';
 
 @Controller('order')
@@ -71,5 +72,15 @@ export class OrderController {
     @CurrentUser('id') waiterId: number,
   ) {
     return this.orderService.cancelOrder(orderId, waiterId);
+  }
+
+  @Patch(':id/status')
+  updateOrderStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('id') userId: number,
+    @CurrentUser('role') role: Role,
+    @Body() dto: UpdateOrderStatusDto,
+  ) {
+    return this.orderService.updateOrderStatus(id, userId, role, dto.status);
   }
 }
