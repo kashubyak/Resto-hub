@@ -27,6 +27,7 @@ import {
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { FilterCategoryDto } from './dto/filter-category.dto';
+import { PaginatedCategoryResponseDto } from './dto/paginated-category-response-dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import {
   CategoryEntity,
@@ -58,7 +59,7 @@ export class CategoryController {
   @ApiOperation({ description: 'Search and filter categories with pagination' })
   @ApiOkResponse({
     description: 'Filtered and sorted list of categories',
-    type: [CategoryEntity],
+    type: PaginatedCategoryResponseDto,
   })
   getFilterCategories(@Query() query: FilterCategoryDto) {
     return this.categoryService.filterCategories(query);
@@ -67,7 +68,7 @@ export class CategoryController {
   @ApiOperation({ description: 'Get a category by ID' })
   @ApiOkResponse({
     description: 'The category has been successfully retrieved.',
-    type: CreateCategoryEntity,
+    type: CategoryEntity,
   })
   @ApiNotFoundResponse({
     description: 'Category with this ID does not exist.',

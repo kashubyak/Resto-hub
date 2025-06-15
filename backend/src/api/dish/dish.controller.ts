@@ -29,6 +29,7 @@ import {
 import { DishService } from './dish.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { FilterDishDto } from './dto/filter-dish.dto';
+import { PaginatedDishesResponseDto } from './dto/paginated-dishes-response-dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { DishEntity } from './entities/dish.entity';
 
@@ -58,7 +59,7 @@ export class DishController {
   @ApiOperation({ description: 'Search and filter dishes with pagination' })
   @ApiOkResponse({
     description: 'Filtered and sorted list of dishes',
-    type: [DishEntity],
+    type: PaginatedDishesResponseDto,
   })
   getFilteredDishes(@Query() query: FilterDishDto) {
     return this.dishService.filterDishes(query);
@@ -84,7 +85,7 @@ export class DishController {
   @ApiOperation({ description: 'Update a dish by its ID' })
   @ApiOkResponse({
     description: 'Dish has been successfully updated.',
-    type: DishEntity,
+    type: CreateDishDto,
   })
   @ApiNotFoundResponse({
     description: 'Dish with the given ID was not found.',
