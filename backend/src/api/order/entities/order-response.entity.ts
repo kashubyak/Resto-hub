@@ -52,6 +52,38 @@ export class OrderDishEntity {
 
   @ApiProperty({ example: 'Pizza Margherita xxl' })
   name: string;
+
+  @ApiProperty({ example: 10 })
+  price: number;
+}
+
+export class DishDetailedEntity {
+  @ApiProperty({ example: 1 })
+  id: number;
+
+  @ApiProperty({ example: 'Pizza Margherita xxl' })
+  name: string;
+
+  @ApiProperty({ example: 13.99 })
+  price: number;
+
+  @ApiProperty({ example: 'pizza pepperoni' })
+  description: string;
+
+  @ApiProperty({ example: 'https://example.com/pizza.jpg' })
+  imageUrl: string;
+
+  @ApiProperty({ example: ['Tomato', 'Mozzarella', 'Basil'] })
+  ingredients: string[];
+
+  @ApiProperty({ example: 300 })
+  weightGr: number;
+
+  @ApiProperty({ example: 800 })
+  calories: number;
+
+  @ApiProperty({ example: true })
+  available: boolean;
 }
 
 export class OrderTableEntity {
@@ -71,11 +103,11 @@ export class OrderUserEntity {
 }
 
 export class OrderItemWithDishEntity {
-  @ApiProperty({ example: 27.98 })
-  price: number;
-
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ example: 2 })
   quantity: number;
+
+  @ApiProperty({ example: 20 })
+  total: number;
 
   @ApiProperty({ example: 'More cheese', required: false })
   notes?: string;
@@ -84,44 +116,15 @@ export class OrderItemWithDishEntity {
   dish: OrderDishEntity;
 }
 
-export class DishDetailedEntity {
-  @ApiProperty({ example: 1 })
-  id: number;
-
-  @ApiProperty({ example: 'Pizza Margherita xxxsl' })
-  name: string;
-
-  @ApiProperty({ example: 'pizza pepperoni' })
-  description: string;
-
-  @ApiProperty({ example: 13.99 })
-  price: number;
-
-  @ApiProperty({ example: 'https://example.com/pizza.jpg' })
-  imageUrl: string;
-
-  @ApiProperty({ example: ['Tomato', 'Mozzarella', 'Basil'], isArray: true })
-  ingredients: string[];
-
-  @ApiProperty({ example: 300 })
-  weightGr: number;
-
-  @ApiProperty({ example: 800 })
-  calories: number;
-
-  @ApiProperty({ example: true })
-  available: boolean;
-}
-
 export class OrderItemWithFullDishEntity {
-  @ApiProperty({ example: 27.98 })
-  price: number;
-
   @ApiProperty({ example: 2 })
   quantity: number;
 
-  @ApiProperty({ example: 'More cheese' })
-  notes: string;
+  @ApiProperty({ example: 20 })
+  total: number;
+
+  @ApiProperty({ example: 'More cheese', required: false })
+  notes?: string;
 
   @ApiProperty({ type: DishDetailedEntity })
   dish: DishDetailedEntity;

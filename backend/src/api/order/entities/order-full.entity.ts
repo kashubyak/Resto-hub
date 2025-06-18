@@ -2,11 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   OrderItemWithDishEntity,
   OrderItemWithFullDishEntity,
-  OrderTableEntity,
-  OrderUserEntity,
 } from './order-response.entity';
 
-export class OrderFullEntity {
+export class OrderBaseEntity {
   @ApiProperty({ example: 1 })
   id: number;
 
@@ -21,21 +19,9 @@ export class OrderFullEntity {
 
   @ApiProperty({ example: 55.96 })
   total: number;
-
-  @ApiProperty({ type: OrderUserEntity })
-  waiter: OrderUserEntity;
-
-  @ApiProperty({ type: OrderUserEntity, nullable: true })
-  cook: OrderUserEntity | null;
-
-  @ApiProperty({ type: OrderTableEntity })
-  table: OrderTableEntity;
-
-  @ApiProperty({ type: [OrderItemWithDishEntity] })
-  orderItems: OrderItemWithDishEntity[];
 }
 
-class ShortUser {
+export class BaseUser {
   @ApiProperty({ example: 1 })
   id: number;
 
@@ -43,7 +29,15 @@ class ShortUser {
   name: string;
 }
 
-class ShortTable {
+export class FullUser extends BaseUser {
+  @ApiProperty({ example: 'waiter@example.com' })
+  email: string;
+
+  @ApiProperty({ example: 'WAITER', enum: ['WAITER', 'COOK'] })
+  role: string;
+}
+
+export class BaseTable {
   @ApiProperty({ example: 1 })
   id: number;
 
@@ -51,30 +45,51 @@ class ShortTable {
   number: number;
 }
 
-export class OrderWithFullDishEntity {
-  @ApiProperty({ example: 1 })
-  id: number;
+export class FullTable extends BaseTable {
+  @ApiProperty({ example: 2 })
+  seats: number;
 
-  @ApiProperty({ example: 'PENDING', enum: ['PENDING', 'COOKING', 'COMPLETE'] })
-  status: string;
+  @ApiProperty({ example: true })
+  active: boolean;
+}
 
-  @ApiProperty({ example: '2025-06-15T12:50:04.136Z' })
-  createdAt: string;
+export class OrderFullEntity extends OrderBaseEntity {
+  @ApiProperty({ type: BaseUser })
+  waiter: BaseUser;
 
-  @ApiProperty({ example: '2025-06-15T12:50:04.136Z' })
-  updatedAt: string;
+  @ApiProperty({ type: BaseUser, nullable: true })
+  cook: BaseUser | null;
 
-  @ApiProperty({ example: 55.96 })
-  total: number;
+  @ApiProperty({ type: BaseTable })
+  table: BaseTable;
 
-  @ApiProperty({ type: ShortUser })
-  waiter: ShortUser;
+  @ApiProperty({ type: [OrderItemWithDishEntity] })
+  orderItems: OrderItemWithDishEntity[];
+}
 
-  @ApiProperty({ type: ShortUser, nullable: true })
-  cook: ShortUser | null;
+export class OrderWithFullDishEntity extends OrderBaseEntity {
+  @ApiProperty({ type: BaseUser })
+  waiter: BaseUser;
 
-  @ApiProperty({ type: ShortTable })
-  table: ShortTable;
+  @ApiProperty({ type: BaseUser, nullable: true })
+  cook: BaseUser | null;
+
+  @ApiProperty({ type: BaseTable })
+  table: BaseTable;
+
+  @ApiProperty({ type: [OrderItemWithFullDishEntity] })
+  orderItems: OrderItemWithFullDishEntity[];
+}
+
+export class OrderIdEntity extends OrderBaseEntity {
+  @ApiProperty({ type: FullUser })
+  waiter: FullUser;
+
+  @ApiProperty({ type: FullUser, nullable: true })
+  cook: FullUser | null;
+
+  @ApiProperty({ type: FullTable })
+  table: FullTable;
 
   @ApiProperty({ type: [OrderItemWithFullDishEntity] })
   orderItems: OrderItemWithFullDishEntity[];

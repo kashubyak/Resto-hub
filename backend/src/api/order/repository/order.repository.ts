@@ -52,8 +52,7 @@ export class OrderRepository {
         table: { select: { id: true, number: true } },
         orderItems: {
           select: {
-            dish: { select: { id: true, name: true } },
-            price: true,
+            dish: { select: { id: true, name: true, price: true } },
             quantity: true,
             notes: true,
           },
@@ -81,7 +80,6 @@ export class OrderRepository {
         },
         orderItems: {
           select: {
-            price: true,
             quantity: true,
             notes: true,
             dish: {
@@ -102,6 +100,7 @@ export class OrderRepository {
       },
     });
   }
+
   async findWithFullDish(
     where: any,
     options: { skip: number; take: number; orderBy: any },
@@ -130,7 +129,6 @@ export class OrderRepository {
                 available: true,
               },
             },
-            price: true,
             quantity: true,
             notes: true,
           },

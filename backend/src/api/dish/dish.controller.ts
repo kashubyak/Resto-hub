@@ -41,7 +41,8 @@ export class DishController {
 
   @Post('create')
   @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Create a new dish' })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ description: 'Create a new dish (admin only)' })
   @ApiCreatedResponse({
     description: 'The dish has been successfully created.',
     type: DishEntity,
@@ -50,7 +51,6 @@ export class DishController {
     description: 'Dish with this name already exists.',
     type: ConflictResponseDto,
   })
-  @HttpCode(HttpStatus.CREATED)
   createDish(@Body() dto: CreateDishDto) {
     return this.dishService.createDish(dto);
   }
@@ -75,14 +75,14 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
-  @HttpCode(HttpStatus.OK)
   getDishById(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.getDishById(id);
   }
 
   @Patch(':id')
   @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Update a dish by its ID' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Update a dish by its ID (admin only)' })
   @ApiOkResponse({
     description: 'Dish has been successfully updated.',
     type: CreateDishDto,
@@ -91,7 +91,6 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
-  @HttpCode(HttpStatus.OK)
   updateDish(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateDishDto,
@@ -101,7 +100,8 @@ export class DishController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Delete a dish by its ID' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Delete a dish by its ID (admin only)' })
   @ApiOkResponse({
     description: 'Dish has been successfully removed.',
   })
@@ -109,14 +109,14 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
-  @HttpCode(HttpStatus.OK)
   removeDish(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.removeDish(id);
   }
 
   @Patch(':id/remove-category')
   @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Remove the category from a dish' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Remove the category from a dish (admin only)' })
   @ApiOkResponse({
     description: 'Category has been successfully removed from the dish.',
     type: DishEntity,
@@ -125,14 +125,16 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
-  @HttpCode(HttpStatus.OK)
   removeCategoryFromDish(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.removeDishFromCategory(id);
   }
 
   @Patch(':id/assign-category/:categoryId')
   @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Assign an existing category to a dish' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    description: 'Assign an existing category to a dish (admin only)',
+  })
   @ApiOkResponse({
     description:
       'Dish has been successfully assigned to the specified category.',
@@ -142,7 +144,6 @@ export class DishController {
     description: 'Dish with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
-  @HttpCode(HttpStatus.OK)
   assignCategory(
     @Param('id', ParseIntPipe) dishId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,

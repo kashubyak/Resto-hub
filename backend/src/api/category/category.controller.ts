@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -42,7 +44,8 @@ export class CategoryController {
 
   @Post('create')
   @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Create a new category' })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ description: 'Create a new category (admin only)' })
   @ApiCreatedResponse({
     description: 'The category has been successfully created.',
     type: CreateCategoryEntity,
@@ -65,6 +68,7 @@ export class CategoryController {
     return this.categoryService.filterCategories(query);
   }
 
+  @Get(':id')
   @ApiOperation({ description: 'Get a category by ID' })
   @ApiOkResponse({
     description: 'The category has been successfully retrieved.',
@@ -74,12 +78,14 @@ export class CategoryController {
     description: 'Category with this ID does not exist.',
     type: HttpErrorResponseDto,
   })
-  @Get(':id')
   getCategoryById(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.getCategoryById(id);
   }
 
-  @ApiOperation({ description: 'Update a category by ID' })
+  @Patch(':id')
+  @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Update a category by ID (admin only)' })
   @ApiOkResponse({
     description: 'The category has been successfully updated.',
     type: CreateCategoryEntity,
@@ -88,8 +94,6 @@ export class CategoryController {
     description: 'Category with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
-  @Patch(':id')
-  @Roles(Role.ADMIN)
   updateCategory(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCategoryDto,
@@ -97,7 +101,9 @@ export class CategoryController {
     return this.categoryService.updateCategory(id, dto);
   }
 
-  @ApiOperation({ description: 'Delete a category by ID' })
+  @Delete(':id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ description: 'Delete a category by ID (admin only)' })
   @ApiOkResponse({
     description: 'The category has been successfully deleted.',
     type: CreateCategoryEntity,
@@ -106,8 +112,6 @@ export class CategoryController {
     description: 'Category with the given ID was not found.',
     type: HttpErrorResponseDto,
   })
-  @Delete(':id')
-  @Roles(Role.ADMIN)
   deleteCategory(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.deleteCategory(id);
   }

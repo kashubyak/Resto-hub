@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -22,9 +24,15 @@ import { Role } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CreateOrderDto } from './dto/create-order-dto';
+import {
+  AssignOrderResponseDto,
+  CancelOrderResponseDto,
+  UpdateOrderStatusResponseDto,
+} from './dto/order-response-dto';
 import { OrdersQueryDto } from './dto/orders-query-dto';
 import {
   PaginatedFreeOrdersResponseDto,
+  PaginatedIdOrdersResponseDto,
   PaginatedOrdersResponseDto,
 } from './dto/paginated-orders-response.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -39,6 +47,7 @@ export class OrderController {
 
   @Post('create')
   @Roles(Role.WAITER)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ description: 'Create a new order (waiter only)' })
   @ApiBody({ type: CreateOrderDto })
   @ApiCreatedResponse({
@@ -96,14 +105,23 @@ export class OrderController {
   @Get(':id')
   @ApiOperation({ description: 'Receive an order by ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiOkResponse({
+    description: 'Full information about a single order',
+    type: PaginatedIdOrdersResponseDto,
+  })
   getOrderById(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.getOrderById(id);
   }
 
   @Patch(':id/assign')
   @Roles(Role.COOK)
-  @ApiOperation({ description: 'Assign yourself an order (only the cook)' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Assign yourself an order (only cook)' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiOkResponse({
+    description: 'Order assigned to cook',
+    type: AssignOrderResponseDto,
+  })
   assignOrder(
     @Param('id', ParseIntPipe) orderId: number,
     @CurrentUser('id') cookId: number,
@@ -113,8 +131,13 @@ export class OrderController {
 
   @Patch(':id/cancel')
   @Roles(Role.WAITER)
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ description: 'Cancel the order (waiter only)' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiOkResponse({
+    description: 'Order canceled',
+    type: CancelOrderResponseDto,
+  })
   cancelOrder(
     @Param('id', ParseIntPipe) orderId: number,
     @CurrentUser('id') waiterId: number,
@@ -123,10 +146,15 @@ export class OrderController {
   }
 
   @Patch(':id/status')
+  @Roles(Role.COOK, Role.WAITER)
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ description: 'Update order status (cook or waiter)' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateOrderStatusDto })
-  @Roles(Role.COOK, Role.WAITER)
+  @ApiOkResponse({
+    description: 'Updated order status',
+    type: UpdateOrderStatusResponseDto,
+  })
   updateOrderStatus(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') userId: number,

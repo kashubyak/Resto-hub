@@ -36,7 +36,7 @@ export class TableController {
 
   @Post('create')
   @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Create a new table' })
+  @ApiOperation({ description: 'Create a new table (admin only)' })
   @ApiCreatedResponse({
     description: 'Table created successfully',
     type: TableEntity,
@@ -83,7 +83,9 @@ export class TableController {
 
   @Patch(':id')
   @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Update table (number, seats, active)' })
+  @ApiOperation({
+    description: 'Update table (number, seats, active) (admin only)',
+  })
   @ApiOkResponse({
     description: 'Table updated successfully',
     type: TableEntity,
@@ -109,7 +111,7 @@ export class TableController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Delete table by ID' })
+  @ApiOperation({ description: 'Delete table by ID (admin only)' })
   @ApiOkResponse({
     description: 'Table deleted successfully',
     type: TableEntity,

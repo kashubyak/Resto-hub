@@ -13,10 +13,15 @@ import { OrderRepository } from './repository/order.repository';
 export class OrderService {
   constructor(private readonly orderRepo: OrderRepository) {}
   private mapSummary = (order: any) => {
-    const total = order.orderItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0,
-    );
+    const summarizedItems = order.orderItems.map((item) => ({
+      price: item.price,
+      quantity: item.quantity,
+      total: item.dish.price * item.quantity,
+      notes: item.notes,
+      dish: item.dish,
+    }));
+
+    const total = summarizedItems.reduce((sum, item) => sum + item.total, 0);
 
     return {
       id: order.id,
@@ -27,12 +32,7 @@ export class OrderService {
       waiter: order.waiter,
       cook: order.cook,
       table: order.table,
-      orderItems: order.orderItems.map((item) => ({
-        price: item.price,
-        quantity: item.quantity,
-        notes: item.notes,
-        dish: item.dish,
-      })),
+      orderItems: summarizedItems,
     };
   };
 
@@ -46,7 +46,7 @@ export class OrderService {
     const items = dto.items.map((item) => ({
       dishId: item.dishId,
       quantity: item.quantity,
-      price: priceMap.get(item.dishId)! * item.quantity,
+      price: priceMap.get(item.dishId)!,
       notes: item.notes,
     }));
 
@@ -173,7 +173,7 @@ export class OrderService {
   async getOrderById(id: number) {
     const order = await this.orderRepo.findById(id);
     if (!order) throw new NotFoundException(`Order with id ${id} not found`);
-    return order;
+    return this.mapSummary(order);
   }
 
   async assignOrderToCook(orderId: number, cookId: number) {
