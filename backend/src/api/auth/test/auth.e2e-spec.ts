@@ -19,6 +19,49 @@ describe('Auth (e2e)', () => {
     role: Role.WAITER,
   };
 
+  async function cleanupUserAndRelatedData(
+    prismaInstance: PrismaService,
+    userEmail: string,
+  ) {
+    const user = await prismaInstance.user.findUnique({
+      where: { email: userEmail },
+      select: {
+        id: true,
+        waiterOrders: { select: { id: true } },
+        cookOrders: { select: { id: true } },
+      },
+    });
+
+    if (user) {
+      const orderIdsFromWaiter = user.waiterOrders.map((o) => o.id);
+      const orderIdsFromCook = user.cookOrders
+        ? user.cookOrders.map((o) => o.id)
+        : [];
+
+      const allAssociatedOrderIds = [
+        ...new Set([...orderIdsFromWaiter, ...orderIdsFromCook]),
+      ];
+
+      if (allAssociatedOrderIds.length > 0) {
+        await prismaInstance.orderItem.deleteMany({
+          where: { orderId: { in: allAssociatedOrderIds } },
+        });
+
+        await prismaInstance.order.deleteMany({
+          where: { id: { in: allAssociatedOrderIds } },
+        });
+      }
+
+      await prismaInstance.user.deleteMany({
+        where: { email: userEmail },
+      });
+    } else {
+      await prismaInstance.user.deleteMany({
+        where: { email: userEmail },
+      });
+    }
+  }
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -29,12 +72,21 @@ describe('Auth (e2e)', () => {
     app.use(cookieParser());
 
     prisma = app.get(PrismaService);
+    await prisma.$transaction([
+      prisma.orderItem.deleteMany(),
+      prisma.order.deleteMany(),
+      prisma.user.deleteMany(),
+      prisma.table.deleteMany(),
+      prisma.category.deleteMany(),
+      prisma.dish.deleteMany(),
+    ]);
+
     await app.init();
     server = app.getHttpServer();
   });
 
   beforeEach(async () => {
-    await prisma.user.deleteMany({ where: { email: testUser.email } });
+    await cleanupUserAndRelatedData(prisma, testUser.email);
     await request(server).post('/auth/register').send(testUser).expect(201);
     const loginRes = await request(server)
       .post('/auth/login')
@@ -44,12 +96,13 @@ describe('Auth (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany({ where: { email: testUser.email } });
+    await cleanupUserAndRelatedData(prisma, testUser.email);
+    await cleanupUserAndRelatedData(prisma, 'new@example.com');
     await app.close();
   });
 
   it('/auth/register (POST) - success', async () => {
-    await prisma.user.deleteMany({ where: { email: 'new@example.com' } });
+    await cleanupUserAndRelatedData(prisma, 'new@example.com');
     const newUser = { ...testUser, email: 'new@example.com' };
     const response = await request(server)
       .post('/auth/register')
@@ -59,7 +112,6 @@ describe('Auth (e2e)', () => {
   });
 
   it('/auth/register (POST) - conflict', async () => {
-    // Немає потреби створювати користувача тут, він вже створений у beforeEach
     const response = await request(server)
       .post('/auth/register')
       .send(testUser)

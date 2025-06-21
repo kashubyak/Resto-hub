@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateCategoryEntity } from 'src/api/category/entities/category.entity';
 
 export class DishEntity {
   @ApiProperty({ description: 'The unique identifier of the dish', example: 1 })
@@ -67,4 +68,10 @@ export class DishEntity {
     example: '2024-05-06T12:00:00Z',
   })
   updatedAt: Date;
+
+  @ApiProperty({
+    type: () => [CreateCategoryEntity],
+    required: false,
+  })
+  category: CreateCategoryEntity[];
 }

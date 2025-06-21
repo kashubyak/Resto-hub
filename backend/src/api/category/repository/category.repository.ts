@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
@@ -7,42 +8,52 @@ import { UpdateCategoryDto } from '../dto/update-category.dto';
 export class CategoryRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createCategory(dto: CreateCategoryDto) {
-    return await this.prisma.category.create({ data: dto });
+  async create(dto: CreateCategoryDto) {
+    return this.prisma.category.create({ data: dto });
   }
 
-  async getAllCategories() {
-    return await this.prisma.category.findMany({
-      include: { dishes: true },
-      orderBy: { createdAt: 'desc' },
-    });
-  }
-
-  async getCategoryById(id: number) {
-    const category = await this.prisma.category.findUnique({
+  async findById(id: number) {
+    return this.prisma.category.findUnique({
       where: { id },
       include: { dishes: true },
     });
-    if (!category) throw new NotFoundException('Category not found');
-    return category;
   }
 
-  async updateCategory(id: number, dto: UpdateCategoryDto) {
-    const exists = await this.prisma.category.findUnique({
-      where: { id },
+  async findByName(name: string) {
+    return this.prisma.category.findUnique({
+      where: { name },
     });
-    if (!exists) throw new NotFoundException('Category not found');
-    return await this.prisma.category.update({
+  }
+
+  async findManyWithCount(args: {
+    where: Prisma.CategoryWhereInput;
+    orderBy: Prisma.CategoryOrderByWithRelationInput;
+    skip: number;
+    take: number;
+  }) {
+    const { where, orderBy, skip, take } = args;
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.category.findMany({
+        where,
+        include: { dishes: true },
+        skip,
+        take,
+        orderBy,
+      }),
+      this.prisma.category.count({ where }),
+    ]);
+
+    return { items, total };
+  }
+
+  async update(id: number, dto: UpdateCategoryDto) {
+    return this.prisma.category.update({
       where: { id },
       data: dto,
     });
   }
 
-  async deleteCategory(id: number) {
-    const exists = await this.prisma.category.findUnique({
-      where: { id },
-    });
-    if (!exists) throw new NotFoundException('Category not found');
-    return await this.prisma.category.delete({ where: { id } });
+  async delete(id: number) {
+    return this.prisma.category.delete({ where: { id } });
   }
 }
