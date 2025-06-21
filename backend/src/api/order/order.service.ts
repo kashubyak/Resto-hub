@@ -3,8 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { OrderStatus, Role } from '@prisma/client';
+import { OrderStatus, Prisma, Role } from '@prisma/client';
+import { endOfDay } from 'date-fns';
 import { CreateOrderDto } from './dto/create-order-dto';
+import {
+  OrderAnalyticsQueryDto,
+  OrderGroupBy,
+  OrderMetric,
+} from './dto/order-analytics-query-dto';
 import { OrdersQueryDto } from './dto/orders-query-dto';
 import { OrderEntity } from './entities/order.entity';
 import { OrderRepository } from './repository/order.repository';
@@ -35,6 +41,108 @@ export class OrderService {
       orderItems: summarizedItems,
     };
   };
+
+  private buildFilters(query: OrderAnalyticsQueryDto): Prisma.OrderWhereInput {
+    const where: Prisma.OrderWhereInput = {};
+    if (query.from || query.to) {
+      where.createdAt = {};
+      if (query.from) where.createdAt.gte = new Date(query.from);
+      if (query.to) where.createdAt.lte = endOfDay(new Date(query.to));
+    }
+    if (query.waiterIds?.length) where.waiterId = { in: query.waiterIds };
+    if (query.cookIds?.length) where.cookId = { in: query.cookIds };
+    if (query.tableIds?.length) where.tableId = { in: query.tableIds };
+    if (query.dishIds?.length || query.categoryIds?.length)
+      where.orderItems = {
+        some: {
+          ...(query.dishIds?.length && { dishId: { in: query.dishIds } }),
+          ...(query.categoryIds?.length && {
+            dish: { categoryId: { in: query.categoryIds } },
+          }),
+        },
+      };
+    return where;
+  }
+
+  private groupOrders(orders: any[], groupBy?: OrderGroupBy) {
+    const grouped: Record<string, any[]> = {};
+    if (groupBy === OrderGroupBy.CATEGORY) {
+      for (const order of orders) {
+        for (const item of order.orderItems || []) {
+          const category = item.dish?.category;
+          const key = category?.name ?? 'Unknown Category';
+
+          if (!grouped[key]) grouped[key] = [];
+          const filteredOrder = {
+            ...order,
+            orderItems: [item],
+          };
+          grouped[key].push(filteredOrder);
+        }
+      }
+      return grouped;
+    }
+
+    for (const order of orders) {
+      let key = 'total';
+      if (groupBy === OrderGroupBy.DAY)
+        key = new Date(order.createdAt).toISOString().split('T')[0];
+      else if (groupBy === OrderGroupBy.MONTH)
+        key = `${order.createdAt.getFullYear()}-${order.createdAt.getMonth() + 1}`;
+      else if (groupBy === OrderGroupBy.WAITER)
+        key = order.waiter?.name ?? 'Unknown';
+      else if (groupBy === OrderGroupBy.COOK)
+        key = order.cook?.name ?? 'Unknown';
+      else if (groupBy === OrderGroupBy.TABLE)
+        key = `Table ${order.table?.number}`;
+      else if (groupBy === OrderGroupBy.DISH)
+        key = order.orderItems?.[0]?.dish?.name ?? 'Unknown Dish';
+
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(order);
+    }
+
+    return grouped;
+  }
+
+  private extractGroupInfo(orders: any[], groupBy?: OrderGroupBy) {
+    if (!orders?.length) return {};
+    const firstOrder = orders[0];
+    if (groupBy === OrderGroupBy.WAITER && firstOrder.waiterId)
+      return { id: firstOrder.waiter.id, name: firstOrder.waiter.name };
+    if (groupBy === OrderGroupBy.COOK && firstOrder.cookId)
+      return { id: firstOrder.cook.id, name: firstOrder.cook.name };
+
+    if (groupBy === OrderGroupBy.TABLE && firstOrder.tableId)
+      return {
+        id: firstOrder.table.id,
+        name: `Table ${firstOrder.table?.number ?? firstOrder.table?.id}`,
+      };
+
+    if (groupBy === OrderGroupBy.DISH) {
+      const dish = firstOrder.orderItems[0]?.dish;
+      return dish
+        ? {
+            id: dish.id,
+            name: dish.name,
+            category: dish.category?.name,
+            categoryId: dish.category?.id,
+          }
+        : {};
+    }
+    if (groupBy === OrderGroupBy.CATEGORY) {
+      const firstItem = orders[0]?.orderItems?.[0];
+      const category = firstItem?.dish?.category;
+      if (category) {
+        return {
+          id: category.id,
+          name: category.name,
+        };
+      }
+    }
+
+    return {};
+  }
 
   async createOrder(waiterId: number, dto: CreateOrderDto) {
     const dishIds = dto.items.map((item) => item.dishId);
@@ -69,7 +177,7 @@ export class OrderService {
       sortOrder = 'desc',
     } = query;
 
-    const where: any = {};
+    const where: Prisma.OrderWhereInput = {};
     if (status) where.status = status;
     if (waiterId) where.waiterId = waiterId;
     if (cookId) where.cookId = cookId;
@@ -230,5 +338,106 @@ export class OrderService {
         );
       return this.orderRepo.updateStatus(orderId, newStatus);
     }
+  }
+  async getOrderAnalytics(query: OrderAnalyticsQueryDto) {
+    const { groupBy, metric = OrderMetric.REVENUE, from, to } = query;
+    const filters = this.buildFilters(query);
+    const orders = await this.orderRepo.findOrdersWithItems(filters);
+    const grouped = this.groupOrders(orders, groupBy);
+
+    const getDateRange = (start: string, end: string): string[] => {
+      const dates: string[] = [];
+      const currentDate = new Date(start);
+      const endDate = new Date(end);
+      while (currentDate <= endDate) {
+        dates.push(currentDate.toISOString().split('T')[0]);
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return dates;
+    };
+
+    const totalRevenue = orders.reduce((acc, order) => {
+      return (
+        acc +
+        order.orderItems.reduce(
+          (sum, item) => sum + item.quantity * item.price,
+          0,
+        )
+      );
+    }, 0);
+
+    return Object.entries(grouped).map(([key, group]) => {
+      let quantity = 0;
+      let revenue = 0;
+      const count = group.length;
+
+      for (const order of group) {
+        for (const item of order.orderItems) {
+          quantity += item.quantity;
+          revenue += item.quantity * item.price;
+        }
+      }
+
+      const trendMap: Record<string, number> = {};
+      for (const order of group) {
+        const createdAt = new Date(order.createdAt as string | number | Date);
+        const dateKey = createdAt.toISOString().split('T')[0];
+        if (!trendMap[dateKey]) trendMap[dateKey] = 0;
+
+        for (const item of order.orderItems) {
+          if (metric === OrderMetric.REVENUE)
+            trendMap[dateKey] += item.quantity * item.price;
+          else if (metric === OrderMetric.QUANTITY)
+            trendMap[dateKey] += item.quantity;
+          else trendMap[dateKey] += 1;
+        }
+      }
+
+      let trend: { date: string; value: number }[] = [];
+      if (from && to) {
+        const dateRange = getDateRange(from, to);
+        trend = dateRange.map((date) => ({ date, value: trendMap[date] || 0 }));
+      } else {
+        trend = Object.entries(trendMap).map(([date, value]) => ({
+          date,
+          value,
+        }));
+      }
+
+      const values = trend.map((t) => t.value);
+      const maxRevenueInDay = Math.max(...values);
+      const minRevenueInDay = Math.min(...values);
+      const peakDay =
+        trend.find((t) => t.value === maxRevenueInDay)?.date || null;
+      const troughDay =
+        trend.find((t) => t.value === minRevenueInDay)?.date || null;
+
+      const value =
+        metric === OrderMetric.REVENUE
+          ? revenue
+          : metric === OrderMetric.QUANTITY
+            ? quantity
+            : count;
+
+      const groupInfo = this.extractGroupInfo(group, groupBy);
+
+      return {
+        group: key,
+        groupInfo,
+        value,
+        count,
+        quantity,
+        revenue,
+        avgRevenuePerOrder: count > 0 ? revenue / count : 0,
+        avgItemsPerOrder: count > 0 ? quantity / count : 0,
+        percentageOfTotalRevenue:
+          totalRevenue > 0 ? (revenue / totalRevenue) * 100 : 0,
+        maxRevenueInDay,
+        minRevenueInDay,
+        peakDay,
+        troughDay,
+        trend,
+      };
+    });
   }
 }

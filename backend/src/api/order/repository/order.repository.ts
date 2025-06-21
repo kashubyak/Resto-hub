@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { OrderEntity } from '../entities/order.entity';
 
@@ -174,6 +174,26 @@ export class OrderRepository {
     return await this.prisma.order.update({
       where: { id: orderId },
       data: { status },
+    });
+  }
+
+  async findOrdersWithItems(where: Prisma.OrderWhereInput) {
+    return this.prisma.order.findMany({
+      where,
+      include: {
+        waiter: true,
+        cook: true,
+        table: true,
+        orderItems: {
+          include: {
+            dish: {
+              include: {
+                category: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 }

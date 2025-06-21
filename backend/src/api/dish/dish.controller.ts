@@ -18,6 +18,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
@@ -60,6 +61,54 @@ export class DishController {
   @ApiOkResponse({
     description: 'Filtered and sorted list of dishes',
     type: PaginatedDishesResponseDto,
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search by dish name',
+  })
+  @ApiQuery({
+    name: 'minPrice',
+    required: false,
+    type: Number,
+    description: 'Minimum dish price',
+  })
+  @ApiQuery({
+    name: 'maxPrice',
+    required: false,
+    type: Number,
+    description: 'Maximum dish price',
+  })
+  @ApiQuery({
+    name: 'available',
+    required: false,
+    type: Boolean,
+    description: 'Only available dishes',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['name', 'price', 'createdAt'],
+    description: 'Field to sort by',
+  })
+  @ApiQuery({
+    name: 'order',
+    required: false,
+    enum: ['asc', 'desc'],
+    description: 'Sort order',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (starts from 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page',
   })
   getFilteredDishes(@Query() query: FilterDishDto) {
     return this.dishService.filterDishes(query);

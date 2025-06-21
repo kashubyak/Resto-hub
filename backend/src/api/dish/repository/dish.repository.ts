@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateDishDto } from '../dto/create-dish.dto';
 import { FilterDishDto } from '../dto/filter-dish.dto';
@@ -24,7 +25,7 @@ export class DishRepository {
       limit = 10,
     } = query;
 
-    const where: any = {};
+    const where: Prisma.DishWhereInput = {};
     if (search) where.name = { contains: search, mode: 'insensitive' };
     if (available !== undefined) where.available = available;
     if (minPrice !== undefined || maxPrice !== undefined) {

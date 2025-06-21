@@ -18,6 +18,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
@@ -63,6 +64,42 @@ export class CategoryController {
   @ApiOkResponse({
     description: 'Filtered and sorted list of categories',
     type: PaginatedCategoryResponseDto,
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search by category name',
+  })
+  @ApiQuery({
+    name: 'hasDishes',
+    required: false,
+    type: Boolean,
+    description: 'Filter only categories with dishes',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['name', 'createdAt', 'updatedAt'],
+    description: 'Sort field',
+  })
+  @ApiQuery({
+    name: 'order',
+    required: false,
+    enum: ['asc', 'desc'],
+    description: 'Sort direction',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (starts from 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page',
   })
   getFilterCategories(@Query() query: FilterCategoryDto) {
     return this.categoryService.filterCategories(query);
