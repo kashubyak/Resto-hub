@@ -32,7 +32,7 @@ export class CategoryRepository {
     take: number;
   }) {
     const { where, orderBy, skip, take } = args;
-    const [items, total] = await this.prisma.$transaction([
+    const [items, total] = await Promise.all([
       this.prisma.category.findMany({
         where,
         include: { dishes: true },

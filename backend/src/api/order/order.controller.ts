@@ -91,7 +91,7 @@ export class OrderController {
     return this.orderService.getOrderAnalytics(query);
   }
 
-  @Get('search')
+  @Get()
   @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Receive all orders (admin only)' })
   @ApiOkResponse({

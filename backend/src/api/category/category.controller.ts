@@ -59,7 +59,7 @@ export class CategoryController {
     return this.categoryService.createCategory(dto);
   }
 
-  @Get('search')
+  @Get()
   @ApiOperation({ description: 'Search and filter categories with pagination' })
   @ApiOkResponse({
     description: 'Filtered and sorted list of categories',

@@ -56,7 +56,7 @@ export class DishController {
     return this.dishService.createDish(dto);
   }
 
-  @Get('search')
+  @Get()
   @ApiOperation({ description: 'Search and filter dishes with pagination' })
   @ApiOkResponse({
     description: 'Filtered and sorted list of dishes',
