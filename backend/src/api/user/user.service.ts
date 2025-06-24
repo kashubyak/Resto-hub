@@ -1,6 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, Role } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
 import { FilterUserDto } from './dto/filter-user.dto';
+import { UpdateUserDto } from './dto/update-user-dto';
 import { UserRepository } from './repository/user.repository';
 
 @Injectable()
@@ -47,5 +53,30 @@ export class UserService {
     const user = await this.userRepository.findUser(id);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
     return user;
+  }
+  async updateUser(id: number, dto: UpdateUserDto) {
+    const user = await this.userRepository.findUserWithPassword(id);
+    if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+
+    if (dto.role === Role.ADMIN)
+      throw new BadRequestException('Cannot assign ADMIN role');
+
+    if (dto.email && dto.email !== user.email) {
+      const existingEmail = await this.userRepository.findByEmail(dto.email);
+      if (existingEmail) throw new BadRequestException('Email already exists');
+    }
+
+    if (dto.password) {
+      if (!dto.oldPassword)
+        throw new BadRequestException(
+          'Old password is required to set new password',
+        );
+
+      const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
+      if (!isMatch) throw new BadRequestException('Old password is incorrect');
+      dto.password = await bcrypt.hash(dto.password, 10);
+    }
+    const { oldPassword, ...safeData } = dto;
+    return await this.userRepository.updateUser(id, safeData);
   }
 }

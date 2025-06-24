@@ -1,3 +1,4 @@
+import { Role } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsIn, IsOptional, IsPositive, IsString } from 'class-validator';
 
@@ -7,8 +8,8 @@ export class FilterUserDto {
   search?: string;
 
   @IsOptional()
-  @IsIn(['COOK', 'WAITER'])
-  role?: 'COOK' | 'WAITER';
+  @IsIn([Role.COOK, Role.WAITER])
+  role?: Role;
 
   @IsOptional()
   @IsIn(['name', 'email', 'createdAt', 'updatedAt'])
