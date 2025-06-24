@@ -23,19 +23,19 @@ import {
 import { OrderStatus, Role } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { CreateOrderDto } from './dto/create-order-dto';
+import { CreateOrderDto } from './dto/create-order.dto';
 import {
   OrderAnalyticsQueryDto,
   OrderGroupBy,
   OrderMetric,
-} from './dto/order-analytics-query-dto';
-import { OrderAnalyticsResponseDto } from './dto/order-analyticsresponse-dto';
+} from './dto/order-analytics-query.dto';
+import { OrderAnalyticsResponseDto } from './dto/order-analyticsresponse.dto';
 import {
   AssignOrderResponseDto,
   CancelOrderResponseDto,
   UpdateOrderStatusResponseDto,
-} from './dto/order-response-dto';
-import { OrdersQueryDto } from './dto/orders-query-dto';
+} from './dto/order-response.dto';
+import { OrdersQueryDto } from './dto/orders-query.dto';
 import {
   PaginatedFreeOrdersResponseDto,
   PaginatedIdOrdersResponseDto,

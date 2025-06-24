@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -37,7 +38,8 @@ export class AuthService {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-
+    if (dto.role !== 'ADMIN')
+      throw new ForbiddenException('Only ADMIN can be registered here');
     if (existingUser) throw new ConflictException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);

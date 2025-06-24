@@ -6,6 +6,21 @@ import { PrismaService } from 'prisma/prisma.service';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  createUser(data: Prisma.UserCreateInput) {
+    return this.prisma.user.create({
+      data,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        avatarUrl: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
   async findManyWithCount(args: {
     where?: Prisma.UserWhereInput;
     orderBy?: Prisma.UserOrderByWithRelationInput;

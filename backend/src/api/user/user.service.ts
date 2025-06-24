@@ -5,13 +5,39 @@ import {
 } from '@nestjs/common';
 import { Prisma, Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { RegisterDto } from '../auth/dto/requests/register.dto';
 import { FilterUserDto } from './dto/filter-user.dto';
-import { UpdateUserDto } from './dto/update-user-dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repository/user.repository';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
+
+  async registerUser(dto: RegisterDto) {
+    const existingUser = await this.userRepository.findByEmail(dto.email);
+    if (existingUser) throw new BadRequestException('Email already exists');
+    if (dto.role === Role.ADMIN)
+      throw new BadRequestException('Cannot assign ADMIN role');
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const user = await this.userRepository.createUser({
+      name: dto.name,
+      email: dto.email,
+      password: hashedPassword,
+      role: dto.role,
+      avatarUrl: dto.avatarUrl,
+    });
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
 
   async findAll(query: FilterUserDto) {
     const {

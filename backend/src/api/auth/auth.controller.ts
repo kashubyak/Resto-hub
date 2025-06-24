@@ -30,7 +30,7 @@ export class AuthController {
   @Post('register')
   @Public()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ description: 'Register a new user' })
+  @ApiOperation({ description: 'Register a new user (admin only)' })
   @ApiBody({ type: RegisterDto })
   @ApiResponse({
     status: 201,
@@ -48,7 +48,7 @@ export class AuthController {
       },
     },
   })
-  async register(
+  register(
     @Body() dto: RegisterDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<Omit<RegisterResponseDto, 'refresh_token'>> {

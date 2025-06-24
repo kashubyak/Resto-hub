@@ -6,7 +6,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { RegisterDto } from 'src/api/auth/dto/requests/register.dto';
 import * as request from 'supertest';
 import { getAuthToken } from 'test/utils/auth-test';
-import { CreateOrderDto } from '../dto/create-order-dto';
+import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
 
 describe('OrderController (e2e)', () => {

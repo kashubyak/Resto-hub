@@ -24,8 +24,8 @@ import {
   ConflictResponseDto,
   HttpErrorResponseDto,
 } from 'src/common/dto/http-error.dto';
-import { CreateTableDto } from './dto/create-table-dto';
-import { UpdateTableDto } from './dto/update-table-dto';
+import { CreateTableDto } from './dto/create-table.dto';
+import { UpdateTableDto } from './dto/update-table.dto';
 import { TableEntity } from './entities/table.entity';
 import { TableService } from './table.service';
 

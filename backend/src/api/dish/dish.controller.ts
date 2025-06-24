@@ -30,7 +30,7 @@ import {
 import { DishService } from './dish.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { FilterDishDto } from './dto/filter-dish.dto';
-import { PaginatedDishesResponseDto } from './dto/paginated-dishes-response-dto';
+import { PaginatedDishesResponseDto } from './dto/paginated-dishes-response.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { DishEntity } from './entities/dish.entity';
 

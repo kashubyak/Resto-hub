@@ -7,16 +7,24 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   Query,
 } from '@nestjs/common';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { RegisterDto } from '../auth/dto/requests/register.dto';
 import { FilterUserDto } from './dto/filter-user.dto';
-import { UpdateUserDto } from './dto/update-user-dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post('register')
+  @Roles(Role.ADMIN)
+  registerUser(@Body() dto: RegisterDto) {
+    return this.userService.registerUser(dto);
+  }
 
   @Get()
   @Roles(Role.ADMIN)

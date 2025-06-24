@@ -30,7 +30,7 @@ import {
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { FilterCategoryDto } from './dto/filter-category.dto';
-import { PaginatedCategoryResponseDto } from './dto/paginated-category-response-dto';
+import { PaginatedCategoryResponseDto } from './dto/paginated-category-response.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import {
   CategoryEntity,
