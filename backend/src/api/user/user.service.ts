@@ -79,4 +79,10 @@ export class UserService {
     const { oldPassword, ...safeData } = dto;
     return await this.userRepository.updateUser(id, safeData);
   }
+
+  async deleteUser(id: number) {
+    const user = await this.userRepository.findUser(id);
+    if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+    return await this.userRepository.deleteUser(id);
+  }
 }

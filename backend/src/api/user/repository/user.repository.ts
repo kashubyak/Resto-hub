@@ -65,7 +65,7 @@ export class UserRepository {
     });
   }
 
-  async findUserWithPassword(id: number) {
+  findUserWithPassword(id: number) {
     return this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -78,9 +78,24 @@ export class UserRepository {
     });
   }
 
-  async findByEmail(email: string) {
+  findByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
+    });
+  }
+
+  deleteUser(id: number) {
+    return this.prisma.user.delete({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        avatarUrl: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 }

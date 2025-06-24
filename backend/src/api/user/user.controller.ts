@@ -2,6 +2,7 @@ import { Role } from '.prisma/client/default';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -36,5 +37,11 @@ export class UserController {
     @Body() dto: UpdateUserDto,
   ) {
     return this.userService.updateUser(id, dto);
+  }
+
+  @Delete(':id')
+  @Roles(Role.ADMIN)
+  deleteUser(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.deleteUser(id);
   }
 }
