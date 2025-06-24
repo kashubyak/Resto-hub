@@ -24,6 +24,7 @@ export class UserRepository {
           name: true,
           email: true,
           role: true,
+          avatarUrl: true,
           createdAt: true,
           updatedAt: true,
         },

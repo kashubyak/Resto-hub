@@ -1,4 +1,10 @@
-import { IsEmail, IsEnum, IsString, MinLength } from '@nestjs/class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsString,
+  IsUrl,
+  MinLength,
+} from '@nestjs/class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
@@ -25,4 +31,11 @@ export class RegisterDto {
   @ApiProperty({ enum: Role, description: 'Role of the user' })
   @IsEnum(Role)
   role: Role;
+
+  @ApiProperty({
+    example: 'https://example.com/avatar.jpg',
+    description: 'URL of the user avatar',
+  })
+  @IsUrl(undefined, { message: 'Avatar URL must be a valid URL' })
+  avatarUrl: string;
 }

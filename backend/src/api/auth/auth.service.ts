@@ -48,6 +48,7 @@ export class AuthService {
         email: dto.email,
         password: hashedPassword,
         role: dto.role,
+        avatarUrl: dto.avatarUrl,
       },
     });
 
@@ -62,6 +63,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatarUrl: user.avatarUrl,
       },
     };
   }

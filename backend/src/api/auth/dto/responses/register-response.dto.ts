@@ -13,6 +13,9 @@ class UserResponse {
 
   @ApiProperty({ enum: Role, example: Role.WAITER })
   role: Role;
+
+  @ApiProperty({ example: 'https://example.com/avatar.jpg' })
+  avatarUrl: string;
 }
 
 export class RegisterResponseDto {
