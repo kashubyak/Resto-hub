@@ -1,4 +1,4 @@
-import { Role } from '.prisma/client/default';
+import { Role, User } from '.prisma/client/default';
 import {
   Body,
   Controller,
@@ -10,6 +10,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RegisterDto } from '../auth/dto/requests/register.dto';
 import { FilterUserDto } from './dto/filter-user.dto';
@@ -30,6 +31,12 @@ export class UserController {
   @Roles(Role.ADMIN)
   findAllUsers(@Query() query: FilterUserDto) {
     return this.userService.findAll(query);
+  }
+
+  @Get('me')
+  @Roles(Role.ADMIN)
+  findCurrentUser(@CurrentUser() user: User) {
+    return this.userService.findById(user.id);
   }
 
   @Get(':id')

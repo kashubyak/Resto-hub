@@ -111,4 +111,10 @@ export class UserService {
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
     return await this.userRepository.deleteUser(id);
   }
+
+  async getCurrentUser(id: number) {
+    const user = await this.userRepository.findUser(id);
+    if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+    return user;
+  }
 }
