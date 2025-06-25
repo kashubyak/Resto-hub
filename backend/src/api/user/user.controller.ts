@@ -45,6 +45,12 @@ export class UserController {
     return this.userService.findById(id);
   }
 
+  @Patch('me')
+  @Roles(Role.ADMIN)
+  updateCurrentUser(@CurrentUser() user: User, @Body() dto: UpdateUserDto) {
+    return this.userService.updateUser(user.id, dto);
+  }
+
   @Patch(':id')
   @Roles(Role.ADMIN)
   updateUser(

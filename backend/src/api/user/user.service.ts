@@ -97,6 +97,8 @@ export class UserService {
         throw new BadRequestException(
           'Old password is required to set new password',
         );
+      if (dto.oldPassword && !dto.password)
+        throw new BadRequestException('New password is required');
 
       const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
       if (!isMatch) throw new BadRequestException('Old password is incorrect');
