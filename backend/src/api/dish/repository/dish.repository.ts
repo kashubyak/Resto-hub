@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import { CreateDishDto } from '../dto/create-dish.dto';
-import { FilterDishDto } from '../dto/filter-dish.dto';
-import { UpdateDishDto } from '../dto/update-dish.dto';
+import { CreateDishDto } from '../dto/request/create-dish.dto';
+import { FilterDishDto } from '../dto/request/filter-dish.dto';
+import { UpdateDishDto } from '../dto/request/update-dish.dto';
 
 @Injectable()
 export class DishRepository {

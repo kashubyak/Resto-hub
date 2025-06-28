@@ -17,8 +17,8 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { RegisterDto } from '../auth/dto/requests/register.dto';
-import { RegisterResponseDto } from '../auth/dto/responses/register-response.dto';
+import { RegisterDto } from '../auth/dto/request/register.dto';
+import { RegisterResponseDto } from '../auth/dto/response/register-response.dto';
 import { FilterUserDto } from './dto/request/filter-user.dto';
 import { UpdateUserDto } from './dto/request/update-user.dto';
 import { PaginatedUserResponseDto } from './dto/response/paginated-user-response.dto';

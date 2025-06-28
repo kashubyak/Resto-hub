@@ -2,19 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
 class UserResponse {
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   id: number;
 
-  @ApiProperty({ example: 'John Doe' })
+  @ApiProperty()
   name: string;
 
-  @ApiProperty({ example: 'john@example.com' })
+  @ApiProperty()
   email: string;
 
   @ApiProperty({ enum: Role, example: Role.WAITER })
   role: Role;
 
-  @ApiProperty({ example: 'https://example.com/avatar.jpg' })
+  @ApiProperty()
   avatarUrl: string;
 }
 

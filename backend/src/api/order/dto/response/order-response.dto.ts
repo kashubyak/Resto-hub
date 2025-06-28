@@ -2,22 +2,22 @@ import { ApiProperty } from '@nestjs/swagger';
 import { OrderStatus } from '@prisma/client';
 
 export class AssignOrderResponseDto {
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   id: number;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   waiterId: number;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   cookId: number;
 
   @ApiProperty({
-    example: 'IN_PROGRESS',
+    example: OrderStatus.IN_PROGRESS,
     enum: ['PENDING', 'IN_PROGRESS', 'COMPLETE'],
   })
   status: OrderStatus;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   tableId: number;
 
   @ApiProperty({ example: '2025-06-16T08:59:04.292Z' })
@@ -28,22 +28,22 @@ export class AssignOrderResponseDto {
 }
 
 export class CancelOrderResponseDto {
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   id: number;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   waiterId: number;
 
-  @ApiProperty({ example: null, nullable: true })
+  @ApiProperty({ nullable: true })
   cookId: number | null;
 
   @ApiProperty({
-    example: 'CANCELED',
+    example: OrderStatus.CANCELED,
     enum: ['PENDING', 'IN_PROGRESS', 'COMPLETE', 'CANCELED'],
   })
   status: OrderStatus;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   tableId: number;
 
   @ApiProperty({ example: '2025-06-16T08:32:24.116Z' })
@@ -54,22 +54,22 @@ export class CancelOrderResponseDto {
 }
 
 export class UpdateOrderStatusResponseDto {
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   id: number;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   waiterId: number;
 
-  @ApiProperty({ example: 1, nullable: true })
+  @ApiProperty({ nullable: true })
   cookId: number | null;
 
   @ApiProperty({
-    example: 'COMPLETE',
+    example: OrderStatus.COMPLETE,
     enum: ['PENDING', 'IN_PROGRESS', 'COMPLETE', 'CANCELED'],
   })
   status: OrderStatus;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty()
   tableId: number;
 
   @ApiProperty({ example: '2025-06-16T08:59:04.292Z' })

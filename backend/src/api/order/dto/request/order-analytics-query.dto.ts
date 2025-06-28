@@ -29,12 +29,18 @@ export class OrderAnalyticsQueryDto {
   @IsOptional()
   metric?: OrderMetric = OrderMetric.REVENUE;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Start date for the analytics query',
+    example: '2023-01-01',
+  })
   @IsDateString()
   @IsOptional()
   from?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'End date for the analytics query',
+    example: '2023-01-31',
+  })
   @IsDateString()
   @IsOptional()
   to?: string;

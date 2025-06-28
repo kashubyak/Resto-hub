@@ -36,7 +36,6 @@ export class UpdateUserDto {
   role?: Role;
 
   @ApiProperty({
-    example: 'https://example.com/avatar.jpg',
     description: 'URL of the user avatar',
   })
   @IsOptional()

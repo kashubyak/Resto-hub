@@ -5,13 +5,13 @@ import {
 } from '@nestjs/common';
 import { OrderStatus, Prisma, Role } from '@prisma/client';
 import { endOfDay } from 'date-fns';
-import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateOrderDto } from './dto/request/create-order.dto';
 import {
   OrderAnalyticsQueryDto,
   OrderGroupBy,
   OrderMetric,
-} from './dto/order-analytics-query.dto';
-import { OrdersQueryDto } from './dto/orders-query.dto';
+} from './dto/request/order-analytics-query.dto';
+import { OrdersQueryDto } from './dto/request/orders-query.dto';
 import { OrderEntity } from './entities/order.entity';
 import { OrderRepository } from './repository/order.repository';
 

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
-import { RegisterDto } from '../auth/dto/requests/register.dto';
+import { RegisterDto } from '../auth/dto/request/register.dto';
 import { FilterUserDto } from './dto/request/filter-user.dto';
 import { UpdateUserDto } from './dto/request/update-user.dto';
 import { UserRepository } from './repository/user.repository';

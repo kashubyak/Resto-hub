@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { DishEntity } from '../entities/dish.entity';
+import { CategorySummaryDto } from './category-summary.dto';
 
-export class PaginatedDishesResponseDto {
-  @ApiProperty({ type: [DishEntity] })
-  items: DishEntity[];
+export class PaginatedCategoryResponseDto {
+  @ApiProperty({ type: [CategorySummaryDto] })
+  items: CategorySummaryDto[];
 
   @ApiProperty({ example: 1 })
   total: number;
