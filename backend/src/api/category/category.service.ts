@@ -38,7 +38,7 @@ export class CategoryService {
 
     const skip = (page - 1) * limit;
 
-    const { items, total } = await this.categoryRep.findManyWithCount({
+    const { data, total } = await this.categoryRep.findManyWithCount({
       where,
       orderBy: { [sortBy]: order },
       skip,
@@ -46,7 +46,7 @@ export class CategoryService {
     });
 
     return {
-      items,
+      data,
       total,
       page,
       limit,

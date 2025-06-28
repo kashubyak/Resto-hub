@@ -3,7 +3,7 @@ import { CategorySummaryDto } from './category-summary.dto';
 
 export class PaginatedCategoryResponseDto {
   @ApiProperty({ type: [CategorySummaryDto] })
-  items: CategorySummaryDto[];
+  data: CategorySummaryDto[];
 
   @ApiProperty({ example: 1 })
   total: number;

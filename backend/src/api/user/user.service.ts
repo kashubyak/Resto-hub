@@ -60,14 +60,14 @@ export class UserService {
         : undefined,
     };
     const skip = (page - 1) * limit;
-    const { items, total } = await this.userRepository.findManyWithCount({
+    const { data, total } = await this.userRepository.findManyWithCount({
       where,
       orderBy: { [sortBy]: order },
       skip,
       take: limit,
     });
     return {
-      items,
+      data,
       total,
       page,
       limit,

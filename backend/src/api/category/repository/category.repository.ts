@@ -32,7 +32,7 @@ export class CategoryRepository {
     take: number;
   }) {
     const { where, orderBy, skip, take } = args;
-    const [items, total] = await Promise.all([
+    const [data, total] = await Promise.all([
       this.prisma.category.findMany({
         where,
         include: { dishes: true },
@@ -43,7 +43,7 @@ export class CategoryRepository {
       this.prisma.category.count({ where }),
     ]);
 
-    return { items, total };
+    return { data, total };
   }
 
   async update(id: number, dto: UpdateCategoryDto) {

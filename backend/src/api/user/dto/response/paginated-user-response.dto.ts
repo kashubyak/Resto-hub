@@ -3,7 +3,7 @@ import { UserItemDto } from './user-item.dto';
 
 export class PaginatedUserResponseDto {
   @ApiProperty({ type: [UserItemDto] })
-  items: UserItemDto[];
+  data: UserItemDto[];
 
   @ApiProperty({ example: 50 })
   total: number;
