@@ -12,37 +12,28 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { OrderStatus, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { CreateOrderDto } from './dto/create-order-dto';
-import {
-  OrderAnalyticsQueryDto,
-  OrderGroupBy,
-  OrderMetric,
-} from './dto/order-analytics-query-dto';
-import { OrderAnalyticsResponseDto } from './dto/order-analyticsresponse-dto';
+import { CreateOrderDto } from './dto/request/create-order.dto';
+import { OrderAnalyticsQueryDto } from './dto/request/order-analytics-query.dto';
+import { OrdersQueryDto } from './dto/request/orders-query.dto';
+import { UpdateOrderStatusDto } from './dto/request/update-order-status.dto';
+import { CreateOrderResponseDto } from './dto/response/create-order-response.dto';
+import { OrderAnalyticsResponseDto } from './dto/response/order-analytic-response.dto';
 import {
   AssignOrderResponseDto,
   CancelOrderResponseDto,
   UpdateOrderStatusResponseDto,
-} from './dto/order-response-dto';
-import { OrdersQueryDto } from './dto/orders-query-dto';
-import {
-  PaginatedFreeOrdersResponseDto,
-  PaginatedIdOrdersResponseDto,
-  PaginatedOrdersResponseDto,
-} from './dto/paginated-orders-response.dto';
-import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-import { OrderResponseEntity } from './entities/order-response.entity';
+} from './dto/response/order-response.dto';
+import { OrderSummaryFullPersonalDto } from './dto/response/order-summary.dto';
+import { PaginatedOrdersResponseDto } from './dto/response/paginated-orders-response.dto';
 import { OrderService } from './order.service';
 
 @ApiTags('Orders')
@@ -55,10 +46,9 @@ export class OrderController {
   @Roles(Role.WAITER)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ description: 'Create a new order (waiter only)' })
-  @ApiBody({ type: CreateOrderDto })
   @ApiCreatedResponse({
     description: 'Order successfully created',
-    type: OrderResponseEntity,
+    type: CreateOrderResponseDto,
   })
   createOrder(
     @CurrentUser('id') waiterId: number,
@@ -75,88 +65,18 @@ export class OrderController {
   })
   @ApiOkResponse({
     description: 'Order analytics data',
-    type: OrderAnalyticsResponseDto,
-    isArray: true,
+    type: [OrderAnalyticsResponseDto],
   })
-  @ApiQuery({ name: 'groupBy', required: false, enum: OrderGroupBy })
-  @ApiQuery({ name: 'metric', required: false, enum: OrderMetric })
-  @ApiQuery({ name: 'from', required: false, type: String, format: 'date' })
-  @ApiQuery({ name: 'to', required: false, type: String, format: 'date' })
-  @ApiQuery({ name: 'dishIds', required: false, type: [Number] })
-  @ApiQuery({ name: 'categoryIds', required: false, type: [Number] })
-  @ApiQuery({ name: 'waiterIds', required: false, type: [Number] })
-  @ApiQuery({ name: 'cookIds', required: false, type: [Number] })
-  @ApiQuery({ name: 'tableIds', required: false, type: [Number] })
   getOrderAnalytics(@Query() query: OrderAnalyticsQueryDto) {
     return this.orderService.getOrderAnalytics(query);
   }
 
-  @Get('search')
+  @Get()
   @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Receive all orders (admin only)' })
   @ApiOkResponse({
-    type: PaginatedOrdersResponseDto,
     description: 'Paginated list of orders',
-  })
-  @ApiQuery({
-    name: 'status',
-    enum: OrderStatus,
-    required: false,
-    description: 'Filter by order status',
-  })
-  @ApiQuery({
-    name: 'from',
-    required: false,
-    type: String,
-    description: 'Filter orders from this date (YYYY-MM-DD)',
-  })
-  @ApiQuery({
-    name: 'to',
-    required: false,
-    type: String,
-    description: 'Filter orders up to this date (YYYY-MM-DD)',
-  })
-  @ApiQuery({
-    name: 'waiterId',
-    required: false,
-    type: Number,
-    description: 'Filter by waiter ID',
-  })
-  @ApiQuery({
-    name: 'cookId',
-    required: false,
-    type: Number,
-    description: 'Filter by cook ID',
-  })
-  @ApiQuery({
-    name: 'tableId',
-    required: false,
-    type: Number,
-    description: 'Filter by table ID',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Page number (starting from 1)',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description: 'Items per page',
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    enum: ['createdAt'],
-    description: 'Sort field',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['asc', 'desc'],
-    description: 'Sort direction',
+    type: PaginatedOrdersResponseDto,
   })
   getAllOrders(@Query() query: OrdersQueryDto) {
     return this.orderService.getAllOrders(query);
@@ -168,68 +88,8 @@ export class OrderController {
     description: 'Order history (waiter or cook)',
   })
   @ApiOkResponse({
+    description: 'Paginated list of orders for the user',
     type: PaginatedOrdersResponseDto,
-    description: 'Paginated order history for waiter or cook',
-  })
-  @ApiQuery({
-    name: 'status',
-    enum: OrderStatus,
-    required: false,
-    description: 'Filter by order status',
-  })
-  @ApiQuery({
-    name: 'from',
-    required: false,
-    type: String,
-    description: 'Filter from date (YYYY-MM-DD)',
-  })
-  @ApiQuery({
-    name: 'to',
-    required: false,
-    type: String,
-    description: 'Filter to date (YYYY-MM-DD)',
-  })
-  @ApiQuery({
-    name: 'waiterId',
-    required: false,
-    type: Number,
-    description: 'Filter by waiter ID (admin only)',
-  })
-  @ApiQuery({
-    name: 'cookId',
-    required: false,
-    type: Number,
-    description: 'Filter by cook ID (admin only)',
-  })
-  @ApiQuery({
-    name: 'tableId',
-    required: false,
-    type: Number,
-    description: 'Filter by table ID',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Page number (starts from 1)',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description: 'Number of items per page',
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    enum: ['createdAt'],
-    description: 'Sort field (currently only "createdAt")',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['asc', 'desc'],
-    description: 'Sort direction',
   })
   getOrderHistory(
     @CurrentUser('id') userId: number,
@@ -241,70 +101,10 @@ export class OrderController {
 
   @Get('free')
   @Roles(Role.COOK)
-  @ApiOperation({ description: 'Get free orders (only cook)' })
+  @ApiOperation({ description: 'Get free orders cook = null (only cook)' })
   @ApiOkResponse({
-    type: PaginatedFreeOrdersResponseDto,
     description: 'List of free orders available for cooks',
-  })
-  @ApiQuery({
-    name: 'status',
-    enum: OrderStatus,
-    required: false,
-    description: 'Filter by order status',
-  })
-  @ApiQuery({
-    name: 'from',
-    required: false,
-    type: String,
-    description: 'Filter from date (YYYY-MM-DD)',
-  })
-  @ApiQuery({
-    name: 'to',
-    required: false,
-    type: String,
-    description: 'Filter to date (YYYY-MM-DD)',
-  })
-  @ApiQuery({
-    name: 'waiterId',
-    required: false,
-    type: Number,
-    description: 'Filter by waiter ID',
-  })
-  @ApiQuery({
-    name: 'cookId',
-    required: false,
-    type: Number,
-    description: 'Filter by cook ID',
-  })
-  @ApiQuery({
-    name: 'tableId',
-    required: false,
-    type: Number,
-    description: 'Filter by table ID',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Page number (min 1)',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description: 'Items per page (min 1)',
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    enum: ['createdAt'],
-    description: 'Sort field (currently only "createdAt")',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['asc', 'desc'],
-    description: 'Sort order',
+    type: PaginatedOrdersResponseDto,
   })
   getFreeOrders(@Query() query: OrdersQueryDto) {
     return this.orderService.getFreeOrders(query);
@@ -315,7 +115,7 @@ export class OrderController {
   @ApiParam({ name: 'id', type: Number })
   @ApiOkResponse({
     description: 'Full information about a single order',
-    type: PaginatedIdOrdersResponseDto,
+    type: OrderSummaryFullPersonalDto,
   })
   getOrderById(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.getOrderById(id);
@@ -358,7 +158,6 @@ export class OrderController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ description: 'Update order status (cook or waiter)' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiBody({ type: UpdateOrderStatusDto })
   @ApiOkResponse({
     description: 'Updated order status',
     type: UpdateOrderStatusResponseDto,

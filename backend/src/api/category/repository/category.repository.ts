@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import { CreateCategoryDto } from '../dto/create-category.dto';
-import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { CreateCategoryDto } from '../dto/request/create-category.dto';
+import { UpdateCategoryDto } from '../dto/request/update-category.dto';
 
 @Injectable()
 export class CategoryRepository {
@@ -32,7 +32,7 @@ export class CategoryRepository {
     take: number;
   }) {
     const { where, orderBy, skip, take } = args;
-    const [items, total] = await this.prisma.$transaction([
+    const [data, total] = await Promise.all([
       this.prisma.category.findMany({
         where,
         include: { dishes: true },
@@ -43,7 +43,7 @@ export class CategoryRepository {
       this.prisma.category.count({ where }),
     ]);
 
-    return { items, total };
+    return { data, total };
   }
 
   async update(id: number, dto: UpdateCategoryDto) {

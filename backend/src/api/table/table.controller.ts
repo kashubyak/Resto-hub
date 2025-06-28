@@ -9,24 +9,16 @@ import {
   Post,
 } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
-  ApiConflictResponse,
   ApiCreatedResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import {
-  BadRequestResponseDto,
-  ConflictResponseDto,
-  HttpErrorResponseDto,
-} from 'src/common/dto/http-error.dto';
-import { CreateTableDto } from './dto/create-table-dto';
-import { UpdateTableDto } from './dto/update-table-dto';
-import { TableEntity } from './entities/table.entity';
+import { CreateTableDto } from './dto/request/create-table.dto';
+import { UpdateTableDto } from './dto/request/update-table.dto';
+import { CreateTableResponseDto } from './dto/response/create-table-response.dto';
 import { TableService } from './table.service';
 
 @ApiTags('Tables')
@@ -39,15 +31,7 @@ export class TableController {
   @ApiOperation({ description: 'Create a new table (admin only)' })
   @ApiCreatedResponse({
     description: 'Table created successfully',
-    type: TableEntity,
-  })
-  @ApiConflictResponse({
-    description: 'Table with the same number already exists',
-    type: ConflictResponseDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'Validation error in body payload',
-    type: BadRequestResponseDto,
+    type: CreateTableResponseDto,
   })
   createTable(@Body() createTableDto: CreateTableDto) {
     return this.tableService.createTable(createTableDto);
@@ -57,7 +41,7 @@ export class TableController {
   @ApiOperation({ description: 'Get all tables' })
   @ApiOkResponse({
     description: 'List of all tables',
-    type: [TableEntity],
+    type: [CreateTableResponseDto],
   })
   getAllTables() {
     return this.tableService.getAllTables();
@@ -67,15 +51,7 @@ export class TableController {
   @ApiOperation({ description: 'Get table by ID' })
   @ApiOkResponse({
     description: 'Table found',
-    type: TableEntity,
-  })
-  @ApiNotFoundResponse({
-    description: 'Table with specified ID was not found',
-    type: HttpErrorResponseDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid ID parameter (must be a number)',
-    type: BadRequestResponseDto,
+    type: CreateTableResponseDto,
   })
   getTableById(@Param('id', ParseIntPipe) id: number) {
     return this.tableService.getTableById(+id);
@@ -88,19 +64,7 @@ export class TableController {
   })
   @ApiOkResponse({
     description: 'Table updated successfully',
-    type: TableEntity,
-  })
-  @ApiNotFoundResponse({
-    description: 'Table with specified ID was not found',
-    type: HttpErrorResponseDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'Validation error in body or ID parameter',
-    type: BadRequestResponseDto,
-  })
-  @ApiConflictResponse({
-    description: 'Updated table number conflicts with another existing table',
-    type: ConflictResponseDto,
+    type: CreateTableResponseDto,
   })
   updateTable(
     @Param('id', ParseIntPipe) id: number,
@@ -114,15 +78,7 @@ export class TableController {
   @ApiOperation({ description: 'Delete table by ID (admin only)' })
   @ApiOkResponse({
     description: 'Table deleted successfully',
-    type: TableEntity,
-  })
-  @ApiNotFoundResponse({
-    description: 'Table with specified ID was not found',
-    type: HttpErrorResponseDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid ID parameter (must be a number)',
-    type: BadRequestResponseDto,
+    type: CreateTableResponseDto,
   })
   deleteTable(@Param('id', ParseIntPipe) id: number) {
     return this.tableService.deleteTable(id);

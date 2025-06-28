@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { FilterCategoryDto } from './dto/filter-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCategoryDto } from './dto/request/create-category.dto';
+import { FilterCategoryDto } from './dto/request/filter-category.dto';
+import { UpdateCategoryDto } from './dto/request/update-category.dto';
 import { CategoryRepository } from './repository/category.repository';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class CategoryService {
 
     const skip = (page - 1) * limit;
 
-    const { items, total } = await this.categoryRep.findManyWithCount({
+    const { data, total } = await this.categoryRep.findManyWithCount({
       where,
       orderBy: { [sortBy]: order },
       skip,
@@ -46,7 +46,7 @@ export class CategoryService {
     });
 
     return {
-      items,
+      data,
       total,
       page,
       limit,

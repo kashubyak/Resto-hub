@@ -10,17 +10,18 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Public } from 'src/common/decorators/public.decorator';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/requests/login.dto';
-import { RegisterDto } from './dto/requests/register.dto';
-import { RegisterResponseDto } from './dto/responses/register-response.dto';
-import { TokenResponseDto } from './dto/responses/token-response.dto';
+import { LoginDto } from './dto/request/login.dto';
+import { RegisterDto } from './dto/request/register.dto';
+import { RegisterResponseDto } from './dto/response/register-response.dto';
+import { TokenResponseDto } from './dto/response/token-response.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -30,25 +31,13 @@ export class AuthController {
   @Post('register')
   @Public()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ description: 'Register a new user' })
+  @ApiOperation({ description: 'Register a new user (admin only)' })
   @ApiBody({ type: RegisterDto })
-  @ApiResponse({
-    status: 201,
+  @ApiCreatedResponse({
     description: 'User registered successfully.',
     type: RegisterResponseDto,
   })
-  @ApiResponse({
-    status: 409,
-    description: 'Email already in use.',
-    schema: {
-      example: {
-        statusCode: 409,
-        message: 'Email already in use',
-        error: 'Conflict',
-      },
-    },
-  })
-  async register(
+  register(
     @Body() dto: RegisterDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<Omit<RegisterResponseDto, 'refresh_token'>> {
@@ -62,23 +51,11 @@ export class AuthController {
     description: 'Log in and get JWT token which expires in 1 day.',
   })
   @ApiBody({ type: LoginDto })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Signed in successfully.',
     schema: {
       example: {
         token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Invalid credentials.',
-    schema: {
-      example: {
-        statusCode: 401,
-        message: 'Invalid credentials',
-        error: 'Unauthorized',
       },
     },
   })
@@ -95,21 +72,9 @@ export class AuthController {
   @ApiOperation({
     description: 'Refresh access token using cookie-based refresh token.',
   })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Token refreshed successfully.',
     type: TokenResponseDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Invalid or expired refresh token.',
-    schema: {
-      example: {
-        statusCode: 401,
-        message: 'Invalid refresh token',
-        error: 'Unauthorized',
-      },
-    },
   })
   async refresh(
     @Req() req: Request,
@@ -122,14 +87,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('access-token')
   @ApiOperation({ description: 'Log out the current user.' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Logged out successfully.',
-    schema: {
-      example: {
-        message: 'Logged out successfully',
-      },
-    },
   })
   logout(@Res({ passthrough: true }) res: Response) {
     return this.authService.logoutUser(res);

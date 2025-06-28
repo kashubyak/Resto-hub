@@ -3,11 +3,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrderStatus, Role } from '@prisma/client';
 import { AppModule } from 'app.module';
 import { PrismaService } from 'prisma/prisma.service';
-import { RegisterDto } from 'src/api/auth/dto/requests/register.dto';
+import { RegisterDto } from 'src/api/auth/dto/request/register.dto';
 import * as request from 'supertest';
 import { getAuthToken } from 'test/utils/auth-test';
-import { CreateOrderDto } from '../dto/create-order-dto';
-import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
+import { CreateOrderDto } from '../dto/request/create-order.dto';
+import { UpdateOrderStatusDto } from '../dto/request/update-order-status.dto';
 
 describe('OrderController (e2e)', () => {
   let app: INestApplication;
@@ -55,24 +55,28 @@ describe('OrderController (e2e)', () => {
       password: 'password',
       name: 'Order Admin',
       role: Role.ADMIN,
+      avatarUrl: 'http://example.com/avatar.jpg',
     };
     const waiterDto: RegisterDto = {
       email: 'order.waiter@test.com',
       password: 'password',
       name: 'Order Waiter',
       role: Role.WAITER,
+      avatarUrl: 'http://example.com/avatar.jpg',
     };
     const cookDto: RegisterDto = {
       email: 'order.cook@test.com',
       password: 'password',
       name: 'Order Cook',
       role: Role.COOK,
+      avatarUrl: 'http://example.com/avatar.jpg',
     };
     const anotherCookDto: RegisterDto = {
       email: 'order.cook2@test.com',
       password: 'password',
       name: 'Another Cook',
       role: Role.COOK,
+      avatarUrl: 'http://example.com/avatar.jpg',
     };
 
     [adminToken, waiterToken, cookToken, anotherCookToken] = await Promise.all([

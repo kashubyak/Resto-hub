@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -8,9 +9,9 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
-import { LoginDto } from './dto/requests/login.dto';
-import { RegisterDto } from './dto/requests/register.dto';
-import { RegisterResponseDto } from './dto/responses/register-response.dto';
+import { LoginDto } from './dto/request/login.dto';
+import { RegisterDto } from './dto/request/register.dto';
+import { RegisterResponseDto } from './dto/response/register-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +38,8 @@ export class AuthService {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-
+    if (dto.role !== 'ADMIN')
+      throw new ForbiddenException('Only ADMIN can be registered here');
     if (existingUser) throw new ConflictException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -48,6 +50,7 @@ export class AuthService {
         email: dto.email,
         password: hashedPassword,
         role: dto.role,
+        avatarUrl: dto.avatarUrl,
       },
     });
 
@@ -62,6 +65,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatarUrl: user.avatarUrl,
       },
     };
   }

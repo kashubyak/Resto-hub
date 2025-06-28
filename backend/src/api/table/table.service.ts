@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateTableDto } from './dto/create-table-dto';
-import { UpdateTableDto } from './dto/update-table-dto';
+import { CreateTableDto } from './dto/request/create-table.dto';
+import { UpdateTableDto } from './dto/request/update-table.dto';
 import { TableRepository } from './repository/table.repository';
 
 @Injectable()

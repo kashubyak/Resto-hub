@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateDishDto } from './dto/create-dish.dto';
-import { FilterDishDto } from './dto/filter-dish.dto';
-import { UpdateDishDto } from './dto/update-dish.dto';
+import { CreateDishDto } from './dto/request/create-dish.dto';
+import { FilterDishDto } from './dto/request/filter-dish.dto';
+import { UpdateDishDto } from './dto/request/update-dish.dto';
 import { DishRepository } from './repository/dish.repository';
 
 @Injectable()
@@ -13,12 +13,12 @@ export class DishService {
   }
 
   async filterDishes(query: FilterDishDto) {
-    const [items, total] = await this.dishRepo.findDishes(query);
+    const [data, total] = await this.dishRepo.findDishes(query);
     const page = query.page || 1;
     const limit = query.limit || 10;
 
     return {
-      items,
+      data,
       total,
       page,
       limit,
