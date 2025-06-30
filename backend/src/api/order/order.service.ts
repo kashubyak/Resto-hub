@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { OrderStatus, Prisma, Role } from '@prisma/client';
 import { endOfDay } from 'date-fns';
+import { socket_events } from 'src/common/constants';
 import { CreateOrderDto } from './dto/request/create-order.dto';
 import {
   OrderAnalyticsQueryDto,
@@ -13,11 +14,15 @@ import {
 } from './dto/request/order-analytics-query.dto';
 import { OrdersQueryDto } from './dto/request/orders-query.dto';
 import { OrderEntity } from './entities/order.entity';
+import { NotificationsGateway } from './gateway/notification.gateway';
 import { OrderRepository } from './repository/order.repository';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly orderRepo: OrderRepository) {}
+  constructor(
+    private readonly orderRepo: OrderRepository,
+    private readonly notificationsGateway: NotificationsGateway,
+  ) {}
   private mapSummary = (order: any) => {
     const summarizedItems = order.orderItems.map((item) => ({
       price: item.price,
@@ -160,7 +165,15 @@ export class OrderService {
 
     const order = new OrderEntity(waiterId, dto.tableId, items);
 
-    return this.orderRepo.createOrder(order);
+    const createdOrder = await this.orderRepo.createOrder(order);
+
+    this.notificationsGateway.notifyKitchen(socket_events.NEW_ORDER, {
+      id: createdOrder.id,
+      itemsCount: order.items.length,
+      createdAt: createdOrder.createdAt,
+    });
+
+    return createdOrder;
   }
 
   async getAllOrders(query: OrdersQueryDto) {
@@ -323,7 +336,18 @@ export class OrderService {
         throw new BadRequestException('You are not assigned to this order');
       if (order.status !== OrderStatus.IN_PROGRESS)
         throw new BadRequestException('Order must be IN_PROGRESS to complete');
-      return this.orderRepo.updateStatus(orderId, newStatus);
+      const update = this.orderRepo.updateStatus(orderId, newStatus);
+
+      this.notificationsGateway.notifyWaiter(
+        socket_events.ORDER_COMPLETED,
+        {
+          orderId,
+          status: newStatus,
+          table: order.table?.number,
+        },
+        order.waiter.id,
+      );
+      return update;
     }
     if (role === Role.WAITER) {
       if (newStatus !== OrderStatus.DELIVERED)
