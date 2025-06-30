@@ -1,11 +1,13 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { OrderStatus, Prisma, Role } from '@prisma/client';
 import { endOfDay } from 'date-fns';
 import { socket_events } from 'src/common/constants';
+import { TableService } from '../table/table.service';
 import { CreateOrderDto } from './dto/request/create-order.dto';
 import {
   OrderAnalyticsQueryDto,
@@ -22,6 +24,7 @@ export class OrderService {
   constructor(
     private readonly orderRepo: OrderRepository,
     private readonly notificationsGateway: NotificationsGateway,
+    private readonly tableService: TableService,
   ) {}
   private mapSummary = (order: any) => {
     const summarizedItems = order.orderItems.map((item) => ({
@@ -152,6 +155,9 @@ export class OrderService {
   async createOrder(waiterId: number, dto: CreateOrderDto) {
     const dishIds = dto.items.map((item) => item.dishId);
     const priceMap = await this.orderRepo.getDishPrices(dishIds);
+    const table = await this.tableService.getTableById(dto.tableId);
+    if (table.active === false)
+      throw new ConflictException('Table is occupied now');
 
     if (priceMap.size !== dishIds.length)
       throw new BadRequestException('Some dishes not found');
@@ -166,7 +172,7 @@ export class OrderService {
     const order = new OrderEntity(waiterId, dto.tableId, items);
 
     const createdOrder = await this.orderRepo.createOrder(order);
-
+    await this.tableService.updateTable(dto.tableId, { active: false });
     this.notificationsGateway.notifyKitchen(socket_events.NEW_ORDER, {
       id: createdOrder.id,
       itemsCount: order.items.length,
@@ -350,19 +356,35 @@ export class OrderService {
       return update;
     }
     if (role === Role.WAITER) {
-      if (newStatus !== OrderStatus.DELIVERED)
-        throw new BadRequestException(
-          'Waiter can only set status to DELIVERED',
-        );
-      if (order?.waiter.id !== userId)
+      if (order.waiter?.id !== userId)
         throw new BadRequestException('You are not assigned to this order');
-      if (order.status !== OrderStatus.COMPLETE)
-        throw new BadRequestException(
-          'Order must be COMPLETE before delivering',
-        );
-      return this.orderRepo.updateStatus(orderId, newStatus);
+
+      if (newStatus === OrderStatus.DELIVERED) {
+        if (order.status !== OrderStatus.COMPLETE)
+          throw new BadRequestException(
+            'Order must be COMPLETE before delivering',
+          );
+        return this.orderRepo.updateStatus(orderId, newStatus);
+      }
+
+      if (newStatus === OrderStatus.FINISHED) {
+        if (order.status !== OrderStatus.DELIVERED)
+          throw new BadRequestException(
+            'Order must be DELIVERED before finishing',
+          );
+        if (!order.table?.id)
+          throw new BadRequestException('Order is not assigned to a table');
+        await this.tableService.updateTable(order.table?.id, { active: true });
+
+        return this.orderRepo.updateStatus(orderId, newStatus);
+      }
+
+      throw new BadRequestException(
+        'Waiter can only set status to DELIVERED or FINISHED',
+      );
     }
   }
+
   async getOrderAnalytics(query: OrderAnalyticsQueryDto) {
     const { groupBy, metric = OrderMetric.REVENUE, from, to } = query;
     const filters = this.buildFilters(query);

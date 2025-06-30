@@ -31,7 +31,6 @@ export class TableService {
   async updateTable(id: number, dto: UpdateTableDto) {
     const table = await this.tableRepo.findById(id);
     if (!table) throw new NotFoundException('Table not found');
-
     if (dto.number !== undefined) {
       const existingWithSameNumber = await this.tableRepo.findByNumber(
         dto.number,
@@ -46,6 +45,8 @@ export class TableService {
   async deleteTable(id: number) {
     const table = await this.tableRepo.findById(id);
     if (!table) throw new NotFoundException('Table not found');
+    if (table.active === false)
+      throw new ConflictException('Cannot delete an occupied table');
     return this.tableRepo.deleteTable(id);
   }
 }

@@ -7,5 +7,6 @@ import { TableService } from './table.service';
 @Module({
   controllers: [TableController],
   providers: [TableService, TableRepository, PrismaService],
+  exports: [TableService],
 })
 export class TableModule {}
