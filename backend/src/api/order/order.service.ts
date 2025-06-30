@@ -350,19 +350,31 @@ export class OrderService {
       return update;
     }
     if (role === Role.WAITER) {
-      if (newStatus !== OrderStatus.DELIVERED)
-        throw new BadRequestException(
-          'Waiter can only set status to DELIVERED',
-        );
-      if (order?.waiter.id !== userId)
+      if (order.waiter?.id !== userId)
         throw new BadRequestException('You are not assigned to this order');
-      if (order.status !== OrderStatus.COMPLETE)
-        throw new BadRequestException(
-          'Order must be COMPLETE before delivering',
-        );
-      return this.orderRepo.updateStatus(orderId, newStatus);
+
+      if (newStatus === OrderStatus.DELIVERED) {
+        if (order.status !== OrderStatus.COMPLETE)
+          throw new BadRequestException(
+            'Order must be COMPLETE before delivering',
+          );
+        return this.orderRepo.updateStatus(orderId, newStatus);
+      }
+
+      if (newStatus === OrderStatus.FINISHED) {
+        if (order.status !== OrderStatus.DELIVERED)
+          throw new BadRequestException(
+            'Order must be DELIVERED before finishing',
+          );
+        return this.orderRepo.updateStatus(orderId, newStatus);
+      }
+
+      throw new BadRequestException(
+        'Waiter can only set status to DELIVERED or FINISHED',
+      );
     }
   }
+
   async getOrderAnalytics(query: OrderAnalyticsQueryDto) {
     const { groupBy, metric = OrderMetric.REVENUE, from, to } = query;
     const filters = this.buildFilters(query);

@@ -17,8 +17,9 @@ enum OrderStatus {
   PENDING
   IN_PROGRESS
   COMPLETE
-  CANCELED
   DELIVERED
+  FINISHED
+  CANCELED
 }
 
 model User {
