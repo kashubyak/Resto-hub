@@ -25,7 +25,7 @@ export class UserService {
       email: dto.email,
       password: hashedPassword,
       role: dto.role,
-      avatarUrl: dto.avatarUrl,
+      // avatarUrl: dto.avatarUrl,
     });
 
     return {
@@ -33,7 +33,7 @@ export class UserService {
       name: user.name,
       email: user.email,
       role: user.role,
-      avatarUrl: user.avatarUrl,
+      // avatarUrl: user.avatarUrl,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

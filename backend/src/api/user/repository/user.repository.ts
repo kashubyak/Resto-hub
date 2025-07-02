@@ -6,7 +6,7 @@ import { PrismaService } from 'prisma/prisma.service';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  createUser(data: Prisma.UserCreateInput) {
+  createUser(data) {
     return this.prisma.user.create({
       data,
       select: {

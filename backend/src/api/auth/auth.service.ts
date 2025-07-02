@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
+import { S3Service } from 'src/common/s3/s3.service';
 import { LoginDto } from './dto/request/login.dto';
 import { RegisterDto } from './dto/request/register.dto';
 import { RegisterResponseDto } from './dto/response/register-response.dto';
@@ -24,6 +25,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly S3Service: S3Service,
   ) {
     this.JWT_SECRET = this.configService.getOrThrow('JWT_TOKEN_SECRET');
     this.JWT_REFRESH_TOKEN_SECRET = this.configService.getOrThrow(
@@ -33,6 +35,7 @@ export class AuthService {
 
   async registerUser(
     dto: RegisterDto,
+    file: Express.Multer.File,
     res: Response,
   ): Promise<Omit<RegisterResponseDto, 'refresh_token'>> {
     const existingUser = await this.prisma.user.findUnique({
@@ -43,6 +46,7 @@ export class AuthService {
     if (existingUser) throw new ConflictException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const avatarUrl = await this.S3Service.uploadFile(file, 'avatars');
 
     const user = await this.prisma.user.create({
       data: {
@@ -50,7 +54,7 @@ export class AuthService {
         email: dto.email,
         password: hashedPassword,
         role: dto.role,
-        avatarUrl: dto.avatarUrl,
+        avatarUrl,
       },
     });
 
