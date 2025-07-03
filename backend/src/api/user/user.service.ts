@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { S3Service } from 'src/common/s3/s3.service';
 import { RegisterDto } from '../auth/dto/request/register.dto';
 import { FilterUserDto } from './dto/request/filter-user.dto';
 import { UpdateUserDto } from './dto/request/update-user.dto';
@@ -12,20 +13,24 @@ import { UserRepository } from './repository/user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly s3Service: S3Service,
+  ) {}
 
-  async registerUser(dto: RegisterDto) {
+  async registerUser(dto: RegisterDto, file: Express.Multer.File) {
     const existingUser = await this.userRepository.findByEmail(dto.email);
     if (existingUser) throw new BadRequestException('Email already exists');
     if (dto.role === Role.ADMIN)
       throw new BadRequestException('Cannot assign ADMIN role');
     const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const avatarUrl = await this.s3Service.uploadFile(file, 'avatars');
     const user = await this.userRepository.createUser({
       name: dto.name,
       email: dto.email,
       password: hashedPassword,
       role: dto.role,
-      // avatarUrl: dto.avatarUrl,
+      avatarUrl,
     });
 
     return {
@@ -33,7 +38,7 @@ export class UserService {
       name: user.name,
       email: user.email,
       role: user.role,
-      // avatarUrl: user.avatarUrl,
+      avatarUrl: user.avatarUrl,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

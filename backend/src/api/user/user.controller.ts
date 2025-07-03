@@ -9,7 +9,10 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -17,6 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { multerOptions } from 'src/common/s3/file-upload.util';
 import { RegisterDto } from '../auth/dto/request/register.dto';
 import { RegisterResponseDto } from '../auth/dto/response/register-response.dto';
 import { FilterUserDto } from './dto/request/filter-user.dto';
@@ -31,13 +35,17 @@ export class UserController {
 
   @Post('register')
   @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('avatarUrl', multerOptions))
   @ApiOperation({ description: 'Create a new user (ADMIN only)' })
   @ApiCreatedResponse({
     description: 'User successfully created',
     type: RegisterResponseDto,
   })
-  registerUser(@Body() dto: RegisterDto) {
-    return this.userService.registerUser(dto);
+  registerUser(
+    @Body() dto: RegisterDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.userService.registerUser(dto, file);
   }
 
   @Get()
