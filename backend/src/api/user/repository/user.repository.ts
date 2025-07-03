@@ -6,7 +6,7 @@ import { PrismaService } from 'prisma/prisma.service';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  createUser(data) {
+  createUser(data: Prisma.UserCreateInput) {
     return this.prisma.user.create({
       data,
       select: {
@@ -89,6 +89,7 @@ export class UserRepository {
         email: true,
         password: true,
         role: true,
+        avatarUrl: true,
       },
     });
   }

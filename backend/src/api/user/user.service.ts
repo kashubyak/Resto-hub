@@ -85,7 +85,8 @@ export class UserService {
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
     return user;
   }
-  async updateUser(id: number, dto: UpdateUserDto) {
+
+  async updateUser(id: number, dto: UpdateUserDto, file: Express.Multer.File) {
     const user = await this.userRepository.findUserWithPassword(id);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
 
@@ -109,8 +110,15 @@ export class UserService {
       if (!isMatch) throw new BadRequestException('Old password is incorrect');
       dto.password = await bcrypt.hash(dto.password, 10);
     }
+
+    let avatarUrl = user.avatarUrl;
+    if (file) {
+      if (avatarUrl) await this.s3Service.deleteFile(avatarUrl);
+      avatarUrl = await this.s3Service.uploadFile(file, 'avatars');
+    }
+
     const { oldPassword, ...safeData } = dto;
-    return await this.userRepository.updateUser(id, safeData);
+    return await this.userRepository.updateUser(id, { ...safeData, avatarUrl });
   }
 
   async deleteUser(id: number) {

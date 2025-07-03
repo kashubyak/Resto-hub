@@ -83,17 +83,23 @@ export class UserController {
 
   @Patch('me')
   @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('avatarUrl', multerOptions))
   @ApiOperation({ description: 'Update current user (ADMIN only)' })
   @ApiOkResponse({
     description: 'Current user updated successfully',
     type: UserItemDto,
   })
-  updateCurrentUser(@CurrentUser() user: User, @Body() dto: UpdateUserDto) {
-    return this.userService.updateUser(user.id, dto);
+  updateCurrentUser(
+    @CurrentUser() user: User,
+    @Body() dto: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.userService.updateUser(user.id, dto, file);
   }
 
   @Patch(':id')
   @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('avatarUrl', multerOptions))
   @ApiOperation({ description: 'Update user by ID (ADMIN only)' })
   @ApiOkResponse({
     description: 'User updated successfully',
@@ -102,8 +108,9 @@ export class UserController {
   updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.userService.updateUser(id, dto);
+    return this.userService.updateUser(id, dto, file);
   }
 
   @Delete(':id')
