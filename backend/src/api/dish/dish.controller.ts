@@ -83,6 +83,10 @@ export class DishController {
   @Patch(':id')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(
+    MulterErrorInterceptor,
+    FileInterceptor('imageUrl', multerOptions),
+  )
   @ApiOperation({ description: 'Update a dish by its ID (admin only)' })
   @ApiOkResponse({
     description: 'Dish has been successfully updated.',
@@ -90,9 +94,10 @@ export class DishController {
   })
   updateDish(
     @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
     @Body() dto: UpdateDishDto,
   ) {
-    return this.dishService.updateDish(id, dto);
+    return this.dishService.updateDish(id, dto, file);
   }
 
   @Delete(':id')

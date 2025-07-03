@@ -89,7 +89,6 @@ export class UserService {
   }
 
   async updateUser(id: number, dto: UpdateUserDto, file: Express.Multer.File) {
-    if (!file) throw new BadRequestException('Avatar image is required');
     const user = await this.userRepository.findUserWithPassword(id);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
 
@@ -115,8 +114,10 @@ export class UserService {
     }
 
     let avatarUrl = user.avatarUrl;
-    if (avatarUrl) await this.s3Service.deleteFile(avatarUrl);
-    avatarUrl = await this.s3Service.uploadFile(file, folder_avatar);
+    if (file) {
+      if (avatarUrl) await this.s3Service.deleteFile(avatarUrl);
+      avatarUrl = await this.s3Service.uploadFile(file, folder_avatar);
+    }
 
     const { oldPassword, ...safeData } = dto;
     return await this.userRepository.updateUser(id, { ...safeData, avatarUrl });
