@@ -21,6 +21,7 @@ import {
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { multerOptions } from 'src/common/s3/file-upload.util';
+import { MulterErrorInterceptor } from 'src/common/s3/multer-error.interceptor';
 import { RegisterDto } from '../auth/dto/request/register.dto';
 import { RegisterResponseDto } from '../auth/dto/response/register-response.dto';
 import { FilterUserDto } from './dto/request/filter-user.dto';
@@ -35,7 +36,10 @@ export class UserController {
 
   @Post('register')
   @Roles(Role.ADMIN)
-  @UseInterceptors(FileInterceptor('avatarUrl', multerOptions))
+  @UseInterceptors(
+    MulterErrorInterceptor,
+    FileInterceptor('avatarUrl', multerOptions),
+  )
   @ApiOperation({ description: 'Create a new user (ADMIN only)' })
   @ApiCreatedResponse({
     description: 'User successfully created',
@@ -83,7 +87,10 @@ export class UserController {
 
   @Patch('me')
   @Roles(Role.ADMIN)
-  @UseInterceptors(FileInterceptor('avatarUrl', multerOptions))
+  @UseInterceptors(
+    MulterErrorInterceptor,
+    FileInterceptor('avatarUrl', multerOptions),
+  )
   @ApiOperation({ description: 'Update current user (ADMIN only)' })
   @ApiOkResponse({
     description: 'Current user updated successfully',
@@ -99,7 +106,10 @@ export class UserController {
 
   @Patch(':id')
   @Roles(Role.ADMIN)
-  @UseInterceptors(FileInterceptor('avatarUrl', multerOptions))
+  @UseInterceptors(
+    MulterErrorInterceptor,
+    FileInterceptor('avatarUrl', multerOptions),
+  )
   @ApiOperation({ description: 'Update user by ID (ADMIN only)' })
   @ApiOkResponse({
     description: 'User updated successfully',

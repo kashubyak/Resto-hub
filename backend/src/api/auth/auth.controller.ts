@@ -21,6 +21,7 @@ import {
 import { Request, Response } from 'express';
 import { Public } from 'src/common/decorators/public.decorator';
 import { multerOptions } from 'src/common/s3/file-upload.util';
+import { MulterErrorInterceptor } from 'src/common/s3/multer-error.interceptor';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/request/login.dto';
 import { RegisterDto } from './dto/request/register.dto';
@@ -34,7 +35,10 @@ export class AuthController {
 
   @Post('register')
   @Public()
-  @UseInterceptors(FileInterceptor('avatarUrl', multerOptions))
+  @UseInterceptors(
+    MulterErrorInterceptor,
+    FileInterceptor('avatarUrl', multerOptions),
+  )
   @ApiOperation({ description: 'Register a new user (admin only)' })
   @ApiBody({ type: RegisterDto })
   @ApiCreatedResponse({
