@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
@@ -9,56 +9,51 @@ import {
   IsOptional,
   IsPositive,
   IsString,
-  IsUrl,
 } from 'class-validator';
 
 export class CreateDishDto {
-  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty()
+  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
   @IsPositive()
   price: number;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  @IsUrl()
-  imageUrl: string;
-
-  @ApiPropertyOptional()
   @IsOptional()
+  @Transform(({ value }) => parseInt(value))
   @IsInt()
   categoryId?: number;
 
-  @ApiProperty()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return value.split(',').map((v) => v.trim());
+    return [];
+  })
   @IsArray()
-  @IsString({ each: true })
   @ArrayMinSize(1)
-  ingredients?: string[];
+  @IsString({ each: true })
+  ingredients: string[];
 
-  @ApiPropertyOptional()
   @IsOptional()
+  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
   @IsPositive()
-  weightGr?: number;
+  weightGr: number;
 
-  @ApiPropertyOptional()
   @IsOptional()
+  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
   @IsPositive()
-  calories?: number;
+  calories: number;
 
-  @ApiProperty()
   @IsOptional()
+  @Transform(({ value }) => value === 'true')
   @IsBoolean()
   available?: boolean;
 }

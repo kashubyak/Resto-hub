@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { folder_dish } from 'src/common/constants';
+import { S3Service } from 'src/common/s3/s3.service';
 import { CreateDishDto } from './dto/request/create-dish.dto';
 import { FilterDishDto } from './dto/request/filter-dish.dto';
 import { UpdateDishDto } from './dto/request/update-dish.dto';
@@ -6,12 +12,17 @@ import { DishRepository } from './repository/dish.repository';
 
 @Injectable()
 export class DishService {
-  constructor(private readonly dishRepo: DishRepository) {}
+  constructor(
+    private readonly dishRepo: DishRepository,
+    private readonly s3Service: S3Service,
+  ) {}
 
-  async createDish(dto: CreateDishDto) {
-    return this.dishRepo.createDish(dto);
+  async createDish(dto: CreateDishDto, file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Dish image is required');
+    const imageUrl = await this.s3Service.uploadFile(file, folder_dish);
+
+    return this.dishRepo.createDish({ ...dto, imageUrl });
   }
-
   async filterDishes(query: FilterDishDto) {
     const [data, total] = await this.dishRepo.findDishes(query);
     const page = query.page || 1;

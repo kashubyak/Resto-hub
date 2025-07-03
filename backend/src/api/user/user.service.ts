@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { folder_avatar } from 'src/common/constants';
 import { S3Service } from 'src/common/s3/s3.service';
 import { RegisterDto } from '../auth/dto/request/register.dto';
 import { FilterUserDto } from './dto/request/filter-user.dto';
@@ -19,12 +20,13 @@ export class UserService {
   ) {}
 
   async registerUser(dto: RegisterDto, file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Avatar image is required');
     const existingUser = await this.userRepository.findByEmail(dto.email);
     if (existingUser) throw new BadRequestException('Email already exists');
     if (dto.role === Role.ADMIN)
       throw new BadRequestException('Cannot assign ADMIN role');
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const avatarUrl = await this.s3Service.uploadFile(file, 'avatars');
+    const avatarUrl = await this.s3Service.uploadFile(file, folder_avatar);
     const user = await this.userRepository.createUser({
       name: dto.name,
       email: dto.email,
@@ -87,6 +89,7 @@ export class UserService {
   }
 
   async updateUser(id: number, dto: UpdateUserDto, file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Avatar image is required');
     const user = await this.userRepository.findUserWithPassword(id);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
 
@@ -112,10 +115,8 @@ export class UserService {
     }
 
     let avatarUrl = user.avatarUrl;
-    if (file) {
-      if (avatarUrl) await this.s3Service.deleteFile(avatarUrl);
-      avatarUrl = await this.s3Service.uploadFile(file, 'avatars');
-    }
+    if (avatarUrl) await this.s3Service.deleteFile(avatarUrl);
+    avatarUrl = await this.s3Service.uploadFile(file, folder_avatar);
 
     const { oldPassword, ...safeData } = dto;
     return await this.userRepository.updateUser(id, { ...safeData, avatarUrl });

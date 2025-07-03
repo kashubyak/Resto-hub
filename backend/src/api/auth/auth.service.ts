@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -9,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
+import { folder_avatar } from 'src/common/constants';
 import { S3Service } from 'src/common/s3/s3.service';
 import { LoginDto } from './dto/request/login.dto';
 import { RegisterDto } from './dto/request/register.dto';
@@ -38,15 +40,15 @@ export class AuthService {
     file: Express.Multer.File,
     res: Response,
   ): Promise<Omit<RegisterResponseDto, 'refresh_token'>> {
+    if (!file) throw new BadRequestException('Avatar image is required');
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
     if (dto.role !== 'ADMIN')
       throw new ForbiddenException('Only ADMIN can be registered here');
     if (existingUser) throw new ConflictException('Email already in use');
-
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const avatarUrl = await this.S3Service.uploadFile(file, 'avatars');
+    const avatarUrl = await this.S3Service.uploadFile(file, folder_avatar);
 
     const user = await this.prisma.user.create({
       data: {

@@ -9,8 +9,8 @@ import { UpdateDishDto } from '../dto/request/update-dish.dto';
 export class DishRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  createDish(dto: CreateDishDto) {
-    return this.prisma.dish.create({ data: dto });
+  createDish(data: CreateDishDto & { imageUrl: string }) {
+    return this.prisma.dish.create({ data });
   }
 
   findDishes(query: FilterDishDto) {
