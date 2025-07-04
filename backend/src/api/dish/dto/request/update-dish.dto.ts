@@ -1,6 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsInt,
@@ -8,7 +7,6 @@ import {
   IsOptional,
   IsPositive,
   IsString,
-  IsUrl,
 } from 'class-validator';
 
 export class UpdateDishDto {
@@ -33,14 +31,6 @@ export class UpdateDishDto {
   price?: number;
 
   @ApiPropertyOptional({
-    description: 'The URL of the dish image',
-  })
-  @IsOptional()
-  @IsString()
-  @IsUrl()
-  imageUrl?: string;
-
-  @ApiPropertyOptional({
     description: 'The ID of the dish category',
   })
   @IsOptional()
@@ -50,7 +40,6 @@ export class UpdateDishDto {
   @ApiPropertyOptional({
     description: 'The list of ingredients',
   })
-  @ArrayMinSize(1)
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

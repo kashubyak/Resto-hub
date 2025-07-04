@@ -7,3 +7,7 @@ export const socket_rooms = {
   KITCHEN: 'kitchen',
   WAITER: (waiterId: number) => `waiter-${waiterId}`,
 };
+export const size_of_image = 15;
+
+export const folder_dish = 'dishes';
+export const folder_avatar = 'avatars';

@@ -5,7 +5,6 @@ import {
   IsIn,
   IsOptional,
   IsString,
-  IsUrl,
   MinLength,
 } from 'class-validator';
 
@@ -34,11 +33,4 @@ export class UpdateUserDto {
   @IsOptional()
   @IsIn([Role.COOK, Role.WAITER])
   role?: Role;
-
-  @ApiProperty({
-    description: 'URL of the user avatar',
-  })
-  @IsOptional()
-  @IsUrl(undefined, { message: 'Avatar URL must be a valid URL' })
-  avatarUrl?: string;
 }

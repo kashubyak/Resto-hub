@@ -6,7 +6,10 @@ import {
   Post,
   Req,
   Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -17,6 +20,8 @@ import {
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Public } from 'src/common/decorators/public.decorator';
+import { multerOptions } from 'src/common/s3/file-upload.util';
+import { MulterErrorInterceptor } from 'src/common/s3/multer-error.interceptor';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/request/login.dto';
 import { RegisterDto } from './dto/request/register.dto';
@@ -30,7 +35,10 @@ export class AuthController {
 
   @Post('register')
   @Public()
-  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(
+    MulterErrorInterceptor,
+    FileInterceptor('avatarUrl', multerOptions),
+  )
   @ApiOperation({ description: 'Register a new user (admin only)' })
   @ApiBody({ type: RegisterDto })
   @ApiCreatedResponse({
@@ -39,9 +47,10 @@ export class AuthController {
   })
   register(
     @Body() dto: RegisterDto,
+    @UploadedFile() file: Express.Multer.File,
     @Res({ passthrough: true }) res: Response,
   ): Promise<Omit<RegisterResponseDto, 'refresh_token'>> {
-    return this.authService.registerUser(dto, res);
+    return this.authService.registerUser(dto, file, res);
   }
 
   @Post('login')

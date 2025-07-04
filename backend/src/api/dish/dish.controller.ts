@@ -10,7 +10,10 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -20,6 +23,8 @@ import {
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { multerOptions } from 'src/common/s3/file-upload.util';
+import { MulterErrorInterceptor } from 'src/common/s3/multer-error.interceptor';
 import { DishService } from './dish.service';
 import { CreateDishDto } from './dto/request/create-dish.dto';
 import { FilterDishDto } from './dto/request/filter-dish.dto';
@@ -39,13 +44,20 @@ export class DishController {
   @Post('create')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(
+    MulterErrorInterceptor,
+    FileInterceptor('imageUrl', multerOptions),
+  )
   @ApiOperation({ description: 'Create a new dish (admin only)' })
   @ApiCreatedResponse({
     description: 'The dish has been successfully created.',
     type: CreateDishResponseDto,
   })
-  createDish(@Body() dto: CreateDishDto) {
-    return this.dishService.createDish(dto);
+  createDish(
+    @Body() dto: CreateDishDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.dishService.createDish(dto, file);
   }
 
   @Get()
@@ -71,6 +83,10 @@ export class DishController {
   @Patch(':id')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(
+    MulterErrorInterceptor,
+    FileInterceptor('imageUrl', multerOptions),
+  )
   @ApiOperation({ description: 'Update a dish by its ID (admin only)' })
   @ApiOkResponse({
     description: 'Dish has been successfully updated.',
@@ -78,9 +94,10 @@ export class DishController {
   })
   updateDish(
     @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
     @Body() dto: UpdateDishDto,
   ) {
-    return this.dishService.updateDish(id, dto);
+    return this.dishService.updateDish(id, dto, file);
   }
 
   @Delete(':id')

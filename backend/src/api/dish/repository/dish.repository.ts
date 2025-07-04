@@ -3,14 +3,13 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateDishDto } from '../dto/request/create-dish.dto';
 import { FilterDishDto } from '../dto/request/filter-dish.dto';
-import { UpdateDishDto } from '../dto/request/update-dish.dto';
 
 @Injectable()
 export class DishRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  createDish(dto: CreateDishDto) {
-    return this.prisma.dish.create({ data: dto });
+  createDish(data: CreateDishDto & { imageUrl: string }) {
+    return this.prisma.dish.create({ data });
   }
 
   findDishes(query: FilterDishDto) {
@@ -55,7 +54,7 @@ export class DishRepository {
     });
   }
 
-  updateDish(id: number, dto: UpdateDishDto) {
+  updateDish(id: number, dto: Prisma.DishUpdateInput) {
     return this.prisma.dish.update({
       where: { id },
       data: dto,

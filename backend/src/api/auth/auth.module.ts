@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaService } from 'prisma/prisma.service';
+import { S3Service } from 'src/common/s3/s3.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt.guard';
@@ -24,6 +25,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     AuthService,
     JwtStrategy,
     PrismaService,
+    S3Service,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

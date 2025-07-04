@@ -89,6 +89,7 @@ export class UserRepository {
         email: true,
         password: true,
         role: true,
+        avatarUrl: true,
       },
     });
   }
