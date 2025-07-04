@@ -126,6 +126,13 @@ export class UserService {
   async deleteUser(id: number) {
     const user = await this.userRepository.findUser(id);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+    if (user.avatarUrl) {
+      try {
+        await this.s3Service.deleteFile(user.avatarUrl);
+      } catch (error) {
+        throw new BadRequestException('Failed to delete avatar image');
+      }
+    }
     return await this.userRepository.deleteUser(id);
   }
 
