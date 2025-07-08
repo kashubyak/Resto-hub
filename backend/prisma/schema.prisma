@@ -22,6 +22,25 @@ enum OrderStatus {
   CANCELED
 }
 
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  address   String
+  latitude  Float
+  longitude Float
+  logoUrl   String   @map("logo_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users      User[]
+  categories Category[]
+  dishes     Dish[]
+  orders     Order[]
+  tables     Table[]
+
+  @@map("companies")
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
@@ -31,6 +50,9 @@ model User {
   avatarUrl String   @map("avatar_url")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
 
   waiterOrders Order[] @relation("WaiterOrders")
   cookOrders   Order[] @relation("CookOrders")
@@ -44,6 +66,8 @@ model Category {
   dishes    Dish[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId Int?
 
   @@map("categories")
 }
@@ -64,20 +88,24 @@ model Dish {
 
   category   Category?   @relation(fields: [categoryId], references: [id])
   orderItems OrderItem[]
+  Company    Company?    @relation(fields: [companyId], references: [id])
+  companyId  Int?
 
   @@map("dishes")
 }
 
 model Order {
-  id       Int         @id @default(autoincrement())
-  waiterId Int
-  cookId   Int?
-  status   OrderStatus @default(PENDING)
-  tableId  Int?
+  id        Int         @id @default(autoincrement())
+  waiterId  Int
+  cookId    Int?
+  status    OrderStatus @default(PENDING)
+  tableId   Int?
+  companyId Int
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  company    Company     @relation(fields: [companyId], references: [id])
   waiter     User        @relation("WaiterOrders", fields: [waiterId], references: [id])
   cook       User?       @relation("CookOrders", fields: [cookId], references: [id])
   orderItems OrderItem[]
@@ -106,14 +134,18 @@ model OrderItem {
 }
 
 model Table {
-  id        Int      @id @default(autoincrement())
-  number    Int      @unique
+  id        Int     @id @default(autoincrement())
+  number    Int
   seats     Int
-  active    Boolean  @default(true)
+  active    Boolean @default(true)
+  companyId Int
+
+  company Company @relation(fields: [companyId], references: [id])
+  orders  Order[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  orders Order[]
-
+  @@unique([companyId, number])
   @@map("tables")
 }
