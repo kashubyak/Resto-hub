@@ -53,7 +53,7 @@ export class AuthService {
     });
     if (existing) throw new ConflictException('Email already in use');
     const existingCompany = await this.prisma.company.findFirst({
-      where: { name: dto.companyName },
+      where: { name: dto.name },
     });
     if (existingCompany) throw new ConflictException('Company already exists');
 
@@ -63,7 +63,7 @@ export class AuthService {
 
     const company = await this.prisma.company.create({
       data: {
-        name: dto.companyName,
+        name: dto.name,
         address: dto.address,
         latitude: dto.latitude,
         longitude: dto.longitude,

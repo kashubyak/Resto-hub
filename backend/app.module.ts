@@ -5,6 +5,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PrismaService } from 'prisma/prisma.service';
 import { CategoryModule } from 'src/api/category/category.module';
+import { CompanyModule } from 'src/api/company/company.module';
 import { DishModule } from 'src/api/dish/dish.module';
 import { OrderModule } from 'src/api/order/order.module';
 import { TableModule } from 'src/api/table/table.module';
@@ -28,6 +29,7 @@ import { AuthModule } from './src/api/auth/auth.module';
     OrderModule,
     TableModule,
     UserModule,
+    CompanyModule,
   ],
   providers: [
     PrismaService,

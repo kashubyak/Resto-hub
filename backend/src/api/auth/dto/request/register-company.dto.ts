@@ -12,7 +12,7 @@ import {
 export class RegisterCompanyDto {
   @ApiProperty({ description: 'Company name' })
   @IsString()
-  companyName: string;
+  name: string;
 
   @ApiProperty({ description: 'Company address' })
   @IsString()

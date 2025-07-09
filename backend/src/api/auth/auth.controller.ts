@@ -24,7 +24,6 @@ import { multerOptions } from 'src/common/s3/file-upload.util';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/request/login.dto';
 import { RegisterCompanyDto } from './dto/request/register-company.dto';
-import { RegisterDto } from './dto/request/register.dto';
 import { RegisterCompanyResponseDto } from './dto/response/register-company-response.dto';
 import { TokenResponseDto } from './dto/response/token-response.dto';
 
@@ -45,7 +44,7 @@ export class AuthController {
     ),
   )
   @ApiOperation({ description: 'Register a new company' })
-  @ApiBody({ type: RegisterDto })
+  @ApiBody({ type: RegisterCompanyDto })
   @ApiCreatedResponse({
     description: 'Company registered successfully.',
     type: RegisterCompanyResponseDto,
