@@ -19,7 +19,11 @@ export class UserService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async registerUser(dto: RegisterDto, file: Express.Multer.File) {
+  async registerUser(
+    dto: RegisterDto,
+    file: Express.Multer.File,
+    companyId: number,
+  ) {
     if (!file) throw new BadRequestException('Avatar image is required');
     const existingUser = await this.userRepository.findByEmail(dto.email);
     if (existingUser) throw new BadRequestException('Email already exists');
@@ -33,6 +37,7 @@ export class UserService {
       password: hashedPassword,
       role: dto.role,
       avatarUrl,
+      companyId,
     });
 
     return {

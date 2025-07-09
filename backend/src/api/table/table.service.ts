@@ -11,11 +11,12 @@ import { TableRepository } from './repository/table.repository';
 export class TableService {
   constructor(private readonly tableRepo: TableRepository) {}
 
-  async createTable(dto: CreateTableDto) {
-    const existing = await this.tableRepo.findByNumber(dto.number);
+  async createTable(dto: CreateTableDto, companyId: number) {
+    const existing = await this.tableRepo.findByNumber(dto.number, companyId);
     if (existing)
       throw new ConflictException('Table with this number already exists');
-    return this.tableRepo.createTable(dto);
+
+    return this.tableRepo.createTable({ ...dto, companyId });
   }
 
   async getAllTables() {
@@ -28,12 +29,13 @@ export class TableService {
     return table;
   }
 
-  async updateTable(id: number, dto: UpdateTableDto) {
+  async updateTable(id: number, dto: UpdateTableDto, companyId: number) {
     const table = await this.tableRepo.findById(id);
     if (!table) throw new NotFoundException('Table not found');
     if (dto.number !== undefined) {
       const existingWithSameNumber = await this.tableRepo.findByNumber(
         dto.number,
+        companyId,
       );
       if (existingWithSameNumber && existingWithSameNumber.id !== id)
         throw new ConflictException('Table number must be unique');

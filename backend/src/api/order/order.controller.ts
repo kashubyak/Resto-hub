@@ -18,7 +18,7 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CreateOrderDto } from './dto/request/create-order.dto';
@@ -53,8 +53,9 @@ export class OrderController {
   createOrder(
     @CurrentUser('id') waiterId: number,
     @Body() dto: CreateOrderDto,
+    @CurrentUser() companyId: number,
   ) {
-    return this.orderService.createOrder(waiterId, dto);
+    return this.orderService.createOrder(waiterId, dto, companyId);
   }
 
   @Get('analytics')
@@ -165,9 +166,15 @@ export class OrderController {
   updateOrderStatus(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') userId: number,
-    @CurrentUser('role') role: Role,
+    @CurrentUser() user: User,
     @Body() dto: UpdateOrderStatusDto,
   ) {
-    return this.orderService.updateOrderStatus(id, userId, role, dto.status);
+    return this.orderService.updateOrderStatus(
+      id,
+      userId,
+      user.role,
+      dto.status,
+      user.companyId,
+    );
   }
 }

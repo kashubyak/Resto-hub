@@ -48,8 +48,9 @@ export class UserController {
   registerUser(
     @Body() dto: RegisterDto,
     @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: User,
   ) {
-    return this.userService.registerUser(dto, file);
+    return this.userService.registerUser(dto, file, user.companyId);
   }
 
   @Get()

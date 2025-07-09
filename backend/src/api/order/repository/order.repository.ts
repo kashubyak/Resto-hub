@@ -12,6 +12,7 @@ export class OrderRepository {
       data: {
         waiterId: order.waiterId,
         tableId: order.tableId,
+        companyId: order.companyId,
         orderItems: {
           create: order.items.map((item) => ({
             dishId: item.dishId,

@@ -11,12 +11,21 @@ export class TableRepository {
     return this.prisma.table.findUnique({ where: { id } });
   }
 
-  async findByNumber(number: number) {
-    return this.prisma.table.findUnique({ where: { number } });
+  async findByNumber(number: number, companyId: number) {
+    return this.prisma.table.findUnique({
+      where: {
+        companyId_number: {
+          number,
+          companyId,
+        },
+      },
+    });
   }
 
-  async createTable(dto: CreateTableDto) {
-    return this.prisma.table.create({ data: dto });
+  async createTable(dto: CreateTableDto & { companyId: number }) {
+    return this.prisma.table.create({
+      data: dto,
+    });
   }
 
   async getAllTables() {

@@ -1,20 +1,20 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
-import { folder_avatar } from 'src/common/constants';
+import { company_avatar, folder_avatar } from 'src/common/constants';
 import { S3Service } from 'src/common/s3/s3.service';
 import { LoginDto } from './dto/request/login.dto';
-import { RegisterDto } from './dto/request/register.dto';
-import { RegisterResponseDto } from './dto/response/register-response.dto';
+import { RegisterCompanyDto } from './dto/request/register-company.dto';
+import { RegisterCompanyResponseDto } from './dto/response/register-company-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -35,43 +35,65 @@ export class AuthService {
     );
   }
 
-  async registerUser(
-    dto: RegisterDto,
-    file: Express.Multer.File,
+  async registerCompany(
+    dto: RegisterCompanyDto,
+    files: {
+      logoUrl?: Express.Multer.File[];
+      avatarUrl?: Express.Multer.File[];
+    },
     res: Response,
-  ): Promise<Omit<RegisterResponseDto, 'refresh_token'>> {
-    if (!file) throw new BadRequestException('Avatar image is required');
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-    if (dto.role !== 'ADMIN')
-      throw new ForbiddenException('Only ADMIN can be registered here');
-    if (existingUser) throw new ConflictException('Email already in use');
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const avatarUrl = await this.S3Service.uploadFile(file, folder_avatar);
+  ): Promise<Omit<RegisterCompanyResponseDto, 'refresh_token'>> {
+    const logo = files.logoUrl?.[0];
+    const avatar = files.avatarUrl?.[0];
+    if (!logo || !avatar)
+      throw new BadRequestException('Logo and avatar are required');
 
-    const user = await this.prisma.user.create({
+    const existing = await this.prisma.user.findUnique({
+      where: { email: dto.adminEmail },
+    });
+    if (existing) throw new ConflictException('Email already in use');
+    const existingCompany = await this.prisma.company.findFirst({
+      where: { name: dto.companyName },
+    });
+    if (existingCompany) throw new ConflictException('Company already exists');
+
+    const logoUrl = await this.S3Service.uploadFile(logo, company_avatar);
+    const avatarUrl = await this.S3Service.uploadFile(avatar, folder_avatar);
+    const hashedPassword = await bcrypt.hash(dto.adminPassword, 10);
+
+    const company = await this.prisma.company.create({
       data: {
-        name: dto.name,
-        email: dto.email,
-        password: hashedPassword,
-        role: dto.role,
-        avatarUrl,
+        name: dto.companyName,
+        address: dto.address,
+        latitude: dto.latitude,
+        longitude: dto.longitude,
+        logoUrl,
+        users: {
+          create: {
+            name: dto.adminName,
+            email: dto.adminEmail,
+            password: hashedPassword,
+            role: Role.ADMIN,
+            avatarUrl,
+          },
+        },
+      },
+      include: {
+        users: true,
       },
     });
-
-    const token = await this.getAccessToken(user.id, user.role);
-    const refreshToken = await this.getRefreshToken(user.id, user.role);
+    const admin = company.users[0];
+    const token = await this.getAccessToken(admin.id, admin.role);
+    const refreshToken = await this.getRefreshToken(admin.id, admin.role);
     this.setRefreshTokenCookie(res, refreshToken);
-
     return {
       access_token: token,
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatarUrl: user.avatarUrl,
+        id: admin.id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+        avatarUrl: admin.avatarUrl,
       },
     };
   }

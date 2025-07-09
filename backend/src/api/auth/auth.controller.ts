@@ -6,10 +6,10 @@ import {
   Post,
   Req,
   Res,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -21,11 +21,11 @@ import {
 import { Request, Response } from 'express';
 import { Public } from 'src/common/decorators/public.decorator';
 import { multerOptions } from 'src/common/s3/file-upload.util';
-import { MulterErrorInterceptor } from 'src/common/s3/multer-error.interceptor';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/request/login.dto';
+import { RegisterCompanyDto } from './dto/request/register-company.dto';
 import { RegisterDto } from './dto/request/register.dto';
-import { RegisterResponseDto } from './dto/response/register-response.dto';
+import { RegisterCompanyResponseDto } from './dto/response/register-company-response.dto';
 import { TokenResponseDto } from './dto/response/token-response.dto';
 
 @ApiTags('Authentication')
@@ -33,24 +33,33 @@ import { TokenResponseDto } from './dto/response/token-response.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
+  @Post('register-company')
   @Public()
   @UseInterceptors(
-    MulterErrorInterceptor,
-    FileInterceptor('avatarUrl', multerOptions),
+    FileFieldsInterceptor(
+      [
+        { name: 'logoUrl', maxCount: 1 },
+        { name: 'avatarUrl', maxCount: 1 },
+      ],
+      multerOptions,
+    ),
   )
-  @ApiOperation({ description: 'Register a new user (admin only)' })
+  @ApiOperation({ description: 'Register a new company' })
   @ApiBody({ type: RegisterDto })
   @ApiCreatedResponse({
-    description: 'User registered successfully.',
-    type: RegisterResponseDto,
+    description: 'Company registered successfully.',
+    type: RegisterCompanyResponseDto,
   })
-  register(
-    @Body() dto: RegisterDto,
-    @UploadedFile() file: Express.Multer.File,
+  registerCompany(
+    @Body() dto: RegisterCompanyDto,
+    @UploadedFiles()
+    files: {
+      logoUrl: Express.Multer.File[];
+      avatarUrl: Express.Multer.File[];
+    },
     @Res({ passthrough: true }) res: Response,
-  ): Promise<Omit<RegisterResponseDto, 'refresh_token'>> {
-    return this.authService.registerUser(dto, file, res);
+  ): Promise<Omit<RegisterCompanyResponseDto, 'refresh_token'>> {
+    return this.authService.registerCompany(dto, files, res);
   }
 
   @Post('login')

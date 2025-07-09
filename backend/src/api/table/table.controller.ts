@@ -15,6 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CreateTableDto } from './dto/request/create-table.dto';
 import { UpdateTableDto } from './dto/request/update-table.dto';
@@ -33,8 +34,11 @@ export class TableController {
     description: 'Table created successfully',
     type: CreateTableResponseDto,
   })
-  createTable(@Body() createTableDto: CreateTableDto) {
-    return this.tableService.createTable(createTableDto);
+  createTable(
+    @Body() createTableDto: CreateTableDto,
+    @CurrentUser() companyId: number,
+  ) {
+    return this.tableService.createTable(createTableDto, companyId);
   }
 
   @Get()
@@ -69,8 +73,9 @@ export class TableController {
   updateTable(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTableDto,
+    @CurrentUser() companyId: number,
   ) {
-    return this.tableService.updateTable(id, dto);
+    return this.tableService.updateTable(id, dto, companyId);
   }
 
   @Delete(':id')

@@ -152,7 +152,7 @@ export class OrderService {
     return {};
   }
 
-  async createOrder(waiterId: number, dto: CreateOrderDto) {
+  async createOrder(waiterId: number, dto: CreateOrderDto, companyId: number) {
     const dishIds = dto.items.map((item) => item.dishId);
     const priceMap = await this.orderRepo.getDishPrices(dishIds);
     const table = await this.tableService.getTableById(dto.tableId);
@@ -169,10 +169,14 @@ export class OrderService {
       notes: item.notes,
     }));
 
-    const order = new OrderEntity(waiterId, dto.tableId, items);
+    const order = new OrderEntity(waiterId, dto.tableId, items, companyId);
 
     const createdOrder = await this.orderRepo.createOrder(order);
-    await this.tableService.updateTable(dto.tableId, { active: false });
+    await this.tableService.updateTable(
+      dto.tableId,
+      { active: false },
+      companyId,
+    );
     this.notificationsGateway.notifyKitchen(socket_events.NEW_ORDER, {
       id: createdOrder.id,
       itemsCount: order.items.length,
@@ -332,6 +336,7 @@ export class OrderService {
     userId: number,
     role: Role,
     newStatus: OrderStatus,
+    companyId: number,
   ) {
     const order = await this.orderRepo.findById(orderId);
     if (!order) throw new NotFoundException('Order not found');
@@ -374,7 +379,11 @@ export class OrderService {
           );
         if (!order.table?.id)
           throw new BadRequestException('Order is not assigned to a table');
-        await this.tableService.updateTable(order.table?.id, { active: true });
+        await this.tableService.updateTable(
+          order.table?.id,
+          { active: true },
+          companyId,
+        );
 
         return this.orderRepo.updateStatus(orderId, newStatus);
       }
