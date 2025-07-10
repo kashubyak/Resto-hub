@@ -53,7 +53,7 @@ export class OrderController {
   createOrder(
     @CurrentUser('id') waiterId: number,
     @Body() dto: CreateOrderDto,
-    @CurrentUser() companyId: number,
+    @CurrentUser('companyId') companyId: number,
   ) {
     return this.orderService.createOrder(waiterId, dto, companyId);
   }

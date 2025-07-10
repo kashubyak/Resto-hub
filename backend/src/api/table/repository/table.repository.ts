@@ -7,8 +7,8 @@ import { UpdateTableDto } from '../dto/request/update-table.dto';
 export class TableRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: number) {
-    return this.prisma.table.findUnique({ where: { id } });
+  async findById(id: number, companyId: number) {
+    return this.prisma.table.findUnique({ where: { id, companyId } });
   }
 
   async findByNumber(number: number, companyId: number) {
@@ -28,18 +28,18 @@ export class TableRepository {
     });
   }
 
-  async getAllTables() {
-    return this.prisma.table.findMany();
+  async getAllTables(companyId: number) {
+    return this.prisma.table.findMany({ where: { companyId } });
   }
 
-  async updateTable(id: number, dto: UpdateTableDto) {
+  async updateTable(id: number, dto: UpdateTableDto, companyId: number) {
     return this.prisma.table.update({
-      where: { id },
+      where: { id, companyId },
       data: dto,
     });
   }
 
-  async deleteTable(id: number) {
-    return this.prisma.table.delete({ where: { id } });
+  async deleteTable(id: number, companyId: number) {
+    return this.prisma.table.delete({ where: { id, companyId } });
   }
 }

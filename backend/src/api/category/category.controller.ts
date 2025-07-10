@@ -19,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/request/create-category.dto';
@@ -45,8 +46,11 @@ export class CategoryController {
     description: 'The category has been successfully created.',
     type: CreateCategoryResponseDto,
   })
-  createCategory(@Body() dto: CreateCategoryDto) {
-    return this.categoryService.createCategory(dto);
+  createCategory(
+    @Body() dto: CreateCategoryDto,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.categoryService.createCategory(dto, companyId);
   }
 
   @Get()
@@ -55,8 +59,11 @@ export class CategoryController {
     description: 'Filtered and sorted list of categories',
     type: PaginatedCategoryResponseDto,
   })
-  getFilterCategories(@Query() query: FilterCategoryDto) {
-    return this.categoryService.filterCategories(query);
+  getFilterCategories(
+    @Query() query: FilterCategoryDto,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.categoryService.filterCategories(query, companyId);
   }
 
   @Get(':id')
@@ -65,8 +72,11 @@ export class CategoryController {
     description: 'The category has been successfully retrieved.',
     type: CategorySummaryDto,
   })
-  getCategoryById(@Param('id', ParseIntPipe) id: number) {
-    return this.categoryService.getCategoryById(id);
+  getCategoryById(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.categoryService.getCategoryById(id, companyId);
   }
 
   @Patch(':id')
@@ -80,8 +90,9 @@ export class CategoryController {
   updateCategory(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCategoryDto,
+    @CurrentUser('companyId') companyId: number,
   ) {
-    return this.categoryService.updateCategory(id, dto);
+    return this.categoryService.updateCategory(id, dto, companyId);
   }
 
   @Delete(':id')
@@ -91,7 +102,10 @@ export class CategoryController {
     description: 'The category has been successfully deleted.',
     type: BaseCategoryDto,
   })
-  deleteCategory(@Param('id', ParseIntPipe) id: number) {
-    return this.categoryService.deleteCategory(id);
+  deleteCategory(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.categoryService.deleteCategory(id, companyId);
   }
 }

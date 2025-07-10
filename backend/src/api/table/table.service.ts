@@ -19,18 +19,18 @@ export class TableService {
     return this.tableRepo.createTable({ ...dto, companyId });
   }
 
-  async getAllTables() {
-    return this.tableRepo.getAllTables();
+  async getAllTables(companyId: number) {
+    return this.tableRepo.getAllTables(companyId);
   }
 
-  async getTableById(id: number) {
-    const table = await this.tableRepo.findById(id);
+  async getTableById(id: number, companyId: number) {
+    const table = await this.tableRepo.findById(id, companyId);
     if (!table) throw new NotFoundException(`Table with id ${id} not found`);
     return table;
   }
 
   async updateTable(id: number, dto: UpdateTableDto, companyId: number) {
-    const table = await this.tableRepo.findById(id);
+    const table = await this.tableRepo.findById(id, companyId);
     if (!table) throw new NotFoundException('Table not found');
     if (dto.number !== undefined) {
       const existingWithSameNumber = await this.tableRepo.findByNumber(
@@ -41,14 +41,14 @@ export class TableService {
         throw new ConflictException('Table number must be unique');
     }
 
-    return this.tableRepo.updateTable(id, dto);
+    return this.tableRepo.updateTable(id, dto, companyId);
   }
 
-  async deleteTable(id: number) {
-    const table = await this.tableRepo.findById(id);
+  async deleteTable(id: number, companyId: number) {
+    const table = await this.tableRepo.findById(id, companyId);
     if (!table) throw new NotFoundException('Table not found');
     if (table.active === false)
       throw new ConflictException('Cannot delete an occupied table');
-    return this.tableRepo.deleteTable(id);
+    return this.tableRepo.deleteTable(id, companyId);
   }
 }

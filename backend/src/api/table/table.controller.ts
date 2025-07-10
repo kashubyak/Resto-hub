@@ -36,7 +36,7 @@ export class TableController {
   })
   createTable(
     @Body() createTableDto: CreateTableDto,
-    @CurrentUser() companyId: number,
+    @CurrentUser('companyId') companyId: number,
   ) {
     return this.tableService.createTable(createTableDto, companyId);
   }
@@ -47,8 +47,8 @@ export class TableController {
     description: 'List of all tables',
     type: [CreateTableResponseDto],
   })
-  getAllTables() {
-    return this.tableService.getAllTables();
+  getAllTables(@CurrentUser('companyId') companyId: number) {
+    return this.tableService.getAllTables(companyId);
   }
 
   @Get(':id')
@@ -57,8 +57,11 @@ export class TableController {
     description: 'Table found',
     type: CreateTableResponseDto,
   })
-  getTableById(@Param('id', ParseIntPipe) id: number) {
-    return this.tableService.getTableById(+id);
+  getTableById(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.tableService.getTableById(id, companyId);
   }
 
   @Patch(':id')
@@ -73,7 +76,7 @@ export class TableController {
   updateTable(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTableDto,
-    @CurrentUser() companyId: number,
+    @CurrentUser('companyId') companyId: number,
   ) {
     return this.tableService.updateTable(id, dto, companyId);
   }
@@ -85,7 +88,10 @@ export class TableController {
     description: 'Table deleted successfully',
     type: CreateTableResponseDto,
   })
-  deleteTable(@Param('id', ParseIntPipe) id: number) {
-    return this.tableService.deleteTable(id);
+  deleteTable(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.tableService.deleteTable(id, companyId);
   }
 }

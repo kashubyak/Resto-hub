@@ -14,7 +14,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role, User } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { multerOptions } from 'src/common/s3/file-upload.util';
@@ -32,8 +32,8 @@ export class CompanyController {
   @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Get current company info (ADMIN only)' })
   @ApiOkResponse({ type: CompanyItemDto })
-  getCompany(@CurrentUser() user: User) {
-    return this.companyService.getCompanyById(user.companyId);
+  getCompany(@CurrentUser('companyId') companyId: number) {
+    return this.companyService.getCompanyById(companyId);
   }
 
   @Patch()
@@ -44,16 +44,16 @@ export class CompanyController {
   updateCompany(
     @Body() dto: UpdateCompanyDto,
     @UploadedFile() file: Express.Multer.File,
-    @CurrentUser() user: User,
+    @CurrentUser('companyId') companyId: number,
   ) {
-    return this.companyService.updateCompany(user.companyId, dto, file);
+    return this.companyService.updateCompany(companyId, dto, file);
   }
 
   @Delete()
   @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Delete current company (ADMIN only)' })
   @ApiOkResponse({ type: CompanyItemDto })
-  deleteCompany(@CurrentUser() user: User) {
-    return this.companyService.deleteCompany(user.companyId);
+  deleteCompany(@CurrentUser('companyId') companyId: number) {
+    return this.companyService.deleteCompany(companyId);
   }
 }
