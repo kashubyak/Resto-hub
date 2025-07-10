@@ -8,11 +8,11 @@ import { FilterDishDto } from '../dto/request/filter-dish.dto';
 export class DishRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  createDish(data: CreateDishDto & { imageUrl: string }) {
-    return this.prisma.dish.create({ data });
+  createDish(data: CreateDishDto & { imageUrl: string }, companyId: number) {
+    return this.prisma.dish.create({ data: { ...data, companyId } });
   }
 
-  findDishes(query: FilterDishDto) {
+  findDishes(query: FilterDishDto, companyId: number) {
     const {
       search,
       minPrice,
@@ -24,7 +24,7 @@ export class DishRepository {
       limit = 10,
     } = query;
 
-    const where: Prisma.DishWhereInput = {};
+    const where: Prisma.DishWhereInput = { companyId };
     if (search) where.name = { contains: search, mode: 'insensitive' };
     if (available !== undefined) where.available = available;
     if (minPrice !== undefined || maxPrice !== undefined) {

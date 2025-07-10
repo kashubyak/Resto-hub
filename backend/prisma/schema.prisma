@@ -44,7 +44,7 @@ model Company {
 model User {
   id        Int      @id @default(autoincrement())
   name      String
-  email     String   @unique
+  email     String
   password  String
   role      Role
   avatarUrl String   @map("avatar_url")
@@ -57,6 +57,7 @@ model User {
   waiterOrders Order[] @relation("WaiterOrders")
   cookOrders   Order[] @relation("CookOrders")
 
+  @@unique([email, companyId])
   @@map("users")
 }
 

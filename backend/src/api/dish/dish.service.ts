@@ -17,14 +17,18 @@ export class DishService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async createDish(dto: CreateDishDto, file: Express.Multer.File) {
+  async createDish(
+    dto: CreateDishDto,
+    file: Express.Multer.File,
+    companyId: number,
+  ) {
     if (!file) throw new BadRequestException('Dish image is required');
     const imageUrl = await this.s3Service.uploadFile(file, folder_dish);
 
-    return this.dishRepo.createDish({ ...dto, imageUrl });
+    return this.dishRepo.createDish({ ...dto, imageUrl }, companyId);
   }
-  async filterDishes(query: FilterDishDto) {
-    const [data, total] = await this.dishRepo.findDishes(query);
+  async filterDishes(query: FilterDishDto, companyId: number) {
+    const [data, total] = await this.dishRepo.findDishes(query, companyId);
     const page = query.page || 1;
     const limit = query.limit || 10;
 

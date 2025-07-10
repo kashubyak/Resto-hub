@@ -6,9 +6,12 @@ import { PrismaService } from 'prisma/prisma.service';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  createUser(data: Prisma.UserUncheckedCreateInput) {
+  createUser(data: Prisma.UserUncheckedCreateInput, companyId: number) {
     return this.prisma.user.create({
-      data,
+      data: {
+        ...data,
+        companyId,
+      },
       select: {
         id: true,
         name: true,
@@ -50,9 +53,9 @@ export class UserRepository {
     return { data, total };
   }
 
-  findUser(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id },
+  findUser(id: number, companyId: number) {
+    return this.prisma.user.findFirst({
+      where: { id, companyId },
       select: {
         id: true,
         name: true,
@@ -65,25 +68,22 @@ export class UserRepository {
     });
   }
 
-  updateUser(id: number, data: Prisma.UserUpdateInput) {
-    return this.prisma.user.update({
-      where: { id },
+  async updateUser(
+    id: number,
+    data: Prisma.UserUpdateInput,
+    companyId: number,
+  ) {
+    const result = await this.prisma.user.updateMany({
+      where: { id, companyId },
       data,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        avatarUrl: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
+    if (result.count === 0) return null;
+    return this.findUser(id, companyId);
   }
 
-  findUserWithPassword(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id },
+  findUserWithPassword(id: number, companyId: number) {
+    return this.prisma.user.findFirst({
+      where: { id, companyId },
       select: {
         id: true,
         name: true,
@@ -95,24 +95,24 @@ export class UserRepository {
     });
   }
 
-  findByEmail(email: string) {
+  findByEmail(email: string, companyId: number) {
     return this.prisma.user.findUnique({
-      where: { email },
+      where: {
+        email_companyId: {
+          email,
+          companyId,
+        },
+      },
     });
   }
 
-  deleteUser(id: number) {
-    return this.prisma.user.delete({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        avatarUrl: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+  async deleteUser(id: number, companyId: number) {
+    const user = await this.findUser(id, companyId);
+    if (!user) return null;
+    const result = await this.prisma.user.deleteMany({
+      where: { id, companyId },
     });
+    if (result.count === 0) return null;
+    return user;
   }
 }

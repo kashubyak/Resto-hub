@@ -41,7 +41,7 @@ export class TableService {
         throw new ConflictException('Table number must be unique');
     }
 
-    return this.tableRepo.updateTable(id, dto, companyId);
+    return this.tableRepo.updateTable(id, companyId, dto);
   }
 
   async deleteTable(id: number, companyId: number) {

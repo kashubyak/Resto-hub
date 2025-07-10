@@ -77,7 +77,9 @@ export class CategoryService {
   }
 
   async deleteCategory(id: number, companyId: number) {
-    await this.getCategoryById(id, companyId);
-    return this.categoryRep.delete(id, companyId);
+    const category = await this.categoryRep.findById(id, companyId);
+    if (!category) throw new NotFoundException('Category not found');
+    await this.categoryRep.delete(id, companyId);
+    return category;
   }
 }

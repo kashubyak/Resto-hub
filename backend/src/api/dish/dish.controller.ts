@@ -22,6 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { multerOptions } from 'src/common/s3/file-upload.util';
 import { MulterErrorInterceptor } from 'src/common/s3/multer-error.interceptor';
@@ -56,8 +57,9 @@ export class DishController {
   createDish(
     @Body() dto: CreateDishDto,
     @UploadedFile() file: Express.Multer.File,
+    @CurrentUser('companyId') companyId: number,
   ) {
-    return this.dishService.createDish(dto, file);
+    return this.dishService.createDish(dto, file, companyId);
   }
 
   @Get()
@@ -66,8 +68,11 @@ export class DishController {
     description: 'Filtered and sorted list of dishes',
     type: PaginatedDishesWithCategoryResponseDto,
   })
-  getFilteredDishes(@Query() query: FilterDishDto) {
-    return this.dishService.filterDishes(query);
+  getFilteredDishes(
+    @Query() query: FilterDishDto,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.dishService.filterDishes(query, companyId);
   }
 
   @Get(':id')
