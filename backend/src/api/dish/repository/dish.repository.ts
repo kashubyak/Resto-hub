@@ -47,43 +47,50 @@ export class DishRepository {
     ]);
   }
 
-  findById(id: number) {
+  findById(id: number, companyId: number) {
     return this.prisma.dish.findUnique({
-      where: { id },
+      where: { id, companyId },
       include: { category: true },
     });
   }
 
-  updateDish(id: number, dto: Prisma.DishUpdateInput) {
-    return this.prisma.dish.update({
-      where: { id },
+  async updateDish(id: number, dto: Prisma.DishUpdateInput, companyId: number) {
+    const result = await this.prisma.dish.updateMany({
+      where: { id, companyId },
       data: dto,
     });
+    if (result.count === 0) return null;
+    return this.findById(id, companyId);
   }
 
-  deleteDish(id: number) {
-    return this.prisma.dish.delete({
-      where: { id },
-    });
+  async deleteDish(id: number, companyId: number) {
+    const dish = await this.findById(id, companyId);
+    if (!dish) return null;
+    await this.prisma.dish.deleteMany({ where: { id, companyId } });
+    return dish;
   }
 
-  removeCategory(id: number) {
-    return this.prisma.dish.update({
-      where: { id },
+  async removeCategory(id: number, companyId: number) {
+    const result = await this.prisma.dish.updateMany({
+      where: { id, companyId },
       data: { categoryId: null },
     });
+    if (result.count === 0) return null;
+    return this.findById(id, companyId);
   }
 
-  assignCategory(id: number, categoryId: number) {
-    return this.prisma.dish.update({
-      where: { id },
+  async assignCategory(id: number, categoryId: number, companyId: number) {
+    const result = await this.prisma.dish.updateMany({
+      where: { id, companyId },
       data: { categoryId },
     });
+    if (result.count === 0) return null;
+    return this.findById(id, companyId);
   }
 
-  findCategoryById(id: number) {
-    return this.prisma.category.findUnique({
-      where: { id },
+  findCategoryById(id: number, companyId: number) {
+    return this.prisma.category.findFirst({
+      where: { id, companyId },
     });
   }
 }

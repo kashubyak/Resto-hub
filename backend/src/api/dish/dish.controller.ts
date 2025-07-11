@@ -81,8 +81,11 @@ export class DishController {
     description: 'Returns the dish with the specified ID.',
     type: CrateDishWithCategoryResponseDto,
   })
-  getDishById(@Param('id', ParseIntPipe) id: number) {
-    return this.dishService.getDishById(id);
+  getDishById(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.dishService.getDishById(id, companyId);
   }
 
   @Patch(':id')
@@ -101,8 +104,9 @@ export class DishController {
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: UpdateDishDto,
+    @CurrentUser('companyId') companyId: number,
   ) {
-    return this.dishService.updateDish(id, dto, file);
+    return this.dishService.updateDish(id, dto, file, companyId);
   }
 
   @Delete(':id')
@@ -113,8 +117,11 @@ export class DishController {
     description: 'Dish has been successfully removed.',
     type: CreateDishResponseDto,
   })
-  removeDish(@Param('id', ParseIntPipe) id: number) {
-    return this.dishService.removeDish(id);
+  removeDish(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.dishService.removeDish(id, companyId);
   }
 
   @Patch(':id/remove-category')
@@ -125,8 +132,11 @@ export class DishController {
     description: 'Category has been successfully removed from the dish.',
     type: CreateDishResponseDto,
   })
-  removeCategoryFromDish(@Param('id', ParseIntPipe) id: number) {
-    return this.dishService.removeDishFromCategory(id);
+  removeCategoryFromDish(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.dishService.removeDishFromCategory(id, companyId);
   }
 
   @Patch(':id/assign-category/:categoryId')
@@ -143,7 +153,8 @@ export class DishController {
   assignCategory(
     @Param('id', ParseIntPipe) dishId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,
+    @CurrentUser('companyId') companyId: number,
   ) {
-    return this.dishService.assignDishToCategory(dishId, categoryId);
+    return this.dishService.assignDishToCategory(dishId, categoryId, companyId);
   }
 }
