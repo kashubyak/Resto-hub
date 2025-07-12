@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateDishDto } from '../dto/request/create-dish.dto';
@@ -55,37 +55,32 @@ export class DishRepository {
   }
 
   async updateDish(id: number, dto: Prisma.DishUpdateInput, companyId: number) {
-    const result = await this.prisma.dish.updateMany({
+    return this.prisma.dish.update({
       where: { id, companyId },
       data: dto,
     });
-    if (result.count === 0) return null;
-    return this.findById(id, companyId);
   }
 
   async deleteDish(id: number, companyId: number) {
     const dish = await this.findById(id, companyId);
-    if (!dish) return null;
-    await this.prisma.dish.deleteMany({ where: { id, companyId } });
-    return dish;
+    if (!dish) throw new NotFoundException('Dish not found');
+    return this.prisma.dish.delete({
+      where: { id, companyId },
+    });
   }
 
   async removeCategory(id: number, companyId: number) {
-    const result = await this.prisma.dish.updateMany({
+    return this.prisma.dish.update({
       where: { id, companyId },
       data: { categoryId: null },
     });
-    if (result.count === 0) return null;
-    return this.findById(id, companyId);
   }
 
   async assignCategory(id: number, categoryId: number, companyId: number) {
-    const result = await this.prisma.dish.updateMany({
+    return this.prisma.dish.update({
       where: { id, companyId },
       data: { categoryId },
     });
-    if (result.count === 0) return null;
-    return this.findById(id, companyId);
   }
 
   findCategoryById(id: number, companyId: number) {

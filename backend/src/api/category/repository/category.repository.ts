@@ -47,19 +47,16 @@ export class CategoryRepository {
   }
 
   async update(id: number, dto: UpdateCategoryDto, companyId: number) {
-    const result = await this.prisma.category.updateMany({
+    return this.prisma.category.update({
       where: { id, companyId },
       data: dto,
     });
-    if (result.count === 0) return null;
-    return this.findById(id, companyId);
   }
 
   async delete(id: number, companyId: number) {
-    const result = await this.prisma.category.deleteMany({
+    await this.prisma.category.delete({
       where: { id, companyId },
     });
-    if (result.count === 0) return null;
     return { id };
   }
 }

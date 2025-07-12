@@ -73,12 +73,10 @@ export class UserRepository {
     data: Prisma.UserUpdateInput,
     companyId: number,
   ) {
-    const result = await this.prisma.user.updateMany({
+    return this.prisma.user.update({
       where: { id, companyId },
       data,
     });
-    if (result.count === 0) return null;
-    return this.findUser(id, companyId);
   }
 
   findUserWithPassword(id: number, companyId: number) {
@@ -109,10 +107,9 @@ export class UserRepository {
   async deleteUser(id: number, companyId: number) {
     const user = await this.findUser(id, companyId);
     if (!user) return null;
-    const result = await this.prisma.user.deleteMany({
+    await this.prisma.user.delete({
       where: { id, companyId },
     });
-    if (result.count === 0) return null;
     return user;
   }
 }

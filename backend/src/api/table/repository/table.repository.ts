@@ -33,14 +33,14 @@ export class TableRepository {
   }
 
   updateTable(id: number, companyId: number, dto: UpdateTableDto) {
-    return this.prisma.table.updateMany({
+    return this.prisma.table.update({
       where: { id, companyId },
       data: dto,
     });
   }
 
   deleteTable(id: number, companyId: number) {
-    return this.prisma.table.deleteMany({
+    return this.prisma.table.delete({
       where: { id, companyId },
     });
   }

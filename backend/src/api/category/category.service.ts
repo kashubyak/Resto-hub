@@ -72,7 +72,6 @@ export class CategoryService {
       if (existingByName && existingByName.id !== id)
         throw new ConflictException('Category with this name already exists');
     }
-
     return this.categoryRep.update(id, dto, companyId);
   }
 

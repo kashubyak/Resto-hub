@@ -140,7 +140,7 @@ export class UserService {
     }
 
     const { oldPassword, ...safeData } = dto;
-    return await this.userRepository.updateUser(
+    return this.userRepository.updateUser(
       id,
       {
         ...safeData,
@@ -160,6 +160,6 @@ export class UserService {
         throw new BadRequestException('Failed to delete avatar image');
       }
     }
-    return await this.userRepository.deleteUser(id, companyId);
+    return this.userRepository.deleteUser(id, companyId);
   }
 }
