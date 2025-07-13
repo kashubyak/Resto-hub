@@ -48,14 +48,18 @@ export class AuthService {
     if (!logo || !avatar)
       throw new BadRequestException('Logo and avatar are required');
 
-    const existing = await this.prisma.user.findUnique({
+    const existing = await this.prisma.user.findFirst({
       where: { email: dto.adminEmail },
     });
     if (existing) throw new ConflictException('Email already in use');
+
     const existingCompany = await this.prisma.company.findFirst({
-      where: { name: dto.name },
+      where: {
+        OR: [{ name: dto.name }, { subdomain: dto.subdomain }],
+      },
     });
-    if (existingCompany) throw new ConflictException('Company already exists');
+    if (existingCompany)
+      throw new ConflictException('Company name or subdomain already exists');
 
     const logoUrl = await this.S3Service.uploadFile(logo, company_avatar);
     const avatarUrl = await this.S3Service.uploadFile(avatar, folder_avatar);
@@ -64,6 +68,7 @@ export class AuthService {
     const company = await this.prisma.company.create({
       data: {
         name: dto.name,
+        subdomain: dto.subdomain,
         address: dto.address,
         latitude: dto.latitude,
         longitude: dto.longitude,
@@ -82,10 +87,12 @@ export class AuthService {
         users: true,
       },
     });
+
     const admin = company.users[0];
     const token = await this.getAccessToken(admin.id, admin.role);
     const refreshToken = await this.getRefreshToken(admin.id, admin.role);
     this.setRefreshTokenCookie(res, refreshToken);
+
     return {
       access_token: token,
       user: {
@@ -97,19 +104,30 @@ export class AuthService {
       },
     };
   }
+  async processLogin(
+    dto: LoginDto,
+    req: Request,
+    res: Response,
+  ): Promise<{ token: string }> {
+    const companyId = req['companyIdFromSubdomain'];
+    if (!companyId)
+      throw new UnauthorizedException('Company subdomain not found');
 
-  async processLogin(dto: LoginDto, res: Response): Promise<{ token: string }> {
     const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+      where: {
+        email_companyId: {
+          email: dto.email,
+          companyId,
+        },
+      },
     });
-    if (!user || !(await bcrypt.compare(dto.password, user.password))) {
+
+    if (!user || !(await bcrypt.compare(dto.password, user.password)))
       throw new UnauthorizedException('Invalid credentials');
-    }
 
     const token = await this.getAccessToken(user.id, user.role);
     const refreshToken = await this.getRefreshToken(user.id, user.role);
     this.setRefreshTokenCookie(res, refreshToken);
-
     return { token };
   }
 

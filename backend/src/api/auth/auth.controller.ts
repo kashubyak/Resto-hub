@@ -78,9 +78,10 @@ export class AuthController {
   })
   async login(
     @Body() dto: LoginDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ token: string }> {
-    return this.authService.processLogin(dto, res);
+    return this.authService.processLogin(dto, req, res);
   }
 
   @Post('refresh')

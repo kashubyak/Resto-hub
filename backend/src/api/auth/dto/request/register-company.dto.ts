@@ -14,6 +14,10 @@ export class RegisterCompanyDto {
   @IsString()
   name: string;
 
+  @ApiProperty({ description: 'Subdomain for the company' })
+  @IsString()
+  subdomain: string;
+
   @ApiProperty({ description: 'Company address' })
   @IsString()
   address: string;

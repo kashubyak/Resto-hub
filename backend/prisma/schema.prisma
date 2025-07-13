@@ -25,6 +25,7 @@ enum OrderStatus {
 model Company {
   id        Int      @id @default(autoincrement())
   name      String   @unique
+  subdomain String   @unique
   address   String
   latitude  Float
   longitude Float

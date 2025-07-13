@@ -3,7 +3,9 @@ import { NestFactory } from '@nestjs/core';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { PrismaService } from 'prisma/prisma.service';
 import { PrismaExceptionFilter } from 'src/common/filters/prisma-exception.filter';
+import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -19,6 +21,10 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new PrismaExceptionFilter());
   app.useWebSocketAdapter(new IoAdapter(app));
+
+  const prisma = app.get(PrismaService);
+  const middleware = new CompanyContextMiddleware(prisma);
+  app.use(middleware.use.bind(middleware));
   const config = new DocumentBuilder()
     .setTitle('Resto-Hub API')
     .setVersion('1.0')

@@ -12,3 +12,5 @@ export const size_of_image = 15;
 export const folder_dish = 'dishes';
 export const folder_avatar = 'avatars';
 export const company_avatar = 'company-avatars';
+
+export const companyIdFromSubdomain = 'companyIdFromSubdomain';
