@@ -8,20 +8,20 @@ import { UpdateCategoryDto } from '../dto/request/update-category.dto';
 export class CategoryRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreateCategoryDto) {
-    return this.prisma.category.create({ data: dto });
+  create(dto: CreateCategoryDto, companyId: number) {
+    return this.prisma.category.create({ data: { ...dto, companyId } });
   }
 
-  async findById(id: number) {
-    return this.prisma.category.findUnique({
-      where: { id },
+  findById(id: number, companyId: number) {
+    return this.prisma.category.findFirst({
+      where: { id, companyId },
       include: { dishes: true },
     });
   }
 
-  async findByName(name: string) {
+  findByName(name: string, companyId: number) {
     return this.prisma.category.findUnique({
-      where: { name },
+      where: { name_companyId: { name, companyId } },
     });
   }
 
@@ -46,14 +46,17 @@ export class CategoryRepository {
     return { data, total };
   }
 
-  async update(id: number, dto: UpdateCategoryDto) {
+  async update(id: number, dto: UpdateCategoryDto, companyId: number) {
     return this.prisma.category.update({
-      where: { id },
+      where: { id, companyId },
       data: dto,
     });
   }
 
-  async delete(id: number) {
-    return this.prisma.category.delete({ where: { id } });
+  async delete(id: number, companyId: number) {
+    await this.prisma.category.delete({
+      where: { id, companyId },
+    });
+    return { id };
   }
 }

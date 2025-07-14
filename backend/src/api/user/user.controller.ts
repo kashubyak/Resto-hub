@@ -48,8 +48,9 @@ export class UserController {
   registerUser(
     @Body() dto: RegisterDto,
     @UploadedFile() file: Express.Multer.File,
+    @CurrentUser('companyId') companyId: number,
   ) {
-    return this.userService.registerUser(dto, file);
+    return this.userService.registerUser(dto, file, companyId);
   }
 
   @Get()
@@ -59,8 +60,11 @@ export class UserController {
     description: 'List of users with pagination',
     type: PaginatedUserResponseDto,
   })
-  findAllUsers(@Query() query: FilterUserDto) {
-    return this.userService.findAll(query);
+  findAllUsers(
+    @Query() query: FilterUserDto,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.userService.findAll(query, companyId);
   }
 
   @Get('me')
@@ -71,7 +75,7 @@ export class UserController {
     type: UserItemDto,
   })
   findCurrentUser(@CurrentUser() user: User) {
-    return this.userService.findById(user.id);
+    return this.userService.findById(user.id, user.companyId);
   }
 
   @Get(':id')
@@ -81,8 +85,11 @@ export class UserController {
     description: 'User found successfully',
     type: UserItemDto,
   })
-  findUserById(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findById(id);
+  findUserById(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.userService.findById(id, companyId);
   }
 
   @Patch('me')
@@ -101,7 +108,7 @@ export class UserController {
     @Body() dto: UpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.userService.updateUser(user.id, dto, file);
+    return this.userService.updateUser(user.id, dto, file, user.companyId);
   }
 
   @Patch(':id')
@@ -119,8 +126,9 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
+    @CurrentUser('companyId') companyId: number,
   ) {
-    return this.userService.updateUser(id, dto, file);
+    return this.userService.updateUser(id, dto, file, companyId);
   }
 
   @Delete(':id')
@@ -130,7 +138,10 @@ export class UserController {
     description: 'User deleted successfully',
     type: UserItemDto,
   })
-  deleteUser(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.deleteUser(id);
+  deleteUser(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.userService.deleteUser(id, companyId);
   }
 }

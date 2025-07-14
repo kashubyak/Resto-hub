@@ -6,15 +6,19 @@ import { PrismaService } from 'prisma/prisma.service';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  createUser(data: Prisma.UserCreateInput) {
+  createUser(data: Prisma.UserUncheckedCreateInput, companyId: number) {
     return this.prisma.user.create({
-      data,
+      data: {
+        ...data,
+        companyId,
+      },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
         avatarUrl: true,
+        companyId: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -49,9 +53,9 @@ export class UserRepository {
     return { data, total };
   }
 
-  findUser(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id },
+  findUser(id: number, companyId: number) {
+    return this.prisma.user.findFirst({
+      where: { id, companyId },
       select: {
         id: true,
         name: true,
@@ -64,9 +68,13 @@ export class UserRepository {
     });
   }
 
-  updateUser(id: number, data: Prisma.UserUpdateInput) {
+  async updateUser(
+    id: number,
+    data: Prisma.UserUpdateInput,
+    companyId: number,
+  ) {
     return this.prisma.user.update({
-      where: { id },
+      where: { id, companyId },
       data,
       select: {
         id: true,
@@ -80,9 +88,9 @@ export class UserRepository {
     });
   }
 
-  findUserWithPassword(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id },
+  findUserWithPassword(id: number, companyId: number) {
+    return this.prisma.user.findFirst({
+      where: { id, companyId },
       select: {
         id: true,
         name: true,
@@ -94,24 +102,23 @@ export class UserRepository {
     });
   }
 
-  findByEmail(email: string) {
+  findByEmail(email: string, companyId: number) {
     return this.prisma.user.findUnique({
-      where: { email },
+      where: {
+        email_companyId: {
+          email,
+          companyId,
+        },
+      },
     });
   }
 
-  deleteUser(id: number) {
-    return this.prisma.user.delete({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        avatarUrl: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+  async deleteUser(id: number, companyId: number) {
+    const user = await this.findUser(id, companyId);
+    if (!user) return null;
+    await this.prisma.user.delete({
+      where: { id, companyId },
     });
+    return user;
   }
 }

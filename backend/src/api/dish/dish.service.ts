@@ -17,14 +17,18 @@ export class DishService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async createDish(dto: CreateDishDto, file: Express.Multer.File) {
+  async createDish(
+    dto: CreateDishDto,
+    file: Express.Multer.File,
+    companyId: number,
+  ) {
     if (!file) throw new BadRequestException('Dish image is required');
     const imageUrl = await this.s3Service.uploadFile(file, folder_dish);
 
-    return this.dishRepo.createDish({ ...dto, imageUrl });
+    return this.dishRepo.createDish({ ...dto, imageUrl }, companyId);
   }
-  async filterDishes(query: FilterDishDto) {
-    const [data, total] = await this.dishRepo.findDishes(query);
+  async filterDishes(query: FilterDishDto, companyId: number) {
+    const [data, total] = await this.dishRepo.findDishes(query, companyId);
     const page = query.page || 1;
     const limit = query.limit || 10;
 
@@ -37,25 +41,30 @@ export class DishService {
     };
   }
 
-  async getDishById(id: number) {
-    const dish = await this.dishRepo.findById(id);
+  async getDishById(id: number, companyId: number) {
+    const dish = await this.dishRepo.findById(id, companyId);
     if (!dish) throw new NotFoundException('Dish not found');
     return dish;
   }
 
-  async updateDish(id: number, dto: UpdateDishDto, file: Express.Multer.File) {
-    const dish = await this.dishRepo.findById(id);
+  async updateDish(
+    id: number,
+    dto: UpdateDishDto,
+    file: Express.Multer.File,
+    companyId: number,
+  ) {
+    const dish = await this.dishRepo.findById(id, companyId);
     if (!dish) throw new NotFoundException('Dish not found');
     let imageUrl = dish.imageUrl;
     if (file) {
       if (imageUrl) await this.s3Service.deleteFile(imageUrl);
       imageUrl = await this.s3Service.uploadFile(file, folder_dish);
     }
-    return this.dishRepo.updateDish(id, { ...dto, imageUrl });
+    return this.dishRepo.updateDish(id, { ...dto, imageUrl }, companyId);
   }
 
-  async removeDish(id: number) {
-    const dish = await this.dishRepo.findById(id);
+  async removeDish(id: number, companyId: number) {
+    const dish = await this.dishRepo.findById(id, companyId);
     if (!dish) throw new NotFoundException('Dish not found');
     if (dish.imageUrl) {
       try {
@@ -64,21 +73,28 @@ export class DishService {
         throw new BadRequestException('Failed to delete dish image');
       }
     }
-    return this.dishRepo.deleteDish(id);
+    return this.dishRepo.deleteDish(id, companyId);
   }
 
-  async removeDishFromCategory(id: number) {
-    const dish = await this.dishRepo.findById(id);
+  async removeDishFromCategory(id: number, companyId: number) {
+    const dish = await this.dishRepo.findById(id, companyId);
     if (!dish) throw new NotFoundException('Dish not found');
-    return this.dishRepo.removeCategory(id);
+    return this.dishRepo.removeCategory(id, companyId);
   }
 
-  async assignDishToCategory(id: number, categoryId: number) {
-    const dish = await this.dishRepo.findById(id);
+  async assignDishToCategory(
+    id: number,
+    categoryId: number,
+    companyId: number,
+  ) {
+    const dish = await this.dishRepo.findById(id, companyId);
     if (!dish) throw new NotFoundException('Dish not found');
-    const category = await this.dishRepo.findCategoryById(categoryId);
+    const category = await this.dishRepo.findCategoryById(
+      categoryId,
+      companyId,
+    );
     if (!category)
       throw new NotFoundException(`Category with ID ${categoryId} not found`);
-    return this.dishRepo.assignCategory(id, categoryId);
+    return this.dishRepo.assignCategory(id, categoryId, companyId);
   }
 }

@@ -9,9 +9,16 @@ export class OrderEntity {
   waiterId: number;
   tableId: number;
   items: OrderItemEntity[];
-  constructor(waiterId: number, tableId: number, items: OrderItemEntity[]) {
+  companyId: number;
+  constructor(
+    waiterId: number,
+    tableId: number,
+    items: OrderItemEntity[],
+    companyId: number,
+  ) {
     this.waiterId = waiterId;
     this.tableId = tableId;
     this.items = items;
+    this.companyId = companyId;
   }
 }

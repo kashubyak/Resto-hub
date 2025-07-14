@@ -152,13 +152,12 @@ export class OrderService {
     return {};
   }
 
-  async createOrder(waiterId: number, dto: CreateOrderDto) {
+  async createOrder(waiterId: number, dto: CreateOrderDto, companyId: number) {
     const dishIds = dto.items.map((item) => item.dishId);
-    const priceMap = await this.orderRepo.getDishPrices(dishIds);
-    const table = await this.tableService.getTableById(dto.tableId);
+    const priceMap = await this.orderRepo.getDishPrices(dishIds, companyId);
+    const table = await this.tableService.getTableById(dto.tableId, companyId);
     if (table.active === false)
       throw new ConflictException('Table is occupied now');
-
     if (priceMap.size !== dishIds.length)
       throw new BadRequestException('Some dishes not found');
 
@@ -169,10 +168,14 @@ export class OrderService {
       notes: item.notes,
     }));
 
-    const order = new OrderEntity(waiterId, dto.tableId, items);
+    const order = new OrderEntity(waiterId, dto.tableId, items, companyId);
 
     const createdOrder = await this.orderRepo.createOrder(order);
-    await this.tableService.updateTable(dto.tableId, { active: false });
+    await this.tableService.updateTable(
+      dto.tableId,
+      { active: false },
+      companyId,
+    );
     this.notificationsGateway.notifyKitchen(socket_events.NEW_ORDER, {
       id: createdOrder.id,
       itemsCount: order.items.length,
@@ -182,7 +185,7 @@ export class OrderService {
     return createdOrder;
   }
 
-  async getAllOrders(query: OrdersQueryDto) {
+  async getAllOrders(query: OrdersQueryDto, companyId: number) {
     const {
       status,
       from,
@@ -196,7 +199,7 @@ export class OrderService {
       sortOrder = 'desc',
     } = query;
 
-    const where: Prisma.OrderWhereInput = {};
+    const where: Prisma.OrderWhereInput = { companyId };
     if (status) where.status = status;
     if (waiterId) where.waiterId = waiterId;
     if (cookId) where.cookId = cookId;
@@ -229,8 +232,14 @@ export class OrderService {
     };
   }
 
-  async getOrderHistory(userId: number, role: Role, query: OrdersQueryDto) {
-    const where: any = {
+  async getOrderHistory(
+    userId: number,
+    role: Role,
+    query: OrdersQueryDto,
+    companyId: number,
+  ) {
+    const where: Prisma.OrderWhereInput = {
+      companyId,
       status: {
         in: [OrderStatus.COMPLETE, OrderStatus.DELIVERED, OrderStatus.CANCELED],
       },
@@ -266,7 +275,7 @@ export class OrderService {
     };
   }
 
-  async getFreeOrders(query: OrdersQueryDto) {
+  async getFreeOrders(query: OrdersQueryDto, companyId: number) {
     const {
       page = 1,
       limit = 10,
@@ -274,7 +283,7 @@ export class OrderService {
       sortOrder = 'desc',
     } = query;
 
-    const where = { cookId: null, status: OrderStatus.PENDING };
+    const where = { cookId: null, status: OrderStatus.PENDING, companyId };
     const skip = (page - 1) * limit;
 
     const [orders, total] = await Promise.all([
@@ -297,25 +306,35 @@ export class OrderService {
     };
   }
 
-  async getOrderById(id: number) {
-    const order = await this.orderRepo.findById(id);
+  async getOrderById(id: number, companyId: number) {
+    const order = await this.orderRepo.findById(id, companyId);
     if (!order) throw new NotFoundException(`Order with id ${id} not found`);
     return this.mapSummary(order);
   }
 
-  async assignOrderToCook(orderId: number, cookId: number) {
-    const order = await this.orderRepo.findPendingOrderWithCookById(orderId);
+  async assignOrderToCook(orderId: number, cookId: number, companyId: number) {
+    const order = await this.orderRepo.findPendingOrderWithCookById(
+      orderId,
+      companyId,
+    );
     if (!order) throw new NotFoundException('Order not found');
     if (order.status !== OrderStatus.PENDING)
       throw new BadRequestException('Only pending orders can be assigned');
     if (order.cookId && order.cookId !== cookId)
       throw new BadRequestException('Order already assigned to another cook');
-    const updatedOrder = await this.orderRepo.assignCook(orderId, cookId);
+    const updatedOrder = await this.orderRepo.assignCook(
+      orderId,
+      cookId,
+      companyId,
+    );
     return updatedOrder;
   }
 
-  async cancelOrder(orderId: number, waiterId: number) {
-    const order = await this.orderRepo.findPendingOrderWithWaiterById(orderId);
+  async cancelOrder(orderId: number, waiterId: number, companyId: number) {
+    const order = await this.orderRepo.findPendingOrderWithWaiterById(
+      orderId,
+      companyId,
+    );
     if (!order) throw new NotFoundException('Order not found');
     if (order?.status !== OrderStatus.PENDING)
       throw new BadRequestException('Only pending orders can be canceled');
@@ -323,7 +342,7 @@ export class OrderService {
       throw new BadRequestException(
         'Only the waiter who created the order can cancel it',
       );
-    const updatedOrder = await this.orderRepo.cancelOrder(orderId);
+    const updatedOrder = await this.orderRepo.cancelOrder(orderId, companyId);
     return updatedOrder;
   }
 
@@ -332,8 +351,9 @@ export class OrderService {
     userId: number,
     role: Role,
     newStatus: OrderStatus,
+    companyId: number,
   ) {
-    const order = await this.orderRepo.findById(orderId);
+    const order = await this.orderRepo.findById(orderId, companyId);
     if (!order) throw new NotFoundException('Order not found');
     if (role === Role.COOK) {
       if (newStatus !== OrderStatus.COMPLETE)
@@ -342,7 +362,7 @@ export class OrderService {
         throw new BadRequestException('You are not assigned to this order');
       if (order.status !== OrderStatus.IN_PROGRESS)
         throw new BadRequestException('Order must be IN_PROGRESS to complete');
-      const update = this.orderRepo.updateStatus(orderId, newStatus);
+      const update = this.orderRepo.updateStatus(orderId, newStatus, companyId);
 
       this.notificationsGateway.notifyWaiter(
         socket_events.ORDER_COMPLETED,
@@ -364,7 +384,7 @@ export class OrderService {
           throw new BadRequestException(
             'Order must be COMPLETE before delivering',
           );
-        return this.orderRepo.updateStatus(orderId, newStatus);
+        return this.orderRepo.updateStatus(orderId, newStatus, companyId);
       }
 
       if (newStatus === OrderStatus.FINISHED) {
@@ -374,9 +394,13 @@ export class OrderService {
           );
         if (!order.table?.id)
           throw new BadRequestException('Order is not assigned to a table');
-        await this.tableService.updateTable(order.table?.id, { active: true });
+        await this.tableService.updateTable(
+          order.table?.id,
+          { active: true },
+          companyId,
+        );
 
-        return this.orderRepo.updateStatus(orderId, newStatus);
+        return this.orderRepo.updateStatus(orderId, newStatus, companyId);
       }
 
       throw new BadRequestException(

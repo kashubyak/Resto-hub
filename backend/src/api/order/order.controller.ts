@@ -18,7 +18,7 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CreateOrderDto } from './dto/request/create-order.dto';
@@ -53,8 +53,9 @@ export class OrderController {
   createOrder(
     @CurrentUser('id') waiterId: number,
     @Body() dto: CreateOrderDto,
+    @CurrentUser('companyId') companyId: number,
   ) {
-    return this.orderService.createOrder(waiterId, dto);
+    return this.orderService.createOrder(waiterId, dto, companyId);
   }
 
   @Get('analytics')
@@ -78,8 +79,11 @@ export class OrderController {
     description: 'Paginated list of orders',
     type: PaginatedOrdersResponseDto,
   })
-  getAllOrders(@Query() query: OrdersQueryDto) {
-    return this.orderService.getAllOrders(query);
+  getAllOrders(
+    @Query() query: OrdersQueryDto,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.orderService.getAllOrders(query, companyId);
   }
 
   @Get('history')
@@ -91,12 +95,13 @@ export class OrderController {
     description: 'Paginated list of orders for the user',
     type: PaginatedOrdersResponseDto,
   })
-  getOrderHistory(
-    @CurrentUser('id') userId: number,
-    @CurrentUser('role') role: Role,
-    @Query() query: OrdersQueryDto,
-  ) {
-    return this.orderService.getOrderHistory(userId, role, query);
+  getOrderHistory(@CurrentUser() user: User, @Query() query: OrdersQueryDto) {
+    return this.orderService.getOrderHistory(
+      user.id,
+      user.role,
+      query,
+      user.companyId,
+    );
   }
 
   @Get('free')
@@ -106,8 +111,11 @@ export class OrderController {
     description: 'List of free orders available for cooks',
     type: PaginatedOrdersResponseDto,
   })
-  getFreeOrders(@Query() query: OrdersQueryDto) {
-    return this.orderService.getFreeOrders(query);
+  getFreeOrders(
+    @Query() query: OrdersQueryDto,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.orderService.getFreeOrders(query, companyId);
   }
 
   @Get(':id')
@@ -117,8 +125,11 @@ export class OrderController {
     description: 'Full information about a single order',
     type: OrderSummaryFullPersonalDto,
   })
-  getOrderById(@Param('id', ParseIntPipe) id: number) {
-    return this.orderService.getOrderById(id);
+  getOrderById(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.orderService.getOrderById(id, companyId);
   }
 
   @Patch(':id/assign')
@@ -132,9 +143,13 @@ export class OrderController {
   })
   assignOrder(
     @Param('id', ParseIntPipe) orderId: number,
-    @CurrentUser('id') cookId: number,
+    @CurrentUser() user: User,
   ) {
-    return this.orderService.assignOrderToCook(orderId, cookId);
+    return this.orderService.assignOrderToCook(
+      orderId,
+      user.id,
+      user.companyId,
+    );
   }
 
   @Patch(':id/cancel')
@@ -148,9 +163,9 @@ export class OrderController {
   })
   cancelOrder(
     @Param('id', ParseIntPipe) orderId: number,
-    @CurrentUser('id') waiterId: number,
+    @CurrentUser() user: User,
   ) {
-    return this.orderService.cancelOrder(orderId, waiterId);
+    return this.orderService.cancelOrder(orderId, user.id, user.companyId);
   }
 
   @Patch(':id/status')
@@ -164,10 +179,15 @@ export class OrderController {
   })
   updateOrderStatus(
     @Param('id', ParseIntPipe) id: number,
-    @CurrentUser('id') userId: number,
-    @CurrentUser('role') role: Role,
+    @CurrentUser() user: User,
     @Body() dto: UpdateOrderStatusDto,
   ) {
-    return this.orderService.updateOrderStatus(id, userId, role, dto.status);
+    return this.orderService.updateOrderStatus(
+      id,
+      user.id,
+      user.role,
+      dto.status,
+      user.companyId,
+    );
   }
 }

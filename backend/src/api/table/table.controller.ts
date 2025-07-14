@@ -15,6 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CreateTableDto } from './dto/request/create-table.dto';
 import { UpdateTableDto } from './dto/request/update-table.dto';
@@ -33,8 +34,11 @@ export class TableController {
     description: 'Table created successfully',
     type: CreateTableResponseDto,
   })
-  createTable(@Body() createTableDto: CreateTableDto) {
-    return this.tableService.createTable(createTableDto);
+  createTable(
+    @Body() createTableDto: CreateTableDto,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.tableService.createTable(createTableDto, companyId);
   }
 
   @Get()
@@ -43,8 +47,8 @@ export class TableController {
     description: 'List of all tables',
     type: [CreateTableResponseDto],
   })
-  getAllTables() {
-    return this.tableService.getAllTables();
+  getAllTables(@CurrentUser('companyId') companyId: number) {
+    return this.tableService.getAllTables(companyId);
   }
 
   @Get(':id')
@@ -53,8 +57,11 @@ export class TableController {
     description: 'Table found',
     type: CreateTableResponseDto,
   })
-  getTableById(@Param('id', ParseIntPipe) id: number) {
-    return this.tableService.getTableById(+id);
+  getTableById(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.tableService.getTableById(id, companyId);
   }
 
   @Patch(':id')
@@ -69,8 +76,9 @@ export class TableController {
   updateTable(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTableDto,
+    @CurrentUser('companyId') companyId: number,
   ) {
-    return this.tableService.updateTable(id, dto);
+    return this.tableService.updateTable(id, dto, companyId);
   }
 
   @Delete(':id')
@@ -80,7 +88,10 @@ export class TableController {
     description: 'Table deleted successfully',
     type: CreateTableResponseDto,
   })
-  deleteTable(@Param('id', ParseIntPipe) id: number) {
-    return this.tableService.deleteTable(id);
+  deleteTable(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('companyId') companyId: number,
+  ) {
+    return this.tableService.deleteTable(id, companyId);
   }
 }

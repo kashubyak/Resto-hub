@@ -19,21 +19,32 @@ export class UserService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async registerUser(dto: RegisterDto, file: Express.Multer.File) {
+  async registerUser(
+    dto: RegisterDto,
+    file: Express.Multer.File,
+    companyId: number,
+  ) {
     if (!file) throw new BadRequestException('Avatar image is required');
-    const existingUser = await this.userRepository.findByEmail(dto.email);
+    const existingUser = await this.userRepository.findByEmail(
+      dto.email,
+      companyId,
+    );
     if (existingUser) throw new BadRequestException('Email already exists');
     if (dto.role === Role.ADMIN)
       throw new BadRequestException('Cannot assign ADMIN role');
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const avatarUrl = await this.s3Service.uploadFile(file, folder_avatar);
-    const user = await this.userRepository.createUser({
-      name: dto.name,
-      email: dto.email,
-      password: hashedPassword,
-      role: dto.role,
-      avatarUrl,
-    });
+    const user = await this.userRepository.createUser(
+      {
+        name: dto.name,
+        email: dto.email,
+        password: hashedPassword,
+        role: dto.role,
+        avatarUrl,
+        companyId,
+      },
+      companyId,
+    );
 
     return {
       id: user.id,
@@ -46,7 +57,7 @@ export class UserService {
     };
   }
 
-  async findAll(query: FilterUserDto) {
+  async findAll(query: FilterUserDto, companyId: number) {
     const {
       search,
       role,
@@ -58,6 +69,7 @@ export class UserService {
 
     const allowedRoles: Role[] = ['COOK', 'WAITER'];
     const where: Prisma.UserWhereInput = {
+      companyId,
       role: role ? role : { in: allowedRoles },
       OR: search
         ? [
@@ -82,21 +94,29 @@ export class UserService {
     };
   }
 
-  async findById(id: number) {
-    const user = await this.userRepository.findUser(id);
+  async findById(id: number, companyId: number) {
+    const user = await this.userRepository.findUser(id, companyId);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
     return user;
   }
 
-  async updateUser(id: number, dto: UpdateUserDto, file: Express.Multer.File) {
-    const user = await this.userRepository.findUserWithPassword(id);
+  async updateUser(
+    id: number,
+    dto: UpdateUserDto,
+    file: Express.Multer.File,
+    companyId: number,
+  ) {
+    const user = await this.userRepository.findUserWithPassword(id, companyId);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
 
     if (dto.role === Role.ADMIN)
       throw new BadRequestException('Cannot assign ADMIN role');
 
     if (dto.email && dto.email !== user.email) {
-      const existingEmail = await this.userRepository.findByEmail(dto.email);
+      const existingEmail = await this.userRepository.findByEmail(
+        dto.email,
+        companyId,
+      );
       if (existingEmail) throw new BadRequestException('Email already exists');
     }
 
@@ -120,11 +140,18 @@ export class UserService {
     }
 
     const { oldPassword, ...safeData } = dto;
-    return await this.userRepository.updateUser(id, { ...safeData, avatarUrl });
+    return this.userRepository.updateUser(
+      id,
+      {
+        ...safeData,
+        avatarUrl,
+      },
+      companyId,
+    );
   }
 
-  async deleteUser(id: number) {
-    const user = await this.userRepository.findUser(id);
+  async deleteUser(id: number, companyId: number) {
+    const user = await this.userRepository.findUser(id, companyId);
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
     if (user.avatarUrl) {
       try {
@@ -133,12 +160,6 @@ export class UserService {
         throw new BadRequestException('Failed to delete avatar image');
       }
     }
-    return await this.userRepository.deleteUser(id);
-  }
-
-  async getCurrentUser(id: number) {
-    const user = await this.userRepository.findUser(id);
-    if (!user) throw new NotFoundException(`User with ID ${id} not found`);
-    return user;
+    return this.userRepository.deleteUser(id, companyId);
   }
 }

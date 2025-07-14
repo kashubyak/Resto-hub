@@ -7,30 +7,41 @@ import { UpdateTableDto } from '../dto/request/update-table.dto';
 export class TableRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: number) {
-    return this.prisma.table.findUnique({ where: { id } });
+  findById(id: number, companyId: number) {
+    return this.prisma.table.findFirst({ where: { id, companyId } });
   }
 
-  async findByNumber(number: number) {
-    return this.prisma.table.findUnique({ where: { number } });
+  findByNumber(number: number, companyId: number) {
+    return this.prisma.table.findUnique({
+      where: {
+        companyId_number: {
+          number,
+          companyId,
+        },
+      },
+    });
   }
 
-  async createTable(dto: CreateTableDto) {
-    return this.prisma.table.create({ data: dto });
-  }
-
-  async getAllTables() {
-    return this.prisma.table.findMany();
-  }
-
-  async updateTable(id: number, dto: UpdateTableDto) {
-    return this.prisma.table.update({
-      where: { id },
+  createTable(dto: CreateTableDto & { companyId: number }) {
+    return this.prisma.table.create({
       data: dto,
     });
   }
 
-  async deleteTable(id: number) {
-    return this.prisma.table.delete({ where: { id } });
+  getAllTables(companyId: number) {
+    return this.prisma.table.findMany({ where: { companyId } });
+  }
+
+  updateTable(id: number, companyId: number, dto: UpdateTableDto) {
+    return this.prisma.table.update({
+      where: { id, companyId },
+      data: dto,
+    });
+  }
+
+  deleteTable(id: number, companyId: number) {
+    return this.prisma.table.delete({
+      where: { id, companyId },
+    });
   }
 }
