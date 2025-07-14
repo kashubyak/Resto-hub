@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -7,8 +6,6 @@ import { PrismaService } from 'prisma/prisma.service';
 import { S3Service } from 'src/common/s3/s3.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt.guard';
-import { RolesGuard } from './guards/roles.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
@@ -21,19 +18,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ThrottlerModule.forRoot([{ limit: 10, ttl: 60 }]),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    PrismaService,
-    S3Service,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-  ],
+  providers: [AuthService, JwtStrategy, PrismaService, S3Service],
 })
 export class AuthModule {}

@@ -4,6 +4,8 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PrismaService } from 'prisma/prisma.service';
+import { JwtAuthGuard } from 'src/api/auth/guards/jwt.guard';
+import { RolesGuard } from 'src/api/auth/guards/roles.guard';
 import { CategoryModule } from 'src/api/category/category.module';
 import { CompanyModule } from 'src/api/company/company.module';
 import { DishModule } from 'src/api/dish/dish.module';
@@ -11,7 +13,8 @@ import { OrderModule } from 'src/api/order/order.module';
 import { TableModule } from 'src/api/table/table.module';
 import { UserModule } from 'src/api/user/user.module';
 import { PrismaExceptionFilter } from 'src/common/filters/prisma-exception.filter';
-import { SubdomainGuard } from 'src/common/subdomain.guard';
+import { CompanyConsistencyGuard } from 'src/common/guards/company-consistency.guard';
+import { SubdomainGuard } from 'src/common/guards/subdomain.guard';
 import { AuthModule } from './src/api/auth/auth.module';
 
 @Module({
@@ -37,6 +40,18 @@ import { AuthModule } from './src/api/auth/auth.module';
     {
       provide: APP_GUARD,
       useClass: SubdomainGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: CompanyConsistencyGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
     {
       provide: APP_FILTER,
