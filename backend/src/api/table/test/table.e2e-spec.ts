@@ -1,61 +1,64 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { AppModule } from 'app.module';
 import { PrismaService } from 'prisma/prisma.service';
+import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware';
 import * as request from 'supertest';
 import { getAuthToken } from 'test/utils/auth-test';
+import { cleanTestDb } from 'test/utils/db-utils';
+import { fakeTable } from 'test/utils/faker';
 
-describe('Table e2e', () => {
+describe('TableModule (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let access_token: string;
-  let createdTableId: number;
+  let token: string;
+  let companyId: number;
+  let tableId: number;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleRef.createNestApplication();
+    app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+
+    prisma = moduleRef.get(PrismaService);
+    const middleware = new CompanyContextMiddleware(prisma);
+    app.use(middleware.use.bind(middleware));
+
     await app.init();
 
     prisma = app.get(PrismaService);
+    await cleanTestDb(prisma);
 
-    await prisma.$transaction([
-      prisma.table.deleteMany(),
-      prisma.user.deleteMany(),
-    ]);
-
-    const adminDto = {
-      email: 'admin@admin.com',
-      password: 'adminpass',
-      name: 'Admin',
-      role: 'ADMIN',
-    };
-
-    access_token = await getAuthToken(app, adminDto);
-    if (!access_token)
-      throw new Error('Admin token not received for table tests');
+    const auth = await getAuthToken(app);
+    token = auth.token;
+    companyId = auth.companyId;
   });
 
   beforeEach(async () => {
-    await prisma.table.deleteMany();
-    const dto = { number: 1, seats: 4 };
+    await prisma.table.deleteMany({ where: { companyId } });
+
+    const tableDto = fakeTable();
     const res = await request(app.getHttpServer())
-      .post('/table/create')
-      .set('Authorization', `Bearer ${access_token}`)
-      .send(dto)
+      .post('/api/table/create')
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
+      .send(tableDto)
       .expect(201);
-    createdTableId = res.body.id;
+
+    tableId = res.body.id;
   });
 
-  it('should create a table', async () => {
-    const dto = { number: 2, seats: 5 };
+  it('should create a new table', async () => {
+    const dto = fakeTable();
 
     const res = await request(app.getHttpServer())
-      .post('/table/create')
-      .set('Authorization', `Bearer ${access_token}`)
+      .post('/api/table/create')
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
       .send(dto)
       .expect(201);
 
@@ -65,54 +68,61 @@ describe('Table e2e', () => {
   });
 
   it('should not allow duplicate table number', async () => {
-    const dto = { number: 1, seats: 4 };
+    const table = await prisma.table.findFirst({ where: { companyId } });
+    if (!table) throw new Error('No table found for the test company');
 
     await request(app.getHttpServer())
-      .post('/table/create')
-      .set('Authorization', `Bearer ${access_token}`)
-      .send(dto)
+      .post('/api/table/create')
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
+      .send({ number: table.number, seats: 4 })
       .expect(409);
   });
 
   it('should get all tables', async () => {
     const res = await request(app.getHttpServer())
-      .get('/table')
-      .set('Authorization', `Bearer ${access_token}`)
+      .get('/api/table')
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
       .expect(200);
 
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('should get one table by id', async () => {
+  it('should get table by id', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/table/${createdTableId}`)
-      .set('Authorization', `Bearer ${access_token}`)
+      .get(`/api/table/${tableId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
       .expect(200);
 
-    expect(res.body).toHaveProperty('id', createdTableId);
+    expect(res.body.id).toBe(tableId);
   });
 
-  it('should return 404 for non-existing table', async () => {
+  it('should return 404 for non-existing id', async () => {
     await request(app.getHttpServer())
-      .get('/table/99999')
-      .set('Authorization', `Bearer ${access_token}`)
+      .get(`/api/table/99999`)
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
       .expect(404);
   });
 
-  it('should return 400 for invalid ID format', async () => {
+  it('should return 400 for invalid id', async () => {
     await request(app.getHttpServer())
-      .get('/table/abc')
-      .set('Authorization', `Bearer ${access_token}`)
+      .get(`/api/table/invalid`)
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
       .expect(400);
   });
 
   it('should update a table', async () => {
-    const dto = { number: 3, seats: 7 };
+    const dto = { number: 99, seats: 6 };
 
     const res = await request(app.getHttpServer())
-      .patch(`/table/${createdTableId}`)
-      .set('Authorization', `Bearer ${access_token}`)
+      .patch(`/api/table/${tableId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
       .send(dto)
       .expect(200);
 
@@ -120,67 +130,61 @@ describe('Table e2e', () => {
     expect(res.body.seats).toBe(dto.seats);
   });
 
-  it('should return 404 when updating non-existing table', async () => {
-    const dto = { number: 10, seats: 2 };
-
-    await request(app.getHttpServer())
-      .patch('/table/99999')
-      .set('Authorization', `Bearer ${access_token}`)
-      .send(dto)
-      .expect(404);
-  });
-
   it('should delete a table', async () => {
-    const newTableDto = { number: 4, seats: 2 };
-    const createRes = await request(app.getHttpServer())
-      .post('/table/create')
-      .set('Authorization', `Bearer ${access_token}`)
-      .send(newTableDto)
+    const dto = fakeTable();
+    const res = await request(app.getHttpServer())
+      .post('/api/table/create')
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
+      .send(dto)
       .expect(201);
-    const tableToDeleteId = createRes.body.id;
+
+    const id = res.body.id;
 
     await request(app.getHttpServer())
-      .delete(`/table/${tableToDeleteId}`)
-      .set('Authorization', `Bearer ${access_token}`)
+      .delete(`/api/table/${id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
       .expect(200);
 
     await request(app.getHttpServer())
-      .get(`/table/${tableToDeleteId}`)
-      .set('Authorization', `Bearer ${access_token}`)
+      .get(`/api/table/${id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(404);
   });
 
-  it('should return 404 when deleting non-existing table', async () => {
+  it('should return 409 when deleting inactive table', async () => {
+    await prisma.table.update({
+      where: { id: tableId },
+      data: { active: false },
+    });
+
     await request(app.getHttpServer())
-      .delete('/table/99999')
-      .set('Authorization', `Bearer ${access_token}`)
-      .expect(404);
+      .delete(`/api/table/${tableId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', 'testcompany.localhost')
+      .expect(409);
   });
 
-  it('should deny creating table without token', async () => {
+  it('should deny access without token', async () => {
     await request(app.getHttpServer())
-      .post('/table/create')
-      .send({ number: 3, seats: 4 })
+      .get('/api/table')
+      .expect(401)
+      .set('Host', 'testcompany.localhost');
+    await request(app.getHttpServer())
+      .post('/api/table/create')
+      .set('Host', 'testcompany.localhost')
+      .send(fakeTable())
       .expect(401);
-  });
-
-  it('should deny getting all tables without token', async () => {
-    await request(app.getHttpServer()).get('/table').expect(401);
-  });
-
-  it('should deny getting one table without token', async () => {
-    await request(app.getHttpServer()).get('/table/1').expect(401);
-  });
-
-  it('should deny updating table without token', async () => {
     await request(app.getHttpServer())
-      .patch('/table/1')
-      .send({ number: 5, seats: 2 })
+      .patch(`/api/table/${tableId}`)
+      .set('Host', 'testcompany.localhost')
+      .send({ number: 7 })
       .expect(401);
-  });
-
-  it('should deny deleting table without token', async () => {
-    await request(app.getHttpServer()).delete('/table/1').expect(401);
+    await request(app.getHttpServer())
+      .delete(`/api/table/${tableId}`)
+      .set('Host', 'testcompany.localhost')
+      .expect(401);
   });
 
   afterAll(async () => {

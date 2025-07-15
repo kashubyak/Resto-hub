@@ -8,6 +8,7 @@ import { company_avatar, folder_avatar } from 'src/common/constants';
 import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware';
 import { S3Service } from 'src/common/s3/s3.service';
 import * as request from 'supertest';
+import { cleanTestDb } from 'test/utils/db-utils';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -25,7 +26,11 @@ describe('AuthController (e2e)', () => {
     adminEmail: 'admin@example.com',
     adminPassword: 'password123',
   };
-
+  const avatarPath = path.resolve(
+    __dirname,
+    '../../../../test/assets/avatar.webp',
+  );
+  const logoPath = path.resolve(__dirname, '../../../../test/assets/logo.jpg');
   const loginDto = {
     email: companyData.adminEmail,
     password: companyData.adminPassword,
@@ -64,16 +69,13 @@ describe('AuthController (e2e)', () => {
       .field('adminName', companyData.adminName)
       .field('adminEmail', companyData.adminEmail)
       .field('adminPassword', companyData.adminPassword)
-      .attach('logoUrl', path.join(__dirname, 'fixtures', 'logo.jpg'))
-      .attach('avatarUrl', path.join(__dirname, 'fixtures', 'avatar.webp'))
+      .attach('logoUrl', logoPath)
+      .attach('avatarUrl', avatarPath)
       .expect(201);
   });
 
   afterAll(async () => {
-    await prisma.orderItem.deleteMany();
-    await prisma.order.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.company.deleteMany();
+    await cleanTestDb(prisma);
     await s3Service.deleteFolder(folder_avatar);
     await s3Service.deleteFolder(company_avatar);
     await app.close();
@@ -92,8 +94,8 @@ describe('AuthController (e2e)', () => {
         .field('adminName', 'Admin 2')
         .field('adminEmail', companyData.adminEmail)
         .field('adminPassword', 'password456')
-        .attach('logoUrl', path.join(__dirname, 'fixtures', 'logo.jpg'))
-        .attach('avatarUrl', path.join(__dirname, 'fixtures', 'avatar.webp'))
+        .attach('logoUrl', logoPath)
+        .attach('avatarUrl', avatarPath)
         .expect(409);
     });
 
@@ -109,8 +111,8 @@ describe('AuthController (e2e)', () => {
         .field('adminName', 'Admin')
         .field('adminEmail', 'another@example.com')
         .field('adminPassword', 'password')
-        .attach('logoUrl', path.join(__dirname, 'fixtures', 'logo.jpg'))
-        .attach('avatarUrl', path.join(__dirname, 'fixtures', 'avatar.webp'))
+        .attach('logoUrl', logoPath)
+        .attach('avatarUrl', avatarPath)
         .expect(409);
     });
 

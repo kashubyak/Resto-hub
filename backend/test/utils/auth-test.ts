@@ -1,9 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import * as path from 'path';
+import { PrismaService } from 'prisma/prisma.service';
 import * as request from 'supertest';
 
 export async function getAuthToken(
-  appInstance: INestApplication,
+  app: INestApplication,
   companyDto?: Partial<{
     name: string;
     subdomain: string;
@@ -14,23 +15,24 @@ export async function getAuthToken(
     adminPassword: string;
     adminName: string;
   }>,
-): Promise<string> {
+): Promise<{ token: string; companyId: number }> {
   const {
     name = 'Test Company',
     subdomain = 'testcompany',
     address = 'Test Address',
-    latitude = 50.4501,
+    latitude = 50.45,
     longitude = 30.5234,
     adminEmail = 'admin@example.com',
     adminPassword = 'password123',
     adminName = 'Admin',
   } = companyDto || {};
 
-  const logoPath = path.join(__dirname, '../assets/logo.png');
-  const avatarPath = path.join(__dirname, '../assets/avatar.png');
+  const logoPath = path.join(__dirname, '../assets/logo.jpg');
+  const avatarPath = path.join(__dirname, '../assets/avatar.webp');
 
-  await request(appInstance.getHttpServer())
-    .post('/auth/register-company')
+  await request(app.getHttpServer())
+    .post('/api/auth/register-company')
+    .set('Host', 'localhost')
     .field('name', name)
     .field('subdomain', subdomain)
     .field('address', address)
@@ -43,10 +45,22 @@ export async function getAuthToken(
     .attach('avatarUrl', avatarPath)
     .expect(201);
 
-  const loginResponse = await request(appInstance.getHttpServer())
-    .post('/auth/login')
+  const loginRes = await request(app.getHttpServer())
+    .post('/api/auth/login')
+    .set('Host', `${subdomain}.localhost`)
     .send({ email: adminEmail, password: adminPassword })
     .expect(200);
 
-  return loginResponse.body.token;
+  const token = loginRes.body.token;
+
+  const prisma = app.get(PrismaService);
+  const company = await prisma.company.findUniqueOrThrow({
+    where: { subdomain },
+    select: { id: true },
+  });
+
+  return {
+    token,
+    companyId: company.id,
+  };
 }
