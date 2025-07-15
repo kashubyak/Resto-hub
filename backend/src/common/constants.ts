@@ -9,8 +9,11 @@ export const socket_rooms = {
 };
 export const size_of_image = 15;
 
-export const folder_dish = 'dishes';
-export const folder_avatar = 'avatars';
-export const company_avatar = 'company-avatars';
+const isTestEnv = process.env.NODE_ENV === 'test';
+export const folder_dish = isTestEnv ? 'test/dishes' : 'dishes';
+export const folder_avatar = isTestEnv ? 'test/avatars' : 'avatars';
+export const company_avatar = isTestEnv
+  ? 'test/company-avatars'
+  : 'company-avatars';
 
 export const companyIdFromSubdomain = 'companyIdFromSubdomain';

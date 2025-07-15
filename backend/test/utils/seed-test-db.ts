@@ -8,6 +8,7 @@ async function main() {
   await prisma.category.deleteMany();
   await prisma.table.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.company.deleteMany();
 
   console.log('Test DB seeded ✅');
 }

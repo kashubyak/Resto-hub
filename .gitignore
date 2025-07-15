@@ -106,7 +106,6 @@ web_modules/
 
 # dotenv environment variable files
 .env*
-!.env.test
 !.env.development
 
 # temp directory
