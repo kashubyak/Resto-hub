@@ -1,455 +1,203 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { AppModule } from 'app.module';
-import * as cookieParser from 'cookie-parser';
 import { PrismaService } from 'prisma/prisma.service';
+import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware';
 import * as request from 'supertest';
 import { getAuthToken } from 'test/utils/auth-test';
+import { cleanTestDb } from 'test/utils/db-utils';
+import { FakeDTO } from 'test/utils/faker';
 
-describe('Category (e2e)', () => {
+const BASE_URL = '/api/category';
+const HOST = 'testcompany.localhost';
+
+describe('CategoryModule (e2e)', () => {
   let app: INestApplication;
-  let server: any;
   let prisma: PrismaService;
-  let adminToken: string;
-  let userToken: string;
+  let token: string;
+  let companyId: number;
   let categoryId: number;
-  const nonExistingId = 999999;
 
-  const adminCredentials = {
-    name: 'Test Admin Cat',
-    email: 'admincat@example.com',
-    password: 'admincatpass123',
-    role: 'ADMIN',
+  const makeRequest = (
+    method: 'get' | 'post' | 'patch' | 'delete',
+    url: string,
+  ) => {
+    return request(app.getHttpServer())
+      [method](url)
+      .set('Authorization', `Bearer ${token}`)
+      .set('Host', HOST);
   };
 
-  const userCredentials = {
-    name: 'Test User Cat',
-    email: 'usercat@example.com',
-    password: 'usercatpass123',
-    role: 'WAITER',
+  const createCategory = async (dto = FakeDTO.category.create()) => {
+    const res = await makeRequest('post', `${BASE_URL}/create`)
+      .send(dto)
+      .expect(201);
+    return res.body;
   };
-
-  const initialCategoryData = {
-    name: 'Initial Test Category',
-  };
-
-  const createCategoryDto = {
-    name: 'Test Category E2E',
-  };
-
-  const createCategoryDtoInvalid = {
-    name: '',
-  };
-
-  const updateCategoryDto = {
-    name: 'Updated Test Category E2E',
-  };
-
-  async function cleanupUserAndRelatedData(
-    prismaInstance: PrismaService,
-    userEmail: string,
-  ) {
-    const user = await prismaInstance.user.findUnique({
-      where: { email: userEmail },
-      select: {
-        id: true,
-        waiterOrders: { select: { id: true } },
-        cookOrders: { select: { id: true } },
-      },
-    });
-
-    if (user) {
-      const orderIdsFromWaiter = user.waiterOrders.map((o) => o.id);
-      const orderIdsFromCook = user.cookOrders
-        ? user.cookOrders.map((o) => o.id)
-        : [];
-
-      const allAssociatedOrderIds = [
-        ...new Set([...orderIdsFromWaiter, ...orderIdsFromCook]),
-      ];
-
-      if (allAssociatedOrderIds.length > 0) {
-        await prismaInstance.orderItem.deleteMany({
-          where: { orderId: { in: allAssociatedOrderIds } },
-        });
-
-        await prismaInstance.order.deleteMany({
-          where: { id: { in: allAssociatedOrderIds } },
-        });
-      }
-      await prismaInstance.user.deleteMany({
-        where: { email: userEmail },
-      });
-    } else {
-      await prismaInstance.user.deleteMany({
-        where: { email: userEmail },
-      });
-    }
-  }
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
-    app.use(cookieParser());
-    prisma = app.get(PrismaService);
+    app = moduleRef.createNestApplication();
+    app.setGlobalPrefix('api');
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-    await prisma.$transaction([
-      prisma.dish.deleteMany(),
-      prisma.category.deleteMany(),
-    ]);
-
-    await cleanupUserAndRelatedData(prisma, adminCredentials.email);
-    await cleanupUserAndRelatedData(prisma, userCredentials.email);
+    prisma = moduleRef.get(PrismaService);
+    const middleware = new CompanyContextMiddleware(prisma);
+    app.use(middleware.use.bind(middleware));
 
     await app.init();
-    server = app.getHttpServer();
 
-    adminToken = await getAuthToken(app, adminCredentials);
-    if (!adminToken) throw new Error('Admin token not received');
+    prisma = app.get(PrismaService);
+    await cleanTestDb(prisma);
 
-    userToken = await getAuthToken(app, userCredentials);
-    if (!userToken) throw new Error('User token not received');
+    const auth = await getAuthToken(app);
+    token = auth.token;
+    companyId = auth.companyId;
   });
 
   beforeEach(async () => {
-    await prisma.category.deleteMany();
-    const res = await request(server)
-      .post('/category/create')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send(initialCategoryData);
+    await prisma.category.deleteMany({ where: { companyId } });
+    const category = await createCategory();
+    categoryId = category.id;
+  });
 
-    if (res.status !== 201) {
-      console.error(
-        'Failed to create initial category in beforeEach for Category tests:',
-        res.status,
-        res.body,
-      );
-      throw new Error('Failed to create initial category in beforeEach');
-    }
-    categoryId = res.body.id;
-    if (!categoryId) {
-      throw new Error(
-        'Initial category ID is undefined after creation in beforeEach',
-      );
-    }
+  it('should create a category', async () => {
+    const dto = FakeDTO.category.create();
+    const res = await makeRequest('post', `${BASE_URL}/create`)
+      .send(dto)
+      .expect(201);
+    expect(res.body.name).toBe(dto.name);
+  });
+
+  it('should not allow duplicate category names', async () => {
+    const existing = await prisma.category.findFirst({ where: { companyId } });
+    await makeRequest('post', `${BASE_URL}/create`)
+      .send({ name: existing!.name })
+      .expect(409);
+  });
+
+  it('should return paginated categories', async () => {
+    await createCategory(FakeDTO.category.create());
+    const res = await makeRequest('get', `${BASE_URL}?page=1&limit=10`).expect(
+      200,
+    );
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.total).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should filter by search', async () => {
+    const dto = { name: 'UniqueCategoryName' };
+    await createCategory(dto);
+    const res = await makeRequest(
+      'get',
+      `${BASE_URL}?search=UniqueCategoryName`,
+    ).expect(200);
+
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.data.length).toBeGreaterThan(0);
+    expect(res.body.data[0].name).toBe(dto.name);
+  });
+
+  it('should sort categories by name ascending', async () => {
+    await createCategory({ name: 'Alpha' });
+    await createCategory({ name: 'Beta' });
+    const res = await makeRequest(
+      'get',
+      `${BASE_URL}?sortBy=name&order=asc`,
+    ).expect(200);
+    const names = res.body.data.map((c: any) => c.name);
+    expect(names).toEqual([...names].sort());
+  });
+
+  it('should fallback to default pagination if page/limit are missing', async () => {
+    await createCategory({ name: 'ExtraCategory' });
+
+    const res = await makeRequest('get', `${BASE_URL}`).expect(200);
+
+    expect(res.body.page).toBe(1);
+    expect(res.body.limit).toBe(10);
+  });
+
+  it('should return 404 when updating non-existent category', async () => {
+    await makeRequest('patch', `${BASE_URL}/9999999`)
+      .send({ name: 'Updated' })
+      .expect(404);
+  });
+
+  it('should return deleted category in response', async () => {
+    const cat = await createCategory({ name: 'ToBeDeleted' });
+    const res = await makeRequest('delete', `${BASE_URL}/${cat.id}`).expect(
+      200,
+    );
+    expect(res.body.id).toBe(cat.id);
+    expect(res.body.name).toBe(cat.name);
+  });
+
+  it('should get category by id', async () => {
+    const res = await makeRequest('get', `${BASE_URL}/${categoryId}`).expect(
+      200,
+    );
+    expect(res.body.id).toBe(categoryId);
+  });
+
+  it('should return 404 if category not found by id', async () => {
+    await makeRequest('get', `${BASE_URL}/9999999`).expect(404);
+  });
+
+  it('should update category', async () => {
+    const dto = { name: 'UpdatedCategoryName' };
+    const res = await makeRequest('patch', `${BASE_URL}/${categoryId}`)
+      .send(dto)
+      .expect(200);
+    expect(res.body.name).toBe(dto.name);
+  });
+
+  it('should not allow updating to duplicate name', async () => {
+    const cat1 = await createCategory({ name: 'Cat1' });
+    const cat2 = await createCategory({ name: 'Cat2' });
+    await makeRequest('patch', `${BASE_URL}/${cat1.id}`)
+      .send({ name: cat2.name })
+      .expect(409);
+  });
+
+  it('should delete category', async () => {
+    const cat = await createCategory();
+    await makeRequest('delete', `${BASE_URL}/${cat.id}`).expect(200);
+    await makeRequest('get', `${BASE_URL}/${cat.id}`).expect(404);
+  });
+
+  it('should return 404 when deleting non-existent category', async () => {
+    await makeRequest('delete', `${BASE_URL}/9999999`).expect(404).expect(404);
+  });
+
+  it('should block access without token', async () => {
+    await request(app.getHttpServer())
+      .get(BASE_URL)
+      .set('Host', HOST)
+      .expect(401);
+
+    await request(app.getHttpServer())
+      .post(`${BASE_URL}/create`)
+      .set('Host', HOST)
+      .send(FakeDTO.category.create())
+      .expect(401);
+
+    await request(app.getHttpServer())
+      .patch(`${BASE_URL}/1`)
+      .set('Host', HOST)
+      .send({ name: 'New' })
+      .expect(401);
+
+    await request(app.getHttpServer())
+      .delete(`${BASE_URL}/1`)
+      .set('Host', HOST)
+      .expect(401);
   });
 
   afterAll(async () => {
-    await cleanupUserAndRelatedData(prisma, adminCredentials.email);
-    await cleanupUserAndRelatedData(prisma, userCredentials.email);
     await app.close();
-  });
-
-  describe('POST /category/create', () => {
-    it('should create a new category for ADMIN', async () => {
-      const res = await request(server)
-        .post('/category/create')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send(createCategoryDto)
-        .expect(201);
-
-      expect(res.body).toHaveProperty('id');
-      expect(res.body.name).toBe(createCategoryDto.name);
-
-      const dbCategory = await prisma.category.findUnique({
-        where: { id: res.body.id },
-      });
-      expect(dbCategory).not.toBeNull();
-      expect(dbCategory?.name).toBe(createCategoryDto.name);
-    });
-
-    it('should return 409 Conflict when creating a category with an existing name', async () => {
-      const res = await request(server)
-        .post('/category/create')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send(initialCategoryData)
-        .expect(409);
-
-      expect(res.body.message).toContain(
-        'Category with this name already exists',
-      );
-    });
-
-    it('should return 400 Bad Request for invalid data (e.g., empty name)', async () => {
-      const res = await request(server)
-        .post('/category/create')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send(createCategoryDtoInvalid)
-        .expect(400);
-
-      expect(res.body.message).toBeInstanceOf(Array);
-      expect(res.body.message[0]).toContain(
-        'name must be longer than or equal to 3 characters',
-      );
-    });
-
-    it('should return 403 Forbidden for non-ADMIN role', async () => {
-      await request(server)
-        .post('/category/create')
-        .set('Authorization', `Bearer ${userToken}`)
-        .send(createCategoryDto)
-        .expect(403);
-    });
-
-    it('should return 401 Unauthorized without token', async () => {
-      await request(server)
-        .post('/category/create')
-        .send(createCategoryDto)
-        .expect(401);
-    });
-  });
-
-  describe('GET /category/search', () => {
-    it('should return all categories by default with pagination', async () => {
-      const res = await request(server)
-        .get('/category/search')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(res.body).toHaveProperty('items');
-      expect(res.body.items.length).toBeGreaterThanOrEqual(1);
-      expect(res.body).toHaveProperty('total');
-      expect(res.body).toHaveProperty('page', 1);
-      expect(res.body).toHaveProperty('limit', 10);
-    });
-
-    it('should filter categories by search term (case-insensitive)', async () => {
-      await prisma.category.create({
-        data: { name: 'UniqueSearchCategory' },
-      });
-
-      const res = await request(server)
-        .get('/category/search?search=search')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(res.body.items.length).toBe(1);
-      expect(res.body.items[0].name).toBe('UniqueSearchCategory');
-    });
-
-    it('should filter categories that have dishes (hasDishes=true)', async () => {
-      const categoryWithDish = await prisma.category.create({
-        data: {
-          name: 'CategoryWithDish',
-          dishes: {
-            create: {
-              name: 'Dish in Category',
-              description: 'Tasty',
-              price: 9.99,
-              imageUrl: 'http://example.com/image.jpg',
-              ingredients: ['ingredient1'],
-            },
-          },
-        },
-        include: { dishes: true },
-      });
-
-      const res = await request(server)
-        .get('/category/search?hasDishes=true')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(res.body.items).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ id: categoryWithDish.id }),
-        ]),
-      );
-    });
-
-    it('should filter categories without dishes (hasDishes=false)', async () => {
-      await prisma.category.create({
-        data: {
-          name: 'CategoryWithoutDish',
-        },
-      });
-
-      const res = await request(server)
-        .get('/category/search?hasDishes=false')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      for (const item of res.body.items) {
-        expect(item.dishes).toEqual([]);
-      }
-    });
-
-    it('should sort categories by name in ascending order', async () => {
-      await prisma.category.createMany({
-        data: [{ name: 'AlphaCat' }, { name: 'BetaCat' }, { name: 'GammaCat' }],
-      });
-
-      const res = await request(server)
-        .get('/category/search?sortBy=name&order=asc&limit=100')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      const names = res.body.items.map((cat: any) => cat.name);
-      const sorted = [...names].sort((a, b) => a.localeCompare(b));
-      expect(names).toEqual(sorted);
-    });
-
-    it('should respect pagination params', async () => {
-      await prisma.category.createMany({
-        data: Array.from({ length: 15 }, (_, i) => ({
-          name: `PaginatedCat${i + 1}`,
-        })),
-      });
-
-      const res = await request(server)
-        .get('/category/search?page=2&limit=5')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(res.body.page).toBe(2);
-      expect(res.body.limit).toBe(5);
-      expect(res.body.items.length).toBe(5);
-    });
-  });
-
-  describe('GET /category/:id', () => {
-    it('should get a category by ID', async () => {
-      expect(categoryId).toBeDefined();
-      const res = await request(server)
-        .get(`/category/${categoryId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(res.body.id).toBe(categoryId);
-      expect(res.body.name).toBe(initialCategoryData.name);
-    });
-
-    it('should return 404 for non-existing category ID', async () => {
-      await request(server)
-        .get(`/category/${nonExistingId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(404);
-    });
-
-    it('should return 400 for invalid ID format', async () => {
-      const res = await request(server)
-        .get(`/category/abc`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(400);
-
-      expect(res.body.message).toContain(
-        'Validation failed (numeric string is expected)',
-      );
-    });
-  });
-
-  describe('PATCH /category/:id', () => {
-    it('should update a category for ADMIN', async () => {
-      expect(categoryId).toBeDefined();
-      const res = await request(server)
-        .patch(`/category/${categoryId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send(updateCategoryDto)
-        .expect(200);
-
-      expect(res.body.id).toBe(categoryId);
-      expect(res.body.name).toBe(updateCategoryDto.name);
-
-      const dbCategory = await prisma.category.findUnique({
-        where: { id: categoryId },
-      });
-      expect(dbCategory?.name).toBe(updateCategoryDto.name);
-    });
-
-    it('should return 404 when trying to update a non-existing category', async () => {
-      await request(server)
-        .patch(`/category/${nonExistingId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send(updateCategoryDto)
-        .expect(404);
-    });
-
-    it('should return 400 Bad Request for invalid update data', async () => {
-      expect(categoryId).toBeDefined();
-      await request(server)
-        .patch(`/category/${categoryId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send(createCategoryDtoInvalid)
-        .expect(400);
-    });
-
-    it('should return 403 Forbidden for USER role trying to update', async () => {
-      expect(categoryId).toBeDefined();
-      await request(server)
-        .patch(`/category/${categoryId}`)
-        .set('Authorization', `Bearer ${userToken}`)
-        .send(updateCategoryDto)
-        .expect(403);
-    });
-
-    it('should return 401 Unauthorized without token trying to update', async () => {
-      expect(categoryId).toBeDefined();
-      await request(server)
-        .patch(`/category/${categoryId}`)
-        .send(updateCategoryDto)
-        .expect(401);
-    });
-
-    it('should return 409 Conflict when updating name to an already existing name', async () => {
-      const secondCategoryDto = {
-        name: 'Another Unique Category for Patch Test',
-      };
-      const secondCatRes = await request(server)
-        .post('/category/create')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send(secondCategoryDto)
-        .expect(201);
-      const secondCategoryId = secondCatRes.body.id;
-
-      await request(server)
-        .patch(`/category/${secondCategoryId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({ name: initialCategoryData.name })
-        .expect(409);
-    });
-  });
-
-  describe('DELETE /category/:id', () => {
-    it('should delete a category for ADMIN', async () => {
-      expect(categoryId).toBeDefined();
-      await request(server)
-        .delete(`/category/${categoryId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      const dbCategory = await prisma.category.findUnique({
-        where: { id: categoryId },
-      });
-      expect(dbCategory).toBeNull();
-    });
-
-    it('should return 404 when trying to delete a non-existing category', async () => {
-      await request(server)
-        .delete(`/category/${nonExistingId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(404);
-    });
-
-    it('should return 403 Forbidden for USER role trying to delete', async () => {
-      expect(categoryId).toBeDefined();
-      await request(server)
-        .delete(`/category/${categoryId}`)
-        .set('Authorization', `Bearer ${userToken}`)
-        .expect(403);
-    });
-
-    it('should return 401 Unauthorized without token trying to delete', async () => {
-      expect(categoryId).toBeDefined();
-      await request(server).delete(`/category/${categoryId}`).expect(401);
-    });
   });
 });

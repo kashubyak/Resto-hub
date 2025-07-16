@@ -21,15 +21,9 @@ export class CategoryService {
   }
 
   async filterCategories(query: FilterCategoryDto, companyId: number) {
-    const {
-      search,
-      hasDishes,
-      sortBy = 'createdAt',
-      order = 'desc',
-      page = 1,
-      limit = 10,
-    } = query;
-
+    const { search, hasDishes, sortBy = 'createdAt', order = 'desc' } = query;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
     const where: Prisma.CategoryWhereInput = { companyId };
     if (search) where.name = { contains: search, mode: 'insensitive' };
 

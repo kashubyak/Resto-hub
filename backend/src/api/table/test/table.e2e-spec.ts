@@ -6,7 +6,7 @@ import { CompanyContextMiddleware } from 'src/common/middleware/company-context.
 import * as request from 'supertest';
 import { getAuthToken } from 'test/utils/auth-test';
 import { cleanTestDb } from 'test/utils/db-utils';
-import { fakeTable } from 'test/utils/faker';
+import { FakeDTO } from 'test/utils/faker';
 
 describe('TableModule (e2e)', () => {
   let app: INestApplication;
@@ -41,7 +41,7 @@ describe('TableModule (e2e)', () => {
   beforeEach(async () => {
     await prisma.table.deleteMany({ where: { companyId } });
 
-    const tableDto = fakeTable();
+    const tableDto = FakeDTO.table.create();
     const res = await request(app.getHttpServer())
       .post('/api/table/create')
       .set('Authorization', `Bearer ${token}`)
@@ -53,7 +53,7 @@ describe('TableModule (e2e)', () => {
   });
 
   it('should create a new table', async () => {
-    const dto = fakeTable();
+    const dto = FakeDTO.table.create();
 
     const res = await request(app.getHttpServer())
       .post('/api/table/create')
@@ -131,7 +131,7 @@ describe('TableModule (e2e)', () => {
   });
 
   it('should delete a table', async () => {
-    const dto = fakeTable();
+    const dto = FakeDTO.table.create();
     const res = await request(app.getHttpServer())
       .post('/api/table/create')
       .set('Authorization', `Bearer ${token}`)
@@ -174,7 +174,7 @@ describe('TableModule (e2e)', () => {
     await request(app.getHttpServer())
       .post('/api/table/create')
       .set('Host', 'testcompany.localhost')
-      .send(fakeTable())
+      .send(FakeDTO.table.create())
       .expect(401);
     await request(app.getHttpServer())
       .patch(`/api/table/${tableId}`)
