@@ -72,6 +72,10 @@ describe('CategoryModule (e2e)', () => {
     expect(res.body.name).toBe(dto.name);
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   it('should not allow duplicate category names', async () => {
     const existing = await prisma.category.findFirst({ where: { companyId } });
     await makeRequest('post', `${BASE_URL}/create`)
@@ -195,9 +199,5 @@ describe('CategoryModule (e2e)', () => {
       .delete(`${BASE_URL}/1`)
       .set('Host', HOST)
       .expect(401);
-  });
-
-  afterAll(async () => {
-    await app.close();
   });
 });
