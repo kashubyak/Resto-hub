@@ -4,6 +4,7 @@ export const BASE_URL = {
   TABLE: '/api/table',
   CATEGORY: '/api/category',
   AUTH: '/api/auth',
+  COMPANY: '/api/company',
 };
 export const HOST = 'testcompany.localhost';
 export const logoPath = path.resolve(__dirname, '../assets/logo.jpg');

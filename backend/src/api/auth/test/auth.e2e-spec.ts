@@ -14,7 +14,7 @@ import {
   baseCompanyFormFields,
 } from 'test/utils/form-utils';
 
-describe('AuthController (e2e)', () => {
+describe('Auth (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let server: any;
@@ -161,7 +161,6 @@ describe('AuthController (e2e)', () => {
         .expect(200);
 
       const token = loginRes.body.token;
-
       const resLogout = await request(server)
         .post(`${BASE_URL.AUTH}/logout`)
         .set('Host', HOST)

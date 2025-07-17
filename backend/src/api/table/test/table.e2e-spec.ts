@@ -10,7 +10,7 @@ import { cleanTestDb } from 'test/utils/db-utils';
 import { FakeDTO } from 'test/utils/faker';
 import { createTable, makeRequest } from 'test/utils/form-utils';
 
-describe('TableModule (e2e)', () => {
+describe('Table (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let token: string;

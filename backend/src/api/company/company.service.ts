@@ -33,23 +33,40 @@ export class CompanyService {
     const company = await this.companyRepository.findById(companyId);
     if (!company)
       throw new NotFoundException(`Company with ID ${companyId} not found`);
+
     if (dto.name && dto.name !== company.name) {
       const existing = await this.companyRepository.findByName(dto.name);
-      if (existing) {
+      if (existing)
         throw new ConflictException(
           `Company with name ${dto.name} already exists`,
         );
-      }
     }
+
     let logoUrl = company.logoUrl;
     if (file) {
       await this.s3Service.deleteFile(logoUrl);
       logoUrl = await this.s3Service.uploadFile(file, company_avatar);
     }
-    return this.companyRepository.update(companyId, {
-      ...dto,
+
+    const latitudeDefined = dto.latitude !== undefined;
+    const longitudeDefined = dto.longitude !== undefined;
+    if (latitudeDefined !== longitudeDefined)
+      throw new ConflictException(
+        'Both latitude and longitude must be provided together',
+      );
+
+    const updateData: Prisma.CompanyUpdateInput = {
+      name: dto.name ?? undefined,
+      address: dto.address ?? undefined,
       logoUrl,
-    } as Prisma.CompanyUpdateInput);
+    };
+
+    if (latitudeDefined && longitudeDefined) {
+      updateData.latitude = dto.latitude;
+      updateData.longitude = dto.longitude;
+    }
+
+    return this.companyRepository.update(companyId, updateData);
   }
 
   async deleteCompany(companyId: number) {

@@ -10,7 +10,7 @@ import { cleanTestDb } from 'test/utils/db-utils';
 import { FakeDTO } from 'test/utils/faker';
 import { createCategory, makeRequest } from 'test/utils/form-utils';
 
-describe('CategoryModule (e2e)', () => {
+describe('Category (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let token: string;
