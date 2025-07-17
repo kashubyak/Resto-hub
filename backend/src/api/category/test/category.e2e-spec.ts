@@ -8,6 +8,7 @@ import { getAuthToken } from 'test/utils/auth-test';
 import { BASE_URL, HOST } from 'test/utils/constants';
 import { cleanTestDb } from 'test/utils/db-utils';
 import { FakeDTO } from 'test/utils/faker';
+import { createCategory, makeRequest } from 'test/utils/form-utils';
 
 describe('CategoryModule (e2e)', () => {
   let app: INestApplication;
@@ -15,23 +16,6 @@ describe('CategoryModule (e2e)', () => {
   let token: string;
   let companyId: number;
   let categoryId: number;
-
-  const makeRequest = (
-    method: 'get' | 'post' | 'patch' | 'delete',
-    url: string,
-  ) => {
-    return request(app.getHttpServer())
-      [method](url)
-      .set('Authorization', `Bearer ${token}`)
-      .set('Host', HOST);
-  };
-
-  const createCategory = async (dto = FakeDTO.category.create()) => {
-    const res = await makeRequest('post', `${BASE_URL.CATEGORY}/create`)
-      .send(dto)
-      .expect(201);
-    return res.body;
-  };
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -47,7 +31,6 @@ describe('CategoryModule (e2e)', () => {
     app.use(middleware.use.bind(middleware));
 
     await app.init();
-
     prisma = app.get(PrismaService);
     await cleanTestDb(prisma);
 
@@ -58,32 +41,39 @@ describe('CategoryModule (e2e)', () => {
 
   beforeEach(async () => {
     await prisma.category.deleteMany({ where: { companyId } });
-    const category = await createCategory();
+    const category = await createCategory(app, token);
     categoryId = category.id;
-  });
-
-  it('should create a category', async () => {
-    const dto = FakeDTO.category.create();
-    const res = await makeRequest('post', `${BASE_URL.CATEGORY}/create`)
-      .send(dto)
-      .expect(201);
-    expect(res.body.name).toBe(dto.name);
   });
 
   afterAll(async () => {
     await app.close();
   });
 
+  it('should create a category', async () => {
+    const dto = FakeDTO.category.create();
+    const res = await makeRequest(
+      app,
+      token,
+      'post',
+      `${BASE_URL.CATEGORY}/create`,
+    )
+      .send(dto)
+      .expect(201);
+    expect(res.body.name).toBe(dto.name);
+  });
+
   it('should not allow duplicate category names', async () => {
     const existing = await prisma.category.findFirst({ where: { companyId } });
-    await makeRequest('post', `${BASE_URL.CATEGORY}/create`)
+    await makeRequest(app, token, 'post', `${BASE_URL.CATEGORY}/create`)
       .send({ name: existing!.name })
       .expect(409);
   });
 
   it('should return paginated categories', async () => {
-    await createCategory(FakeDTO.category.create());
+    await createCategory(app, token, FakeDTO.category.create());
     const res = await makeRequest(
+      app,
+      token,
       'get',
       `${BASE_URL.CATEGORY}?page=1&limit=10`,
     ).expect(200);
@@ -93,8 +83,10 @@ describe('CategoryModule (e2e)', () => {
 
   it('should filter by search', async () => {
     const dto = { name: 'UniqueCategoryName' };
-    await createCategory(dto);
+    await createCategory(app, token, dto);
     const res = await makeRequest(
+      app,
+      token,
       'get',
       `${BASE_URL.CATEGORY}?search=UniqueCategoryName`,
     ).expect(200);
@@ -105,9 +97,11 @@ describe('CategoryModule (e2e)', () => {
   });
 
   it('should sort categories by name ascending', async () => {
-    await createCategory({ name: 'Alpha' });
-    await createCategory({ name: 'Beta' });
+    await createCategory(app, token, { name: 'Alpha' });
+    await createCategory(app, token, { name: 'Beta' });
     const res = await makeRequest(
+      app,
+      token,
       'get',
       `${BASE_URL.CATEGORY}?sortBy=name&order=asc`,
     ).expect(200);
@@ -116,23 +110,28 @@ describe('CategoryModule (e2e)', () => {
   });
 
   it('should fallback to default pagination if page/limit are missing', async () => {
-    await createCategory({ name: 'ExtraCategory' });
-
-    const res = await makeRequest('get', `${BASE_URL.CATEGORY}`).expect(200);
-
+    await createCategory(app, token, { name: 'ExtraCategory' });
+    const res = await makeRequest(
+      app,
+      token,
+      'get',
+      `${BASE_URL.CATEGORY}`,
+    ).expect(200);
     expect(res.body.page).toBe(1);
     expect(res.body.limit).toBe(10);
   });
 
   it('should return 404 when updating non-existent category', async () => {
-    await makeRequest('patch', `${BASE_URL.CATEGORY}/9999999`)
+    await makeRequest(app, token, 'patch', `${BASE_URL.CATEGORY}/9999999`)
       .send({ name: 'Updated' })
       .expect(404);
   });
 
   it('should return deleted category in response', async () => {
-    const cat = await createCategory({ name: 'ToBeDeleted' });
+    const cat = await createCategory(app, token, { name: 'ToBeDeleted' });
     const res = await makeRequest(
+      app,
+      token,
       'delete',
       `${BASE_URL.CATEGORY}/${cat.id}`,
     ).expect(200);
@@ -142,6 +141,8 @@ describe('CategoryModule (e2e)', () => {
 
   it('should get category by id', async () => {
     const res = await makeRequest(
+      app,
+      token,
       'get',
       `${BASE_URL.CATEGORY}/${categoryId}`,
     ).expect(200);
@@ -149,33 +150,50 @@ describe('CategoryModule (e2e)', () => {
   });
 
   it('should return 404 if category not found by id', async () => {
-    await makeRequest('get', `${BASE_URL.CATEGORY}/9999999`).expect(404);
+    await makeRequest(app, token, 'get', `${BASE_URL.CATEGORY}/9999999`).expect(
+      404,
+    );
   });
 
   it('should update category', async () => {
     const dto = { name: 'UpdatedCategoryName' };
-    const res = await makeRequest('patch', `${BASE_URL.CATEGORY}/${categoryId}`)
+    const res = await makeRequest(
+      app,
+      token,
+      'patch',
+      `${BASE_URL.CATEGORY}/${categoryId}`,
+    )
       .send(dto)
       .expect(200);
     expect(res.body.name).toBe(dto.name);
   });
 
   it('should not allow updating to duplicate name', async () => {
-    const cat1 = await createCategory({ name: 'Cat1' });
-    const cat2 = await createCategory({ name: 'Cat2' });
-    await makeRequest('patch', `${BASE_URL.CATEGORY}/${cat1.id}`)
+    const cat1 = await createCategory(app, token, { name: 'Cat1' });
+    const cat2 = await createCategory(app, token, { name: 'Cat2' });
+    await makeRequest(app, token, 'patch', `${BASE_URL.CATEGORY}/${cat1.id}`)
       .send({ name: cat2.name })
       .expect(409);
   });
 
   it('should delete category', async () => {
-    const cat = await createCategory();
-    await makeRequest('delete', `${BASE_URL.CATEGORY}/${cat.id}`).expect(200);
-    await makeRequest('get', `${BASE_URL.CATEGORY}/${cat.id}`).expect(404);
+    const cat = await createCategory(app, token);
+    await makeRequest(
+      app,
+      token,
+      'delete',
+      `${BASE_URL.CATEGORY}/${cat.id}`,
+    ).expect(200);
+    await makeRequest(
+      app,
+      token,
+      'get',
+      `${BASE_URL.CATEGORY}/${cat.id}`,
+    ).expect(404);
   });
 
   it('should return 404 when deleting non-existent category', async () => {
-    await makeRequest('delete', `${BASE_URL.CATEGORY}/9999999`)
+    await makeRequest(app, token, 'delete', `${BASE_URL.CATEGORY}/9999999`)
       .expect(404)
       .expect(404);
   });

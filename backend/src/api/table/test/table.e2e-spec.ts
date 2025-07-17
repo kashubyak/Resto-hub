@@ -8,6 +8,7 @@ import { getAuthToken } from 'test/utils/auth-test';
 import { BASE_URL, HOST } from 'test/utils/constants';
 import { cleanTestDb } from 'test/utils/db-utils';
 import { FakeDTO } from 'test/utils/faker';
+import { createTable, makeRequest } from 'test/utils/form-utils';
 
 describe('TableModule (e2e)', () => {
   let app: INestApplication;
@@ -15,23 +16,6 @@ describe('TableModule (e2e)', () => {
   let token: string;
   let companyId: number;
   let tableId: number;
-
-  const makeRequest = (
-    method: 'get' | 'post' | 'patch' | 'delete',
-    url: string,
-  ) => {
-    return request(app.getHttpServer())
-      [method](url)
-      .set('Authorization', `Bearer ${token}`)
-      .set('Host', HOST);
-  };
-
-  const createTable = async (dto = FakeDTO.table.create()) => {
-    const res = await makeRequest('post', `${BASE_URL.TABLE}/create`)
-      .send(dto)
-      .expect(201);
-    return res.body;
-  };
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -47,7 +31,6 @@ describe('TableModule (e2e)', () => {
     app.use(middleware.use.bind(middleware));
 
     await app.init();
-
     prisma = app.get(PrismaService);
     await cleanTestDb(prisma);
 
@@ -58,7 +41,7 @@ describe('TableModule (e2e)', () => {
 
   beforeEach(async () => {
     await prisma.table.deleteMany({ where: { companyId } });
-    const res = await createTable();
+    const res = await createTable(app, token);
     tableId = res.id;
   });
 
@@ -68,7 +51,7 @@ describe('TableModule (e2e)', () => {
 
   it('should create a new table', async () => {
     const dto = FakeDTO.table.create();
-    const res = await createTable(dto);
+    const res = await createTable(app, token, dto);
     expect(res).toHaveProperty('id');
     expect(res.number).toBe(dto.number);
     expect(res.seats).toBe(dto.seats);
@@ -77,36 +60,50 @@ describe('TableModule (e2e)', () => {
   it('should not allow duplicate table number', async () => {
     const table = await prisma.table.findFirst({ where: { companyId } });
     if (!table) throw new Error('No table found for the test company');
-    await makeRequest('post', `${BASE_URL.TABLE}/create`)
+    await makeRequest(app, token, 'post', `${BASE_URL.TABLE}/create`)
       .send({ number: table.number, seats: 4 })
       .expect(409);
   });
 
   it('should get all tables', async () => {
-    const res = await makeRequest('get', `${BASE_URL.TABLE}`).expect(200);
+    const res = await makeRequest(
+      app,
+      token,
+      'get',
+      `${BASE_URL.TABLE}`,
+    ).expect(200);
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should get table by id', async () => {
-    const res = await makeRequest('get', `${BASE_URL.TABLE}/${tableId}`).expect(
-      200,
-    );
+    const res = await makeRequest(
+      app,
+      token,
+      'get',
+      `${BASE_URL.TABLE}/${tableId}`,
+    ).expect(200);
     expect(res.body.id).toBe(tableId);
   });
 
   it('should return 404 for non-existing id', async () => {
-    await makeRequest('get', `${BASE_URL.TABLE}/99999`).expect(404);
+    await makeRequest(app, token, 'get', `${BASE_URL.TABLE}/99999`).expect(404);
   });
 
   it('should return 400 for invalid id', async () => {
-    await makeRequest('get', `${BASE_URL.TABLE}/invalid`).expect(400);
+    await makeRequest(app, token, 'get', `${BASE_URL.TABLE}/invalid`).expect(
+      400,
+    );
   });
 
   it('should update a table', async () => {
     const dto = { number: 99, seats: 6 };
-
-    const res = await makeRequest('patch', `${BASE_URL.TABLE}/${tableId}`)
+    const res = await makeRequest(
+      app,
+      token,
+      'patch',
+      `${BASE_URL.TABLE}/${tableId}`,
+    )
       .send(dto)
       .expect(200);
     expect(res.body.number).toBe(dto.number);
@@ -115,13 +112,20 @@ describe('TableModule (e2e)', () => {
 
   it('should delete a table', async () => {
     const dto = FakeDTO.table.create();
-    const res = await makeRequest('post', `${BASE_URL.TABLE}/create`)
+    const res = await makeRequest(
+      app,
+      token,
+      'post',
+      `${BASE_URL.TABLE}/create`,
+    )
       .send(dto)
       .expect(201);
     const id = res.body.id;
 
-    await makeRequest('delete', `${BASE_URL.TABLE}/${id}`).expect(200);
-    await makeRequest('get', `${BASE_URL.TABLE}/${id}`).expect(404);
+    await makeRequest(app, token, 'delete', `${BASE_URL.TABLE}/${id}`).expect(
+      200,
+    );
+    await makeRequest(app, token, 'get', `${BASE_URL.TABLE}/${id}`).expect(404);
   });
 
   it('should return 409 when deleting inactive table', async () => {
@@ -129,7 +133,12 @@ describe('TableModule (e2e)', () => {
       where: { id: tableId },
       data: { active: false },
     });
-    await makeRequest('delete', `${BASE_URL.TABLE}/${tableId}`).expect(409);
+    await makeRequest(
+      app,
+      token,
+      'delete',
+      `${BASE_URL.TABLE}/${tableId}`,
+    ).expect(409);
   });
 
   it('should deny access without token', async () => {
