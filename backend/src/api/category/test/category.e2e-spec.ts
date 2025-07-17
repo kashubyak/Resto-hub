@@ -5,11 +5,9 @@ import { PrismaService } from 'prisma/prisma.service';
 import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware';
 import * as request from 'supertest';
 import { getAuthToken } from 'test/utils/auth-test';
+import { BASE_URL, HOST } from 'test/utils/constants';
 import { cleanTestDb } from 'test/utils/db-utils';
 import { FakeDTO } from 'test/utils/faker';
-
-const BASE_URL = '/api/category';
-const HOST = 'testcompany.localhost';
 
 describe('CategoryModule (e2e)', () => {
   let app: INestApplication;
@@ -29,7 +27,7 @@ describe('CategoryModule (e2e)', () => {
   };
 
   const createCategory = async (dto = FakeDTO.category.create()) => {
-    const res = await makeRequest('post', `${BASE_URL}/create`)
+    const res = await makeRequest('post', `${BASE_URL.CATEGORY}/create`)
       .send(dto)
       .expect(201);
     return res.body;
@@ -66,7 +64,7 @@ describe('CategoryModule (e2e)', () => {
 
   it('should create a category', async () => {
     const dto = FakeDTO.category.create();
-    const res = await makeRequest('post', `${BASE_URL}/create`)
+    const res = await makeRequest('post', `${BASE_URL.CATEGORY}/create`)
       .send(dto)
       .expect(201);
     expect(res.body.name).toBe(dto.name);
@@ -78,16 +76,17 @@ describe('CategoryModule (e2e)', () => {
 
   it('should not allow duplicate category names', async () => {
     const existing = await prisma.category.findFirst({ where: { companyId } });
-    await makeRequest('post', `${BASE_URL}/create`)
+    await makeRequest('post', `${BASE_URL.CATEGORY}/create`)
       .send({ name: existing!.name })
       .expect(409);
   });
 
   it('should return paginated categories', async () => {
     await createCategory(FakeDTO.category.create());
-    const res = await makeRequest('get', `${BASE_URL}?page=1&limit=10`).expect(
-      200,
-    );
+    const res = await makeRequest(
+      'get',
+      `${BASE_URL.CATEGORY}?page=1&limit=10`,
+    ).expect(200);
     expect(Array.isArray(res.body.data)).toBe(true);
     expect(res.body.total).toBeGreaterThanOrEqual(1);
   });
@@ -97,7 +96,7 @@ describe('CategoryModule (e2e)', () => {
     await createCategory(dto);
     const res = await makeRequest(
       'get',
-      `${BASE_URL}?search=UniqueCategoryName`,
+      `${BASE_URL.CATEGORY}?search=UniqueCategoryName`,
     ).expect(200);
 
     expect(Array.isArray(res.body.data)).toBe(true);
@@ -110,7 +109,7 @@ describe('CategoryModule (e2e)', () => {
     await createCategory({ name: 'Beta' });
     const res = await makeRequest(
       'get',
-      `${BASE_URL}?sortBy=name&order=asc`,
+      `${BASE_URL.CATEGORY}?sortBy=name&order=asc`,
     ).expect(200);
     const names = res.body.data.map((c: any) => c.name);
     expect(names).toEqual([...names].sort());
@@ -119,41 +118,43 @@ describe('CategoryModule (e2e)', () => {
   it('should fallback to default pagination if page/limit are missing', async () => {
     await createCategory({ name: 'ExtraCategory' });
 
-    const res = await makeRequest('get', `${BASE_URL}`).expect(200);
+    const res = await makeRequest('get', `${BASE_URL.CATEGORY}`).expect(200);
 
     expect(res.body.page).toBe(1);
     expect(res.body.limit).toBe(10);
   });
 
   it('should return 404 when updating non-existent category', async () => {
-    await makeRequest('patch', `${BASE_URL}/9999999`)
+    await makeRequest('patch', `${BASE_URL.CATEGORY}/9999999`)
       .send({ name: 'Updated' })
       .expect(404);
   });
 
   it('should return deleted category in response', async () => {
     const cat = await createCategory({ name: 'ToBeDeleted' });
-    const res = await makeRequest('delete', `${BASE_URL}/${cat.id}`).expect(
-      200,
-    );
+    const res = await makeRequest(
+      'delete',
+      `${BASE_URL.CATEGORY}/${cat.id}`,
+    ).expect(200);
     expect(res.body.id).toBe(cat.id);
     expect(res.body.name).toBe(cat.name);
   });
 
   it('should get category by id', async () => {
-    const res = await makeRequest('get', `${BASE_URL}/${categoryId}`).expect(
-      200,
-    );
+    const res = await makeRequest(
+      'get',
+      `${BASE_URL.CATEGORY}/${categoryId}`,
+    ).expect(200);
     expect(res.body.id).toBe(categoryId);
   });
 
   it('should return 404 if category not found by id', async () => {
-    await makeRequest('get', `${BASE_URL}/9999999`).expect(404);
+    await makeRequest('get', `${BASE_URL.CATEGORY}/9999999`).expect(404);
   });
 
   it('should update category', async () => {
     const dto = { name: 'UpdatedCategoryName' };
-    const res = await makeRequest('patch', `${BASE_URL}/${categoryId}`)
+    const res = await makeRequest('patch', `${BASE_URL.CATEGORY}/${categoryId}`)
       .send(dto)
       .expect(200);
     expect(res.body.name).toBe(dto.name);
@@ -162,41 +163,43 @@ describe('CategoryModule (e2e)', () => {
   it('should not allow updating to duplicate name', async () => {
     const cat1 = await createCategory({ name: 'Cat1' });
     const cat2 = await createCategory({ name: 'Cat2' });
-    await makeRequest('patch', `${BASE_URL}/${cat1.id}`)
+    await makeRequest('patch', `${BASE_URL.CATEGORY}/${cat1.id}`)
       .send({ name: cat2.name })
       .expect(409);
   });
 
   it('should delete category', async () => {
     const cat = await createCategory();
-    await makeRequest('delete', `${BASE_URL}/${cat.id}`).expect(200);
-    await makeRequest('get', `${BASE_URL}/${cat.id}`).expect(404);
+    await makeRequest('delete', `${BASE_URL.CATEGORY}/${cat.id}`).expect(200);
+    await makeRequest('get', `${BASE_URL.CATEGORY}/${cat.id}`).expect(404);
   });
 
   it('should return 404 when deleting non-existent category', async () => {
-    await makeRequest('delete', `${BASE_URL}/9999999`).expect(404).expect(404);
+    await makeRequest('delete', `${BASE_URL.CATEGORY}/9999999`)
+      .expect(404)
+      .expect(404);
   });
 
   it('should block access without token', async () => {
     await request(app.getHttpServer())
-      .get(BASE_URL)
+      .get(BASE_URL.CATEGORY)
       .set('Host', HOST)
       .expect(401);
 
     await request(app.getHttpServer())
-      .post(`${BASE_URL}/create`)
+      .post(`${BASE_URL.CATEGORY}/create`)
       .set('Host', HOST)
       .send(FakeDTO.category.create())
       .expect(401);
 
     await request(app.getHttpServer())
-      .patch(`${BASE_URL}/1`)
+      .patch(`${BASE_URL.CATEGORY}/1`)
       .set('Host', HOST)
       .send({ name: 'New' })
       .expect(401);
 
     await request(app.getHttpServer())
-      .delete(`${BASE_URL}/1`)
+      .delete(`${BASE_URL.CATEGORY}/1`)
       .set('Host', HOST)
       .expect(401);
   });

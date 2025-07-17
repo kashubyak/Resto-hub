@@ -5,11 +5,9 @@ import { PrismaService } from 'prisma/prisma.service';
 import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware';
 import * as request from 'supertest';
 import { getAuthToken } from 'test/utils/auth-test';
+import { BASE_URL, HOST } from 'test/utils/constants';
 import { cleanTestDb } from 'test/utils/db-utils';
 import { FakeDTO } from 'test/utils/faker';
-
-const BASE_URL = '/api/table';
-const HOST = 'testcompany.localhost';
 
 describe('TableModule (e2e)', () => {
   let app: INestApplication;
@@ -29,7 +27,7 @@ describe('TableModule (e2e)', () => {
   };
 
   const createTable = async (dto = FakeDTO.table.create()) => {
-    const res = await makeRequest('post', `${BASE_URL}/create`)
+    const res = await makeRequest('post', `${BASE_URL.TABLE}/create`)
       .send(dto)
       .expect(201);
     return res.body;
@@ -79,34 +77,36 @@ describe('TableModule (e2e)', () => {
   it('should not allow duplicate table number', async () => {
     const table = await prisma.table.findFirst({ where: { companyId } });
     if (!table) throw new Error('No table found for the test company');
-    await makeRequest('post', `${BASE_URL}/create`)
+    await makeRequest('post', `${BASE_URL.TABLE}/create`)
       .send({ number: table.number, seats: 4 })
       .expect(409);
   });
 
   it('should get all tables', async () => {
-    const res = await makeRequest('get', `${BASE_URL}`).expect(200);
+    const res = await makeRequest('get', `${BASE_URL.TABLE}`).expect(200);
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should get table by id', async () => {
-    const res = await makeRequest('get', `${BASE_URL}/${tableId}`).expect(200);
+    const res = await makeRequest('get', `${BASE_URL.TABLE}/${tableId}`).expect(
+      200,
+    );
     expect(res.body.id).toBe(tableId);
   });
 
   it('should return 404 for non-existing id', async () => {
-    await makeRequest('get', `${BASE_URL}/99999`).expect(404);
+    await makeRequest('get', `${BASE_URL.TABLE}/99999`).expect(404);
   });
 
   it('should return 400 for invalid id', async () => {
-    await makeRequest('get', `${BASE_URL}/invalid`).expect(400);
+    await makeRequest('get', `${BASE_URL.TABLE}/invalid`).expect(400);
   });
 
   it('should update a table', async () => {
     const dto = { number: 99, seats: 6 };
 
-    const res = await makeRequest('patch', `${BASE_URL}/${tableId}`)
+    const res = await makeRequest('patch', `${BASE_URL.TABLE}/${tableId}`)
       .send(dto)
       .expect(200);
     expect(res.body.number).toBe(dto.number);
@@ -115,13 +115,13 @@ describe('TableModule (e2e)', () => {
 
   it('should delete a table', async () => {
     const dto = FakeDTO.table.create();
-    const res = await makeRequest('post', `${BASE_URL}/create`)
+    const res = await makeRequest('post', `${BASE_URL.TABLE}/create`)
       .send(dto)
       .expect(201);
     const id = res.body.id;
 
-    await makeRequest('delete', `${BASE_URL}/${id}`).expect(200);
-    await makeRequest('get', `${BASE_URL}/${id}`).expect(404);
+    await makeRequest('delete', `${BASE_URL.TABLE}/${id}`).expect(200);
+    await makeRequest('get', `${BASE_URL.TABLE}/${id}`).expect(404);
   });
 
   it('should return 409 when deleting inactive table', async () => {
@@ -129,27 +129,27 @@ describe('TableModule (e2e)', () => {
       where: { id: tableId },
       data: { active: false },
     });
-    await makeRequest('delete', `${BASE_URL}/${tableId}`).expect(409);
+    await makeRequest('delete', `${BASE_URL.TABLE}/${tableId}`).expect(409);
   });
 
   it('should deny access without token', async () => {
     await request(app.getHttpServer())
-      .get('/api/table')
+      .get(`${BASE_URL.TABLE}`)
       .expect(401)
-      .set('Host', 'testcompany.localhost');
+      .set('Host', HOST);
     await request(app.getHttpServer())
-      .post('/api/table/create')
-      .set('Host', 'testcompany.localhost')
+      .post(`${BASE_URL.TABLE}/create`)
+      .set('Host', HOST)
       .send(FakeDTO.table.create())
       .expect(401);
     await request(app.getHttpServer())
-      .patch(`/api/table/${tableId}`)
-      .set('Host', 'testcompany.localhost')
+      .patch(`${BASE_URL.TABLE}/${tableId}`)
+      .set('Host', HOST)
       .send({ number: 7 })
       .expect(401);
     await request(app.getHttpServer())
-      .delete(`/api/table/${tableId}`)
-      .set('Host', 'testcompany.localhost')
+      .delete(`${BASE_URL.TABLE}/${tableId}`)
+      .set('Host', HOST)
       .expect(401);
   });
 });

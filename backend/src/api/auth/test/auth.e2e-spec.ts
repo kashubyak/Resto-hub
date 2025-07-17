@@ -2,12 +2,12 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'app.module';
 import * as cookieParser from 'cookie-parser';
-import * as path from 'path';
 import { PrismaService } from 'prisma/prisma.service';
 import { company_avatar, folder_avatar } from 'src/common/constants';
 import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware';
 import { S3Service } from 'src/common/s3/s3.service';
 import * as request from 'supertest';
+import { BASE_URL, HOST, logoPath } from 'test/utils/constants';
 import { cleanTestDb } from 'test/utils/db-utils';
 
 describe('AuthController (e2e)', () => {
@@ -26,16 +26,10 @@ describe('AuthController (e2e)', () => {
     adminEmail: 'admin@example.com',
     adminPassword: 'password123',
   };
-  const avatarPath = path.resolve(
-    __dirname,
-    '../../../../test/assets/avatar.webp',
-  );
-  const logoPath = path.resolve(__dirname, '../../../../test/assets/logo.jpg');
   const loginDto = {
     email: companyData.adminEmail,
     password: companyData.adminPassword,
   };
-  const hostHeaderWithSubdomain = `${companyData.subdomain}.localhost`;
   const hostHeaderWithoutSubdomain = 'localhost';
 
   beforeAll(async () => {
@@ -59,7 +53,7 @@ describe('AuthController (e2e)', () => {
     server = app.getHttpServer();
 
     await request(server)
-      .post('/api/auth/register-company')
+      .post(`${BASE_URL.AUTH}/register-company`)
       .set('Host', hostHeaderWithoutSubdomain)
       .field('name', companyData.name)
       .field('subdomain', companyData.subdomain)
@@ -70,7 +64,7 @@ describe('AuthController (e2e)', () => {
       .field('adminEmail', companyData.adminEmail)
       .field('adminPassword', companyData.adminPassword)
       .attach('logoUrl', logoPath)
-      .attach('avatarUrl', avatarPath)
+      .attach('avatarUrl', logoPath)
       .expect(201);
   });
 
@@ -81,10 +75,10 @@ describe('AuthController (e2e)', () => {
     await app.close();
   });
 
-  describe('/api/auth/register-company (POST)', () => {
+  describe('${BASE_URL.AUTH}/register-company (POST)', () => {
     it('should return 409 if email is already in use', async () => {
       await request(server)
-        .post('/api/auth/register-company')
+        .post(`${BASE_URL.AUTH}/register-company`)
         .set('Host', hostHeaderWithoutSubdomain)
         .field('name', 'AnotherCo')
         .field('subdomain', 'anotherco')
@@ -95,13 +89,13 @@ describe('AuthController (e2e)', () => {
         .field('adminEmail', companyData.adminEmail)
         .field('adminPassword', 'password456')
         .attach('logoUrl', logoPath)
-        .attach('avatarUrl', avatarPath)
+        .attach('avatarUrl', logoPath)
         .expect(409);
     });
 
     it('should return 409 if subdomain or name already exists', async () => {
       await request(server)
-        .post('/api/auth/register-company')
+        .post(`${BASE_URL.AUTH}/register-company`)
         .set('Host', hostHeaderWithoutSubdomain)
         .field('name', companyData.name)
         .field('subdomain', companyData.subdomain)
@@ -112,13 +106,13 @@ describe('AuthController (e2e)', () => {
         .field('adminEmail', 'another@example.com')
         .field('adminPassword', 'password')
         .attach('logoUrl', logoPath)
-        .attach('avatarUrl', avatarPath)
+        .attach('avatarUrl', logoPath)
         .expect(409);
     });
 
     it('should return 400 if files are missing', async () => {
       await request(server)
-        .post('/api/auth/register-company')
+        .post(`${BASE_URL.AUTH}/register-company`)
         .set('Host', hostHeaderWithoutSubdomain)
         .field('name', 'NewCo')
         .field('subdomain', 'newco')
@@ -132,11 +126,11 @@ describe('AuthController (e2e)', () => {
     });
   });
 
-  describe('/api/auth/login (POST)', () => {
+  describe(`${BASE_URL.AUTH}/login (POST)`, () => {
     it('should login successfully', async () => {
       const res = await request(server)
-        .post('/api/auth/login')
-        .set('Host', hostHeaderWithSubdomain)
+        .post(`${BASE_URL.AUTH}/login`)
+        .set('Host', HOST)
         .send(loginDto)
         .expect(200);
 
@@ -146,34 +140,34 @@ describe('AuthController (e2e)', () => {
 
     it('should fail login with wrong credentials', async () => {
       await request(server)
-        .post('/api/auth/login')
-        .set('Host', hostHeaderWithSubdomain)
+        .post(`${BASE_URL.AUTH}/login`)
+        .set('Host', HOST)
         .send({ email: loginDto.email, password: 'wrongpass' })
         .expect(401);
     });
 
     it('should return 401 if company subdomain is missing', async () => {
       await request(server)
-        .post('/api/auth/login')
+        .post(`${BASE_URL.AUTH}/login`)
         .set('Host', hostHeaderWithoutSubdomain)
         .send(loginDto)
         .expect(401);
     });
   });
 
-  describe('/api/auth/refresh (POST)', () => {
+  describe(`${BASE_URL.AUTH}/refresh (POST)`, () => {
     it('should refresh token using cookies', async () => {
       const loginRes = await request(server)
-        .post('/api/auth/login')
-        .set('Host', hostHeaderWithSubdomain)
+        .post(`${BASE_URL.AUTH}/login`)
+        .set('Host', HOST)
         .send(loginDto)
         .expect(200);
 
       const cookies = loginRes.headers['set-cookie'];
 
       const refreshRes = await request(server)
-        .post('/api/auth/refresh')
-        .set('Host', hostHeaderWithSubdomain)
+        .post(`${BASE_URL.AUTH}/refresh`)
+        .set('Host', HOST)
         .set('Cookie', cookies)
         .expect(200);
 
@@ -182,33 +176,33 @@ describe('AuthController (e2e)', () => {
 
     it('should return 401 if no refresh token', async () => {
       await request(server)
-        .post('/api/auth/refresh')
-        .set('Host', hostHeaderWithSubdomain)
+        .post(`${BASE_URL.AUTH}/refresh`)
+        .set('Host', HOST)
         .expect(401);
     });
 
     it('should return 401 for invalid refresh token', async () => {
       await request(server)
-        .post('/api/auth/refresh')
-        .set('Host', hostHeaderWithSubdomain)
+        .post(`${BASE_URL.AUTH}/refresh`)
+        .set('Host', HOST)
         .set('Cookie', 'jid=invalidtoken')
         .expect(401);
     });
   });
 
-  describe('/api/auth/logout (POST)', () => {
+  describe(`${BASE_URL.AUTH}/logout (POST)`, () => {
     it('should logout and clear cookie', async () => {
       const loginRes = await request(server)
-        .post('/api/auth/login')
-        .set('Host', hostHeaderWithSubdomain)
+        .post(`${BASE_URL.AUTH}/login`)
+        .set('Host', HOST)
         .send(loginDto)
         .expect(200);
 
       const token = loginRes.body.token;
 
       const resLogout = await request(server)
-        .post('/api/auth/logout')
-        .set('Host', hostHeaderWithSubdomain)
+        .post(`${BASE_URL.AUTH}/logout`)
+        .set('Host', HOST)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
