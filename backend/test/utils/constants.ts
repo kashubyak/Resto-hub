@@ -7,3 +7,15 @@ export const BASE_URL = {
 };
 export const HOST = 'testcompany.localhost';
 export const logoPath = path.resolve(__dirname, '../assets/logo.jpg');
+export const localhost = 'localhost';
+
+export const companyData = {
+  name: 'TestCompany',
+  subdomain: 'testcompany',
+  address: '123 Main St',
+  latitude: 50.45,
+  longitude: 30.5234,
+  adminName: 'Test Admin',
+  adminEmail: 'admin@example.com',
+  adminPassword: 'password123',
+};
