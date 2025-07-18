@@ -46,6 +46,7 @@ export class UserRepository {
           avatarUrl: true,
           createdAt: true,
           updatedAt: true,
+          companyId: true,
         },
       }),
       this.prisma.user.count({ where }),
