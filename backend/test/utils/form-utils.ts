@@ -89,3 +89,33 @@ export const createCompany = async (app: INestApplication, token: string) => {
 
   return company;
 };
+
+export const createDish = async (
+  app: INestApplication,
+  token: string,
+  categoryId: number,
+  overrideDto: Partial<ReturnType<typeof FakeDTO.dish.create>> = {},
+) => {
+  const dto = {
+    ...FakeDTO.dish.create(),
+    categoryId,
+    ...overrideDto,
+  };
+
+  const res = await request(app.getHttpServer())
+    .post(`${BASE_URL.DISH}/create`)
+    .set('Authorization', `Bearer ${token}`)
+    .set('Host', HOST)
+    .field('name', dto.name)
+    .field('description', dto.description)
+    .field('price', dto.price.toString())
+    .field('categoryId', dto.categoryId.toString())
+    .field('ingredients', dto.ingredients.join(','))
+    .field('weightGr', dto.weightGr.toString())
+    .field('calories', dto.calories.toString())
+    .field('available', dto.available.toString())
+    .attach('imageUrl', logoPath)
+    .expect(201);
+
+  return res.body;
+};
