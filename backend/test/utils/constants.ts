@@ -7,6 +7,7 @@ export const BASE_URL = {
   COMPANY: '/api/company',
   USER: '/api/user',
   DISH: '/api/dish',
+  ORDER: '/api/order',
 };
 export const HOST = 'testcompany.localhost';
 export const logoPath = path.resolve(__dirname, '../assets/logo.jpg');

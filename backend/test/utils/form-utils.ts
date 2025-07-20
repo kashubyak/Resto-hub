@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { Order } from '@prisma/client';
 import * as request from 'supertest';
-import { BASE_URL, companyData, HOST, localhost, logoPath } from './constants';
+import { BASE_URL, HOST, logoPath } from './constants';
 import { FakeDTO } from './faker';
 
 export const baseCompanyFormFields = (
@@ -74,22 +74,6 @@ export const createCategory = async (
   return res.body;
 };
 
-export const createCompany = async (app: INestApplication, token: string) => {
-  const prisma = app.get(PrismaService);
-  await attachCompanyFormFields(
-    request(app.getHttpServer())
-      .post(`${BASE_URL.AUTH}/register-company`)
-      .set('Host', localhost),
-    companyData,
-  ).expect(201);
-
-  const company = await prisma.company.findUniqueOrThrow({
-    where: { subdomain: companyData.subdomain },
-  });
-
-  return company;
-};
-
 export const createDish = async (
   app: INestApplication,
   token: string,
@@ -102,10 +86,7 @@ export const createDish = async (
     ...overrideDto,
   };
 
-  const res = await request(app.getHttpServer())
-    .post(`${BASE_URL.DISH}/create`)
-    .set('Authorization', `Bearer ${token}`)
-    .set('Host', HOST)
+  const res = await makeRequest(app, token, 'post', `${BASE_URL.DISH}/create`)
     .field('name', dto.name)
     .field('description', dto.description)
     .field('price', dto.price.toString())
@@ -118,4 +99,35 @@ export const createDish = async (
     .expect(201);
 
   return res.body;
+};
+
+export const getUserInfo = async (app: INestApplication, token: string) => {
+  const res = await makeRequest(
+    app,
+    token,
+    'get',
+    `${BASE_URL.USER}/me`,
+  ).expect(200);
+  return res.body;
+};
+
+export const createOrder = async (
+  app: INestApplication,
+  token: string,
+  categoryId: number,
+): Promise<Order> => {
+  const dish = await createDish(app, token, categoryId);
+  const table = await createTable(app, token);
+  const dto = FakeDTO.order.create(dish.id, table.id);
+
+  const response = await makeRequest(
+    app,
+    token,
+    'post',
+    `${BASE_URL.ORDER}/create`,
+  )
+    .send(dto)
+    .expect(201);
+
+  return response.body as Order;
 };

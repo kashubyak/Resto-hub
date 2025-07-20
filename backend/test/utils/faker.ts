@@ -29,4 +29,26 @@ export class FakeDTO {
       available: faker.datatype.boolean(),
     }),
   };
+
+  static order = {
+    create: (dishId: number, tableId: number) => ({
+      tableId,
+      items: [
+        {
+          dishId,
+          quantity: faker.number.int({ min: 1, max: 3 }),
+          notes: faker.lorem.sentence(),
+        },
+      ],
+    }),
+  };
+
+  static user = {
+    waiter: () => ({
+      name: faker.person.fullName(),
+      email: faker.internet.email({ provider: 'example.com' }),
+      password: faker.internet.password(),
+      role: 'WAITER' as const,
+    }),
+  };
 }

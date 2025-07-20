@@ -1,12 +1,13 @@
 import { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
+import { SubUserDto } from 'src/common/interface/user.interface';
 import * as request from 'supertest';
-import { BASE_URL, companyData, HOST, localhost } from './constants';
-import { attachCompanyFormFields } from './form-utils';
+import { BASE_URL, companyData, HOST, localhost, logoPath } from './constants';
+import { attachCompanyFormFields, makeRequest } from './form-utils';
 
-export async function getAuthToken(
+export const getAuthToken = async (
   app: INestApplication,
-): Promise<{ token: string; companyId: number }> {
+): Promise<{ token: string; companyId: number }> => {
   await attachCompanyFormFields(
     request(app.getHttpServer())
       .post(`${BASE_URL.AUTH}/register-company`)
@@ -32,4 +33,29 @@ export async function getAuthToken(
   });
 
   return { token, companyId: company.id };
-}
+};
+
+export const getAuthSubUser = async (
+  app: INestApplication,
+  adminToken: string,
+  dto: SubUserDto,
+) => {
+  await makeRequest(app, adminToken, 'post', `${BASE_URL.USER}/register`)
+    .field('name', dto.name)
+    .field('email', dto.email)
+    .field('password', dto.password)
+    .field('role', dto.role)
+    .attach('avatarUrl', logoPath)
+    .expect(201);
+
+  const loginRes = await request(app.getHttpServer())
+    .post(`${BASE_URL.AUTH}/login`)
+    .set('Host', HOST)
+    .send({
+      email: dto.email,
+      password: dto.password,
+    })
+    .expect(200);
+
+  return loginRes.body.token;
+};
