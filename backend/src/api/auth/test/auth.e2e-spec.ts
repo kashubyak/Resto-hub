@@ -1,66 +1,28 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Role } from '@prisma/client';
 import { AppModule } from 'app.module';
 import * as cookieParser from 'cookie-parser';
 import { PrismaService } from 'prisma/prisma.service';
+import { company_avatar, folder_avatar } from 'src/common/constants';
+import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware';
+import { S3Service } from 'src/common/s3/s3.service';
 import * as request from 'supertest';
+import { BASE_URL, companyData, HOST, localhost } from 'test/utils/constants';
+import { cleanTestDb } from 'test/utils/db-utils';
+import {
+  attachCompanyFormFields,
+  baseCompanyFormFields,
+} from 'test/utils/form-utils';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let server: any;
-  let authToken: string;
-
-  const testUser = {
-    name: 'Test User',
-    email: 'test@example.com',
-    password: 'password123',
-    role: Role.WAITER,
+  let s3Service: S3Service;
+  const loginDto = {
+    email: companyData.adminEmail,
+    password: companyData.adminPassword,
   };
-
-  async function cleanupUserAndRelatedData(
-    prismaInstance: PrismaService,
-    userEmail: string,
-  ) {
-    const user = await prismaInstance.user.findUnique({
-      where: { email: userEmail },
-      select: {
-        id: true,
-        waiterOrders: { select: { id: true } },
-        cookOrders: { select: { id: true } },
-      },
-    });
-
-    if (user) {
-      const orderIdsFromWaiter = user.waiterOrders.map((o) => o.id);
-      const orderIdsFromCook = user.cookOrders
-        ? user.cookOrders.map((o) => o.id)
-        : [];
-
-      const allAssociatedOrderIds = [
-        ...new Set([...orderIdsFromWaiter, ...orderIdsFromCook]),
-      ];
-
-      if (allAssociatedOrderIds.length > 0) {
-        await prismaInstance.orderItem.deleteMany({
-          where: { orderId: { in: allAssociatedOrderIds } },
-        });
-
-        await prismaInstance.order.deleteMany({
-          where: { id: { in: allAssociatedOrderIds } },
-        });
-      }
-
-      await prismaInstance.user.deleteMany({
-        where: { email: userEmail },
-      });
-    } else {
-      await prismaInstance.user.deleteMany({
-        where: { email: userEmail },
-      });
-    }
-  }
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -68,94 +30,145 @@ describe('Auth (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
     app.use(cookieParser());
 
     prisma = app.get(PrismaService);
-    await prisma.$transaction([
-      prisma.orderItem.deleteMany(),
-      prisma.order.deleteMany(),
-      prisma.user.deleteMany(),
-      prisma.table.deleteMany(),
-      prisma.category.deleteMany(),
-      prisma.dish.deleteMany(),
-    ]);
+    await cleanTestDb(prisma);
+    s3Service = app.get(S3Service);
+
+    const middleware = new CompanyContextMiddleware(prisma);
+    app.use(middleware.use.bind(middleware));
 
     await app.init();
     server = app.getHttpServer();
-  });
 
-  beforeEach(async () => {
-    await cleanupUserAndRelatedData(prisma, testUser.email);
-    await request(server).post('/auth/register').send(testUser).expect(201);
-    const loginRes = await request(server)
-      .post('/auth/login')
-      .send({ email: testUser.email, password: testUser.password })
-      .expect(200);
-    authToken = loginRes.body.token;
+    await attachCompanyFormFields(
+      request(server)
+        .post(`${BASE_URL.AUTH}/register-company`)
+        .set('Host', localhost),
+      companyData,
+    ).expect(201);
   });
 
   afterAll(async () => {
-    await cleanupUserAndRelatedData(prisma, testUser.email);
-    await cleanupUserAndRelatedData(prisma, 'new@example.com');
+    await s3Service.deleteFolder(folder_avatar);
+    await s3Service.deleteFolder(company_avatar);
     await app.close();
   });
 
-  it('/auth/register (POST) - success', async () => {
-    await cleanupUserAndRelatedData(prisma, 'new@example.com');
-    const newUser = { ...testUser, email: 'new@example.com' };
-    const response = await request(server)
-      .post('/auth/register')
-      .send(newUser)
-      .expect(201);
-    expect(response.body).toHaveProperty('access_token');
+  describe('${BASE_URL.AUTH}/register-company (POST)', () => {
+    it('should return 409 if email is already in use', async () => {
+      await attachCompanyFormFields(
+        request(server)
+          .post(`${BASE_URL.AUTH}/register-company`)
+          .set('Host', localhost),
+        companyData,
+      ).expect(409);
+    });
+
+    it('should return 409 if subdomain or name already exists', async () => {
+      await attachCompanyFormFields(
+        request(server)
+          .post(`${BASE_URL.AUTH}/register-company`)
+          .set('Host', localhost),
+        companyData,
+      ).expect(409);
+    });
+
+    it('should return 400 if files are missing', async () => {
+      await baseCompanyFormFields(
+        request(server)
+          .post(`${BASE_URL.AUTH}/register-company`)
+          .set('Host', localhost),
+        companyData,
+      ).expect(400);
+    });
   });
 
-  it('/auth/register (POST) - conflict', async () => {
-    const response = await request(server)
-      .post('/auth/register')
-      .send(testUser)
-      .expect(409);
-    expect(response.body.message).toBe('Email already in use');
+  describe(`${BASE_URL.AUTH}/login (POST)`, () => {
+    it('should login successfully', async () => {
+      const res = await request(server)
+        .post(`${BASE_URL.AUTH}/login`)
+        .set('Host', HOST)
+        .send(loginDto)
+        .expect(200);
+
+      expect(res.body).toHaveProperty('token');
+      expect(res.headers['set-cookie']).toBeDefined();
+    });
+
+    it('should fail login with wrong credentials', async () => {
+      await request(server)
+        .post(`${BASE_URL.AUTH}/login`)
+        .set('Host', HOST)
+        .send({ email: loginDto.email, password: 'wrongpass' })
+        .expect(401);
+    });
+
+    it('should return 401 if company subdomain is missing', async () => {
+      await request(server)
+        .post(`${BASE_URL.AUTH}/login`)
+        .set('Host', localhost)
+        .send(loginDto)
+        .expect(401);
+    });
   });
 
-  it('/auth/login (POST) - success', async () => {
-    const response = await request(server)
-      .post('/auth/login')
-      .send({ email: testUser.email, password: testUser.password })
-      .expect(200);
-    expect(response.body).toHaveProperty('token');
-    expect(response.headers['set-cookie']).toBeDefined();
+  describe(`${BASE_URL.AUTH}/refresh (POST)`, () => {
+    it('should refresh token using cookies', async () => {
+      const loginRes = await request(server)
+        .post(`${BASE_URL.AUTH}/login`)
+        .set('Host', HOST)
+        .send(loginDto)
+        .expect(200);
+
+      const cookies = loginRes.headers['set-cookie'];
+
+      const refreshRes = await request(server)
+        .post(`${BASE_URL.AUTH}/refresh`)
+        .set('Host', HOST)
+        .set('Cookie', cookies)
+        .expect(200);
+
+      expect(refreshRes.body).toHaveProperty('token');
+    });
+
+    it('should return 401 if no refresh token', async () => {
+      await request(server)
+        .post(`${BASE_URL.AUTH}/refresh`)
+        .set('Host', HOST)
+        .expect(401);
+    });
+
+    it('should return 401 for invalid refresh token', async () => {
+      await request(server)
+        .post(`${BASE_URL.AUTH}/refresh`)
+        .set('Host', HOST)
+        .set('Cookie', 'jid=invalidtoken')
+        .expect(401);
+    });
   });
 
-  it('/auth/login (POST) - unauthorized', async () => {
-    const response = await request(server)
-      .post('/auth/login')
-      .send({ email: 'wrong@example.com', password: 'invalidpassword' })
-      .expect(401);
-    expect(response.body.message).toBe('Invalid credentials');
-  });
+  describe(`${BASE_URL.AUTH}/logout (POST)`, () => {
+    it('should logout and clear cookie', async () => {
+      const loginRes = await request(server)
+        .post(`${BASE_URL.AUTH}/login`)
+        .set('Host', HOST)
+        .send(loginDto)
+        .expect(200);
 
-  it('/auth/refresh (POST) - success', async () => {
-    const loginResponse = await request(server)
-      .post('/auth/login')
-      .send({ email: testUser.email, password: testUser.password })
-      .expect(200);
-    const cookies = loginResponse.headers['set-cookie'];
-    const response = await request(server)
-      .post('/auth/refresh')
-      .set('Cookie', cookies)
-      .expect(200);
-    expect(response.body).toHaveProperty('token');
-  });
+      const token = loginRes.body.token;
+      const resLogout = await request(server)
+        .post(`${BASE_URL.AUTH}/logout`)
+        .set('Host', HOST)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
 
-  it('/auth/logout (POST) - should log out successfully', async () => {
-    const logoutRes = await request(server)
-      .post('/auth/logout')
-      .set('Authorization', `Bearer ${authToken}`)
-      .expect(200);
-    expect(logoutRes.body).toEqual({ message: 'Logged out successfully' });
-    const setCookieHeader = logoutRes.headers['set-cookie'];
-    expect(setCookieHeader).toBeDefined();
+      expect(resLogout.body.message).toBe('Logged out successfully');
+      expect(resLogout.headers['set-cookie']).toBeDefined();
+    });
   });
 });

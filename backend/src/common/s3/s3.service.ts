@@ -1,5 +1,7 @@
 import {
   DeleteObjectCommand,
+  DeleteObjectsCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -58,5 +60,28 @@ export class S3Service {
         Key: key,
       }),
     );
+  }
+
+  async deleteFolder(folderPrefix: string) {
+    const listCommand = {
+      Bucket: this.bucket,
+      Prefix: folderPrefix,
+    };
+
+    const listResponse = await this.s3.send(
+      new ListObjectsV2Command(listCommand),
+    );
+
+    if (!listResponse.Contents || listResponse.Contents.length === 0) return;
+
+    const deleteCommand = {
+      Bucket: this.bucket,
+      Delete: {
+        Objects: listResponse.Contents.map((obj) => ({ Key: obj.Key! })),
+        Quiet: true,
+      },
+    };
+
+    await this.s3.send(new DeleteObjectsCommand(deleteCommand));
   }
 }

@@ -63,9 +63,13 @@ export class UserService {
       role,
       sortBy = 'createdAt',
       order = 'desc',
-      page = 1,
-      limit = 10,
+      page: rawPage,
+      limit: rawLimit,
     } = query;
+
+    const page = rawPage || 1;
+    const limit = rawLimit || 10;
+    const skip = (page - 1) * limit;
 
     const allowedRoles: Role[] = ['COOK', 'WAITER'];
     const where: Prisma.UserWhereInput = {
@@ -78,13 +82,13 @@ export class UserService {
           ]
         : undefined,
     };
-    const skip = (page - 1) * limit;
     const { data, total } = await this.userRepository.findManyWithCount({
       where,
       orderBy: { [sortBy]: order },
       skip,
       take: limit,
     });
+
     return {
       data,
       total,

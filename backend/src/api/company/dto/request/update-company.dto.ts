@@ -14,7 +14,9 @@ export class UpdateCompanyDto {
   address?: string;
 
   @ApiProperty()
-  @Transform(({ value }) => Number(value))
+  @Transform(({ value }) =>
+    value === undefined || value === '' ? undefined : Number(value),
+  )
   @IsOptional()
   @IsNumber()
   @Min(-90)
@@ -22,7 +24,9 @@ export class UpdateCompanyDto {
   latitude?: number;
 
   @ApiProperty()
-  @Transform(({ value }) => Number(value))
+  @Transform(({ value }) =>
+    value === undefined || value === '' ? undefined : Number(value),
+  )
   @IsOptional()
   @IsNumber()
   @Min(-180)
