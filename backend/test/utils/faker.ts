@@ -50,5 +50,11 @@ export class FakeDTO {
       password: faker.internet.password(),
       role: 'WAITER' as const,
     }),
+    cook: () => ({
+      name: faker.person.fullName(),
+      email: faker.internet.email({ provider: 'cook.example.com' }),
+      password: faker.internet.password(),
+      role: 'COOK' as const,
+    }),
   };
 }

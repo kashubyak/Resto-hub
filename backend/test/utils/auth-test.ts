@@ -39,14 +39,24 @@ export const getAuthSubUser = async (
   app: INestApplication,
   adminToken: string,
   dto: SubUserDto,
-) => {
-  await makeRequest(app, adminToken, 'post', `${BASE_URL.USER}/register`)
+): Promise<{ token: string; id: number }> => {
+  const registerRes = await makeRequest(
+    app,
+    adminToken,
+    'post',
+    `${BASE_URL.USER}/register`,
+  )
     .field('name', dto.name)
     .field('email', dto.email)
     .field('password', dto.password)
     .field('role', dto.role)
     .attach('avatarUrl', logoPath)
     .expect(201);
+
+  const id = registerRes.body.id;
+  if (!id) {
+    throw new Error('User registration response did not include an ID.');
+  }
 
   const loginRes = await request(app.getHttpServer())
     .post(`${BASE_URL.AUTH}/login`)
@@ -57,5 +67,7 @@ export const getAuthSubUser = async (
     })
     .expect(200);
 
-  return loginRes.body.token;
+  const token = loginRes.body.token;
+
+  return { token, id };
 };
