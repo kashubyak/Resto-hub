@@ -22,6 +22,19 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaExceptionFilter());
   app.useWebSocketAdapter(new IoAdapter(app));
 
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Not allowed by CORS: ${origin}`));
+      }
+    },
+    credentials: true,
+  });
+
   const prisma = app.get(PrismaService);
   const middleware = new CompanyContextMiddleware(prisma);
   app.use(middleware.use.bind(middleware));

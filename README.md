@@ -41,6 +41,7 @@ Create the following environment files inside the `backend/` directory.
 DATABASE_URL="postgresql://<db_user>:<db_password>@localhost:5432/resto_hub?schema=public"
 PORT=3000
 NODE_ENV=development
+ALLOWED_ORIGINS=http://localhost:3001
 
 JWT_TOKEN_SECRET=your_jwt_access_secret
 JWT_REFRESH_TOKEN_SECRET=your_jwt_refresh_secret
