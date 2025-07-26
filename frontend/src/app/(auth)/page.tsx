@@ -44,53 +44,8 @@ export default function RegisterCompanyPage() {
 
 	return (
 		<div>
-			<h1>Register Company</h1>
-			<form
-				onSubmit={handleSubmit(onSubmit)}
-				encType='multipart/form-data'
-			>
-				<input placeholder='Company name' {...register('name', { required: true })} />
-				<input placeholder='Subdomain' {...register('subdomain', { required: true })} />
-				<input placeholder='Address' {...register('address', { required: true })} />
-				<input
-					type='number'
-					placeholder='Latitude'
-					{...register('latitude', { required: true })}
-				/>
-				<input
-					type='number'
-					placeholder='Longitude'
-					{...register('longitude', { required: true })}
-				/>
-				<input placeholder='Admin name' {...register('adminName', { required: true })} />
-				<input
-					type='email'
-					placeholder='Admin email'
-					{...register('adminEmail', { required: true })}
-				/>
-				<input
-					type='password'
-					placeholder='Admin password'
-					{...register('adminPassword', { required: true, minLength: 6 })}
-				/>
-				<div>
-					<label>Company logo</label>
-					<input
-						type='file'
-						accept='image/*'
-						{...register('logoUrl', { required: true })}
-					/>
-				</div>
-				<div>
-					<label>Admin avatar</label>
-					<input
-						type='file'
-						accept='image/*'
-						{...register('avatarUrl', { required: true })}
-					/>
-				</div>
-				<button type='submit'>Register</button>
-			</form>
+			<h1 className='text-amber-500'>Register Company</h1>
+			<form onSubmit={handleSubmit(onSubmit)} encType='multipart/form-data'></form>
 		</div>
 	)
 }
