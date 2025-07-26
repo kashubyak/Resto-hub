@@ -1,6 +1,7 @@
-export const metadata = {
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
 	title: 'Resto Hub',
-	description: 'Restaurant management app',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
