@@ -1,5 +1,7 @@
 'use client'
 
+import { AuthButton } from '@/components/Auth/AuthButton'
+import { AuthInput } from '@/components/Auth/AuthInput'
 import { registerCompany } from '@/services/auth'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -44,25 +46,34 @@ export default function RegisterCompanyPage() {
 
 	return (
 		<div className='w-screen h-screen bg-background text-foreground flex items-center justify-center p-4'>
-			<div className='w-full max-w-xl bg-muted border border-border text-muted-foreground rounded-xl shadow-xl max-h-full overflow-y-auto p-6'>
-				<h1 className='text-primary text-2xl font-semibold mb-4 text-center'>
+			<div className='w-full max-w-xl bg-muted border border-border text-muted-foreground rounded-xl shadow-xl max-h-10/12 overflow-y-auto p-6'>
+				<h1 className='text-primary text-2xl font-semibold mb-2 text-center'>
 					Register Company
 				</h1>
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					encType='multipart/form-data'
-					className='space-y-4'
+					className='space-y-2.5 py-2'
 				>
-					<input
-						className='w-full p-2 rounded-md bg-input border border-border focus:outline-none focus:ring-2 focus:ring-ring text-foreground'
+					<AuthInput
+						type='text'
 						placeholder='Company Name'
+						register={register('name', { required: 'Company name is required' })}
+						error={errors.name?.message}
 					/>
-					<button
-						type='submit'
-						className='w-full bg-primary text-primary-foreground hover:bg-primary active:bg-active py-2 px-4 rounded-md font-semibold'
-					>
-						Submit
-					</button>
+					<AuthInput
+						type='text'
+						placeholder='Subdomain'
+						register={register('subdomain', { required: 'Subdomain is required' })}
+						error={errors.subdomain?.message}
+					/>
+					<AuthInput
+						type='text'
+						placeholder='Company Address'
+						register={register('address', { required: 'Address is required' })}
+						error={errors.address?.message}
+					/>
+					<AuthButton type='submit' text='Submit' />
 				</form>
 			</div>
 		</div>
