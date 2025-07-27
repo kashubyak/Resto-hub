@@ -43,9 +43,28 @@ export default function RegisterCompanyPage() {
 	}
 
 	return (
-		<div>
-			<h1 className='text-amber-500'>Register Company</h1>
-			<form onSubmit={handleSubmit(onSubmit)} encType='multipart/form-data'></form>
+		<div className='w-screen h-screen bg-background text-foreground flex items-center justify-center p-4'>
+			<div className='w-full max-w-xl bg-muted border border-border text-muted-foreground rounded-xl shadow-xl max-h-full overflow-y-auto p-6'>
+				<h1 className='text-primary text-2xl font-semibold mb-4 text-center'>
+					Register Company
+				</h1>
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					encType='multipart/form-data'
+					className='space-y-4'
+				>
+					<input
+						className='w-full p-2 rounded-md bg-input border border-border focus:outline-none focus:ring-2 focus:ring-ring text-foreground'
+						placeholder='Company Name'
+					/>
+					<button
+						type='submit'
+						className='w-full bg-primary text-primary-foreground hover:bg-hover active:bg-active py-2 px-4 rounded-md font-semibold'
+					>
+						Submit
+					</button>
+				</form>
+			</div>
 		</div>
 	)
 }
