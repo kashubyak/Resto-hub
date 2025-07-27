@@ -1,12 +1,13 @@
 'use client'
 
 import { AuthButton } from '@/components/Auth/AuthButton'
+import { AuthImageUpload } from '@/components/Auth/AuthImageUpload'
 import { AuthInput } from '@/components/Auth/AuthInput'
 import { registerCompany } from '@/services/auth'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
-type FormValues = {
+interface IFormValues {
 	name: string
 	subdomain: string
 	address: string
@@ -24,10 +25,10 @@ export default function RegisterCompanyPage() {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<FormValues>()
+	} = useForm<IFormValues>()
 	const router = useRouter()
 
-	const onSubmit = async (data: FormValues) => {
+	const onSubmit = async (data: IFormValues) => {
 		const formData = new FormData()
 		formData.append('name', data.name)
 		formData.append('subdomain', data.subdomain)
@@ -73,9 +74,25 @@ export default function RegisterCompanyPage() {
 						register={register('address', { required: 'Address is required' })}
 						error={errors.address?.message}
 					/>
+					<AuthImageUpload
+						label='Company Logo'
+						register={register('logoUrl', { required: 'Logo is required' })}
+						error={errors.logoUrl?.message}
+					/>
 					<AuthButton type='submit' text='Submit' />
 				</form>
 			</div>
 		</div>
 	)
 }
+
+// {
+//   "name": "string",
+//   "subdomain": "string",
+//   "address": "string",
+//   "latitude": 50.4501,
+//   "longitude": 30.5234,
+//   "adminName": "string",
+//   "adminEmail": "string",
+//   "adminPassword": "string"
+// }

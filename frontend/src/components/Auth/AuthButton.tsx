@@ -1,3 +1,5 @@
+'use client'
+
 type AuthButtonProps = {
 	type: 'submit' | 'button' | 'reset'
 	text: string
