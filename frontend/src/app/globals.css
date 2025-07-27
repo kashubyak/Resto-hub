@@ -7,21 +7,24 @@
 	--muted-foreground: #6b7280;
 	--primary: #4ade80;
 	--primary-foreground: #052e16;
+	--primary-hover: #40b269;
 	--secondary: #22d3ee;
 	--secondary-foreground: #042c3a;
+	--secondary-hover: #1eb7d6;
 	--destructive: #ef4444;
 	--destructive-foreground: #fff1f2;
+	--destructive-hover: #dc2626;
 	--warning: #facc15;
 	--warning-foreground: #1f1f00;
+	--warning-hover: #eab308;
 	--info: #3b82f6;
 	--info-foreground: #eff6ff;
+	--info-hover: #2563eb;
 	--border: #e5e7eb;
 	--input: #f3f4f6;
 	--ring: #4ade80;
 	--hover: #f9fafb;
 	--active: #e5e5e5;
-	--font-sans: var(--font-geist-sans);
-	--font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -32,14 +35,19 @@
 		--muted-foreground: #a3a3a3;
 		--primary: #4ade80;
 		--primary-foreground: #0f291e;
+		--primary-hover: #3bbd6c;
 		--secondary: #22d3ee;
 		--secondary-foreground: #042c3a;
+		--secondary-hover: #1aa8c9;
 		--destructive: #ef4444;
 		--destructive-foreground: #fff1f2;
+		--destructive-hover: #dc2626;
 		--warning: #facc15;
 		--warning-foreground: #1f1f00;
+		--warning-hover: #eab308;
 		--info: #3b82f6;
 		--info-foreground: #eff6ff;
+		--info-hover: #2563eb;
 		--border: #262626;
 		--input: #1e1e1e;
 		--ring: #4ade80;
@@ -52,4 +60,82 @@ body {
 	background: var(--background);
 	color: var(--foreground);
 	font-family: var(--font-sans), Arial, sans-serif;
+}
+
+@layer utilities {
+	.bg-background {
+		background-color: var(--background);
+	}
+	.text-foreground {
+		color: var(--foreground);
+	}
+	.bg-muted {
+		background-color: var(--muted);
+	}
+	.text-muted-foreground {
+		color: var(--muted-foreground);
+	}
+	.text-primary {
+		color: var(--primary);
+	}
+	.bg-primary {
+		background-color: var(--primary);
+	}
+	.text-primary-foreground {
+		color: var(--primary-foreground);
+	}
+	.bg-secondary {
+		background-color: var(--secondary);
+	}
+	.text-secondary-foreground {
+		color: var(--secondary-foreground);
+	}
+	.bg-destructive {
+		background-color: var(--destructive);
+	}
+	.text-destructive-foreground {
+		color: var(--destructive-foreground);
+	}
+	.bg-warning {
+		background-color: var(--warning);
+	}
+	.text-warning-foreground {
+		color: var(--warning-foreground);
+	}
+	.bg-info {
+		background-color: var(--info);
+	}
+	.text-info-foreground {
+		color: var(--info-foreground);
+	}
+	.border-border {
+		border-color: var(--border);
+	}
+	.bg-input {
+		background-color: var(--input);
+	}
+	.focus\:ring-ring:focus {
+		box-shadow: 0 0 0 2px var(--ring);
+	}
+	.hover\:bg-hover:hover {
+		background-color: var(--hover);
+	}
+	.active\:bg-active:active {
+		background-color: var(--active);
+	}
+	.hover\:bg-primary:hover {
+		background-color: var(--primary-hover);
+	}
+	.hover\:bg-secondary:hover {
+		background-color: var(--secondary-hover);
+	}
+	.hover\:bg-destructive:hover {
+		background-color: var(--destructive-hover);
+	}
+	.hover\:bg-warning:hover {
+		background-color: var(--warning-hover);
+	}
+	.hover\:bg-info:hover {
+		background-color: var(--info-hover);
+	}
 }

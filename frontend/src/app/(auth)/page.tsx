@@ -59,7 +59,7 @@ export default function RegisterCompanyPage() {
 					/>
 					<button
 						type='submit'
-						className='w-full bg-primary text-primary-foreground hover:bg-hover active:bg-active py-2 px-4 rounded-md font-semibold'
+						className='w-full bg-primary text-primary-foreground hover:bg-primary active:bg-active py-2 px-4 rounded-md font-semibold'
 					>
 						Submit
 					</button>
