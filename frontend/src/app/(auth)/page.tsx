@@ -1,8 +1,8 @@
 'use client'
 
 import { AuthButton } from '@/components/Auth/AuthButton'
-import { AuthImageUpload } from '@/components/Auth/AuthImageUpload'
 import { AuthInput } from '@/components/Auth/AuthInput'
+import { UploadImage } from '@/components/UploadImage/UploadImage'
 import { registerCompany } from '@/services/auth'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -74,7 +74,7 @@ export default function RegisterCompanyPage() {
 						register={register('address', { required: 'Address is required' })}
 						error={errors.address?.message}
 					/>
-					<AuthImageUpload
+					<UploadImage
 						label='Company Logo'
 						register={register('logoUrl', { required: 'Logo is required' })}
 						error={errors.logoUrl?.message}
