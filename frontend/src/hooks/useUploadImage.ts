@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
-export const useUploadImage = (register: UseFormRegisterReturn) => {
+type UseUploadImageReturn = {
+	register: UseFormRegisterReturn
+}
+
+export const useUploadImage = ({ register }: UseUploadImageReturn) => {
 	const [preview, setPreview] = useState<string | null>(null)
 	const [isDragging, setIsDragging] = useState(false)
 

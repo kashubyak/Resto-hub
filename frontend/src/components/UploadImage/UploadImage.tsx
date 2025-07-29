@@ -10,7 +10,7 @@ type UploadImageProps = {
 	register: UseFormRegisterReturn
 }
 
-export const UploadImage = ({ label, error, register }: UploadImageProps) => {
+export const UploadImage = ({ label, error, ...register }: UploadImageProps) => {
 	const {
 		preview,
 		isDragging,
@@ -32,7 +32,7 @@ export const UploadImage = ({ label, error, register }: UploadImageProps) => {
 
 			{preview ? (
 				<div
-					className='relative w-32 h-32 mx-auto rounded-md overflow-hidden'
+					className='relative w-32 h-32 rounded-md overflow-hidden'
 					onClick={() => inputRef.current?.click()}
 				>
 					<Image

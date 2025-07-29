@@ -5,7 +5,7 @@ import type { UseFormRegisterReturn } from 'react-hook-form'
 
 type AuthInputProps = {
 	error?: string
-	register: UseFormRegisterReturn
+	register?: UseFormRegisterReturn
 } & InputHTMLAttributes<HTMLInputElement>
 
 export const AuthInput = ({ register, ...rest }: AuthInputProps) => {
