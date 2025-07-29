@@ -2,6 +2,7 @@
 
 import { AuthButton } from '@/components/Auth/AuthButton'
 import { AuthInput } from '@/components/Auth/AuthInput'
+import { LocationPicker } from '@/components/Auth/LocationPicker'
 import { UploadImage } from '@/components/UploadImage/UploadImage'
 import { registerCompany } from '@/services/auth'
 import { useRouter } from 'next/navigation'
@@ -79,6 +80,7 @@ export default function RegisterCompanyPage() {
 						register={register('logoUrl', { required: 'Logo is required' })}
 						error={errors.logoUrl?.message}
 					/>
+					<LocationPicker />
 					<AuthButton type='submit' text='Submit' />
 				</form>
 			</div>
