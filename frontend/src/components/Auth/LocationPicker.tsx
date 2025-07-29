@@ -69,8 +69,6 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 				geocoder.current!.geocode(
 					{
 						address: query,
-						componentRestrictions: { country: 'UA' },
-						region: 'UA',
 					},
 					(results, status) => {
 						resolve(status === 'OK' && results ? results : [])
@@ -175,7 +173,6 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 		[onSelectLocation],
 	)
 
-	// Обробка кліку по карті
 	const handleMapClick = useCallback(
 		(event: google.maps.MapMouseEvent) => {
 			if (!event.latLng || !geocoder.current) return
@@ -235,13 +232,13 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 								setShowResults(true)
 							}
 						}}
-						placeholder='Введіть назву міста будь-якою мовою (Київ, Paris, Лондон)...'
-						className='w-full px-4 py-3 pr-12 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base'
+						placeholder='Enter the name of the city in any language (Kyiv, Paris, London)'
+						className='w-full px-4 py-3 pr-12 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-base text-foreground'
 					/>
 
 					{isSearching && (
 						<div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
-							<div className='animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent'></div>
+							<div className='animate-spin rounded-full h-5 w-5 border-2 border-[var(--primary)] border-t-transparent'></div>
 						</div>
 					)}
 
@@ -253,7 +250,7 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 								setShowResults(false)
 								setPosition(null)
 							}}
-							className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600'
+							className='absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground'
 						>
 							<svg
 								className='w-5 h-5'
@@ -272,49 +269,51 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 					)}
 				</div>
 
-				{/* Список результатів пошуку */}
 				{showResults && searchResults.length > 0 && (
-					<div className='absolute z-10 w-full mt-2 bg-white border border-neutral-300 rounded-lg shadow-lg max-h-64 overflow-y-auto'>
+					<div className='absolute z-10 w-full mt-2 bg-muted border border-border rounded-md shadow-lg max-h-64 overflow-y-auto'>
 						{searchResults.map(result => (
 							<button
 								key={result.placeId}
 								onClick={() => handleResultSelect(result)}
-								className='w-full px-4 py-3 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none border-b border-gray-100 last:border-b-0 first:rounded-t-lg last:rounded-b-lg transition-colors'
+								className='w-full px-4 py-3 text-left hover:bg-hover border-b border-border last:border-b-0 first:rounded-t-md last:rounded-b-md transition-colors'
 							>
-								<div className='font-medium text-gray-900 mb-1'>{result.mainText}</div>
-								<div className='text-sm text-gray-600'>{result.secondaryText}</div>
+								<div className='font-medium text-foreground mb-1'>{result.mainText}</div>
+								<div className='text-sm text-muted-foreground'>
+									{result.secondaryText}
+								</div>
 							</button>
 						))}
 					</div>
 				)}
 
-				{/* Повідомлення про відсутність результатів */}
 				{showResults &&
 					searchResults.length === 0 &&
 					!isSearching &&
 					searchValue.length > 2 && (
-						<div className='absolute z-10 w-full mt-2 bg-white border border-neutral-300 rounded-lg shadow-lg p-4 text-center text-gray-500'>
+						<div className='absolute z-10 w-full mt-2 bg-muted border border-border rounded-md shadow-lg p-4 text-center text-muted-foreground'>
 							<div className='mb-2'>🔍</div>
-							<div>Нічого не знайдено для `${searchValue}`</div>
+							<div>Nothing found for `${searchValue}`</div>
 							<div className='text-xs mt-1'>
-								Спробуйте інший запит або скористайтесь картою нижче
+								Try a different query or use the map below
 							</div>
 						</div>
 					)}
 			</div>
 
-			<div className='bg-blue-50 border border-blue-200 rounded-lg p-3'>
-				<div className='text-sm text-blue-700'>
-					<div className='font-medium mb-1'>💡 Як користуватися:</div>
+			<div className='bg-info rounded-md p-3'>
+				<div className='text-sm text-info-foreground'>
+					<div className='font-medium mb-1'>💡 How to use:</div>
 					<div className='space-y-1'>
-						<div>• Введіть назву міста будь-якою мовою: Київ, Kiev, Paris, Москва</div>
-						<div>• Натисніть Enter для вибору першого результату</div>
-						<div>• Клікніть по карті, щоб встановити мітку в конкретному місці</div>
+						<div>
+							• Enter the name of the city in any language: Kyiv, Kiev, Paris, Moscow
+						</div>
+						<div>• Press Enter to select the first result</div>
+						<div>• Click on the map to place a marker at a specific location</div>
 					</div>
 				</div>
 			</div>
 
-			<div className='rounded-lg overflow-hidden border border-neutral-300 shadow-sm'>
+			<div className='rounded-lg overflow-hidden shadow-sm'>
 				{isLoaded && (
 					<GoogleMap
 						mapContainerStyle={containerStyle}

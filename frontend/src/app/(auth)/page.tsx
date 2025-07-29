@@ -75,12 +75,12 @@ export default function RegisterCompanyPage() {
 						register={register('subdomain', { required: 'Subdomain is required' })}
 						error={errors.subdomain?.message}
 					/>
+					<LocationPicker onSelectLocation={setLocation} />
 					<UploadImage
 						label='Company Logo'
 						register={register('logoUrl', { required: 'Logo is required' })}
 						error={errors.logoUrl?.message}
 					/>
-					<LocationPicker onSelectLocation={setLocation} />
 					<AuthButton type='submit' text='Submit' />
 
 					{location && (

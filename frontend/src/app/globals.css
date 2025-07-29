@@ -4,6 +4,7 @@
 	--background: #ffffff;
 	--foreground: #171717;
 	--muted: #f9fafb;
+	--muted-hover: #f3f4f6;
 	--muted-foreground: #6b7280;
 	--primary: #4ade80;
 	--primary-foreground: #052e16;
@@ -23,7 +24,6 @@
 	--border: #e5e7eb;
 	--input: #f3f4f6;
 	--ring: #4ade80;
-	--hover: #f9fafb;
 	--active: #e5e5e5;
 }
 
@@ -32,6 +32,7 @@
 		--background: #0a0a0a;
 		--foreground: #e5e5e5;
 		--muted: #1a1a1a;
+		--muted-hover: #1e1e1e;
 		--muted-foreground: #a3a3a3;
 		--primary: #4ade80;
 		--primary-foreground: #0f291e;
@@ -51,7 +52,6 @@
 		--border: #262626;
 		--input: #1e1e1e;
 		--ring: #4ade80;
-		--hover: #1e1e1e;
 		--active: #2a2a2a;
 	}
 }
@@ -118,7 +118,7 @@ body {
 		box-shadow: 0 0 0 2px var(--ring);
 	}
 	.hover\:bg-hover:hover {
-		background-color: var(--hover);
+		background-color: var(--muted-hover);
 	}
 	.active\:bg-active:active {
 		background-color: var(--active);
