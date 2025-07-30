@@ -20,7 +20,33 @@ interface ISearchResult {
 	fullAddress: string
 }
 
-const libraries: 'geometry'[] = ['geometry']
+interface PlacePredictionText {
+	text: string
+}
+
+interface PlacePrediction {
+	placeId: string
+	mainText: PlacePredictionText
+	secondaryText?: PlacePredictionText
+}
+
+interface Suggestion {
+	placePrediction: PlacePrediction
+}
+
+interface AutocompleteSuggestionResult {
+	suggestions: Suggestion[]
+}
+
+interface AutocompleteSuggestionStatic {
+	fetchAutocompleteSuggestions: (opts: {
+		input: string
+		includedRegionCodes: string[]
+		includedPrimaryTypes: string[]
+	}) => Promise<AutocompleteSuggestionResult>
+}
+
+const libraries: ('geometry' | 'places')[] = ['geometry', 'places']
 
 const containerStyle = {
 	width: '100%',
@@ -55,77 +81,43 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 		geocoder.current = new window.google.maps.Geocoder()
 	}, [isLoaded])
 
-	const searchPlaces = useCallback((query: string) => {
-		if (!geocoder.current || !query.trim() || query.length < 2) {
+	const searchPlaces = useCallback(async (query: string) => {
+		if (!window.google?.maps?.importLibrary || query.length < 2) {
 			setSearchResults([])
 			setShowResults(false)
 			setIsSearching(false)
 			return
 		}
+
 		setIsSearching(true)
+		try {
+			const lib = (await window.google.maps.importLibrary('places')) as {
+				AutocompleteSuggestion: AutocompleteSuggestionStatic
+			}
+			const { suggestions } =
+				await lib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+					input: query,
+					includedRegionCodes: [],
+					includedPrimaryTypes: ['locality', 'geocode'],
+				})
 
-		const searchPromises = [
-			new Promise<google.maps.GeocoderResult[]>(resolve => {
-				geocoder.current!.geocode(
-					{
-						address: query,
-					},
-					(results, status) => {
-						resolve(status === 'OK' && results ? results : [])
-					},
-				)
-			}),
-			new Promise<google.maps.GeocoderResult[]>(resolve => {
-				geocoder.current!.geocode(
-					{
-						address: query,
-						region: 'UA',
-					},
-					(results, status) => {
-						resolve(status === 'OK' && results ? results : [])
-					},
-				)
-			}),
-		]
+			const formatted = suggestions.map((s: Suggestion) => ({
+				placeId: s.placePrediction.placeId,
+				mainText: s.placePrediction.mainText.text,
+				secondaryText: s.placePrediction.secondaryText?.text || '',
+				fullAddress: `${s.placePrediction.mainText.text}, ${
+					s.placePrediction.secondaryText?.text || ''
+				}`,
+			}))
 
-		Promise.all(searchPromises)
-			.then(resultArrays => {
-				const allResults = resultArrays.flat()
-				const uniqueResults = allResults.filter(
-					(result, index, self) =>
-						index === self.findIndex(r => r.place_id === result.place_id),
-				)
-
-				const formattedResults: ISearchResult[] = uniqueResults
-					.slice(0, 8)
-					.map(result => {
-						const components = result.address_components
-						const mainComponent = components[0]?.long_name || ''
-						const secondaryComponents = components
-							.slice(1)
-							.map(c => c.long_name)
-							.join(', ')
-
-						return {
-							placeId: result.place_id,
-							mainText: mainComponent || result.formatted_address.split(',')[0],
-							secondaryText:
-								secondaryComponents ||
-								result.formatted_address.split(',').slice(1).join(',').trim(),
-							fullAddress: result.formatted_address,
-						}
-					})
-
-				setSearchResults(formattedResults)
-				setShowResults(formattedResults.length > 0)
-			})
-			.catch(error => {
-				setSearchResults([])
-				setShowResults(false)
-			})
-			.finally(() => {
-				setIsSearching(false)
-			})
+			setSearchResults(formatted)
+			setShowResults(formatted.length > 0)
+		} catch {
+			setSearchResults([])
+			setShowResults(false)
+		} finally {
+			setIsSearching(false)
+		}
 	}, [])
 
 	const handleSearch = useCallback(
@@ -273,6 +265,7 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 					<div className='absolute z-10 w-full mt-2 bg-muted border border-border rounded-md shadow-lg max-h-64 overflow-y-auto'>
 						{searchResults.map(result => (
 							<button
+								type='button'
 								key={result.placeId}
 								onClick={() => handleResultSelect(result)}
 								className='w-full px-4 py-3 text-left hover:bg-hover border-b border-border last:border-b-0 first:rounded-t-md last:rounded-b-md transition-colors'
@@ -343,7 +336,7 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 							<Marker
 								position={position}
 								animation={google.maps.Animation.DROP}
-								title={searchValue || 'Вибране місце'}
+								title={searchValue || 'Selected Location'}
 							/>
 						)}
 					</GoogleMap>
