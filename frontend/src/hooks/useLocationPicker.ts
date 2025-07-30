@@ -1,0 +1,181 @@
+import { API_URL } from '@/constants/api'
+import type {
+	AutocompleteSuggestionStatic,
+	ISearchResult,
+	LocationPickerProps,
+	Suggestion,
+} from '@/shared/LocationPicker'
+import { useJsApiLoader } from '@react-google-maps/api'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+const libraries: ('geometry' | 'places')[] = ['geometry', 'places']
+export const useLocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
+	const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null)
+	const [searchValue, setSearchValue] = useState('')
+	const [searchResults, setSearchResults] = useState<ISearchResult[]>([])
+	const [showResults, setShowResults] = useState(false)
+	const [isSearching, setIsSearching] = useState(false)
+
+	const mapRef = useRef<google.maps.Map | null>(null)
+	const geocoder = useRef<google.maps.Geocoder | null>(null)
+	const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+	const { isLoaded } = useJsApiLoader({
+		googleMapsApiKey: API_URL.GOOGLE_MAPS!,
+		libraries,
+		language: 'en',
+		region: 'UA',
+	})
+
+	useEffect(() => {
+		if (!isLoaded || !window.google) return
+		geocoder.current = new window.google.maps.Geocoder()
+	}, [isLoaded])
+
+	const searchPlaces = useCallback(async (query: string) => {
+		if (!window.google?.maps?.importLibrary || query.length < 2) {
+			setSearchResults([])
+			setShowResults(false)
+			setIsSearching(false)
+			return
+		}
+
+		setIsSearching(true)
+		try {
+			const lib = (await window.google.maps.importLibrary('places')) as {
+				AutocompleteSuggestion: AutocompleteSuggestionStatic
+			}
+			const { suggestions } =
+				await lib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+					input: query,
+					includedRegionCodes: [],
+					includedPrimaryTypes: ['locality', 'geocode'],
+				})
+
+			const formatted = suggestions.map((s: Suggestion) => ({
+				placeId: s.placePrediction.placeId,
+				mainText: s.placePrediction.mainText.text,
+				secondaryText: s.placePrediction.secondaryText?.text || '',
+				fullAddress: `${s.placePrediction.mainText.text}, ${
+					s.placePrediction.secondaryText?.text || ''
+				}`,
+			}))
+
+			setSearchResults(formatted)
+			setShowResults(formatted.length > 0)
+		} catch {
+			setSearchResults([])
+			setShowResults(false)
+		} finally {
+			setIsSearching(false)
+		}
+	}, [])
+
+	const handleSearch = useCallback(
+		(value: string) => {
+			setSearchValue(value)
+			if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+			searchTimeoutRef.current = setTimeout(() => {
+				searchPlaces(value)
+			}, 400)
+		},
+		[searchPlaces],
+	)
+
+	const handleResultSelect = useCallback(
+		(result: ISearchResult) => {
+			if (!geocoder.current) return
+
+			geocoder.current.geocode({ placeId: result.placeId }, (results, status) => {
+				if (status === 'OK' && results?.[0]) {
+					const location = results[0].geometry.location
+					const lat = location.lat()
+					const lng = location.lng()
+					const address = result.fullAddress
+
+					const coords = { lat, lng, address }
+					setPosition({ lat, lng })
+					setSearchValue(address)
+					setShowResults(false)
+					onSelectLocation(coords)
+
+					if (mapRef.current) {
+						mapRef.current.panTo({ lat, lng })
+						const types = results[0].types
+						let zoom = 12
+						if (types.includes('country')) zoom = 6
+						else if (types.includes('administrative_area_level_1')) zoom = 8
+						else if (types.includes('locality')) zoom = 12
+						else if (types.includes('establishment')) zoom = 16
+
+						mapRef.current.setZoom(zoom)
+					}
+				}
+			})
+		},
+		[onSelectLocation],
+	)
+
+	const handleMapClick = useCallback(
+		(event: google.maps.MapMouseEvent) => {
+			if (!event.latLng || !geocoder.current) return
+
+			const lat = event.latLng.lat()
+			const lng = event.latLng.lng()
+
+			setPosition({ lat, lng })
+
+			geocoder.current.geocode({ location: { lat, lng } }, (results, status) => {
+				if (status === 'OK' && results?.[0]) {
+					const address = results[0].formatted_address
+					setSearchValue(address)
+					onSelectLocation({ lat, lng, address })
+				} else {
+					const address = `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+					setSearchValue(address)
+					onSelectLocation({ lat, lng, address })
+				}
+			})
+		},
+		[onSelectLocation],
+	)
+
+	const onMapLoad = useCallback((map: google.maps.Map) => {
+		mapRef.current = map
+	}, [])
+
+	useEffect(() => {
+		return () => {
+			if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+		}
+	}, [])
+
+	const handleKeyDown = useCallback(
+		(e: React.KeyboardEvent<HTMLInputElement>) => {
+			if (e.key === 'Enter' && searchResults.length > 0) {
+				e.preventDefault()
+				handleResultSelect(searchResults[0])
+			}
+			if (e.key === 'Escape') setShowResults(false)
+		},
+		[searchResults, handleResultSelect],
+	)
+
+	return {
+		position,
+		searchValue,
+		isSearching,
+		searchResults,
+		showResults,
+		isLoaded,
+		handleSearch,
+		handleKeyDown,
+		handleResultSelect,
+		setShowResults,
+		setSearchValue,
+		setSearchResults,
+		setPosition,
+		onMapLoad,
+		handleMapClick,
+	}
+}
