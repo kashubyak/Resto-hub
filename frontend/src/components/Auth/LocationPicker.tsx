@@ -136,21 +136,12 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 						onLoad={onMapLoad}
 						onClick={handleMapClick}
 						options={{
-							streetViewControl: false,
-							mapTypeControl: true,
+							disableDefaultUI: true,
 							fullscreenControl: true,
-							zoomControl: true,
-							mapTypeControlOptions: {
-								style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-								position: google.maps.ControlPosition.BOTTOM_CENTER,
+							fullscreenControlOptions: {
+								position: google.maps.ControlPosition.TOP_RIGHT,
 							},
-							styles: [
-								{
-									featureType: 'poi',
-									elementType: 'labels',
-									stylers: [{ visibility: 'on' }],
-								},
-							],
+							gestureHandling: 'greedy',
 						}}
 					>
 						{position && (

@@ -82,15 +82,6 @@ export default function RegisterCompanyPage() {
 						error={errors.logoUrl?.message}
 					/>
 					<AuthButton type='submit' text='Submit' />
-
-					{location && (
-						<div className='text-sm text-gray-300'>
-							<p>
-								📍 Координати: {location.lat}, {location.lng}
-							</p>
-							<p>🏠 Адреса: {location.address}</p>
-						</div>
-					)}
 				</form>
 			</div>
 		</div>

@@ -9,6 +9,38 @@ import { useJsApiLoader } from '@react-google-maps/api'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const libraries: ('geometry' | 'places')[] = ['geometry', 'places']
+const getReadableAddress = (results: google.maps.GeocoderResult[]): string => {
+	if (!results || results.length === 0) return ''
+
+	for (const result of results) {
+		const address = result.formatted_address
+		const plusCodePattern = /^[A-Z0-9+]{4,}/
+		if (!plusCodePattern.test(address)) {
+			return address
+		}
+	}
+
+	const firstResult = results[0]
+	const components = firstResult.address_components
+
+	const addressParts: string[] = []
+	const locality = components.find(c => c.types.includes('locality'))?.long_name
+	const area1 = components.find(c =>
+		c.types.includes('administrative_area_level_1'),
+	)?.long_name
+	const area2 = components.find(c =>
+		c.types.includes('administrative_area_level_2'),
+	)?.long_name
+	const country = components.find(c => c.types.includes('country'))?.long_name
+
+	if (locality) addressParts.push(locality)
+	else if (area2) addressParts.push(area2)
+	if (area1 && area1 !== locality) addressParts.push(area1)
+	if (country) addressParts.push(country)
+
+	return addressParts.length > 0 ? addressParts.join(', ') : firstResult.formatted_address
+}
+
 export const useLocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 	const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null)
 	const [searchValue, setSearchValue] = useState('')
@@ -126,8 +158,8 @@ export const useLocationPicker = ({ onSelectLocation }: LocationPickerProps) => 
 			setPosition({ lat, lng })
 
 			geocoder.current.geocode({ location: { lat, lng } }, (results, status) => {
-				if (status === 'OK' && results?.[0]) {
-					const address = results[0].formatted_address
+				if (status === 'OK' && results) {
+					const address = getReadableAddress(results)
 					setSearchValue(address)
 					onSelectLocation({ lat, lng, address })
 				} else {
