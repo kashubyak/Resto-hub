@@ -2,6 +2,6 @@
 
 import { RegisterCompany } from './RegisterCompany'
 
-export default function RegisterCompanyPage() {
+export default function Auth() {
 	return <RegisterCompany />
 }

@@ -8,6 +8,7 @@ import { registerCompany } from '@/services/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { AuthLayout } from './AuthLayout'
 
 interface IFormValues {
 	name: string
@@ -53,38 +54,31 @@ export const RegisterCompany = () => {
 	}
 
 	return (
-		<div className='w-screen h-screen bg-background text-foreground flex items-center justify-center p-4'>
-			<div className='w-full max-w-xl bg-muted border border-border text-muted-foreground rounded-xl shadow-xl max-h-10/12 overflow-y-auto p-6'>
-				<h1 className='text-primary text-2xl font-semibold mb-2 text-center'>
-					Register Company
-				</h1>
-				<form
-					onSubmit={handleSubmit(onSubmit)}
-					encType='multipart/form-data'
-					className='space-y-2.5 py-2'
-				>
-					<AuthInput
-						type='text'
-						placeholder='Company Name'
-						register={register('name', { required: 'Company name is required' })}
-						error={errors.name?.message}
-					/>
-					<AuthInput
-						type='text'
-						placeholder='Subdomain'
-						register={register('subdomain', { required: 'Subdomain is required' })}
-						error={errors.subdomain?.message}
-					/>
-					<LocationPicker onSelectLocation={setLocation} />
-					<UploadImage
-						label='Company Logo'
-						register={register('logoUrl', { required: 'Logo is required' })}
-						error={errors.logoUrl?.message}
-					/>
-					<AuthButton type='submit' text='Submit' />
-				</form>
-			</div>
-		</div>
+		<AuthLayout
+			title='Register Company'
+			onSubmit={handleSubmit(onSubmit)}
+			encType='multipart/form-data'
+		>
+			<AuthInput
+				type='text'
+				placeholder='Company Name'
+				register={register('name', { required: 'Company name is required' })}
+				error={errors.name?.message}
+			/>
+			<AuthInput
+				type='text'
+				placeholder='Subdomain'
+				register={register('subdomain', { required: 'Subdomain is required' })}
+				error={errors.subdomain?.message}
+			/>
+			<LocationPicker onSelectLocation={setLocation} />
+			<UploadImage
+				label='Company Logo'
+				register={register('logoUrl', { required: 'Logo is required' })}
+				error={errors.logoUrl?.message}
+			/>
+			<AuthButton type='submit' text='Submit' />
+		</AuthLayout>
 	)
 }
 // {
