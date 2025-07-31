@@ -24,6 +24,7 @@ interface IFormValues {
 }
 
 export const RegisterCompany = () => {
+	const [step, setStep] = useState<0 | 1>(0)
 	const {
 		register,
 		handleSubmit,
@@ -37,6 +38,15 @@ export const RegisterCompany = () => {
 	} | null>(null)
 
 	const onSubmit = async (data: IFormValues) => {
+		if (step === 0) {
+			if (!location) {
+				alert('Please select a location')
+				return
+			}
+			setStep(1)
+			return
+		}
+
 		const formData = new FormData()
 		formData.append('name', data.name)
 		formData.append('subdomain', data.subdomain)
@@ -59,28 +69,34 @@ export const RegisterCompany = () => {
 			onSubmit={handleSubmit(onSubmit)}
 			encType='multipart/form-data'
 		>
-			<AuthInput
-				type='text'
-				placeholder='Company Name'
-				register={register('name', { required: 'Company name is required' })}
-				error={errors.name?.message}
-			/>
-			<AuthInput
-				type='text'
-				placeholder='Subdomain'
-				register={register('subdomain', { required: 'Subdomain is required' })}
-				error={errors.subdomain?.message}
-			/>
-			<LocationPicker onSelectLocation={setLocation} />
-			<UploadImage
-				label='Company Logo'
-				register={register('logoUrl', { required: 'Logo is required' })}
-				error={errors.logoUrl?.message}
-			/>
-			<AuthButton type='submit' text='Submit' />
+			{step === 0 && (
+				<>
+					<AuthInput
+						type='text'
+						placeholder='Company Name'
+						register={register('name', { required: 'Company name is required' })}
+						error={errors.name?.message}
+					/>
+					<AuthInput
+						type='text'
+						placeholder='Subdomain'
+						register={register('subdomain', { required: 'Subdomain is required' })}
+						error={errors.subdomain?.message}
+					/>
+					<LocationPicker onSelectLocation={setLocation} />
+					<UploadImage
+						label='Company Logo'
+						register={register('logoUrl', { required: 'Logo is required' })}
+						error={errors.logoUrl?.message}
+					/>
+					<AuthButton type='submit' text='Next' />
+				</>
+			)}
+			{step === 1 && <></>}
 		</AuthLayout>
 	)
 }
+
 // {
 //   "name": "string",
 //   "subdomain": "string",
