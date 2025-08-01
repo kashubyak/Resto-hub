@@ -41,9 +41,22 @@ const getReadableAddress = (results: google.maps.GeocoderResult[]): string => {
 	return addressParts.length > 0 ? addressParts.join(', ') : firstResult.formatted_address
 }
 
-export const useLocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
-	const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null)
-	const [searchValue, setSearchValue] = useState('')
+interface ExtendedLocationPickerProps extends LocationPickerProps {
+	initialLocation?: {
+		lat: number
+		lng: number
+		address: string
+	}
+}
+
+export const useLocationPicker = ({
+	onSelectLocation,
+	initialLocation,
+}: ExtendedLocationPickerProps) => {
+	const [position, setPosition] = useState<{ lat: number; lng: number } | null>(
+		initialLocation ? { lat: initialLocation.lat, lng: initialLocation.lng } : null,
+	)
+	const [searchValue, setSearchValue] = useState(initialLocation?.address || '')
 	const [searchResults, setSearchResults] = useState<ISearchResult[]>([])
 	const [showResults, setShowResults] = useState(false)
 	const [isSearching, setIsSearching] = useState(false)
@@ -63,6 +76,13 @@ export const useLocationPicker = ({ onSelectLocation }: LocationPickerProps) => 
 		if (!isLoaded || !window.google) return
 		geocoder.current = new window.google.maps.Geocoder()
 	}, [isLoaded])
+
+	useEffect(() => {
+		if (initialLocation && initialLocation.address && !position) {
+			setPosition({ lat: initialLocation.lat, lng: initialLocation.lng })
+			setSearchValue(initialLocation.address)
+		}
+	}, [initialLocation, position])
 
 	const searchPlaces = useCallback(async (query: string) => {
 		if (!window.google?.maps?.importLibrary || query.length < 2) {

@@ -27,11 +27,29 @@ interface IFormValues {
 export const RegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
 	const [hasMounted, setHasMounted] = useState(false)
+	const [savedPreviews, setSavedPreviews] = useState<{
+		logo: string | null
+		avatar: string | null
+	}>({
+		logo: null,
+		avatar: null,
+	})
+	const [savedFiles, setSavedFiles] = useState<{
+		logo: File | null
+		avatar: File | null
+	}>({
+		logo: null,
+		avatar: null,
+	})
 	useEffect(() => setHasMounted(true), [])
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
+		watch,
+		setValue,
+		clearErrors,
 	} = useForm<IFormValues>()
 	const router = useRouter()
 	const [location, setLocation] = useState<{
@@ -44,12 +62,38 @@ export const RegisterCompany = () => {
 		address: '',
 	})
 
+	const handleImageData = (
+		type: 'logo' | 'avatar',
+		preview: string | null,
+		file: File | null,
+	) => {
+		setSavedPreviews(prev => ({
+			...prev,
+			[type]: preview,
+		}))
+		setSavedFiles(prev => ({
+			...prev,
+			[type]: file,
+		}))
+
+		if (file) {
+			if (type === 'logo') {
+				clearErrors('logoUrl')
+			} else {
+				clearErrors('avatarUrl')
+			}
+		}
+	}
+
 	const onSubmit = async (data: IFormValues) => {
 		if (step === 0) {
-			if (!location) {
+			if (!location.address) {
 				alert('Please select a location')
 				return
 			}
+			setValue('address', location.address)
+			setValue('latitude', location.lat)
+			setValue('longitude', location.lng)
 			setStep(1)
 			return
 		}
@@ -63,11 +107,27 @@ export const RegisterCompany = () => {
 		formData.append('adminName', data.adminName)
 		formData.append('adminEmail', data.adminEmail)
 		formData.append('adminPassword', data.adminPassword)
-		formData.append('logoUrl', data.logoUrl[0])
-		formData.append('avatarUrl', data.avatarUrl[0])
+		formData.append('logoUrl', data.logoUrl?.[0] || savedFiles.logo!)
+		formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
 
 		const response = await registerCompany(formData)
 		localStorage.setItem('token', response.access_token)
+	}
+	const validateLogo = () => {
+		const logoFiles = watch('logoUrl')
+		return (
+			(logoFiles && logoFiles.length > 0) ||
+			savedFiles.logo !== null ||
+			'Logo is required'
+		)
+	}
+	const validateAvatar = () => {
+		const avatarFiles = watch('avatarUrl')
+		return (
+			(avatarFiles && avatarFiles.length > 0) ||
+			savedFiles.avatar !== null ||
+			'Avatar is required'
+		)
 	}
 
 	return (
@@ -99,11 +159,18 @@ export const RegisterCompany = () => {
 								register={register('subdomain', { required: 'Subdomain is required' })}
 								error={errors.subdomain?.message}
 							/>
-							<LocationPicker onSelectLocation={setLocation} />
+							<LocationPicker
+								onSelectLocation={setLocation}
+								initialLocation={location.address ? location : undefined}
+							/>
 							<UploadImage
 								label='Company Logo'
-								register={register('logoUrl', { required: 'Logo is required' })}
+								register={register('logoUrl', {
+									validate: validateLogo,
+								})}
 								error={errors.logoUrl?.message}
+								savedPreview={savedPreviews.logo}
+								onDataChange={(preview, file) => handleImageData('logo', preview, file)}
 							/>
 							<AuthButton type='submit' text='Next' />
 						</motion.div>
@@ -139,8 +206,12 @@ export const RegisterCompany = () => {
 							/>
 							<UploadImage
 								label='Admin avatar'
-								register={register('avatarUrl', { required: 'Avatar is required' })}
+								register={register('avatarUrl', {
+									validate: validateAvatar,
+								})}
 								error={errors.avatarUrl?.message}
+								savedPreview={savedPreviews.avatar}
+								onDataChange={(preview, file) => handleImageData('avatar', preview, file)}
 							/>
 							<div className='flex justify-between gap-4'>
 								<AuthButton type='button' text='Back' onClick={() => setStep(0)} />

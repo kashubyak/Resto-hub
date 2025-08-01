@@ -8,9 +8,17 @@ type UploadImageProps = {
 	label?: string
 	error?: string
 	register: UseFormRegisterReturn
+	savedPreview?: string | null
+	onDataChange?: (preview: string | null, file: File | null) => void
 }
 
-export const UploadImage = ({ label, error, ...register }: UploadImageProps) => {
+export const UploadImage = ({
+	label,
+	error,
+	savedPreview,
+	onDataChange,
+	...register
+}: UploadImageProps) => {
 	const {
 		preview,
 		isDragging,
@@ -19,24 +27,24 @@ export const UploadImage = ({ label, error, ...register }: UploadImageProps) => 
 		preventDefaults,
 		ref,
 		...restRegister
-	} = useUploadImage(register)
+	} = useUploadImage({ ...register, savedPreview, onDataChange })
+	const currentPreview = preview || savedPreview
+
 	return (
 		<div className='flex flex-col gap-2 relative'>
 			{label && <span className='text-sm font-medium text-foreground'>{label}</span>}
-
 			{isDragging && (
 				<div className='fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center pointer-events-auto'>
 					<p className='text-white text-lg font-semibold'>Drop image to upload</p>
 				</div>
 			)}
-
-			{preview ? (
+			{currentPreview ? (
 				<div
 					className='relative w-32 h-32 rounded-md overflow-hidden'
 					onClick={() => inputRef.current?.click()}
 				>
 					<Image
-						src={preview}
+						src={currentPreview}
 						alt='Preview'
 						fill
 						className='object-cover cursor-pointer'

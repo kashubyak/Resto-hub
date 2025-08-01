@@ -13,7 +13,18 @@ const defaultCenter = {
 	lng: 30.5234,
 }
 
-export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
+interface ExtendedLocationPickerProps extends LocationPickerProps {
+	initialLocation?: {
+		lat: number
+		lng: number
+		address: string
+	}
+}
+
+export const LocationPicker = ({
+	onSelectLocation,
+	initialLocation,
+}: ExtendedLocationPickerProps) => {
 	const {
 		position,
 		searchValue,
@@ -30,7 +41,8 @@ export const LocationPicker = ({ onSelectLocation }: LocationPickerProps) => {
 		setPosition,
 		onMapLoad,
 		handleMapClick,
-	} = useLocationPicker({ onSelectLocation })
+	} = useLocationPicker({ onSelectLocation, initialLocation })
+
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='relative'>
