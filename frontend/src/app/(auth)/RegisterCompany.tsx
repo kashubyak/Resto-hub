@@ -92,7 +92,39 @@ export const RegisterCompany = () => {
 					<AuthButton type='submit' text='Next' />
 				</>
 			)}
-			{step === 1 && <></>}
+			{step === 1 && (
+				<>
+					<AuthInput
+						type='text'
+						placeholder='Admin Name'
+						register={register('adminName', { required: 'Admin name is required' })}
+						error={errors.adminName?.message}
+					/>
+					<AuthInput
+						type='email'
+						placeholder='Admin Email'
+						register={register('adminEmail', { required: 'Admin email is required' })}
+						error={errors.adminEmail?.message}
+					/>
+					<AuthInput
+						type='text'
+						placeholder='Admin Password'
+						register={register('adminPassword', {
+							required: 'Admin password is required',
+						})}
+						error={errors.adminPassword?.message}
+					/>
+					<UploadImage
+						label='Admin avatar'
+						register={register('avatarUrl', { required: 'Avatar is required' })}
+						error={errors.avatarUrl?.message}
+					/>
+					<div className='flex justify-between gap-4'>
+						<AuthButton type='button' text='Back' onClick={() => setStep(0)} />
+						<AuthButton type='submit' text='Submit' />
+					</div>
+				</>
+			)}
 		</AuthLayout>
 	)
 }
