@@ -1,21 +1,60 @@
 import { useEffect, useRef, useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
-type UseUploadImageReturn = {
+type UseUploadImageParams = {
 	register: UseFormRegisterReturn
+	savedPreview?: string | null
+	onDataChange?: (preview: string | null, file: File | null) => void
 }
 
-export const useUploadImage = ({ register }: UseUploadImageReturn) => {
-	const [preview, setPreview] = useState<string | null>(null)
+export const useUploadImage = ({
+	register,
+	savedPreview,
+	onDataChange,
+}: UseUploadImageParams) => {
+	const [preview, setPreview] = useState<string | null>(savedPreview || null)
 	const [isDragging, setIsDragging] = useState(false)
 
 	const inputRef = useRef<HTMLInputElement | null>(null)
 	const { ref, ...restRegister } = register
 
+	const createFileFromBase64 = (base64: string, fileName: string = 'image.jpg'): File => {
+		const arr = base64.split(',')
+		const mime = arr[0].match(/:(.*?);/)![1]
+		const bstr = atob(arr[1])
+		let n = bstr.length
+		const u8arr = new Uint8Array(n)
+		while (n--) {
+			u8arr[n] = bstr.charCodeAt(n)
+		}
+		return new File([u8arr], fileName, { type: mime })
+	}
+
+	useEffect(() => {
+		if (savedPreview && !preview) {
+			setPreview(savedPreview)
+			if (inputRef.current && savedPreview.startsWith('data:')) {
+				try {
+					const file = createFileFromBase64(savedPreview)
+					const dataTransfer = new DataTransfer()
+					dataTransfer.items.add(file)
+					inputRef.current.files = dataTransfer.files
+
+					const event = new Event('change', { bubbles: true })
+					inputRef.current.dispatchEvent(event)
+				} catch (error) {
+					console.error('Error restoring file from base64:', error)
+				}
+			}
+		}
+	}, [savedPreview, preview])
+
 	const handleFile = (file: File) => {
 		const reader = new FileReader()
 		reader.onloadend = () => {
-			setPreview(reader.result as string)
+			const result = reader.result as string
+			setPreview(result)
+			onDataChange?.(result, file)
 		}
 		reader.readAsDataURL(file)
 
