@@ -1,6 +1,7 @@
 'use client'
 import { useLocationPicker } from '@/hooks/useLocationPicker'
 import type { LocationPickerProps } from '@/shared/LocationPicker'
+import Close from '@mui/icons-material/Close'
 import { GoogleMap, Marker } from '@react-google-maps/api'
 
 const containerStyle = {
@@ -77,19 +78,7 @@ export const LocationPicker = ({
 							}}
 							className='absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground'
 						>
-							<svg
-								className='w-5 h-5'
-								fill='none'
-								stroke='currentColor'
-								viewBox='0 0 24 24'
-							>
-								<path
-									strokeLinecap='round'
-									strokeLinejoin='round'
-									strokeWidth={2}
-									d='M6 18L18 6M6 6l12 12'
-								/>
-							</svg>
+							<Close className='w-5 h-5' />
 						</button>
 					)}
 				</div>

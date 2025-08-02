@@ -20,6 +20,7 @@ interface IFormValues {
 	adminName: string
 	adminEmail: string
 	adminPassword: string
+	confirmPassword: string
 	logoUrl: FileList
 	avatarUrl: FileList
 }
@@ -130,6 +131,11 @@ export const RegisterCompany = () => {
 		)
 	}
 
+	const validatePasswordMatch = (value: string) => {
+		const password = watch('adminPassword')
+		return password === value || 'Passwords do not match'
+	}
+
 	return (
 		<AuthLayout
 			title='Register Company'
@@ -203,6 +209,15 @@ export const RegisterCompany = () => {
 									required: 'Admin password is required',
 								})}
 								error={errors.adminPassword?.message}
+							/>
+							<AuthInput
+								type='password'
+								placeholder='Confirm Password'
+								register={register('confirmPassword', {
+									required: 'Confirm password is required',
+									validate: validatePasswordMatch,
+								})}
+								error={errors.confirmPassword?.message}
 							/>
 							<UploadImage
 								label='Admin avatar'
