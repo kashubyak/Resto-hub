@@ -8,7 +8,6 @@ import type { UseFormRegisterReturn } from 'react-hook-form'
 type AuthInputProps = {
 	error?: string
 	register?: UseFormRegisterReturn
-	rest: InputHTMLAttributes<HTMLInputElement>
 	type: 'text' | 'email' | 'password' | 'number'
 } & InputHTMLAttributes<HTMLInputElement>
 
