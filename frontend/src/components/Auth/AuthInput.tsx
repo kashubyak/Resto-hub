@@ -1,9 +1,7 @@
 'use client'
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
-import { InputAdornment } from '@mui/material'
-import IconButton from '@mui/material/IconButton'
-import TextField, { type TextFieldProps } from '@mui/material/TextField'
+import { IconButton, InputAdornment, TextField, type TextFieldProps } from '@mui/material'
 import { useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
@@ -38,6 +36,19 @@ export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) =>
 								edge='end'
 								tabIndex={-1}
 								aria-label={showPassword ? 'Hide password' : 'Show password'}
+								sx={{
+									transition: 'all 0.2s ease',
+									'&:hover': {
+										color: 'var(--foreground)',
+										backgroundColor:
+											'color-mix(in oklab, var(--foreground) 10%, transparent)',
+									},
+									'&:active': {
+										transform: 'scale(0.9)',
+										backgroundColor:
+											'color-mix(in oklab, var(--foreground) 20%, transparent)',
+									},
+								}}
 							>
 								{showPassword ? (
 									<VisibilityOff className='text-muted-foreground h-5 w-5' />
@@ -68,7 +79,7 @@ export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) =>
 						},
 					},
 					'& .MuiInputLabel-root': {
-						color: 'var(--muted-foreground)',
+						color: error ? 'var(--destructive)' : 'var(--muted-foreground)',
 						'&.Mui-focused': {
 							color: error ? 'var(--destructive)' : 'var(--ring)',
 						},
