@@ -35,7 +35,7 @@ export const UploadImage = ({
 			{label && <span className='text-sm font-medium text-foreground'>{label}</span>}
 			{isDragging && (
 				<div className='fixed inset-0 bg-[var(--background)]/30 backdrop-blur-sm z-50 flex items-center justify-center pointer-events-auto'>
-					<p className='text-foreground text-lg font-semibold'>Drop image to upload</p>
+					<p className='text-foreground text-2xl font-semibold'>Drop image to upload</p>
 				</div>
 			)}
 			{currentPreview ? (

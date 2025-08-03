@@ -78,11 +78,8 @@ export const RegisterCompany = () => {
 		}))
 
 		if (file) {
-			if (type === 'logo') {
-				clearErrors('logoUrl')
-			} else {
-				clearErrors('avatarUrl')
-			}
+			if (type === 'logo') clearErrors('logoUrl')
+			else clearErrors('avatarUrl')
 		}
 	}
 
@@ -151,17 +148,17 @@ export const RegisterCompany = () => {
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: 40 }}
 							transition={{ duration: 0.3 }}
-							className='space-y-2'
+							className='space-y-3'
 						>
 							<AuthInput
 								type='text'
-								placeholder='Company Name'
+								label='Company Name'
 								register={register('name', { required: 'Company name is required' })}
 								error={errors.name?.message}
 							/>
 							<AuthInput
 								type='text'
-								placeholder='Subdomain'
+								label='Subdomain'
 								register={register('subdomain', { required: 'Subdomain is required' })}
 								error={errors.subdomain?.message}
 							/>
@@ -188,23 +185,23 @@ export const RegisterCompany = () => {
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: -40 }}
 							transition={{ duration: 0.3 }}
-							className='space-y-2'
+							className='space-y-3'
 						>
 							<AuthInput
 								type='text'
-								placeholder='Admin Name'
+								label='Admin Name'
 								register={register('adminName', { required: 'Admin name is required' })}
 								error={errors.adminName?.message}
 							/>
 							<AuthInput
 								type='email'
-								placeholder='Admin Email'
+								label='Admin Email'
 								register={register('adminEmail', { required: 'Admin email is required' })}
 								error={errors.adminEmail?.message}
 							/>
 							<AuthInput
 								type='password'
-								placeholder='Admin Password'
+								label='Admin Password'
 								register={register('adminPassword', {
 									required: 'Admin password is required',
 								})}
@@ -212,7 +209,7 @@ export const RegisterCompany = () => {
 							/>
 							<AuthInput
 								type='password'
-								placeholder='Confirm Password'
+								label='Confirm Password'
 								register={register('confirmPassword', {
 									required: 'Confirm password is required',
 									validate: validatePasswordMatch,
