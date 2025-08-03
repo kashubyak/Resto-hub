@@ -59,7 +59,7 @@ export const LocationPicker = ({
 							}
 						}}
 						placeholder='Enter the name of the city in any language (Kyiv, Paris, London)'
-						className='w-full px-4 py-3 pr-12 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-base text-foreground'
+						className='w-full px-4 py-3 pr-12 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-base text-foreground'
 					/>
 
 					{isSearching && (

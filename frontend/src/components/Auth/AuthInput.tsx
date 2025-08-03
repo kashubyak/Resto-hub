@@ -24,8 +24,8 @@ export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) =>
 					{...register}
 					{...rest}
 					type={inputType}
-					className={`w-full border rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring ${
-						error ? 'border-red-500' : 'border-border'
+					className={`w-full border rounded-md px-3 py-2 bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-ring ${
+						error ? 'border-[var(--destructive)]' : 'border-border'
 					} ${isPasswordField ? 'pr-10' : ''}`}
 				/>
 				{isPasswordField && (
@@ -43,7 +43,7 @@ export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) =>
 					</button>
 				)}
 			</div>
-			{error && <span className='text-red-500 text-sm mt-1'>{error}</span>}
+			{error && <span className='text-[var(--destructive)] text-sm mt-1'>{error}</span>}
 		</div>
 	)
 }
