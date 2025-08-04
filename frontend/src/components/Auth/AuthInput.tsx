@@ -79,7 +79,9 @@ export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) =>
 						},
 					},
 					'& .MuiInputLabel-root': {
-						color: error ? 'var(--destructive)' : 'var(--muted-foreground)',
+						color: error
+							? 'var(--destructive)'
+							: 'color-mix(in oklab, var(--foreground) 70%, transparent)',
 						'&.Mui-focused': {
 							color: error ? 'var(--destructive)' : 'var(--ring)',
 						},

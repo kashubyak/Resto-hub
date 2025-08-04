@@ -36,10 +36,8 @@ export const LocationPicker = ({
 		handleSearch,
 		handleKeyDown,
 		handleResultSelect,
+		handleClear,
 		setShowResults,
-		setSearchValue,
-		setSearchResults,
-		setPosition,
 		onMapLoad,
 		handleMapClick,
 	} = useLocationPicker({ onSelectLocation, initialLocation })
@@ -70,11 +68,9 @@ export const LocationPicker = ({
 
 					{searchValue && !isSearching && (
 						<button
-							onClick={() => {
-								setSearchValue('')
-								setSearchResults([])
-								setShowResults(false)
-								setPosition(null)
+							onMouseDown={e => {
+								e.preventDefault()
+								handleClear()
 							}}
 							className='absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground'
 						>
