@@ -34,8 +34,8 @@ export const UploadImage = ({
 		<div className='flex flex-col gap-2 relative'>
 			{label && <span className='text-sm font-medium text-foreground'>{label}</span>}
 			{isDragging && (
-				<div className='fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center pointer-events-auto'>
-					<p className='text-white text-lg font-semibold'>Drop image to upload</p>
+				<div className='fixed inset-0 bg-[var(--background)]/30 backdrop-blur-sm z-50 flex items-center justify-center pointer-events-auto'>
+					<p className='text-foreground text-2xl font-semibold'>Drop image to upload</p>
 				</div>
 			)}
 			{currentPreview ? (
@@ -57,7 +57,7 @@ export const UploadImage = ({
 					onDragEnter={preventDefaults}
 					onDragLeave={preventDefaults}
 					onClick={() => inputRef.current?.click()}
-					className='relative border-2 border-dashed border-muted p-6 rounded-md text-center cursor-pointer transition-colors hover:bg-muted/40'
+					className='relative border-2 border-dashed border-[var(--muted-foreground)] p-6 rounded-md text-center cursor-pointer transition-colors hover:bg-muted/40'
 				>
 					<p className='text-muted-foreground'>Click or drag & drop an image</p>
 				</div>
@@ -74,7 +74,7 @@ export const UploadImage = ({
 				className='hidden'
 			/>
 
-			{error && <span className='text-red-500 text-sm'>{error}</span>}
+			{error && <span className='text-destructive-foreground text-sm'>{error}</span>}
 		</div>
 	)
 }

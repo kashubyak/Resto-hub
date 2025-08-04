@@ -3,6 +3,7 @@ import { useLocationPicker } from '@/hooks/useLocationPicker'
 import type { LocationPickerProps } from '@/shared/LocationPicker'
 import Close from '@mui/icons-material/Close'
 import { GoogleMap, Marker } from '@react-google-maps/api'
+import { AuthInput } from './AuthInput'
 
 const containerStyle = {
 	width: '100%',
@@ -36,10 +37,8 @@ export const LocationPicker = ({
 		handleSearch,
 		handleKeyDown,
 		handleResultSelect,
+		handleClear,
 		setShowResults,
-		setSearchValue,
-		setSearchResults,
-		setPosition,
 		onMapLoad,
 		handleMapClick,
 	} = useLocationPicker({ onSelectLocation, initialLocation })
@@ -48,7 +47,7 @@ export const LocationPicker = ({
 		<div className='flex flex-col gap-4'>
 			<div className='relative'>
 				<div className='relative'>
-					<input
+					<AuthInput
 						type='text'
 						value={searchValue}
 						onChange={e => handleSearch(e.target.value)}
@@ -58,29 +57,31 @@ export const LocationPicker = ({
 								setShowResults(true)
 							}
 						}}
-						placeholder='Enter the name of the city in any language (Kyiv, Paris, London)'
-						className='w-full px-4 py-3 pr-12 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-base text-foreground'
+						label='Enter the name of the city in any language (Kyiv, Paris, London)'
+						InputProps={{
+							endAdornment: (
+								<>
+									{isSearching && (
+										<div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
+											<div className='animate-spin rounded-full h-5 w-5 border-2 border-[var(--primary)] border-t-transparent'></div>
+										</div>
+									)}
+
+									{searchValue && !isSearching && (
+										<button
+											onMouseDown={e => {
+												e.preventDefault()
+												handleClear()
+											}}
+											className='absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground'
+										>
+											<Close className='w-5 h-5' />
+										</button>
+									)}
+								</>
+							),
+						}}
 					/>
-
-					{isSearching && (
-						<div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
-							<div className='animate-spin rounded-full h-5 w-5 border-2 border-[var(--primary)] border-t-transparent'></div>
-						</div>
-					)}
-
-					{searchValue && !isSearching && (
-						<button
-							onClick={() => {
-								setSearchValue('')
-								setSearchResults([])
-								setShowResults(false)
-								setPosition(null)
-							}}
-							className='absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground'
-						>
-							<Close className='w-5 h-5' />
-						</button>
-					)}
 				</div>
 
 				{showResults && searchResults.length > 0 && (

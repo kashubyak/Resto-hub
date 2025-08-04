@@ -1,7 +1,7 @@
 'use client'
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
-import type { InputHTMLAttributes } from 'react'
+import { IconButton, InputAdornment, TextField, type TextFieldProps } from '@mui/material'
 import { useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
@@ -9,7 +9,7 @@ type AuthInputProps = {
 	error?: string
 	register?: UseFormRegisterReturn
 	type: 'text' | 'email' | 'password' | 'number'
-} & InputHTMLAttributes<HTMLInputElement>
+} & Omit<TextFieldProps, 'type' | 'error'>
 
 export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) => {
 	const [showPassword, setShowPassword] = useState(false)
@@ -19,31 +19,80 @@ export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) =>
 
 	return (
 		<div className='flex flex-col'>
-			<div className='relative'>
-				<input
-					{...register}
-					{...rest}
-					type={inputType}
-					className={`w-full border rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring ${
-						error ? 'border-red-500' : 'border-border'
-					} ${isPasswordField ? 'pr-10' : ''}`}
-				/>
-				{isPasswordField && (
-					<button
-						type='button'
-						onClick={togglePasswordVisibility}
-						className='absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground hover:text-[var(--muted-foreground)] focus:outline-none'
-						tabIndex={-1}
-					>
-						{showPassword ? (
-							<VisibilityOff className='h-5 w-5' />
-						) : (
-							<Visibility className='h-5 w-5' />
-						)}
-					</button>
-				)}
-			</div>
-			{error && <span className='text-red-500 text-sm mt-1'>{error}</span>}
+			<TextField
+				{...register}
+				{...rest}
+				type={inputType}
+				variant='outlined'
+				fullWidth
+				error={!!error}
+				helperText={null}
+				InputProps={{
+					...rest.InputProps,
+					endAdornment: isPasswordField ? (
+						<InputAdornment position='end'>
+							<IconButton
+								onClick={togglePasswordVisibility}
+								edge='end'
+								tabIndex={-1}
+								aria-label={showPassword ? 'Hide password' : 'Show password'}
+								sx={{
+									transition: 'all 0.2s ease',
+									'&:hover': {
+										color: 'var(--foreground)',
+										backgroundColor:
+											'color-mix(in oklab, var(--foreground) 10%, transparent)',
+									},
+									'&:active': {
+										transform: 'scale(0.9)',
+										backgroundColor:
+											'color-mix(in oklab, var(--foreground) 20%, transparent)',
+									},
+								}}
+							>
+								{showPassword ? (
+									<VisibilityOff className='text-muted-foreground h-5 w-5' />
+								) : (
+									<Visibility className='text-muted-foreground h-5 w-5' />
+								)}
+							</IconButton>
+						</InputAdornment>
+					) : (
+						rest.InputProps?.endAdornment
+					),
+				}}
+				sx={{
+					'& .MuiOutlinedInput-root': {
+						backgroundColor: 'var(--input)',
+						color: 'var(--foreground)',
+						borderRadius: '6px',
+						'& fieldset': {
+							borderColor: error ? 'var(--destructive)' : 'var(--border)',
+							borderWidth: '1px',
+						},
+						'&:hover fieldset': {
+							borderColor: error ? 'var(--destructive)' : 'var(--border)',
+						},
+						'&.Mui-focused fieldset': {
+							borderColor: error ? 'var(--destructive)' : 'var(--ring)',
+							borderWidth: '2px',
+						},
+					},
+					'& .MuiInputLabel-root': {
+						color: error
+							? 'var(--destructive)'
+							: 'color-mix(in oklab, var(--foreground) 70%, transparent)',
+						'&.Mui-focused': {
+							color: error ? 'var(--destructive)' : 'var(--ring)',
+						},
+					},
+					'& .MuiFormHelperText-root': {
+						display: 'none',
+					},
+					...rest.sx,
+				}}
+			/>
+			{error && <span className='text-[var(--destructive)] text-sm mt-1'>{error}</span>}
 		</div>
 	)
 }

@@ -134,6 +134,19 @@ export const useLocationPicker = ({
 		[searchPlaces],
 	)
 
+	const handleClear = useCallback(() => {
+		if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+
+		setTimeout(() => {
+			setSearchValue('')
+			setSearchResults([])
+			setShowResults(false)
+			setPosition(null)
+			setIsSearching(false)
+			onSelectLocation({ lat: 0, lng: 0, address: '' })
+		}, 0)
+	}, [onSelectLocation])
+
 	const handleResultSelect = useCallback(
 		(result: ISearchResult) => {
 			if (!geocoder.current) return
@@ -171,7 +184,6 @@ export const useLocationPicker = ({
 	const handleMapClick = useCallback(
 		(event: google.maps.MapMouseEvent) => {
 			if (!event.latLng || !geocoder.current) return
-
 			const lat = event.latLng.lat()
 			const lng = event.latLng.lng()
 
@@ -223,6 +235,7 @@ export const useLocationPicker = ({
 		handleSearch,
 		handleKeyDown,
 		handleResultSelect,
+		handleClear,
 		setShowResults,
 		setSearchValue,
 		setSearchResults,
