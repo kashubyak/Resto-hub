@@ -16,6 +16,7 @@ export const useUploadImage = ({
 	const [isDragging, setIsDragging] = useState(false)
 
 	const inputRef = useRef<HTMLInputElement | null>(null)
+	const isDispatching = useRef(false)
 	const { ref, ...restRegister } = register
 
 	const createFileFromBase64 = (base64: string, fileName: string = 'image.jpg'): File => {
@@ -40,6 +41,7 @@ export const useUploadImage = ({
 					dataTransfer.items.add(file)
 					inputRef.current.files = dataTransfer.files
 
+					isDispatching.current = true
 					const event = new Event('change', { bubbles: true })
 					inputRef.current.dispatchEvent(event)
 				} catch (error) {
@@ -62,6 +64,8 @@ export const useUploadImage = ({
 			const dataTransfer = new DataTransfer()
 			dataTransfer.items.add(file)
 			inputRef.current.files = dataTransfer.files
+
+			isDispatching.current = true
 			const event = new Event('change', { bubbles: true })
 			inputRef.current.dispatchEvent(event)
 		}
@@ -121,16 +125,23 @@ export const useUploadImage = ({
 
 	useEffect(() => {
 		const handleChange = (e: Event) => {
+			if (isDispatching.current) {
+				isDispatching.current = false
+				return
+			}
 			const target = e.target as HTMLInputElement
 			const file = target.files?.[0]
 			if (file) handleFile(file)
 		}
+
 		const input = inputRef.current
 		input?.addEventListener('change', handleChange)
+
 		return () => {
 			input?.removeEventListener('change', handleChange)
 		}
 	}, [])
+
 	return {
 		preview,
 		isDragging,
