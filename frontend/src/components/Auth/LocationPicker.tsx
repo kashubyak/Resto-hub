@@ -121,7 +121,8 @@ export const LocationPicker = ({
 					<div className='font-medium mb-1'>💡 How to use:</div>
 					<div className='space-y-1'>
 						<div>
-							• Enter the name of the city in any language: Kyiv, Kiev, Paris, Moscow
+							• Enter the name of the city in any language: Kyiv, Kiev, Paris, Berlin,
+							etc.
 						</div>
 						<div>• Press Enter to select the first result</div>
 						<div>• Click on the map to place a marker at a specific location</div>

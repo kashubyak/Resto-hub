@@ -8,7 +8,7 @@ import { useRegisterCompany } from '@/hooks/useRegisterCompany'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AuthLayout } from './AuthLayout'
 
-export const RegisterCompany = () => {
+export const RegisterCompany = ({ toggleMode }: { toggleMode: () => void }) => {
 	const {
 		handleSubmit,
 		onSubmit,
@@ -31,6 +31,8 @@ export const RegisterCompany = () => {
 			title='Register Company'
 			onSubmit={handleSubmit(onSubmit)}
 			encType='multipart/form-data'
+			toggleMode={toggleMode}
+			isLogin={false}
 		>
 			<div className='min-h-[21.875rem]'>
 				<AnimatePresence mode='wait'>
