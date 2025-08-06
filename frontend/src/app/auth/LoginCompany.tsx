@@ -2,14 +2,13 @@
 
 import { AuthLayout } from './AuthLayout'
 
-export const LoginCompany = ({ toggleMode }: { toggleMode: () => void }) => {
+export const LoginCompany = () => {
 	return (
 		<AuthLayout
-			title='Login'
+			title='Authorization'
 			onSubmit={e => {
 				e.preventDefault()
 			}}
-			toggleMode={toggleMode}
 			isLogin={true}
 		>
 			<div className='space-y-3'>login</div>
