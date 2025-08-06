@@ -1,17 +1,20 @@
 import type { Metadata } from 'next'
 import AuthPageClient from '../AuthPageClient'
 
-type Props = {
-	params: { mode: string }
+interface Props {
+	params: Promise<{ mode: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-	const mode = params.mode === 'login' ? 'Login' : 'Register'
+	const resolvedParams = await params
+	const mode = resolvedParams.mode === 'login' ? 'Login' : 'Register'
 	return {
 		title: `${mode}`,
 	}
 }
 
-export default function AuthPage({ params }: Props) {
-	return <AuthPageClient mode={params.mode} />
+export default async function AuthPage({ params }: Props) {
+	const resolvedParams = await params
+	const mode = resolvedParams.mode === 'login' ? 'login' : 'register'
+	return <AuthPageClient mode={mode} />
 }
