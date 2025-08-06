@@ -1,11 +1,12 @@
 'use client'
 
+import Link from 'next/link'
+
 interface AuthLayoutProps {
 	title: string
 	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
 	children: React.ReactNode
 	encType?: string
-	toggleMode: () => void
 	isLogin?: boolean
 }
 
@@ -14,7 +15,6 @@ export const AuthLayout = ({
 	onSubmit,
 	children,
 	encType,
-	toggleMode,
 	isLogin = false,
 }: AuthLayoutProps) => {
 	return (
@@ -28,24 +28,22 @@ export const AuthLayout = ({
 					{isLogin ? (
 						<>
 							Don’t have an account?{' '}
-							<button
-								type='button'
-								onClick={toggleMode}
+							<Link
+								href='/auth/register'
 								className='text-primary hover:underline font-medium'
 							>
 								Register here
-							</button>
+							</Link>
 						</>
 					) : (
 						<>
 							Already have an account?{' '}
-							<button
-								type='button'
-								onClick={toggleMode}
+							<Link
+								href='/auth/login'
 								className='text-primary hover:underline font-medium'
 							>
 								Login here
-							</button>
+							</Link>
 						</>
 					)}
 				</div>
