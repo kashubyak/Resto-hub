@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const resolvedParams = await params
 	const mode = resolvedParams.mode === 'login' ? 'Login' : 'Register'
 	return {
-		title: `${mode}`,
+		title: mode,
 	}
 }
 
