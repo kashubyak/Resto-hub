@@ -1,4 +1,4 @@
-import { API_URL } from '@/constants/api'
+import { API_URL } from '@/config/api'
 import type {
 	AutocompleteSuggestionStatic,
 	ISearchResult,

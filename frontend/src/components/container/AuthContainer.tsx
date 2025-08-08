@@ -1,5 +1,6 @@
 'use client'
 
+import { ROUTES } from '@/constants/pages.config'
 import Link from 'next/link'
 
 interface AuthContainerProps {
@@ -29,7 +30,7 @@ export const AuthContainer = ({
 						<>
 							Don’t have an account?{' '}
 							<Link
-								href='/auth/register'
+								href={ROUTES.AUTH.REGISTER}
 								className='text-primary hover:underline font-medium'
 							>
 								Register here
@@ -39,7 +40,7 @@ export const AuthContainer = ({
 						<>
 							Already have an account?{' '}
 							<Link
-								href='/auth/login'
+								href={ROUTES.AUTH.LOGIN}
 								className='text-primary hover:underline font-medium'
 							>
 								Login here
