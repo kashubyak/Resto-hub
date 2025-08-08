@@ -19,9 +19,6 @@ export class RegisterCompanyUserDto {
 }
 
 export class RegisterCompanyResponseDto {
-  @ApiProperty()
-  access_token: string;
-
   @ApiProperty({ type: RegisterCompanyUserDto })
   user: RegisterCompanyUserDto;
 }

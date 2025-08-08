@@ -89,12 +89,7 @@ export class AuthService {
     });
 
     const admin = company.users[0];
-    const token = await this.getAccessToken(admin.id, admin.role);
-    const refreshToken = await this.getRefreshToken(admin.id, admin.role);
-    this.setRefreshTokenCookie(res, refreshToken);
-
     return {
-      access_token: token,
       user: {
         id: admin.id,
         name: admin.name,
