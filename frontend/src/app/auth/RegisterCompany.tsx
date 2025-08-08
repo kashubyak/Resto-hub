@@ -31,6 +31,7 @@ export const RegisterCompany = () => {
 			title='Register Company'
 			onSubmit={handleSubmit(onSubmit)}
 			encType='multipart/form-data'
+			isLogin={false}
 		>
 			<div className='min-h-[21.875rem]'>
 				<AnimatePresence mode='wait'>

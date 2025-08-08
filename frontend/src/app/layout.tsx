@@ -8,7 +8,10 @@ const geistSans = Geist({
 })
 
 export const metadata: Metadata = {
-	title: 'Resto Hub',
+	title: {
+		template: '%s | Resto Hub',
+		default: 'Resto Hub',
+	},
 }
 
 export default function RootLayout({
