@@ -1,13 +1,13 @@
 'use client'
 
-import { AuthInput } from '@/components/Auth/AuthInput'
+import { AuthInput } from '@/components/ui/AuthInput'
 import { useLogin } from '@/hooks/useLogin'
-import { AuthLayout } from './AuthLayout'
+import { AuthContainer } from '../../components/container/AuthContainer'
 
 export const Login = () => {
 	const { register, handleSubmit, errors } = useLogin()
 	return (
-		<AuthLayout
+		<AuthContainer
 			title='Authorization'
 			onSubmit={e => {
 				e.preventDefault()
@@ -34,6 +34,6 @@ export const Login = () => {
 					error={errors.password?.message}
 				/>
 			</div>
-		</AuthLayout>
+		</AuthContainer>
 	)
 }

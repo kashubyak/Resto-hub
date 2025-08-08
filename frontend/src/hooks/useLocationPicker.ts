@@ -4,7 +4,7 @@ import type {
 	ISearchResult,
 	LocationPickerProps,
 	Suggestion,
-} from '@/shared/LocationPicker'
+} from '@/types/locationPicker.interface'
 import { useJsApiLoader } from '@react-google-maps/api'
 import { useCallback, useEffect, useRef, useState } from 'react'
 

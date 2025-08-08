@@ -1,12 +1,12 @@
 'use client'
 
-import { AuthButton } from '@/components/Auth/AuthButton'
-import { AuthInput } from '@/components/Auth/AuthInput'
-import { LocationPicker } from '@/components/Auth/LocationPicker'
-import { UploadImage } from '@/components/UploadImage/UploadImage'
+import { LocationPicker } from '@/components/elements/LocationPicker'
+import { UploadImage } from '@/components/elements/UploadImage'
+import { AuthButton } from '@/components/ui/AuthButton'
+import { AuthInput } from '@/components/ui/AuthInput'
 import { useRegisterCompany } from '@/hooks/useRegisterCompany'
 import { AnimatePresence, motion } from 'framer-motion'
-import { AuthLayout } from './AuthLayout'
+import { AuthContainer } from '../../components/container/AuthContainer'
 
 export const RegisterCompany = () => {
 	const {
@@ -27,7 +27,7 @@ export const RegisterCompany = () => {
 	} = useRegisterCompany()
 
 	return (
-		<AuthLayout
+		<AuthContainer
 			title='Register Company'
 			onSubmit={handleSubmit(onSubmit)}
 			encType='multipart/form-data'
@@ -125,6 +125,6 @@ export const RegisterCompany = () => {
 					</motion.div>
 				)}
 			</AnimatePresence>
-		</AuthLayout>
+		</AuthContainer>
 	)
 }
