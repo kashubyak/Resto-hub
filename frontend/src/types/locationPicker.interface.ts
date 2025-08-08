@@ -18,7 +18,7 @@ interface AutocompleteSuggestionResult {
 	suggestions: Suggestion[]
 }
 
-export type LocationPickerProps = {
+export interface LocationPickerProps {
 	onSelectLocation: (location: Coordinates) => void
 }
 
