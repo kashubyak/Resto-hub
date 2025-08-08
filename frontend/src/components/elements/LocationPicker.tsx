@@ -1,9 +1,9 @@
 'use client'
 import { useLocationPicker } from '@/hooks/useLocationPicker'
-import type { LocationPickerProps } from '@/shared/LocationPicker'
+import type { LocationPickerProps } from '@/types/locationPicker.interface'
 import Close from '@mui/icons-material/Close'
 import { GoogleMap, Marker } from '@react-google-maps/api'
-import { AuthInput } from './AuthInput'
+import { AuthInput } from '../ui/AuthInput'
 
 const containerStyle = {
 	width: '100%',

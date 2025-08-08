@@ -1,8 +1,9 @@
 'use client'
 
+import { ROUTES } from '@/constants/pages.config'
 import Link from 'next/link'
 
-interface AuthLayoutProps {
+interface AuthContainerProps {
 	title: string
 	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
 	children: React.ReactNode
@@ -10,13 +11,13 @@ interface AuthLayoutProps {
 	isLogin?: boolean
 }
 
-export const AuthLayout = ({
+export const AuthContainer = ({
 	title,
 	onSubmit,
 	children,
 	encType,
 	isLogin = false,
-}: AuthLayoutProps) => {
+}: AuthContainerProps) => {
 	return (
 		<div className='w-screen h-screen bg-background text-foreground flex items-center justify-center p-4'>
 			<div className='w-full max-w-xl bg-muted border border-border text-muted-foreground rounded-xl shadow-xl max-h-10/12 overflow-y-auto p-6'>
@@ -29,7 +30,7 @@ export const AuthLayout = ({
 						<>
 							Don’t have an account?{' '}
 							<Link
-								href='/auth/register'
+								href={ROUTES.AUTH.REGISTER}
 								className='text-primary hover:underline font-medium'
 							>
 								Register here
@@ -39,7 +40,7 @@ export const AuthLayout = ({
 						<>
 							Already have an account?{' '}
 							<Link
-								href='/auth/login'
+								href={ROUTES.AUTH.LOGIN}
 								className='text-primary hover:underline font-medium'
 							>
 								Login here

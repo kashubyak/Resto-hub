@@ -1,10 +1,10 @@
-import { API_URL } from '@/constants/api'
+import { API_URL } from '@/config/api'
 import type {
 	AutocompleteSuggestionStatic,
 	ISearchResult,
 	LocationPickerProps,
 	Suggestion,
-} from '@/shared/LocationPicker'
+} from '@/types/locationPicker.interface'
 import { useJsApiLoader } from '@react-google-maps/api'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
