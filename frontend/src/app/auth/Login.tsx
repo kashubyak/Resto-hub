@@ -1,19 +1,14 @@
 'use client'
 
+import { AuthButton } from '@/components/ui/AuthButton'
 import { AuthInput } from '@/components/ui/AuthInput'
 import { useLogin } from '@/hooks/useLogin'
 import { AuthContainer } from '../../components/container/AuthContainer'
 
 export const Login = () => {
-	const { register, handleSubmit, errors } = useLogin()
+	const { register, handleSubmit, errors, onSubmit } = useLogin()
 	return (
-		<AuthContainer
-			title='Authorization'
-			onSubmit={e => {
-				e.preventDefault()
-			}}
-			isLogin={true}
-		>
+		<AuthContainer title='Authorization' onSubmit={handleSubmit(onSubmit)} isLogin={true}>
 			<div className='space-y-3'>
 				<AuthInput
 					type='text'
@@ -33,6 +28,7 @@ export const Login = () => {
 					register={register('password', { required: 'Password is required' })}
 					error={errors.password?.message}
 				/>
+				<AuthButton type='submit' text='Login' />
 			</div>
 		</AuthContainer>
 	)

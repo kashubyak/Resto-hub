@@ -14,5 +14,8 @@ export const useLogin = () => {
 		watch,
 		clearErrors,
 	} = useForm<IFormValues>()
-	return { register, handleSubmit, errors }
+	const onSubmit = (data: IFormValues) => {
+		console.log(data)
+	}
+	return { register, handleSubmit, errors, onSubmit }
 }
