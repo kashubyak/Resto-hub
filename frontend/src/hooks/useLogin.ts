@@ -1,11 +1,7 @@
+import { login } from '@/services/auth'
+import type { ILogin } from '@/types/login.interface'
 import { useForm } from 'react-hook-form'
 
-interface IFormValues {
-	subdomain: string
-	name: string
-	email: string
-	password: string
-}
 export const useLogin = () => {
 	const {
 		register,
@@ -13,9 +9,9 @@ export const useLogin = () => {
 		formState: { errors },
 		watch,
 		clearErrors,
-	} = useForm<IFormValues>()
-	const onSubmit = (data: IFormValues) => {
-		console.log(data)
+	} = useForm<ILogin>()
+	const onSubmit = async (data: ILogin) => {
+		const response = await login(data)
 	}
 	return { register, handleSubmit, errors, onSubmit }
 }
