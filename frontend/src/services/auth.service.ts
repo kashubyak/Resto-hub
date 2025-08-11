@@ -5,17 +5,6 @@ import api from '@/utils/api'
 import { convertToDays } from '@/utils/convertToDays'
 import Cookies from 'js-cookie'
 
-export const registerCompany = async (formData: FormData) => {
-	const response = await api.post(API_URL.AUTH.REGISTER, formData, {
-		headers: {
-			'Content-Type': 'multipart/form-data',
-		},
-		withCredentials: true,
-	})
-	console.log(response)
-	return response.data
-}
-
 export const login = async (data: ILogin) => {
 	Cookies.set(AUTH.SUBDOMAIN, data.subdomain, {
 		expires: 365,

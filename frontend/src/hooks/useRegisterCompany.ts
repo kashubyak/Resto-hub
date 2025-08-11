@@ -1,4 +1,4 @@
-import { registerCompany } from '@/services/auth'
+import { registerCompany } from '@/services/company.service'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'

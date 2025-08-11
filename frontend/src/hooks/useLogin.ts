@@ -1,4 +1,4 @@
-import { login } from '@/services/auth'
+import { login } from '@/services/auth.service'
 import type { ILogin } from '@/types/login.interface'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
