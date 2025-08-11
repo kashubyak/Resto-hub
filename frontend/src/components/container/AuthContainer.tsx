@@ -1,6 +1,6 @@
 'use client'
 
-import { ROUTES } from '@/constants/pages.config'
+import { ROUTES } from '@/constants/pages'
 import Link from 'next/link'
 
 interface AuthContainerProps {

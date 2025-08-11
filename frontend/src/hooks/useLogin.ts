@@ -1,5 +1,6 @@
 import { login } from '@/services/auth'
 import type { ILogin } from '@/types/login.interface'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
 export const useLogin = () => {
@@ -7,11 +8,18 @@ export const useLogin = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-		watch,
-		clearErrors,
 	} = useForm<ILogin>()
+	const router = useRouter()
+
 	const onSubmit = async (data: ILogin) => {
-		const response = await login(data)
+		try {
+			const response = await login(data)
+			if (response.status === 200) router.push('/')
+			console.log(response)
+		} catch (err) {
+			console.error(err)
+		}
 	}
+
 	return { register, handleSubmit, errors, onSubmit }
 }

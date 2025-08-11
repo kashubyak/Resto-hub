@@ -1,4 +1,6 @@
+import { AUTH } from '@/constants/auth'
 import axios from 'axios'
+import Cookies from 'js-cookie'
 
 const api = axios.create({
 	baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -7,7 +9,7 @@ const api = axios.create({
 
 api.interceptors.request.use(config => {
 	if (typeof window !== 'undefined') {
-		const subdomain = localStorage.getItem('subdomain')
+		const subdomain = Cookies.get(AUTH.SUBDOMAIN)
 		if (subdomain) {
 			const apiBase = process.env.NEXT_PUBLIC_API_URL ?? ''
 			const base = new URL(apiBase)
@@ -16,7 +18,7 @@ api.interceptors.request.use(config => {
 		}
 	}
 
-	const accessToken = localStorage.getItem('access_token')
+	const accessToken = Cookies.get(AUTH.TOKEN)
 	if (accessToken) {
 		config.headers.Authorization = `Bearer ${accessToken}`
 	}
