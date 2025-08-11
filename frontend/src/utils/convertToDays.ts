@@ -12,6 +12,8 @@ export const convertToDays = (timeString: string): number => {
 			return value / 24
 		case 'm':
 			return value / (24 * 60)
+		case 's':
+			return value / (24 * 60 * 60)
 		default:
 			return 1
 	}
