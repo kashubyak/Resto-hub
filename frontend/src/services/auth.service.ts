@@ -1,7 +1,7 @@
 import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth'
 import type { ILogin } from '@/types/login.interface'
-import api from '@/utils/api'
+import api, { setApiSubdomain } from '@/utils/api'
 import { convertToDays } from '@/utils/convertToDays'
 import Cookies from 'js-cookie'
 
@@ -11,6 +11,7 @@ export const login = async (data: ILogin) => {
 		secure: true,
 		sameSite: 'strict',
 	})
+	setApiSubdomain(data.subdomain)
 
 	const response = await api.post(API_URL.AUTH.LOGIN, {
 		email: data.email,

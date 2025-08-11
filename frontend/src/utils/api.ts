@@ -8,22 +8,39 @@ const api = axios.create({
 })
 
 api.interceptors.request.use(config => {
-	if (typeof window !== 'undefined') {
-		const subdomain = Cookies.get(AUTH.SUBDOMAIN)
-		if (subdomain) {
-			const apiBase = process.env.NEXT_PUBLIC_API_URL ?? ''
-			const base = new URL(apiBase)
-			base.hostname = `${subdomain}.localhost`
-			config.baseURL = base.toString()
-		}
+	config.headers = config.headers || {}
+	const token = Cookies.get(AUTH.TOKEN)
+	if (token) {
+		config.headers.Authorization = `Bearer ${token}`
 	}
-
-	const accessToken = Cookies.get(AUTH.TOKEN)
-	if (accessToken) {
-		config.headers.Authorization = `Bearer ${accessToken}`
-	}
-
 	return config
 })
+
+export function setApiSubdomain(subdomain?: string) {
+	const apiBase = process.env.NEXT_PUBLIC_API_URL ?? ''
+	if (!subdomain) {
+		api.defaults.baseURL = apiBase
+		return
+	}
+
+	try {
+		const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+		const url = new URL(apiBase)
+		url.hostname = `${subdomain}.${rootDomain}`
+		api.defaults.baseURL = url.toString()
+	} catch (e) {
+		console.error('Invalid API base URL', e)
+		api.defaults.baseURL = apiBase
+	}
+}
+
+export function initApiFromCookies() {
+	const subdomain = Cookies.get(AUTH.SUBDOMAIN)
+	if (subdomain) setApiSubdomain(subdomain)
+	const token = Cookies.get(AUTH.TOKEN)
+	if (token) {
+		api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+	}
+}
 
 export default api
