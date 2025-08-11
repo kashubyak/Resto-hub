@@ -17,7 +17,11 @@ export const registerCompany = async (formData: FormData) => {
 }
 
 export const login = async (data: ILogin) => {
-	Cookies.set(AUTH.SUBDOMAIN, data.subdomain, { expires: 365 })
+	Cookies.set(AUTH.SUBDOMAIN, data.subdomain, {
+		expires: 365,
+		secure: true,
+		sameSite: 'strict',
+	})
 
 	const response = await api.post(API_URL.AUTH.LOGIN, {
 		email: data.email,
@@ -28,6 +32,8 @@ export const login = async (data: ILogin) => {
 		const TOKEN_EXPIRES_IN = process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d'
 		Cookies.set(AUTH.TOKEN, response.data.token, {
 			expires: convertToDays(TOKEN_EXPIRES_IN),
+			secure: true,
+			sameSite: 'strict',
 		})
 	}
 
