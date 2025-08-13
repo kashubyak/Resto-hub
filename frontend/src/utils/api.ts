@@ -43,7 +43,7 @@ api.interceptors.response.use(
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
-					window.location.href = ROUTES.AUTH.LOGIN
+					window.location.href = ROUTES.PUBLIC.AUTH.LOGIN
 				}
 				return Promise.reject(error)
 			}
@@ -87,7 +87,7 @@ api.interceptors.response.use(
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
 					const currentPath = window.location.pathname
-					const loginUrl = `${ROUTES.AUTH.LOGIN}?redirect=${encodeURIComponent(
+					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(
 						currentPath,
 					)}`
 					window.location.href = loginUrl

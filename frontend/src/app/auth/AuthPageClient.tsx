@@ -9,7 +9,7 @@ import { RegisterCompany } from './RegisterCompany'
 export default function AuthPageClient({ mode }: { mode: string }) {
 	const router = useRouter()
 	useEffect(() => {
-		if (mode !== 'login' && mode !== 'register') router.replace(ROUTES.AUTH.LOGIN)
+		if (mode !== 'login' && mode !== 'register') router.replace(ROUTES.PUBLIC.AUTH.LOGIN)
 	}, [mode, router])
 
 	if (mode === 'login') return <Login />

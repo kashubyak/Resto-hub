@@ -30,7 +30,7 @@ export const AuthContainer = ({
 						<>
 							Don’t have an account?{' '}
 							<Link
-								href={ROUTES.AUTH.REGISTER}
+								href={ROUTES.PUBLIC.AUTH.REGISTER}
 								className='text-primary hover:underline font-medium'
 							>
 								Register here
@@ -40,7 +40,7 @@ export const AuthContainer = ({
 						<>
 							Already have an account?{' '}
 							<Link
-								href={ROUTES.AUTH.LOGIN}
+								href={ROUTES.PUBLIC.AUTH.LOGIN}
 								className='text-primary hover:underline font-medium'
 							>
 								Login here
