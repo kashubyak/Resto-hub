@@ -1,4 +1,6 @@
+import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth'
+import { ROUTES } from '@/constants/pages'
 import { refreshToken } from '@/services/auth.service'
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -38,6 +40,14 @@ api.interceptors.response.use(
 		const originalRequest = error.config
 
 		if (error.response?.status === 401 && !originalRequest._retry) {
+			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
+				if (typeof window !== 'undefined') {
+					Cookies.remove(AUTH.TOKEN)
+					window.location.href = ROUTES.AUTH.LOGIN
+				}
+				return Promise.reject(error)
+			}
+
 			if (isRefreshing) {
 				return new Promise((resolve, reject) => {
 					failedQueue.push({ resolve, reject })
@@ -58,19 +68,31 @@ api.interceptors.response.use(
 				const { token: newToken } = await refreshToken()
 
 				if (newToken) {
+					const tokenExpiresIn = process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d'
 					Cookies.set(AUTH.TOKEN, newToken, {
-						expires: convertToDays(process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d'),
-						secure: true,
+						expires: convertToDays(tokenExpiresIn),
+						secure: process.env.NODE_ENV === 'production',
 						sameSite: 'strict',
 					})
+
 					api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 					processQueue(null, newToken)
 					originalRequest.headers['Authorization'] = `Bearer ${newToken}`
-				}
 
-				return api(originalRequest)
+					return api(originalRequest)
+				}
 			} catch (err) {
 				processQueue(err, null)
+
+				if (typeof window !== 'undefined') {
+					Cookies.remove(AUTH.TOKEN)
+					const currentPath = window.location.pathname
+					const loginUrl = `${ROUTES.AUTH.LOGIN}?redirect=${encodeURIComponent(
+						currentPath,
+					)}`
+					window.location.href = loginUrl
+				}
+
 				return Promise.reject(err)
 			} finally {
 				isRefreshing = false

@@ -31,7 +31,6 @@ export const login = async (data: ILogin) => {
 }
 
 export const refreshToken = async (): Promise<{ token: string }> => {
-	console.log('refreshToken called', API_URL.AUTH.REFRESH)
 	const response = await api.post(API_URL.AUTH.REFRESH, {}, { withCredentials: true })
 	console.log(response)
 

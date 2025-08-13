@@ -1,6 +1,7 @@
+import { API_URL } from '@/config/api'
 import { login } from '@/services/auth.service'
 import type { ILogin } from '@/types/login.interface'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
 export const useLogin = () => {
@@ -10,11 +11,18 @@ export const useLogin = () => {
 		formState: { errors },
 	} = useForm<ILogin>()
 	const router = useRouter()
+	const searchParams = useSearchParams()
 
 	const onSubmit = async (data: ILogin) => {
 		try {
 			const response = await login(data)
-			if (response.status === 200) router.push('/')
+			if (response.status === 200) {
+				const redirectTo = searchParams.get('redirect')
+
+				if (redirectTo && redirectTo.startsWith(API_URL.AUTH.ROOT))
+					router.push(redirectTo)
+				else router.push('/')
+			}
 			console.log(response)
 		} catch (err) {
 			console.error(err)
