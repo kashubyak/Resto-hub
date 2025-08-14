@@ -1,4 +1,5 @@
 import { AUTH } from '@/constants/auth'
+import { convertToDays } from '@/utils/convertToDays'
 import { NextRequest, NextResponse } from 'next/server'
 import { redirectToHome, redirectToLogin } from './redirects'
 import { isAuthRoute, isPublicRoute } from './route-guards'
@@ -12,7 +13,6 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
 	const subdomain = request.cookies.get(AUTH.SUBDOMAIN)?.value
 
 	if (isAuthRoute(pathname) && accessToken) return redirectToHome(request)
-
 	if (!isAuthRoute(pathname)) {
 		if (accessToken) return NextResponse.next()
 		const refreshResult = await refreshAccessToken(request, subdomain)
@@ -21,14 +21,13 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
 			return setNewTokenAndContinue(refreshResult.token)
 		return redirectToLogin(request, pathname)
 	}
-
 	return NextResponse.next()
 }
 
 function setNewTokenAndContinue(token: string): NextResponse {
 	const response = NextResponse.next()
 
-	const expiresInDays = parseInt(process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d')
+	const expiresInDays = convertToDays(process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d')
 
 	response.cookies.set(AUTH.TOKEN, token, {
 		httpOnly: false,

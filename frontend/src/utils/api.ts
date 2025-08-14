@@ -38,7 +38,6 @@ api.interceptors.response.use(
 	response => response,
 	async error => {
 		const originalRequest = error.config
-
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
 				if (typeof window !== 'undefined') {
@@ -47,7 +46,6 @@ api.interceptors.response.use(
 				}
 				return Promise.reject(error)
 			}
-
 			if (isRefreshing) {
 				return new Promise((resolve, reject) => {
 					failedQueue.push({ resolve, reject })
@@ -60,17 +58,16 @@ api.interceptors.response.use(
 					})
 					.catch(err => Promise.reject(err))
 			}
-
 			originalRequest._retry = true
 			isRefreshing = true
-
 			try {
 				const { token: newToken } = await refreshToken()
-
 				if (newToken) {
-					const tokenExpiresIn = process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d'
+					const tokenExpiresInDays = convertToDays(
+						process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d',
+					)
 					Cookies.set(AUTH.TOKEN, newToken, {
-						expires: convertToDays(tokenExpiresIn),
+						expires: tokenExpiresInDays,
 						secure: process.env.NODE_ENV === 'production',
 						sameSite: 'strict',
 					})
@@ -78,12 +75,10 @@ api.interceptors.response.use(
 					api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 					processQueue(null, newToken)
 					originalRequest.headers['Authorization'] = `Bearer ${newToken}`
-
 					return api(originalRequest)
 				}
 			} catch (err) {
 				processQueue(err, null)
-
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
 					const currentPath = window.location.pathname
@@ -92,13 +87,11 @@ api.interceptors.response.use(
 					)}`
 					window.location.href = loginUrl
 				}
-
 				return Promise.reject(err)
 			} finally {
 				isRefreshing = false
 			}
 		}
-
 		return Promise.reject(error)
 	},
 )
@@ -109,7 +102,6 @@ export function setApiSubdomain(subdomain?: string) {
 		api.defaults.baseURL = apiBase
 		return
 	}
-
 	try {
 		const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
 		const url = new URL(apiBase)

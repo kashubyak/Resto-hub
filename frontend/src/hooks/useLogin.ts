@@ -1,4 +1,3 @@
-import { API_URL } from '@/config/api'
 import { login } from '@/services/auth.service'
 import type { ILogin } from '@/types/login.interface'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -19,8 +18,7 @@ export const useLogin = () => {
 			if (response.status === 200) {
 				const redirectTo = searchParams.get('redirect')
 
-				if (redirectTo && redirectTo.startsWith(API_URL.AUTH.ROOT))
-					router.push(redirectTo)
+				if (redirectTo && redirectTo.startsWith('/auth')) router.push(redirectTo)
 				else router.push('/')
 			}
 			console.log(response)
