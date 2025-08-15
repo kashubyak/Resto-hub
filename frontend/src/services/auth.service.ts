@@ -26,8 +26,6 @@ export const login = async (data: ILogin) => {
 			sameSite: 'strict',
 		})
 	}
-	console.log(response)
-
 	return response
 }
 
@@ -36,4 +34,9 @@ export const refreshToken = async (): Promise<{ token: string }> => {
 	console.log(response)
 
 	return response.data
+}
+
+export const logout = async () => {
+	const response = await api.post(API_URL.AUTH.LOGOUT, {}, { withCredentials: true })
+	return response
 }

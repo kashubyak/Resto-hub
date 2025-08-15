@@ -1,7 +1,8 @@
 'use client'
 
 import { AUTH } from '@/constants/auth'
-import { login as loginRequest } from '@/services/auth.service'
+import { ROUTES } from '@/constants/pages'
+import { login as loginRequest, logout as logoutRequest } from '@/services/auth.service'
 import type { IAuthContext, ILogin, IUser } from '@/types/login.interface'
 import { initApiFromCookies } from '@/utils/api'
 import Cookies from 'js-cookie'
@@ -26,11 +27,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		}
 	}
 	const logout = async () => {
-		// make api to logout
-		Cookies.remove(AUTH.TOKEN)
-		Cookies.remove(AUTH.SUBDOMAIN)
-		setUser(null)
-		setIsAuth(false)
+		try {
+			await logoutRequest()
+			Cookies.remove(AUTH.TOKEN)
+			Cookies.remove(AUTH.SUBDOMAIN)
+			setUser(null)
+			setIsAuth(false)
+			window.location.href = `${ROUTES.PUBLIC.AUTH.LOGIN}`
+		} catch (error) {
+			console.log(error)
+		}
 	}
 	const getUser = async () => {
 		// make api to get user
