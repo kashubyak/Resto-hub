@@ -1,4 +1,3 @@
-import { registerCompany } from '@/services/company.service'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -99,9 +98,6 @@ export const useRegisterCompany = () => {
 		formData.append('adminPassword', data.adminPassword)
 		formData.append('logoUrl', data.logoUrl?.[0] || savedFiles.logo!)
 		formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
-
-		const response = await registerCompany(formData)
-		localStorage.setItem('token', response.access_token)
 	}
 	const validateLogo = () => {
 		const logoFiles = watch('logoUrl')
