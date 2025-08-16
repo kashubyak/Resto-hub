@@ -44,7 +44,9 @@ export const useRegisterCompany = () => {
 		watch,
 		setValue,
 		clearErrors,
-	} = useForm<IFormValues>()
+	} = useForm<IFormValues>({
+		mode: 'onChange',
+	})
 	const [location, setLocation] = useState<{
 		lat: number
 		lng: number
