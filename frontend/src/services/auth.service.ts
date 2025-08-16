@@ -26,6 +26,8 @@ export const login = async (data: ILogin) => {
 			sameSite: 'strict',
 		})
 	}
+	console.log(response)
+
 	return response
 }
 

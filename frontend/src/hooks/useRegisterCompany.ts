@@ -1,3 +1,4 @@
+import { useAuth } from '@/providers/AuthContext'
 import { registerCompany } from '@/services/company.service'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -18,6 +19,7 @@ interface IFormValues {
 
 export const useRegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
+	const { login } = useAuth()
 	const [hasMounted, setHasMounted] = useState(false)
 	const [savedPreviews, setSavedPreviews] = useState<{
 		logo: string | null
@@ -98,7 +100,14 @@ export const useRegisterCompany = () => {
 			formData.append('logoUrl', data.logoUrl?.[0] || savedFiles.logo!)
 			formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
 			const response = await registerCompany(formData)
+			console.log(response)
+
 			if (response.status == 201) {
+				await login({
+					subdomain: data.subdomain,
+					email: data.adminEmail,
+					password: data.adminPassword,
+				})
 			}
 		} catch {}
 	}
