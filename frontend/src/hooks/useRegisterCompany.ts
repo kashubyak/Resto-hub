@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation'
+import { registerCompany } from '@/services/company.service'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -43,7 +43,6 @@ export const useRegisterCompany = () => {
 		setValue,
 		clearErrors,
 	} = useForm<IFormValues>()
-	const router = useRouter()
 	const [location, setLocation] = useState<{
 		lat: number
 		lng: number
@@ -86,18 +85,22 @@ export const useRegisterCompany = () => {
 			setStep(1)
 			return
 		}
-
-		const formData = new FormData()
-		formData.append('name', data.name)
-		formData.append('subdomain', data.subdomain)
-		formData.append('address', location.address)
-		formData.append('latitude', String(location.lat))
-		formData.append('longitude', String(location.lng))
-		formData.append('adminName', data.adminName)
-		formData.append('adminEmail', data.adminEmail)
-		formData.append('adminPassword', data.adminPassword)
-		formData.append('logoUrl', data.logoUrl?.[0] || savedFiles.logo!)
-		formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
+		try {
+			const formData = new FormData()
+			formData.append('name', data.name)
+			formData.append('subdomain', data.subdomain)
+			formData.append('address', location.address)
+			formData.append('latitude', String(location.lat))
+			formData.append('longitude', String(location.lng))
+			formData.append('adminName', data.adminName)
+			formData.append('adminEmail', data.adminEmail)
+			formData.append('adminPassword', data.adminPassword)
+			formData.append('logoUrl', data.logoUrl?.[0] || savedFiles.logo!)
+			formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
+			const response = await registerCompany(formData)
+			if (response.status == 201) {
+			}
+		} catch {}
 	}
 	const validateLogo = () => {
 		const logoFiles = watch('logoUrl')
