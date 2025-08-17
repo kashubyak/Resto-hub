@@ -1,7 +1,7 @@
 import Alert from '@mui/material/Alert'
 
 interface IAlertProps {
-	severity: 'error' | 'warning' | 'info' | 'success'
+	severity: 'success' | 'error' | 'info' | 'warning'
 	text: string
 }
 
