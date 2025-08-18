@@ -6,6 +6,16 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { convertToDays } from './convertToDays'
 
+let globalShowAlert:
+	| ((severity: 'error' | 'warning' | 'info' | 'success', text: string) => void)
+	| null = null
+
+export const setGlobalAlertFunction = (
+	showAlert: (severity: 'error' | 'warning' | 'info' | 'success', text: string) => void,
+) => {
+	globalShowAlert = showAlert
+}
+
 const api = axios.create({
 	baseURL: process.env.NEXT_PUBLIC_API_URL,
 	withCredentials: true,
