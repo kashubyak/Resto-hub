@@ -1,19 +1,31 @@
+// frontend/src/utils/api.ts
 import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth'
 import { ROUTES } from '@/constants/pages'
 import { refreshToken } from '@/services/auth.service'
+import type { IApiErrorResponse } from '@/types/error.interface'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { convertToDays } from './convertToDays'
 
 let globalShowAlert:
-	| ((severity: 'error' | 'warning' | 'info' | 'success', text: string) => void)
+	| ((
+			severity: 'error' | 'warning' | 'info' | 'success',
+			text: string | string[],
+	  ) => void)
 	| null = null
 
+let globalShowBackendError: ((error: IApiErrorResponse) => void) | null = null
+
 export const setGlobalAlertFunction = (
-	showAlert: (severity: 'error' | 'warning' | 'info' | 'success', text: string) => void,
+	showAlert: (
+		severity: 'error' | 'warning' | 'info' | 'success',
+		text: string | string[],
+	) => void,
+	showBackendError: (error: IApiErrorResponse) => void,
 ) => {
 	globalShowAlert = showAlert
+	globalShowBackendError = showBackendError
 }
 
 const api = axios.create({
@@ -52,10 +64,13 @@ api.interceptors.response.use(
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
+					Cookies.remove(AUTH.SUBDOMAIN)
+					globalShowAlert?.('warning', 'Your session has expired. Please log in again.')
 					window.location.href = ROUTES.PUBLIC.AUTH.LOGIN
 				}
 				return Promise.reject(error)
 			}
+
 			if (isRefreshing) {
 				return new Promise((resolve, reject) => {
 					failedQueue.push({ resolve, reject })
@@ -68,8 +83,10 @@ api.interceptors.response.use(
 					})
 					.catch(err => Promise.reject(err))
 			}
+
 			originalRequest._retry = true
 			isRefreshing = true
+
 			try {
 				const { token: newToken } = await refreshToken()
 				if (newToken) {
@@ -91,16 +108,37 @@ api.interceptors.response.use(
 				processQueue(err, null)
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
+					Cookies.remove(AUTH.SUBDOMAIN)
 					const currentPath = window.location.pathname
 					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(
 						currentPath,
 					)}`
+
+					if (globalShowBackendError) {
+						globalShowBackendError(err as IApiErrorResponse)
+					} else {
+						globalShowAlert?.(
+							'warning',
+							'Your session has expired. Redirecting to login page.',
+						)
+					}
+
 					window.location.href = loginUrl
 				}
 				return Promise.reject(err)
 			} finally {
 				isRefreshing = false
 			}
+		}
+
+		if (typeof window !== 'undefined' && globalShowBackendError) {
+			const status = error.response?.status
+			const shouldShowAlert =
+				status !== 401 &&
+				!originalRequest.url?.includes(API_URL.AUTH.LOGIN) &&
+				!originalRequest.url?.includes(API_URL.AUTH.REGISTER) &&
+				!originalRequest._hideGlobalError
+			if (shouldShowAlert) globalShowBackendError(error)
 		}
 		return Promise.reject(error)
 	},
@@ -120,6 +158,7 @@ export function setApiSubdomain(subdomain?: string) {
 	} catch (e) {
 		console.error('Invalid API base URL', e)
 		api.defaults.baseURL = apiBase
+		globalShowAlert?.('error', 'Error configuring API')
 	}
 }
 
