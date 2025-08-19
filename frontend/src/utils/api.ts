@@ -1,9 +1,8 @@
-// frontend/src/utils/api.ts
 import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth'
 import { ROUTES } from '@/constants/pages'
 import { refreshToken } from '@/services/auth.service'
-import type { IApiErrorResponse } from '@/types/error.interface'
+import type { IAxiosError } from '@/types/error.interface'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { convertToDays } from './convertToDays'
@@ -15,14 +14,14 @@ let globalShowAlert:
 	  ) => void)
 	| null = null
 
-let globalShowBackendError: ((error: IApiErrorResponse) => void) | null = null
+let globalShowBackendError: ((error: IAxiosError) => void) | null = null
 
 export const setGlobalAlertFunction = (
 	showAlert: (
 		severity: 'error' | 'warning' | 'info' | 'success',
 		text: string | string[],
 	) => void,
-	showBackendError: (error: IApiErrorResponse) => void,
+	showBackendError: (error: IAxiosError) => void,
 ) => {
 	globalShowAlert = showAlert
 	globalShowBackendError = showBackendError
@@ -60,6 +59,17 @@ api.interceptors.response.use(
 	response => response,
 	async error => {
 		const originalRequest = error.config
+
+		if (error.response?.status >= 400) {
+			console.error('API Error:', {
+				status: error.response.status,
+				message: error.response.data?.message,
+				url: error.config?.url,
+				method: error.config?.method,
+				data: error.response.data,
+			})
+		}
+
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
 				if (typeof window !== 'undefined') {
@@ -114,15 +124,12 @@ api.interceptors.response.use(
 						currentPath,
 					)}`
 
-					if (globalShowBackendError) {
-						globalShowBackendError(err as IApiErrorResponse)
-					} else {
+					if (globalShowBackendError) globalShowBackendError(err as IAxiosError)
+					else
 						globalShowAlert?.(
 							'warning',
 							'Your session has expired. Redirecting to login page.',
 						)
-					}
-
 					window.location.href = loginUrl
 				}
 				return Promise.reject(err)
@@ -138,7 +145,7 @@ api.interceptors.response.use(
 				!originalRequest.url?.includes(API_URL.AUTH.LOGIN) &&
 				!originalRequest.url?.includes(API_URL.AUTH.REGISTER) &&
 				!originalRequest._hideGlobalError
-			if (shouldShowAlert) globalShowBackendError(error)
+			if (shouldShowAlert) globalShowBackendError(error as IAxiosError)
 		}
 		return Promise.reject(error)
 	},

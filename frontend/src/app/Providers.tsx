@@ -7,13 +7,22 @@ import { setGlobalAlertFunction } from '@/utils/api'
 import { useEffect } from 'react'
 
 const AlertInitializer = () => {
-	const { showAlert } = useAlert()
+	const { showError, showWarning, showInfo, showSuccess, showBackendError } = useAlert()
 
 	useEffect(() => {
-		setGlobalAlertFunction((severity, text) => {
-			showAlert({ severity, text })
-		})
-	}, [showAlert])
+		setGlobalAlertFunction(
+			(severity, text) => {
+				if (severity === 'error') showError(text)
+				else if (severity === 'warning') showWarning(text)
+				else if (severity === 'info') showInfo(text)
+				else if (severity === 'success')
+					showSuccess(Array.isArray(text) ? text.join(' ') : text)
+			},
+			error => {
+				showBackendError(error)
+			},
+		)
+	}, [showError, showWarning, showInfo, showSuccess, showBackendError])
 
 	return null
 }
