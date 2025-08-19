@@ -63,9 +63,7 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 					showAlert({ severity: 'error', text: message, duration })
 				}, index * 100)
 			})
-		} else {
-			showAlert({ severity: 'error', text, duration })
-		}
+		} else showAlert({ severity: 'error', text, duration })
 	}
 
 	const showWarning = (text: string | string[], duration?: number) => {

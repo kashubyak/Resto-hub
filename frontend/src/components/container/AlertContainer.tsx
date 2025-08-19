@@ -21,14 +21,40 @@ const AlertContainer = styled('div')(({ theme }) => ({
 	},
 }))
 
-const CustomAlert = styled(AlertUI)(({ theme }) => ({
-	'& .MuiAlert-message': {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		width: '100%',
-	},
-}))
+const CustomAlert = styled(AlertUI)<{ severity: string }>(({ severity }) => {
+	let background = 'var(--muted)'
+	let color = 'var(--foreground)'
+
+	if (severity === 'success') {
+		background = 'var(--primary)'
+		color = 'var(--primary-foreground)'
+	} else if (severity === 'error') {
+		background = 'var(--destructive)'
+		color = 'var(--destructive-foreground)'
+	} else if (severity === 'warning') {
+		background = 'var(--warning)'
+		color = 'var(--warning-foreground)'
+	} else if (severity === 'info') {
+		background = 'var(--info)'
+		color = 'var(--info-foreground)'
+	}
+
+	return {
+		backgroundColor: background,
+		color,
+		border: '1px solid var(--border)',
+		'& .MuiAlert-icon': {
+			color,
+		},
+		'& .MuiAlert-message': {
+			color,
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			width: '100%',
+		},
+	}
+})
 
 export const AlertDisplay = () => {
 	const { alerts, removeAlert } = useAlert()
@@ -50,9 +76,7 @@ export const AlertDisplay = () => {
 							transform: 'translateY(-50%)',
 							color: 'inherit',
 							opacity: 0.7,
-							'&:hover': {
-								opacity: 1,
-							},
+							'&:hover': { opacity: 1 },
 						}}
 					>
 						<CloseIcon fontSize='small' />

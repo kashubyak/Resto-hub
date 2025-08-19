@@ -32,6 +32,11 @@ const api = axios.create({
 	withCredentials: true,
 })
 
+export const refreshApi = axios.create({
+	baseURL: process.env.NEXT_PUBLIC_API_URL,
+	withCredentials: true,
+})
+
 api.interceptors.request.use(config => {
 	config.headers = config.headers || {}
 	const token = Cookies.get(AUTH.TOKEN)
