@@ -1,5 +1,8 @@
+import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
 import { registerCompany } from '@/services/company.service'
+import { toAxiosError } from '@/utils/errorConverter'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -20,6 +23,9 @@ interface IFormValues {
 export const useRegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
 	const { login } = useAuth()
+	const { showSuccess, showBackendError } = useAlert()
+	const searchParams = useSearchParams()
+	const router = useRouter()
 	const [hasMounted, setHasMounted] = useState(false)
 	const [savedPreviews, setSavedPreviews] = useState<{
 		logo: string | null
@@ -111,7 +117,17 @@ export const useRegisterCompany = () => {
 					password: data.adminPassword,
 				})
 			}
-		} catch {}
+			showSuccess('Register company successful!')
+			const redirectTo = searchParams.get('redirect')
+			if (redirectTo && redirectTo.startsWith('/auth')) {
+				router.push(redirectTo)
+			} else {
+				router.push('/')
+			}
+		} catch (err) {
+			console.error('Login error:', err)
+			showBackendError(toAxiosError(err))
+		}
 	}
 	const validateLogo = () => {
 		const logoFiles = watch('logoUrl')

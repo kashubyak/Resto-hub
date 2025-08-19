@@ -52,6 +52,7 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 	}
 
 	const showSuccess = (text: string, duration?: number) => {
+		console.log(text)
 		showAlert({ severity: 'success', text, duration })
 	}
 
