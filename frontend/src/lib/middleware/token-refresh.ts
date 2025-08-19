@@ -34,12 +34,5 @@ export async function refreshAccessToken(request: NextRequest): Promise<RefreshR
 }
 
 function buildRefreshUrl(): string {
-	const apiUrl = process.env.NEXT_PUBLIC_API_URL
-	console.log('API URL:', apiUrl)
-
-	if (!apiUrl) throw new Error('NEXT_PUBLIC_API_URL not configured')
-
-	const finalUrl = `${apiUrl}${API_URL.AUTH.REFRESH}`
-	console.log('Built URL:', finalUrl)
-	return finalUrl
+	return `${process.env.NEXT_PUBLIC_API_URL}${API_URL.AUTH.REFRESH}`
 }
