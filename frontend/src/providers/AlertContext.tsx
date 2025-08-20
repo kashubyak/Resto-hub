@@ -39,7 +39,7 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 		const id = generateId()
 		const newAlert: IAlert = { ...alert, id }
 		setAlerts(prev => [...prev, newAlert])
-		const duration = alert.duration ?? 5000
+		const duration = alert.duration ?? 0
 		if (duration > 0) {
 			setTimeout(() => {
 				removeAlert(id)

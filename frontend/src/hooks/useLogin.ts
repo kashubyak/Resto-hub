@@ -13,13 +13,16 @@ export const useLogin = () => {
 	} = useForm<ILogin>()
 	const router = useRouter()
 	const { login } = useAuth()
-	const { showSuccess, showBackendError } = useAlert()
+	const { showSuccess, showError, showInfo, showWarning, showBackendError } = useAlert()
 	const searchParams = useSearchParams()
 
 	const onSubmit = async (data: ILogin) => {
 		try {
 			await login(data)
 			showSuccess('Login successful!')
+			showInfo('Redirecting to your dashboard...')
+			showError('An error occurred while logging in.')
+			showWarning('Please check your credentials and try again.')
 			const redirectTo = searchParams.get('redirect')
 			if (redirectTo && redirectTo.startsWith('/auth')) {
 				router.push(redirectTo)
@@ -27,7 +30,6 @@ export const useLogin = () => {
 				router.push('/')
 			}
 		} catch (err: unknown) {
-			console.error('Login error:', err)
 			showBackendError(toAxiosError(err))
 		}
 	}
