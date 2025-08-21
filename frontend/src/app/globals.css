@@ -1,28 +1,29 @@
 @import 'tailwindcss';
 
 :root {
-	--background: #fff;
-	--foreground: #171717;
-	--muted: #f9fafb;
-	--muted-hover: #f3f4f6;
-	--muted-foreground: #6b7280;
-	--primary: #4ade80;
-	--primary-foreground: #052e16;
-	--primary-hover: #40b269;
-	--secondary: #22d3ee;
-	--secondary-foreground: #042c3a;
-	--secondary-hover: #1eb7d6;
+	--background: #fcfcfc;
+	--foreground: #0a0e13;
+	--muted: #f5f6fa;
+	--muted-hover: #f1f2f8;
+	--muted-foreground: #48536b;
+	--primary: #207be6;
+	--primary-foreground: #ffffff;
+	--primary-hover: #328df6;
+	--secondary: #f5f6fa;
+	--secondary-foreground: #8c8e92;
+	--secondary-hover: #f1f2f8;
 	--success: #52bc52;
 	--success-hover: #40b269;
-	--destructive: #ef4444;
+	--destructive: #c20b0a;
 	--destructive-hover: #dc2626;
 	--warning: #facc15;
 	--warning-hover: #eab308;
-	--info: #62aefe;
-	--info-hover: #3b82f6;
-	--border: #e5e7eb;
-	--input: #f3f4f6;
+	--info: #047af2;
+	--info-hover: #68aaf1;
+	--border: #e0e4ec;
+	--input: #f5f6fa;
 	--stable-light: #fff;
+	--active-item: #e8eaf1;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,22 +32,22 @@
 		--foreground: #fff;
 		--muted: #0a0e13;
 		--muted-hover: #151a24;
-		--muted-foreground: #a3a3a3;
-		--primary: #62aefe;
-		--primary-foreground: #0f291e;
-		--primary-hover: #3bbd6c;
+		--muted-foreground: #949fb7;
+		--primary: #3187f3;
+		--primary-foreground: #e0e6f2;
+		--primary-hover: #3b82f6;
 		--secondary: #0c1018;
-		--secondary-foreground: #6b7488;
-		--secondary-hover: #1aa8c9;
+		--secondary-foreground: #b7b8ba;
+		--secondary-hover: #151a24;
 		--success: #52bc52;
 		--success-hover: #40b269;
 		--destructive: #c20b0a;
 		--destructive-hover: #dc2626;
 		--warning: #facc15;
 		--warning-hover: #eab308;
-		--info: #3187f3;
-		--info-hover: #2769b9;
-		--border: #212732;
+		--info: #047af2;
+		--info-hover: #68aaf1;
+		--border: #242a37;
 		--input: #0e1217;
 		--stable-light: #fff;
 		--active-item: #73777f;
