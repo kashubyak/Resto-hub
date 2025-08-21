@@ -74,7 +74,7 @@ export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) =>
 							borderColor: error ? 'var(--destructive)' : 'var(--border)',
 						},
 						'&.Mui-focused fieldset': {
-							borderColor: error ? 'var(--destructive)' : 'var(--ring)',
+							borderColor: error ? 'var(--destructive)' : 'var(--primary)',
 							borderWidth: '2px',
 						},
 					},
@@ -83,7 +83,7 @@ export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) =>
 							? 'var(--destructive)'
 							: 'color-mix(in oklab, var(--foreground) 70%, transparent)',
 						'&.Mui-focused': {
-							color: error ? 'var(--destructive)' : 'var(--ring)',
+							color: error ? 'var(--destructive)' : 'var(--primary)',
 						},
 					},
 					'& .MuiFormHelperText-root': {

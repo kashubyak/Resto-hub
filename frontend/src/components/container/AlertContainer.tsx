@@ -22,21 +22,17 @@ const AlertContainer = styled('div')(() => ({
 }))
 
 const CustomAlert = styled(AlertUI)<{ severity: string }>(({ severity }) => {
-	let background = 'var(--muted)'
+	const background = 'var(--muted)'
 	let color = 'var(--foreground)'
 
 	if (severity === 'success') {
-		background = 'var(--primary)'
-		color = 'var(--primary-foreground)'
+		color = 'var(--success)'
 	} else if (severity === 'error') {
-		background = 'var(--destructive)'
-		color = 'var(--destructive-foreground)'
+		color = 'var(--destructive)'
 	} else if (severity === 'warning') {
-		background = 'var(--warning)'
-		color = 'var(--warning-foreground)'
+		color = 'var(--warning)'
 	} else if (severity === 'info') {
-		background = 'var(--info)'
-		color = 'var(--info-foreground)'
+		color = 'var(--info)'
 	}
 
 	return {

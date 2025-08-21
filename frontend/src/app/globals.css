@@ -12,18 +12,17 @@
 	--secondary: #22d3ee;
 	--secondary-foreground: #042c3a;
 	--secondary-hover: #1eb7d6;
+	--success: #52bc52;
+	--success-hover: #40b269;
 	--destructive: #ef4444;
-	--destructive-foreground: #fff1f2;
 	--destructive-hover: #dc2626;
 	--warning: #facc15;
-	--warning-foreground: #1f1f00;
 	--warning-hover: #eab308;
-	--info: #3b82f6;
-	--info-foreground: #eff6ff;
-	--info-hover: #2563eb;
+	--info: #62aefe;
+	--info-hover: #3b82f6;
 	--border: #e5e7eb;
 	--input: #f3f4f6;
-	--ring: #4ade80;
+	--stable-light: #fff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -39,18 +38,17 @@
 		--secondary: #22d3ee;
 		--secondary-foreground: #042c3a;
 		--secondary-hover: #1aa8c9;
-		--destructive: #ef4444;
-		--destructive-foreground: #fff1f2;
+		--success: #52bc52;
+		--success-hover: #40b269;
+		--destructive: #c20b0a;
 		--destructive-hover: #dc2626;
 		--warning: #facc15;
-		--warning-foreground: #1f1f00;
 		--warning-hover: #eab308;
-		--info: #3b82f6;
-		--info-foreground: #eff6ff;
-		--info-hover: #2563eb;
+		--info: #3187f3;
+		--info-hover: #2769b9;
 		--border: #262626;
 		--input: #1e1e1e;
-		--ring: #4ade80;
+		--stable-light: #fff;
 	}
 }
 
@@ -109,11 +107,8 @@ body {
 	.border-border {
 		border-color: var(--border);
 	}
-	.bg-input {
-		background-color: var(--input);
-	}
-	.focus\:ring-ring:focus {
-		box-shadow: 0 0 0 2px var(--ring);
+	.focus\:ring-primary:focus {
+		box-shadow: 0 0 0 2px var(--primary);
 	}
 	.hover\:bg-hover:hover {
 		background-color: var(--muted-hover);
