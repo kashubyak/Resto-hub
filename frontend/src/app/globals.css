@@ -24,7 +24,6 @@
 	--border: #e5e7eb;
 	--input: #f3f4f6;
 	--ring: #4ade80;
-	--active: #e5e5e5;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,7 +51,6 @@
 		--border: #262626;
 		--input: #1e1e1e;
 		--ring: #4ade80;
-		--active: #2a2a2a;
 	}
 }
 
@@ -119,9 +117,6 @@ body {
 	}
 	.hover\:bg-hover:hover {
 		background-color: var(--muted-hover);
-	}
-	.active\:bg-active:active {
-		background-color: var(--active);
 	}
 	.hover\:bg-primary:hover {
 		background-color: var(--primary-hover);

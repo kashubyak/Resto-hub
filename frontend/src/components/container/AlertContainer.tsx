@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
 import { AlertUI } from '../ui/Alert'
 
-const AlertContainer = styled('div')(({ theme }) => ({
+const AlertContainer = styled('div')(() => ({
 	position: 'fixed',
 	top: '20px',
 	right: '20px',
