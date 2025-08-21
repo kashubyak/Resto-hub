@@ -27,16 +27,16 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--background: #000;
-		--foreground: #e5e5e5;
-		--muted: #1a1a1a;
-		--muted-hover: #1e1e1e;
+		--background: #05070a;
+		--foreground: #fff;
+		--muted: #0a0e13;
+		--muted-hover: #151a24;
 		--muted-foreground: #a3a3a3;
-		--primary: #4ade80;
+		--primary: #62aefe;
 		--primary-foreground: #0f291e;
 		--primary-hover: #3bbd6c;
-		--secondary: #22d3ee;
-		--secondary-foreground: #042c3a;
+		--secondary: #0c1018;
+		--secondary-foreground: #6b7488;
 		--secondary-hover: #1aa8c9;
 		--success: #52bc52;
 		--success-hover: #40b269;
@@ -46,9 +46,10 @@
 		--warning-hover: #eab308;
 		--info: #3187f3;
 		--info-hover: #2769b9;
-		--border: #262626;
-		--input: #1e1e1e;
+		--border: #212732;
+		--input: #0e1217;
 		--stable-light: #fff;
+		--active-item: #73777f;
 	}
 }
 

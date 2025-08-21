@@ -77,6 +77,9 @@ export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) =>
 							borderColor: error ? 'var(--destructive)' : 'var(--primary)',
 							borderWidth: '2px',
 						},
+						'&.Mui-error fieldset': {
+							borderColor: 'var(--destructive) !important',
+						},
 					},
 					'& .MuiInputLabel-root': {
 						color: error
