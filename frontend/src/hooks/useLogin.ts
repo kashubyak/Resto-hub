@@ -20,6 +20,7 @@ export const useLogin = () => {
 		try {
 			await login(data)
 			showSuccess('Login successful!')
+			//
 			showSuccess('Login successful!')
 			showInfo('Redirecting to your dashboard...')
 			showError('An error occurred while logging in.')

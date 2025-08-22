@@ -4,7 +4,6 @@ import { useAlert } from '@/providers/AlertContext'
 import CloseIcon from '@mui/icons-material/Close'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
-import { useRef } from 'react'
 import { AlertUI } from '../ui/Alert'
 
 const AlertContainer = styled('div')(() => ({
@@ -19,13 +18,11 @@ const AlertContainer = styled('div')(() => ({
 	'& .MuiAlert-root': {
 		boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
 		borderRadius: '8px',
-		whiteSpace: 'pre-line',
 	},
 }))
 
 export const AlertDisplay = () => {
-	const { alerts, removeAlert } = useAlert()
-	const hoverTimers = useRef<Record<string, NodeJS.Timeout>>({})
+	const { alerts, removeAlert, pauseAlertTimer, resumeAlertTimer } = useAlert()
 
 	if (alerts.length === 0) return null
 
@@ -35,12 +32,8 @@ export const AlertDisplay = () => {
 				<div
 					key={alert.id}
 					style={{ position: 'relative' }}
-					onMouseEnter={() => {
-						clearTimeout(hoverTimers.current[alert.id])
-					}}
-					onMouseLeave={() => {
-						hoverTimers.current[alert.id] = setTimeout(() => removeAlert(alert.id), 2000)
-					}}
+					onMouseEnter={() => pauseAlertTimer(alert.id)}
+					onMouseLeave={() => resumeAlertTimer(alert.id)}
 				>
 					<AlertUI severity={alert.severity} text={alert.text} />
 					<IconButton

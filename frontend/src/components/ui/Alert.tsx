@@ -6,5 +6,9 @@ interface IAlertProps {
 }
 
 export const AlertUI = ({ severity, text }: IAlertProps) => {
-	return <Alert severity={severity}>{text}</Alert>
+	return (
+		<Alert severity={severity} sx={{ whiteSpace: 'pre-line' }}>
+			{text}
+		</Alert>
+	)
 }
