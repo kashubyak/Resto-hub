@@ -1,5 +1,5 @@
 import { API_URL } from '@/config/api'
-import { AUTH } from '@/constants/auth'
+import { AUTH } from '@/constants/auth.constant'
 import type { ILogin } from '@/types/login.interface'
 import api, { refreshApi, setApiSubdomain } from '@/utils/api'
 import { convertToDays } from '@/utils/convertToDays'

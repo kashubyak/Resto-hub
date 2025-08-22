@@ -1,6 +1,6 @@
 'use client'
-import { AUTH } from '@/constants/auth'
-import { ROUTES } from '@/constants/pages'
+import { AUTH } from '@/constants/auth.constant'
+import { ROUTES } from '@/constants/pages.constant'
 import { login as loginRequest, logout as logoutRequest } from '@/services/auth.service'
 import { getCurrentUser } from '@/services/user.service'
 import { useAuthStore } from '@/store/auth.store'

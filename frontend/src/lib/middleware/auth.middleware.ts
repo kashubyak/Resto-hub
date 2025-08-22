@@ -1,4 +1,4 @@
-import { AUTH } from '@/constants/auth'
+import { AUTH } from '@/constants/auth.constant'
 import { convertToDays } from '@/utils/convertToDays'
 import { NextRequest, NextResponse } from 'next/server'
 import { redirectToHome, redirectToLogin } from './redirects'
