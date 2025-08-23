@@ -1,5 +1,6 @@
 import { DEFAULT_DURATION_ALERT } from '@/constants/alert.constant'
 import type { IAxiosError } from '@/types/error.interface'
+import { setGlobalAlertFunction } from '@/utils/api'
 import { parseBackendError } from '@/utils/errorHandler'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
@@ -135,6 +136,16 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 		return () => {
 			Object.keys(timers.current).forEach(clearTimer)
 		}
+	}, [])
+	useEffect(() => {
+		setGlobalAlertFunction(
+			(severity, text) =>
+				showAlert({
+					severity,
+					text: Array.isArray(text) ? text.join('\n') : text,
+				}),
+			showBackendError,
+		)
 	}, [])
 
 	return (

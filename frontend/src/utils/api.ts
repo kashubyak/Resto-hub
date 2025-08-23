@@ -61,20 +61,16 @@ const processQueue = (error: unknown, token: string | null = null) => {
 }
 
 api.interceptors.response.use(
-	response => response,
+	response => {
+		if (response.config.url?.includes(API_URL.AUTH.LOGIN))
+			globalShowAlert?.('success', 'Successfully logged in.')
+		if (response.config.url?.includes(API_URL.AUTH.REGISTER))
+			globalShowAlert?.('success', 'Account created successfully.')
+
+		return response
+	},
 	async error => {
 		const originalRequest = error.config
-
-		if (error.response?.status >= 400) {
-			console.error('API Error:', {
-				status: error.response.status,
-				message: error.response.data?.message,
-				url: error.config?.url,
-				method: error.config?.method,
-				data: error.response.data,
-			})
-		}
-
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
 				if (typeof window !== 'undefined') {
@@ -117,6 +113,8 @@ api.interceptors.response.use(
 					api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 					processQueue(null, newToken)
 					originalRequest.headers['Authorization'] = `Bearer ${newToken}`
+
+					globalShowAlert?.('info', 'Session refreshed successfully.')
 					return api(originalRequest)
 				}
 			} catch (err) {
@@ -130,11 +128,12 @@ api.interceptors.response.use(
 					)}`
 
 					if (globalShowBackendError) globalShowBackendError(err as IAxiosError)
-					else
+					else {
 						globalShowAlert?.(
 							'warning',
 							'Your session has expired. Redirecting to login page.',
 						)
+					}
 					window.location.href = loginUrl
 				}
 				return Promise.reject(err)
@@ -152,6 +151,8 @@ api.interceptors.response.use(
 				!originalRequest._hideGlobalError
 			if (shouldShowAlert) globalShowBackendError(error as IAxiosError)
 		}
+		if (!error.response)
+			globalShowAlert?.('error', 'Network error. Please check your internet connection.')
 		return Promise.reject(error)
 	},
 )
