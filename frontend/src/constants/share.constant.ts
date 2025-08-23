@@ -1,1 +1,1 @@
-export const DEFAULT_DURATION_ALERT = 5000
+export const DEFAULT_DURATION_ALERT = 0

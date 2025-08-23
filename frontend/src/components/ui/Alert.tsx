@@ -1,5 +1,6 @@
 import Alert from '@mui/material/Alert'
 import { styled } from '@mui/material/styles'
+import { useState } from 'react'
 
 interface IAlertProps {
 	severity: 'success' | 'error' | 'info' | 'warning'
@@ -7,13 +8,17 @@ interface IAlertProps {
 }
 
 const CustomAlert = styled(Alert)(({ theme }) => ({
-	borderRadius: '8px',
+	borderRadius: '10px',
 	fontSize: '14px',
-	color: 'var(--foreground)',
-	backgroundColor: 'var(--muted)',
-	border: `1px solid var(--border)`,
+	padding: '10px 40px 10px 12px',
+	lineHeight: 1.4,
 	'& .MuiAlert-icon': {
-		color: 'inherit',
+		marginRight: '8px',
+		fontSize: '20px',
+		alignSelf: 'flex-start',
+	},
+	'& .MuiAlert-message': {
+		flex: 1,
 	},
 	'&.MuiAlert-standardSuccess': {
 		backgroundColor: 'var(--success)',
@@ -46,9 +51,29 @@ const CustomAlert = styled(Alert)(({ theme }) => ({
 }))
 
 export const AlertUI = ({ severity, text }: IAlertProps) => {
+	const [expanded, setExpanded] = useState(false)
+	const maxLength = 100
+
+	const isLong = text.length > maxLength
+	const displayText = expanded || !isLong ? text : text.slice(0, maxLength) + '...'
+
 	return (
-		<CustomAlert severity={severity} sx={{ whiteSpace: 'pre-line' }}>
-			{text}
+		<CustomAlert severity={severity}>
+			<span>{displayText}</span>
+			{isLong && (
+				<span
+					style={{
+						marginLeft: '8px',
+						textDecoration: 'underline',
+						cursor: 'pointer',
+						fontSize: '12px',
+						opacity: 0.8,
+					}}
+					onClick={() => setExpanded(!expanded)}
+				>
+					{expanded ? 'Show less' : 'Show more'}
+				</span>
+			)}
 		</CustomAlert>
 	)
 }

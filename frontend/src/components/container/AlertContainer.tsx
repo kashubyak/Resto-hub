@@ -13,11 +13,11 @@ const AlertContainer = styled('div')(() => ({
 	zIndex: 9999,
 	display: 'flex',
 	flexDirection: 'column',
-	gap: '8px',
-	maxWidth: '400px',
+	gap: '12px',
+	maxWidth: '420px',
 	'& .MuiAlert-root': {
 		boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-		borderRadius: '8px',
+		borderRadius: '10px',
 	},
 }))
 
@@ -41,9 +41,8 @@ export const AlertDisplay = () => {
 						onClick={() => removeAlert(alert.id)}
 						sx={{
 							position: 'absolute',
-							right: 8,
-							top: '50%',
-							transform: 'translateY(-50%)',
+							right: 6,
+							top: 6,
 							color: 'inherit',
 							opacity: 0.7,
 							'&:hover': { opacity: 1 },
