@@ -13,20 +13,13 @@ export const useLogin = () => {
 	} = useForm<ILogin>()
 	const router = useRouter()
 	const { login } = useAuth()
-	const { showSuccess, showError, showInfo, showWarning, showBackendError } = useAlert()
+	const { showSuccess, showBackendError } = useAlert()
 	const searchParams = useSearchParams()
 
 	const onSubmit = async (data: ILogin) => {
 		try {
 			await login(data)
 			showSuccess('Login successful!')
-			//
-			showSuccess('Login successful!')
-			showInfo('Redirecting to your dashboard...')
-			showError('An error occurred while logging in.')
-			showWarning(
-				'Please check your credentials and try again.Please check your credentials and try again.Please check your credentials and try again.',
-			)
 			const redirectTo = searchParams.get('redirect')
 			if (redirectTo && redirectTo.startsWith('/auth')) {
 				router.push(redirectTo)
