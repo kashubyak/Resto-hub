@@ -13,7 +13,7 @@ const AlertContainer = styled('div')(() => ({
 	zIndex: 9999,
 	display: 'flex',
 	flexDirection: 'column',
-	gap: '12px',
+	gap: '8px',
 	maxWidth: '420px',
 	'& .MuiAlert-root': {
 		boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',

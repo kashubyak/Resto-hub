@@ -1,4 +1,4 @@
-import { DEFAULT_DURATION_ALERT } from '@/constants/share.constant'
+import { DEFAULT_DURATION_ALERT } from '@/constants/alert.constant'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'

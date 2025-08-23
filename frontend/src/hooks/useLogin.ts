@@ -24,7 +24,9 @@ export const useLogin = () => {
 			showSuccess('Login successful!')
 			showInfo('Redirecting to your dashboard...')
 			showError('An error occurred while logging in.')
-			showWarning('Please check your credentials and try again.')
+			showWarning(
+				'Please check your credentials and try again.Please check your credentials and try again.Please check your credentials and try again.',
+			)
 			const redirectTo = searchParams.get('redirect')
 			if (redirectTo && redirectTo.startsWith('/auth')) {
 				router.push(redirectTo)
