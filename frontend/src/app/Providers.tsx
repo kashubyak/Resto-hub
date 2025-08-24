@@ -3,11 +3,13 @@
 import { AlertDisplay } from '@/components/container/AlertContainer'
 import { AlertProvider, useAlert } from '@/providers/AlertContext'
 import { AuthProvider } from '@/providers/AuthContext'
+import { useAlertStore } from '@/store/alert.store'
 import { setGlobalAlertFunction } from '@/utils/api'
 import { useEffect } from 'react'
 
 const AlertInitializer = () => {
-	const { showError, showWarning, showInfo, showSuccess, showBackendError } = useAlert()
+	const { showError, showWarning, showInfo, showSuccess, showBackendError, showAlert } =
+		useAlert()
 
 	useEffect(() => {
 		setGlobalAlertFunction(
@@ -24,6 +26,16 @@ const AlertInitializer = () => {
 		)
 	}, [showError, showWarning, showInfo, showSuccess, showBackendError])
 
+	useEffect(() => {
+		const pending = useAlertStore.getState().consumePendingAlert()
+		if (pending) {
+			showAlert({
+				severity: pending.severity,
+				text: pending.text,
+				duration: pending.duration,
+			})
+		}
+	}, [showAlert])
 	return null
 }
 
