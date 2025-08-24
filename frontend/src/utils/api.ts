@@ -13,14 +13,10 @@ import { parseBackendError } from './errorHandler'
 let globalShowAlert: ((severity: AlertSeverity, text: string | string[]) => void) | null =
 	null
 
-let globalShowBackendError: ((error: IAxiosError) => void) | null = null
-
-export const setGlobalAlertFunction = (
+export function setGlobalAlertFunction(
 	showAlert: (severity: AlertSeverity, text: string | string[]) => void,
-	showBackendError: (error: IAxiosError) => void,
-) => {
+) {
 	globalShowAlert = showAlert
-	globalShowBackendError = showBackendError
 }
 
 const api = axios.create({
@@ -144,7 +140,7 @@ api.interceptors.response.use(
 			}
 		}
 
-		if (typeof window !== 'undefined' && globalShowBackendError) {
+		if (typeof window !== 'undefined') {
 			const status = error.response?.status
 			const shouldShowAlert =
 				status !== 401 &&
