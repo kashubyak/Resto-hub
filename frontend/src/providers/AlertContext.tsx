@@ -2,7 +2,14 @@ import { DEFAULT_DURATION_ALERT } from '@/constants/alert.constant'
 import type { IAxiosError } from '@/types/error.interface'
 import { setGlobalAlertFunction } from '@/utils/api'
 import { parseBackendError } from '@/utils/errorHandler'
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react'
 
 interface IAlert {
 	id: string
@@ -43,22 +50,33 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const generateId = () => `alert-${Date.now()}-${Math.random()}`
 
-	const clearTimer = (id: string) => {
+	const clearTimer = useCallback((id: string) => {
 		const t = timers.current[id]
 		if (t) {
 			clearTimeout(t)
 			delete timers.current[id]
 		}
-	}
+	}, [])
 
-	const startTimer = (id: string, duration: number) => {
-		if (duration > 0) {
+	const removeAlert = useCallback(
+		(id: string) => {
 			clearTimer(id)
-			timers.current[id] = setTimeout(() => {
-				removeAlert(id)
-			}, duration)
-		}
-	}
+			setAlerts(prev => prev.filter(a => a.id !== id))
+		},
+		[clearTimer],
+	)
+
+	const startTimer = useCallback(
+		(id: string, duration: number) => {
+			if (duration > 0) {
+				clearTimer(id)
+				timers.current[id] = setTimeout(() => {
+					removeAlert(id)
+				}, duration)
+			}
+		},
+		[clearTimer, removeAlert],
+	)
 
 	const pauseAlertTimer = (id: string) => {
 		clearTimer(id)
@@ -71,34 +89,32 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 		startTimer(id, duration)
 	}
 
-	const showAlert = (alert: Omit<IAlert, 'id'>) => {
-		setAlerts(prev => {
-			const existing = prev.find(a => a.severity === alert.severity)
-			if (existing) {
-				const merged: IAlert = {
-					...existing,
-					text: `${existing.text}\n${alert.text}`.trim(),
+	const showAlert = useCallback(
+		(alert: Omit<IAlert, 'id'>) => {
+			setAlerts(prev => {
+				const existing = prev.find(a => a.severity === alert.severity)
+				if (existing) {
+					const merged: IAlert = {
+						...existing,
+						text: `${existing.text}\n${alert.text}`.trim(),
+					}
+					const d = existing.duration ?? alert.duration ?? DEFAULT_DURATION_ALERT
+					startTimer(existing.id, d)
+					return prev.map(a => (a.id === existing.id ? merged : a))
 				}
-				const d = existing.duration ?? alert.duration ?? DEFAULT_DURATION_ALERT
-				startTimer(existing.id, d)
-				return prev.map(a => (a.id === existing.id ? merged : a))
-			}
 
-			const id = generateId()
-			const newAlert: IAlert = {
-				...alert,
-				id,
-				duration: alert.duration ?? DEFAULT_DURATION_ALERT,
-			}
-			startTimer(id, newAlert.duration!)
-			return [...prev, newAlert]
-		})
-	}
-
-	const removeAlert = (id: string) => {
-		clearTimer(id)
-		setAlerts(prev => prev.filter(a => a.id !== id))
-	}
+				const id = generateId()
+				const newAlert: IAlert = {
+					...alert,
+					id,
+					duration: alert.duration ?? DEFAULT_DURATION_ALERT,
+				}
+				startTimer(id, newAlert.duration!)
+				return [...prev, newAlert]
+			})
+		},
+		[startTimer],
+	)
 
 	const showSuccess = (text: string | string[], duration?: number) =>
 		showAlert({
@@ -107,12 +123,15 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 			duration,
 		})
 
-	const showError = (text: string | string[], duration?: number) =>
-		showAlert({
-			severity: 'error',
-			text: Array.isArray(text) ? text.join('\n') : text,
-			duration,
-		})
+	const showError = useCallback(
+		(text: string | string[], duration?: number) =>
+			showAlert({
+				severity: 'error',
+				text: Array.isArray(text) ? text.join('\n') : text,
+				duration,
+			}),
+		[showAlert],
+	)
 
 	const showWarning = (text: string | string[], duration?: number) =>
 		showAlert({
@@ -128,15 +147,20 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 			duration,
 		})
 
-	const showBackendError = (error: IAxiosError, duration?: number) => {
-		const errorMessages = parseBackendError(error)
-		showError(errorMessages, duration)
-	}
+	const showBackendError = useCallback(
+		(error: IAxiosError, duration?: number) => {
+			const errorMessages = parseBackendError(error)
+			showError(errorMessages, duration)
+		},
+		[showError],
+	)
+
 	useEffect(() => {
 		return () => {
 			Object.keys(timers.current).forEach(clearTimer)
 		}
-	}, [])
+	}, [clearTimer])
+
 	useEffect(() => {
 		setGlobalAlertFunction(
 			(severity, text) =>
@@ -146,7 +170,7 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 				}),
 			showBackendError,
 		)
-	}, [])
+	}, [showAlert, showBackendError])
 
 	return (
 		<AlertContext.Provider

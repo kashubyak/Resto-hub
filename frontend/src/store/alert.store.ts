@@ -11,7 +11,7 @@ interface IAlertStore {
 	setPendingAlert: (alert: IPendingAlert) => void
 	consumePendingAlert: () => IPendingAlert | null
 }
-export const useAlertStore = create<IAlertStore>(set => ({
+export const useAlertStore = create<IAlertStore>(() => ({
 	setPendingAlert: alert => {
 		localStorage.setItem('pending-alert', JSON.stringify(alert))
 	},
