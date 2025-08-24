@@ -52,13 +52,7 @@ export const AlertUI = ({ severity, text }: IAlertProps) => {
 			<span>{displayText}</span>
 			{isLong && (
 				<span
-					style={{
-						marginLeft: '8px',
-						textDecoration: 'underline',
-						cursor: 'pointer',
-						fontSize: '12px',
-						opacity: 0.8,
-					}}
+					className='ml-2 underline cursor-pointer text-xs opacity-80 text-nowrap'
 					onClick={() => setExpanded(!expanded)}
 				>
 					{expanded ? 'Show less' : 'Show more'}

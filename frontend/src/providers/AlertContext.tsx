@@ -1,4 +1,5 @@
 import { DEFAULT_DURATION_ALERT } from '@/constants/alert.constant'
+import type { AlertSeverity } from '@/types/alert.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import {
@@ -12,7 +13,7 @@ import {
 
 interface IAlert {
 	id: string
-	severity: 'success' | 'error' | 'info' | 'warning'
+	severity: AlertSeverity
 	text: string
 	duration?: number
 }
