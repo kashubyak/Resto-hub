@@ -72,7 +72,10 @@ api.interceptors.response.use(
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
 					Cookies.remove(AUTH.SUBDOMAIN)
-					globalShowAlert?.('warning', 'Your session has expired. Please log in again.')
+					useAlertStore.getState().setPendingAlert({
+						severity: 'warning',
+						text: 'Your session has expired. Please log in again.',
+					})
 					window.location.href = ROUTES.PUBLIC.AUTH.LOGIN
 				}
 				return Promise.reject(error)
@@ -128,10 +131,10 @@ api.interceptors.response.use(
 							text: parseBackendError(err as IAxiosError).join('\n'),
 						})
 					} catch {
-						globalShowAlert?.(
-							'warning',
-							'Your session has expired. Redirecting to login page.',
-						)
+						useAlertStore.getState().setPendingAlert({
+							severity: 'warning',
+							text: 'Your session has expired. Redirecting to login page.',
+						})
 					}
 					window.location.href = loginUrl
 				}
@@ -148,10 +151,17 @@ api.interceptors.response.use(
 				!originalRequest.url?.includes(API_URL.AUTH.LOGIN) &&
 				!originalRequest.url?.includes(API_URL.AUTH.REGISTER) &&
 				!originalRequest._hideGlobalError
-			if (shouldShowAlert) globalShowBackendError(error as IAxiosError)
+			if (shouldShowAlert)
+				useAlertStore.getState().setPendingAlert({
+					severity: 'error',
+					text: parseBackendError(error as IAxiosError).join('\n'),
+				})
 		}
 		if (!error.response)
-			globalShowAlert?.('error', 'Network error. Please check your internet connection.')
+			useAlertStore.getState().setPendingAlert({
+				severity: 'error',
+				text: 'Network error. Please check your internet connection.',
+			})
 		return Promise.reject(error)
 	},
 )
