@@ -13,13 +13,12 @@ export const useLogin = () => {
 	} = useForm<ILogin>()
 	const router = useRouter()
 	const { login } = useAuth()
-	const { showSuccess, showBackendError } = useAlert()
+	const { showBackendError } = useAlert()
 	const searchParams = useSearchParams()
 
 	const onSubmit = async (data: ILogin) => {
 		try {
 			await login(data)
-			showSuccess('Login successful!')
 			const redirectTo = searchParams.get('redirect')
 			if (redirectTo && redirectTo.startsWith('/auth')) {
 				router.push(redirectTo)

@@ -2,25 +2,19 @@ import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { refreshToken } from '@/services/auth.service'
+import type { AlertSeverity } from '@/types/alert.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { convertToDays } from './convertToDays'
 
-let globalShowAlert:
-	| ((
-			severity: 'error' | 'warning' | 'info' | 'success',
-			text: string | string[],
-	  ) => void)
-	| null = null
+let globalShowAlert: ((severity: AlertSeverity, text: string | string[]) => void) | null =
+	null
 
 let globalShowBackendError: ((error: IAxiosError) => void) | null = null
 
 export const setGlobalAlertFunction = (
-	showAlert: (
-		severity: 'error' | 'warning' | 'info' | 'success',
-		text: string | string[],
-	) => void,
+	showAlert: (severity: AlertSeverity, text: string | string[]) => void,
 	showBackendError: (error: IAxiosError) => void,
 ) => {
 	globalShowAlert = showAlert
