@@ -2,11 +2,13 @@ import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { refreshToken } from '@/services/auth.service'
+import { useAlertStore } from '@/store/alert.store'
 import type { AlertSeverity } from '@/types/alert.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { convertToDays } from './convertToDays'
+import { parseBackendError } from './errorHandler'
 
 let globalShowAlert: ((severity: AlertSeverity, text: string | string[]) => void) | null =
 	null
@@ -120,9 +122,12 @@ api.interceptors.response.use(
 					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(
 						currentPath,
 					)}`
-
-					if (globalShowBackendError) globalShowBackendError(err as IAxiosError)
-					else {
+					try {
+						useAlertStore.getState().setPendingAlert({
+							severity: 'error',
+							text: parseBackendError(err as IAxiosError).join('\n'),
+						})
+					} catch {
 						globalShowAlert?.(
 							'warning',
 							'Your session has expired. Redirecting to login page.',
