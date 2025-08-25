@@ -156,7 +156,7 @@ api.interceptors.response.use(
 		if (!error.response)
 			useAlertStore.getState().setPendingAlert({
 				severity: 'error',
-				text: 'Network error. Please check your internet connection.',
+				text: parseBackendError(error as IAxiosError).join('\n'),
 			})
 		return Promise.reject(error)
 	},
