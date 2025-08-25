@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				text: response.data.message,
 			})
 			window.location.href = ROUTES.PUBLIC.AUTH.LOGIN
-		} catch (error) {
+		} catch {
 			setPendingAlert({
 				severity: 'error',
 				text: 'Logout failed. Please try again later.',

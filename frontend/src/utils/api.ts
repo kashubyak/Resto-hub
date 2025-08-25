@@ -173,10 +173,12 @@ export function setApiSubdomain(subdomain?: string) {
 		const url = new URL(apiBase)
 		url.hostname = `${subdomain}.${rootDomain}`
 		api.defaults.baseURL = url.toString()
-	} catch (e) {
-		console.error('Invalid API base URL', e)
+	} catch (error) {
 		api.defaults.baseURL = apiBase
-		globalShowAlert?.('error', 'Error configuring API')
+		useAlertStore.getState().setPendingAlert({
+			severity: 'error',
+			text: parseBackendError(error as IAxiosError).join('\n'),
+		})
 	}
 }
 

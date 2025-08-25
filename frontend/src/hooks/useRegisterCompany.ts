@@ -125,7 +125,6 @@ export const useRegisterCompany = () => {
 				router.push('/')
 			}
 		} catch (err) {
-			console.error('Login error:', err)
 			showBackendError(toAxiosError(err))
 		}
 	}
