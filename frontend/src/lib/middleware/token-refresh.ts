@@ -20,15 +20,13 @@ export async function refreshAccessToken(request: NextRequest): Promise<RefreshR
 		})
 
 		if (!response.ok) {
-			console.error(`Refresh failed: HTTP ${response.status}`)
 			return { success: false, error: `HTTP ${response.status}` }
 		}
 
 		const data = await response.json()
 		if (data.token) return { success: true, token: data.token }
 		return { success: false, error: 'No token in response' }
-	} catch (error) {
-		console.error('Token refresh error:', error)
+	} catch {
 		return { success: false, error: 'Network error' }
 	}
 }
