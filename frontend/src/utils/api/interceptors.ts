@@ -3,31 +3,13 @@ import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { refreshToken } from '@/services/auth.service'
 import { useAlertStore } from '@/store/alert.store'
-import type { AlertSeverity } from '@/types/alert.interface'
 import type { IAxiosError } from '@/types/error.interface'
-import axios from 'axios'
 import Cookies from 'js-cookie'
-import { convertToDays } from './convertToDays'
-import { parseBackendError } from './errorHandler'
-
-let globalShowAlert: ((severity: AlertSeverity, text: string | string[]) => void) | null =
-	null
-
-export function setGlobalAlertFunction(
-	showAlert: (severity: AlertSeverity, text: string | string[]) => void,
-) {
-	globalShowAlert = showAlert
-}
-
-const api = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_API_URL,
-	withCredentials: true,
-})
-
-export const refreshApi = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_API_URL,
-	withCredentials: true,
-})
+import { convertToDays } from '../convertToDays'
+import { parseBackendError } from '../errorHandler'
+import { getIsRefreshing, processQueue, pushToQueue, setIsRefreshing } from './authQueue'
+import { api } from './axiosInstances'
+import { getGlobalShowAlert } from './globalAlert'
 
 api.interceptors.request.use(config => {
 	config.headers = config.headers || {}
@@ -38,26 +20,12 @@ api.interceptors.request.use(config => {
 	return config
 })
 
-let isRefreshing = false
-let failedQueue: {
-	resolve: (value?: unknown) => void
-	reject: (error?: unknown) => void
-}[] = []
-
-const processQueue = (error: unknown, token: string | null = null) => {
-	failedQueue.forEach(prom => {
-		if (error) prom.reject(error)
-		else prom.resolve(token)
-	})
-	failedQueue = []
-}
-
 api.interceptors.response.use(
 	response => {
 		if (response.config.url?.includes(API_URL.AUTH.LOGIN))
-			globalShowAlert?.('success', 'Successfully logged in.')
+			getGlobalShowAlert()?.('success', 'Successfully logged in.')
 		if (response.config.url?.includes(API_URL.AUTH.REGISTER))
-			globalShowAlert?.('success', 'Account created successfully.')
+			getGlobalShowAlert()?.('success', 'Account created successfully.')
 
 		return response
 	},
@@ -77,9 +45,9 @@ api.interceptors.response.use(
 				return Promise.reject(error)
 			}
 
-			if (isRefreshing) {
+			if (getIsRefreshing()) {
 				return new Promise((resolve, reject) => {
-					failedQueue.push({ resolve, reject })
+					pushToQueue(resolve, reject)
 				})
 					.then(token => {
 						if (token) {
@@ -91,7 +59,7 @@ api.interceptors.response.use(
 			}
 
 			originalRequest._retry = true
-			isRefreshing = true
+			setIsRefreshing(true)
 
 			try {
 				const { token: newToken } = await refreshToken()
@@ -109,7 +77,7 @@ api.interceptors.response.use(
 					processQueue(null, newToken)
 					originalRequest.headers['Authorization'] = `Bearer ${newToken}`
 
-					globalShowAlert?.('info', 'Session refreshed successfully.')
+					getGlobalShowAlert()?.('info', 'Session refreshed successfully.')
 					return api(originalRequest)
 				}
 			} catch (err) {
@@ -136,7 +104,7 @@ api.interceptors.response.use(
 				}
 				return Promise.reject(err)
 			} finally {
-				isRefreshing = false
+				setIsRefreshing(false)
 			}
 		}
 
@@ -161,32 +129,3 @@ api.interceptors.response.use(
 		return Promise.reject(error)
 	},
 )
-
-export function setApiSubdomain(subdomain?: string) {
-	const apiBase = process.env.NEXT_PUBLIC_API_URL ?? ''
-	if (!subdomain) {
-		api.defaults.baseURL = apiBase
-		return
-	}
-	try {
-		const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
-		const url = new URL(apiBase)
-		url.hostname = `${subdomain}.${rootDomain}`
-		api.defaults.baseURL = url.toString()
-	} catch (error) {
-		api.defaults.baseURL = apiBase
-		useAlertStore.getState().setPendingAlert({
-			severity: 'error',
-			text: parseBackendError(error as IAxiosError).join('\n'),
-		})
-	}
-}
-
-export function initApiFromCookies() {
-	const subdomain = Cookies.get(AUTH.SUBDOMAIN)
-	if (subdomain) setApiSubdomain(subdomain)
-	const token = Cookies.get(AUTH.TOKEN)
-	if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-}
-
-export default api
