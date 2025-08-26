@@ -1,5 +1,9 @@
+import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
 import { registerCompany } from '@/services/company.service'
+import type { IAxiosError } from '@/types/error.interface'
+import { parseBackendError } from '@/utils/errorHandler'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -20,6 +24,9 @@ interface IFormValues {
 export const useRegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
 	const { login } = useAuth()
+	const { showError } = useAlert()
+	const searchParams = useSearchParams()
+	const router = useRouter()
 	const [hasMounted, setHasMounted] = useState(false)
 	const [savedPreviews, setSavedPreviews] = useState<{
 		logo: string | null
@@ -102,7 +109,6 @@ export const useRegisterCompany = () => {
 			formData.append('logoUrl', data.logoUrl?.[0] || savedFiles.logo!)
 			formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
 			const response = await registerCompany(formData)
-			console.log(response)
 
 			if (response.status == 201) {
 				await login({
@@ -111,7 +117,12 @@ export const useRegisterCompany = () => {
 					password: data.adminPassword,
 				})
 			}
-		} catch {}
+			const redirectTo = searchParams.get('redirect')
+			if (redirectTo && redirectTo.startsWith('/auth')) router.push(redirectTo)
+			else router.push('/')
+		} catch (err) {
+			showError(parseBackendError(err as IAxiosError).join('\n'))
+		}
 	}
 	const validateLogo = () => {
 		const logoFiles = watch('logoUrl')

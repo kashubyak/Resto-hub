@@ -1,7 +1,7 @@
 import { API_URL } from '@/config/api'
-import { AUTH } from '@/constants/auth'
+import { AUTH } from '@/constants/auth.constant'
 import type { ILogin } from '@/types/login.interface'
-import api, { setApiSubdomain } from '@/utils/api'
+import api, { refreshApi, setApiSubdomain } from '@/utils/api'
 import { convertToDays } from '@/utils/convertToDays'
 import Cookies from 'js-cookie'
 
@@ -26,15 +26,15 @@ export const login = async (data: ILogin) => {
 			sameSite: 'strict',
 		})
 	}
-	console.log(response)
-
 	return response
 }
 
 export const refreshToken = async (): Promise<{ token: string }> => {
-	const response = await api.post(API_URL.AUTH.REFRESH, {}, { withCredentials: true })
-	console.log(response)
-
+	const response = await refreshApi.post(
+		API_URL.AUTH.REFRESH,
+		{},
+		{ withCredentials: true },
+	)
 	return response.data
 }
 

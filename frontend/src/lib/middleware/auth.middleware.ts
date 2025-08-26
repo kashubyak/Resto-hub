@@ -1,4 +1,4 @@
-import { AUTH } from '@/constants/auth'
+import { AUTH } from '@/constants/auth.constant'
 import { convertToDays } from '@/utils/convertToDays'
 import { NextRequest, NextResponse } from 'next/server'
 import { redirectToHome, redirectToLogin } from './redirects'
@@ -10,13 +10,11 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
 	if (isPublicRoute(pathname)) return NextResponse.next()
 
 	const accessToken = request.cookies.get(AUTH.TOKEN)?.value
-	const subdomain = request.cookies.get(AUTH.SUBDOMAIN)?.value
 
 	if (isAuthRoute(pathname) && accessToken) return redirectToHome(request)
 	if (!isAuthRoute(pathname)) {
 		if (accessToken) return NextResponse.next()
-		const refreshResult = await refreshAccessToken(request, subdomain)
-
+		const refreshResult = await refreshAccessToken(request)
 		if (refreshResult.success && refreshResult.token)
 			return setNewTokenAndContinue(refreshResult.token)
 		return redirectToLogin(request, pathname)

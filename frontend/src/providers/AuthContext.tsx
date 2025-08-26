@@ -1,8 +1,9 @@
 'use client'
-import { AUTH } from '@/constants/auth'
-import { ROUTES } from '@/constants/pages'
+import { AUTH } from '@/constants/auth.constant'
+import { ROUTES } from '@/constants/pages.constant'
 import { login as loginRequest, logout as logoutRequest } from '@/services/auth.service'
 import { getCurrentUser } from '@/services/user.service'
+import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILogin } from '@/types/login.interface'
 import { initApiFromCookies } from '@/utils/api'
@@ -18,6 +19,7 @@ const AuthContext = createContext<IAuthContext>({
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const { user, isAuth, setUser, setIsAuth, hydrated } = useAuthStore()
+	const { setPendingAlert } = useAlertStore()
 
 	const login = async (data: ILogin) => {
 		const response = await loginRequest(data)
@@ -31,14 +33,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 	const logout = async () => {
 		try {
-			await logoutRequest()
+			const response = await logoutRequest()
 			Cookies.remove(AUTH.TOKEN)
 			Cookies.remove(AUTH.SUBDOMAIN)
 			setUser(null)
 			setIsAuth(false)
+			setPendingAlert({
+				severity: 'success',
+				text: response.data.message,
+			})
 			window.location.href = ROUTES.PUBLIC.AUTH.LOGIN
-		} catch (error) {
-			console.log(error)
+		} catch {
+			setPendingAlert({
+				severity: 'error',
+				text: 'Logout failed. Please try again later.',
+			})
 		}
 	}
 

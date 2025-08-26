@@ -1,4 +1,4 @@
-import { ROUTES } from '@/constants/pages'
+import { ROUTES } from '@/constants/pages.constant'
 import { NextRequest, NextResponse } from 'next/server'
 
 export function redirectToLogin(request: NextRequest, currentPath: string): NextResponse {

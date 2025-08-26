@@ -7,13 +7,9 @@ interface RefreshResult {
 	error?: string
 }
 
-export async function refreshAccessToken(
-	request: NextRequest,
-	subdomain?: string,
-): Promise<RefreshResult> {
+export async function refreshAccessToken(request: NextRequest): Promise<RefreshResult> {
 	try {
-		const refreshUrl = buildRefreshUrl(subdomain)
-
+		const refreshUrl = buildRefreshUrl()
 		const response = await fetch(refreshUrl, {
 			method: 'POST',
 			headers: {
@@ -37,23 +33,6 @@ export async function refreshAccessToken(
 	}
 }
 
-function buildRefreshUrl(subdomain?: string): string {
-	const apiUrl = process.env.NEXT_PUBLIC_API_URL
-	if (!apiUrl) throw new Error('NEXT_PUBLIC_API_URL not configured')
-	if (!subdomain) return `${apiUrl}${API_URL.AUTH.REFRESH}`
-
-	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
-	if (!rootDomain) {
-		console.warn('NEXT_PUBLIC_ROOT_DOMAIN not set, using base URL')
-		return `${apiUrl}${API_URL.AUTH.REFRESH}`
-	}
-
-	try {
-		const url = new URL(apiUrl)
-		url.hostname = `${subdomain}.${rootDomain}`
-		return `${url.toString()}${API_URL.AUTH.REFRESH}`
-	} catch (error) {
-		console.error('Error building subdomain URL:', error)
-		return `${apiUrl}${API_URL.AUTH.REFRESH}`
-	}
+function buildRefreshUrl(): string {
+	return `${process.env.NEXT_PUBLIC_API_URL}${API_URL.AUTH.REFRESH}`
 }

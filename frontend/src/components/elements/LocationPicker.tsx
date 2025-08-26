@@ -117,7 +117,7 @@ export const LocationPicker = ({
 			</div>
 
 			<div className='bg-info rounded-md p-3'>
-				<div className='text-sm text-info-foreground'>
+				<div className='text-sm text-[var(--stable-light)]'>
 					<div className='font-medium mb-1'>💡 How to use:</div>
 					<div className='space-y-1'>
 						<div>

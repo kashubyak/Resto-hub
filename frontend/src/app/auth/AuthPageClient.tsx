@@ -1,6 +1,6 @@
 'use client'
 
-import { ROUTES } from '@/constants/pages'
+import { ROUTES } from '@/constants/pages.constant'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Login } from './Login'
