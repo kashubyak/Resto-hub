@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { size_of_image } from '@/constants/share.constant'
+import { useAlert } from '@/providers/AlertContext'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
 type UseUploadImageParams = {
@@ -14,6 +16,7 @@ export const useUploadImage = ({
 }: UseUploadImageParams) => {
 	const [preview, setPreview] = useState<string | null>(savedPreview || null)
 	const [isDragging, setIsDragging] = useState(false)
+	const { showSuccess, showError } = useAlert()
 
 	const inputRef = useRef<HTMLInputElement | null>(null)
 	const isDispatching = useRef(false)
@@ -51,25 +54,39 @@ export const useUploadImage = ({
 		}
 	}, [savedPreview, preview])
 
-	const handleFile = (file: File) => {
-		const reader = new FileReader()
-		reader.onloadend = () => {
-			const result = reader.result as string
-			setPreview(result)
-			onDataChange?.(result, file)
-		}
-		reader.readAsDataURL(file)
+	const handleFile = useCallback(
+		(file: File) => {
+			if (!file.type.startsWith('image/')) {
+				showError('Only image files are allowed')
+				return
+			}
+			if (file.size > size_of_image * 1024 * 1024) {
+				showError(`File size must be less than ${size_of_image}MB`)
+				return
+			}
 
-		if (inputRef.current) {
-			const dataTransfer = new DataTransfer()
-			dataTransfer.items.add(file)
-			inputRef.current.files = dataTransfer.files
+			const reader = new FileReader()
+			reader.onloadend = () => {
+				const result = reader.result as string
+				setPreview(result)
+				onDataChange?.(result, file)
+				showSuccess('Image uploaded successfully')
+			}
+			reader.onerror = () => showError('Error reading the file')
+			reader.readAsDataURL(file)
 
-			isDispatching.current = true
-			const event = new Event('change', { bubbles: true })
-			inputRef.current.dispatchEvent(event)
-		}
-	}
+			if (inputRef.current) {
+				const dataTransfer = new DataTransfer()
+				dataTransfer.items.add(file)
+				inputRef.current.files = dataTransfer.files
+
+				isDispatching.current = true
+				const event = new Event('change', { bubbles: true })
+				inputRef.current.dispatchEvent(event)
+			}
+		},
+		[onDataChange, showSuccess, showError],
+	)
 
 	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault()
@@ -121,7 +138,7 @@ export const useUploadImage = ({
 			window.removeEventListener('drop', handleDrop)
 			window.removeEventListener('dragover', e => e.preventDefault())
 		}
-	}, [])
+	}, [handleFile])
 
 	useEffect(() => {
 		const handleChange = (e: Event) => {
@@ -140,7 +157,7 @@ export const useUploadImage = ({
 		return () => {
 			input?.removeEventListener('change', handleChange)
 		}
-	}, [])
+	}, [handleFile])
 
 	return {
 		preview,

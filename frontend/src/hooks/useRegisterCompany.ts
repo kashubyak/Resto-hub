@@ -24,7 +24,7 @@ interface IFormValues {
 export const useRegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
 	const { login } = useAuth()
-	const { showSuccess, showError } = useAlert()
+	const { showError } = useAlert()
 	const searchParams = useSearchParams()
 	const router = useRouter()
 	const [hasMounted, setHasMounted] = useState(false)
