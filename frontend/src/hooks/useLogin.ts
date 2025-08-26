@@ -1,7 +1,8 @@
-import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
+import { useAlertStore } from '@/store/alert.store'
 import type { ILogin } from '@/types/login.interface'
 import { toAxiosError } from '@/utils/errorConverter'
+import { parseBackendError } from '@/utils/errorHandler'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
@@ -13,13 +14,11 @@ export const useLogin = () => {
 	} = useForm<ILogin>()
 	const router = useRouter()
 	const { login } = useAuth()
-	const { showSuccess, showBackendError } = useAlert()
 	const searchParams = useSearchParams()
 
 	const onSubmit = async (data: ILogin) => {
 		try {
 			await login(data)
-			showSuccess('Login successful!')
 			const redirectTo = searchParams.get('redirect')
 			if (redirectTo && redirectTo.startsWith('/auth')) {
 				router.push(redirectTo)
@@ -27,7 +26,10 @@ export const useLogin = () => {
 				router.push('/')
 			}
 		} catch (err: unknown) {
-			showBackendError(toAxiosError(err))
+			useAlertStore.getState().setPendingAlert({
+				severity: 'error',
+				text: parseBackendError(toAxiosError(err)).join('\n'),
+			})
 		}
 	}
 

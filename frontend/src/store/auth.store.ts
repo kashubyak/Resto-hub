@@ -2,7 +2,7 @@ import type { IUser } from '@/types/login.interface'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-interface AuthStore {
+interface IAuthStore {
 	user: IUser | null
 	isAuth: boolean
 	hydrated: boolean
@@ -11,7 +11,7 @@ interface AuthStore {
 	setHydrated: (state: boolean) => void
 }
 
-export const useAuthStore = create<AuthStore>()(
+export const useAuthStore = create<IAuthStore>()(
 	persist(
 		set => ({
 			user: null,
