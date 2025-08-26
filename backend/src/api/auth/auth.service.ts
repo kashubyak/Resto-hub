@@ -20,8 +20,8 @@ import { RegisterCompanyResponseDto } from './dto/response/register-company-resp
 export class AuthService {
   private readonly JWT_SECRET: string;
   private readonly JWT_REFRESH_TOKEN_SECRET: string;
-  private readonly JWT_EXPIRES_IN = '1d';
-  private readonly JWT_REFRESH_EXPIRES_IN = '30d';
+  private readonly JWT_EXPIRES_IN: string;
+  private readonly JWT_REFRESH_EXPIRES_IN: string;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -32,6 +32,10 @@ export class AuthService {
     this.JWT_SECRET = this.configService.getOrThrow('JWT_TOKEN_SECRET');
     this.JWT_REFRESH_TOKEN_SECRET = this.configService.getOrThrow(
       'JWT_REFRESH_TOKEN_SECRET',
+    );
+    this.JWT_EXPIRES_IN = this.configService.getOrThrow('JWT_EXPIRES_IN');
+    this.JWT_REFRESH_EXPIRES_IN = this.configService.getOrThrow(
+      'JWT_REFRESH_EXPIRES_IN',
     );
   }
 
@@ -176,10 +180,12 @@ export class AuthService {
   }
 
   private setRefreshTokenCookie(res: Response, refreshToken: string): void {
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('jid', refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: isProd,
+      sameSite: isProd ? 'strict' : 'none',
+      ...(isProd ? { domain: `.${process.env.DOMAIN}` } : {}),
       path: '/auth',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });

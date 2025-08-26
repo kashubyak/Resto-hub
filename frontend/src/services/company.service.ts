@@ -8,6 +8,5 @@ export const registerCompany = async (formData: FormData) => {
 		},
 		withCredentials: true,
 	})
-	console.log(response)
-	return response.data
+	return response
 }

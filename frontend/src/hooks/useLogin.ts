@@ -1,18 +1,37 @@
+import { useAuth } from '@/providers/AuthContext'
+import { useAlertStore } from '@/store/alert.store'
+import type { ILogin } from '@/types/login.interface'
+import { toAxiosError } from '@/utils/errorConverter'
+import { parseBackendError } from '@/utils/errorHandler'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
-interface IFormValues {
-	subdomain: string
-	name: string
-	email: string
-	password: string
-}
 export const useLogin = () => {
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
-		watch,
-		clearErrors,
-	} = useForm<IFormValues>()
-	return { register, handleSubmit, errors }
+	} = useForm<ILogin>()
+	const router = useRouter()
+	const { login } = useAuth()
+	const searchParams = useSearchParams()
+
+	const onSubmit = async (data: ILogin) => {
+		try {
+			await login(data)
+			const redirectTo = searchParams.get('redirect')
+			if (redirectTo && redirectTo.startsWith('/auth')) {
+				router.push(redirectTo)
+			} else {
+				router.push('/')
+			}
+		} catch (err: unknown) {
+			useAlertStore.getState().setPendingAlert({
+				severity: 'error',
+				text: parseBackendError(toAxiosError(err)).join('\n'),
+			})
+		}
+	}
+
+	return { register, handleSubmit, errors, onSubmit }
 }

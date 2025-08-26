@@ -10,7 +10,7 @@ export const AuthButton = ({ type, text, onClick }: AuthButtonProps) => {
 		<button
 			type={type}
 			onClick={onClick}
-			className='w-full bg-primary text-primary-foreground hover:bg-primary active:bg-active mt-2 py-2 px-4 rounded-md font-semibold'
+			className='w-full bg-primary text-primary-foreground hover:bg-primary mt-2 py-2 px-4 rounded-md font-semibold'
 		>
 			{text}
 		</button>

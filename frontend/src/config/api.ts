@@ -1,5 +1,5 @@
 const WS = process.env.NEXT_PUBLIC_WEBSOCKET_URL
-const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH
+const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH || '/auth'
 const CATEGORY_BASE = process.env.NEXT_PUBLIC_CATEGORY
 const DISH_BASE = process.env.NEXT_PUBLIC_DISH
 const BASE_ORDER = process.env.NEXT_PUBLIC_ORDER

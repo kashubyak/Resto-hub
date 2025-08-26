@@ -1,4 +1,5 @@
 import { API_URL } from '@/config/api'
+import { useAlert } from '@/providers/AlertContext'
 import type {
 	AutocompleteSuggestionStatic,
 	ISearchResult,
@@ -56,6 +57,7 @@ export const useLocationPicker = ({
 	const [position, setPosition] = useState<{ lat: number; lng: number } | null>(
 		initialLocation ? { lat: initialLocation.lat, lng: initialLocation.lng } : null,
 	)
+	const { showError, showWarning } = useAlert()
 	const [searchValue, setSearchValue] = useState(initialLocation?.address || '')
 	const [searchResults, setSearchResults] = useState<ISearchResult[]>([])
 	const [showResults, setShowResults] = useState(false)
@@ -84,44 +86,49 @@ export const useLocationPicker = ({
 		}
 	}, [initialLocation, position])
 
-	const searchPlaces = useCallback(async (query: string) => {
-		if (!window.google?.maps?.importLibrary || query.length < 2) {
-			setSearchResults([])
-			setShowResults(false)
-			setIsSearching(false)
-			return
-		}
-
-		setIsSearching(true)
-		try {
-			const lib = (await window.google.maps.importLibrary('places')) as {
-				AutocompleteSuggestion: AutocompleteSuggestionStatic
+	const searchPlaces = useCallback(
+		async (query: string) => {
+			if (!window.google?.maps?.importLibrary || query.length < 2) {
+				setSearchResults([])
+				setShowResults(false)
+				setIsSearching(false)
+				return
 			}
-			const { suggestions } =
-				await lib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-					input: query,
-					includedRegionCodes: [],
-					includedPrimaryTypes: ['locality', 'geocode'],
-				})
 
-			const formatted = suggestions.map((s: Suggestion) => ({
-				placeId: s.placePrediction.placeId,
-				mainText: s.placePrediction.mainText.text,
-				secondaryText: s.placePrediction.secondaryText?.text || '',
-				fullAddress: `${s.placePrediction.mainText.text}, ${
-					s.placePrediction.secondaryText?.text || ''
-				}`,
-			}))
+			setIsSearching(true)
+			try {
+				const lib = (await window.google.maps.importLibrary('places')) as {
+					AutocompleteSuggestion: AutocompleteSuggestionStatic
+				}
+				const { suggestions } =
+					await lib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+						input: query,
+						includedRegionCodes: [],
+						includedPrimaryTypes: ['locality', 'geocode'],
+					})
 
-			setSearchResults(formatted)
-			setShowResults(formatted.length > 0)
-		} catch {
-			setSearchResults([])
-			setShowResults(false)
-		} finally {
-			setIsSearching(false)
-		}
-	}, [])
+				const formatted = suggestions.map((s: Suggestion) => ({
+					placeId: s.placePrediction.placeId,
+					mainText: s.placePrediction.mainText.text,
+					secondaryText: s.placePrediction.secondaryText?.text || '',
+					fullAddress: `${s.placePrediction.mainText.text}, ${
+						s.placePrediction.secondaryText?.text || ''
+					}`,
+				}))
+
+				setSearchResults(formatted)
+				setShowResults(formatted.length > 0)
+				if (formatted.length === 0) showWarning(`No results found for "${query}"`)
+			} catch {
+				setSearchResults([])
+				setShowResults(false)
+				showError('Failed to fetch places. Please try again.')
+			} finally {
+				setIsSearching(false)
+			}
+		},
+		[showError, showWarning],
+	)
 
 	const handleSearch = useCallback(
 		(value: string) => {

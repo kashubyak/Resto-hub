@@ -68,8 +68,7 @@ export class UserController {
   }
 
   @Get('me')
-  @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Find current user (ADMIN only)' })
+  @ApiOperation({ description: 'Find current user' })
   @ApiOkResponse({
     description: 'Current user found successfully',
     type: UserItemDto,

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
+import { Providers } from './Providers'
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -12,6 +13,14 @@ export const metadata: Metadata = {
 		template: '%s | Resto Hub',
 		default: 'Resto Hub',
 	},
+	icons: {
+		icon: [
+			{ url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+			{ url: '/favicon.ico' },
+		],
+		apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+	},
+	manifest: '/site.webmanifest',
 }
 
 export default function RootLayout({
@@ -21,7 +30,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body className={`${geistSans.variable} antialiased`}>{children}</body>
+			<body className={`${geistSans.variable} antialiased`}>
+				<Providers>{children}</Providers>
+			</body>
 		</html>
 	)
 }

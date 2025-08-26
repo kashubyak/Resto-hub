@@ -1,5 +1,9 @@
-import { registerCompany } from '@/services/auth'
-import { useRouter } from 'next/navigation'
+import { useAlert } from '@/providers/AlertContext'
+import { useAuth } from '@/providers/AuthContext'
+import { registerCompany } from '@/services/company.service'
+import type { IAxiosError } from '@/types/error.interface'
+import { parseBackendError } from '@/utils/errorHandler'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -19,6 +23,10 @@ interface IFormValues {
 
 export const useRegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
+	const { login } = useAuth()
+	const { showError } = useAlert()
+	const searchParams = useSearchParams()
+	const router = useRouter()
 	const [hasMounted, setHasMounted] = useState(false)
 	const [savedPreviews, setSavedPreviews] = useState<{
 		logo: string | null
@@ -43,8 +51,9 @@ export const useRegisterCompany = () => {
 		watch,
 		setValue,
 		clearErrors,
-	} = useForm<IFormValues>()
-	const router = useRouter()
+	} = useForm<IFormValues>({
+		mode: 'onChange',
+	})
 	const [location, setLocation] = useState<{
 		lat: number
 		lng: number
@@ -87,21 +96,33 @@ export const useRegisterCompany = () => {
 			setStep(1)
 			return
 		}
+		try {
+			const formData = new FormData()
+			formData.append('name', data.name)
+			formData.append('subdomain', data.subdomain)
+			formData.append('address', location.address)
+			formData.append('latitude', String(location.lat))
+			formData.append('longitude', String(location.lng))
+			formData.append('adminName', data.adminName)
+			formData.append('adminEmail', data.adminEmail)
+			formData.append('adminPassword', data.adminPassword)
+			formData.append('logoUrl', data.logoUrl?.[0] || savedFiles.logo!)
+			formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
+			const response = await registerCompany(formData)
 
-		const formData = new FormData()
-		formData.append('name', data.name)
-		formData.append('subdomain', data.subdomain)
-		formData.append('address', location.address)
-		formData.append('latitude', String(location.lat))
-		formData.append('longitude', String(location.lng))
-		formData.append('adminName', data.adminName)
-		formData.append('adminEmail', data.adminEmail)
-		formData.append('adminPassword', data.adminPassword)
-		formData.append('logoUrl', data.logoUrl?.[0] || savedFiles.logo!)
-		formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
-
-		const response = await registerCompany(formData)
-		localStorage.setItem('token', response.access_token)
+			if (response.status == 201) {
+				await login({
+					subdomain: data.subdomain,
+					email: data.adminEmail,
+					password: data.adminPassword,
+				})
+			}
+			const redirectTo = searchParams.get('redirect')
+			if (redirectTo && redirectTo.startsWith('/auth')) router.push(redirectTo)
+			else router.push('/')
+		} catch (err) {
+			showError(parseBackendError(err as IAxiosError).join('\n'))
+		}
 	}
 	const validateLogo = () => {
 		const logoFiles = watch('logoUrl')
