@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from '@prisma/client';
 import { IS_PUBLIC_KEY } from 'src/common/constants';
 
 @Injectable()
@@ -22,8 +23,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context) as Promise<boolean>;
   }
 
-  handleRequest(err: any, user: any) {
-    if (err || !user) throw err || new UnauthorizedException();
+  override handleRequest<TUser extends User = User>(
+    err: unknown,
+    user: TUser,
+    _info: unknown,
+    _context: ExecutionContext,
+    _status?: unknown,
+  ): TUser {
+    if (err) throw err instanceof Error ? err : new UnauthorizedException();
+    if (!user) throw new UnauthorizedException();
     return user;
   }
 }
