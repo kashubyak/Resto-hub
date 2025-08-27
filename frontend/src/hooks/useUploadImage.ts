@@ -1,5 +1,7 @@
 import { size_of_image } from '@/constants/share.constant'
 import { useAlert } from '@/providers/AlertContext'
+import type { IAxiosError } from '@/types/error.interface'
+import { parseBackendError } from '@/utils/errorHandler'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
@@ -48,11 +50,11 @@ export const useUploadImage = ({
 					const event = new Event('change', { bubbles: true })
 					inputRef.current.dispatchEvent(event)
 				} catch (error) {
-					console.error('Error restoring file from base64:', error)
+					showError(parseBackendError(error as IAxiosError).join('\n'))
 				}
 			}
 		}
-	}, [savedPreview, preview])
+	}, [savedPreview, preview, showError])
 
 	const handleFile = useCallback(
 		(file: File) => {

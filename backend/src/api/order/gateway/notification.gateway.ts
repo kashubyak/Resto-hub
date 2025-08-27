@@ -10,6 +10,20 @@ import * as jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import { socket_rooms } from 'src/common/constants';
 
+interface CustomJwtPayload {
+  sub: number;
+  role: Role;
+  iat?: number;
+  exp?: number;
+}
+
+type NotificationData =
+  | Record<string, unknown>
+  | string
+  | number
+  | boolean
+  | null;
+
 @WebSocketGateway({ cors: true })
 @Injectable()
 export class NotificationsGateway
@@ -21,18 +35,25 @@ export class NotificationsGateway
 
   async handleConnection(client: Socket) {
     try {
-      const token =
+      const token: string | undefined =
         client.handshake.auth?.token ||
         client.handshake.query?.token ||
-        client.handshake.headers?.authorization?.split(' ')[1];
-      if (!token) throw new Error('Token is missing');
+        (typeof client.handshake.headers?.authorization === 'string'
+          ? client.handshake.headers.authorization.split(' ')[1]
+          : undefined);
 
+      if (!token) throw new Error('Token is missing');
       const secret = process.env.JWT_TOKEN_SECRET;
       if (!secret) throw new Error('JWT_TOKEN_SECRET is not defined');
+      const decoded = jwt.verify(token, secret);
 
-      const payload = jwt.verify(token, secret) as any;
-      const userId = payload.sub;
-      const role = payload.role;
+      if (typeof decoded === 'string') throw new Error('Invalid token format');
+      const payload = decoded as unknown as CustomJwtPayload;
+      if (typeof payload.sub !== 'number' || !payload.role)
+        throw new Error('Invalid token payload');
+
+      const userId: number = payload.sub;
+      const role: Role = payload.role;
 
       client.data.userId = userId;
       client.data.role = role;
@@ -51,10 +72,10 @@ export class NotificationsGateway
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
-  notifyKitchen(event: string, data: any) {
+  notifyKitchen(event: string, data: NotificationData) {
     this.server.to(socket_rooms.KITCHEN).emit(event, data);
   }
-  notifyWaiter(event: string, data: any, waiterId: number) {
+  notifyWaiter(event: string, data: NotificationData, waiterId: number) {
     this.server.to(socket_rooms.WAITER(waiterId)).emit(event, data);
   }
 }
