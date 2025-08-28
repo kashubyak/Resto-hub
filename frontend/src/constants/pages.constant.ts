@@ -22,10 +22,25 @@ export const ROUTES = {
 			},
 		},
 		API_PUBLIC: '/api/public',
+		NOT_FOUND: '/404',
 	} as const,
 
 	PRIVATE: {
 		DASHBOARD: '/',
+		ADMIN: {
+			ROOT: '/admin',
+			STAFF: '/admin/staff',
+			SETTINGS: '/admin/settings',
+		},
+		COOK: {
+			ROOT: '/cook',
+			ORDERS: '/cook/free-orders',
+		},
+		WAITER: {
+			ROOT: '/waiter',
+			ORDERS: '/waiter/orders',
+			TABLES: '/waiter/tables',
+		},
 	} as const,
 } as const
 
