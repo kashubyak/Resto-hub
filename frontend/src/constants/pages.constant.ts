@@ -1,3 +1,9 @@
+export enum UserRole {
+	ADMIN = 'ADMIN',
+	COOK = 'COOK',
+	WAITER = 'WAITER',
+}
+
 export const ROUTES = {
 	PUBLIC: {
 		AUTH: {
