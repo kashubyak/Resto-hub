@@ -18,7 +18,15 @@ const AuthContext = createContext<IAuthContext>({
 })
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-	const { user, isAuth, setUser, setIsAuth, hydrated } = useAuthStore()
+	const {
+		user,
+		isAuth,
+		setUser,
+		setIsAuth,
+		hydrated,
+		updateUserRoleFromToken,
+		clearAuth,
+	} = useAuthStore()
 	const { setPendingAlert } = useAlertStore()
 
 	const login = async (data: ILogin) => {
@@ -28,6 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const currentUser = await getCurrentUser()
 			setUser(currentUser.data)
 			setIsAuth(true)
+			updateUserRoleFromToken()
 		}
 	}
 
@@ -36,8 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const response = await logoutRequest()
 			Cookies.remove(AUTH.TOKEN)
 			Cookies.remove(AUTH.SUBDOMAIN)
-			setUser(null)
-			setIsAuth(false)
+			clearAuth()
+
 			setPendingAlert({
 				severity: 'success',
 				text: response.data.message,
@@ -55,17 +64,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		if (!hydrated) return
 		if (!user && Cookies.get(AUTH.TOKEN)) {
 			initApiFromCookies()
+
 			getCurrentUser()
 				.then(current => {
 					setUser(current.data)
 					setIsAuth(true)
+					updateUserRoleFromToken()
 				})
 				.catch(() => {
-					setUser(null)
-					setIsAuth(false)
+					clearAuth()
 				})
 		}
-	}, [hydrated, user, setUser, setIsAuth])
+	}, [hydrated, user, setUser, setIsAuth, updateUserRoleFromToken, clearAuth])
 
 	const value = { user, isAuth, login, logout }
 

@@ -2,10 +2,10 @@ import { useAuthStore } from '@/store/auth.store'
 import type { IUser } from '@/types/login.interface'
 
 export function initializeAuth(user: IUser) {
-	const { setUser, setIsAuth, updateUserFromToken } = useAuthStore.getState()
+	const { setUser, setIsAuth, updateUserRoleFromToken } = useAuthStore.getState()
 	setUser(user)
 	setIsAuth(true)
-	updateUserFromToken()
+	updateUserRoleFromToken()
 }
 
 export function clearAuth() {
