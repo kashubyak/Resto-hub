@@ -1,17 +1,15 @@
 'use client'
 
+import { SafeRender } from '@/components/container/SafeRender'
 import { RoleGuard } from '@/components/ui/RoleGuard'
 import { UserRole } from '@/constants/pages.constant'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
-import { useAuth } from '@/providers/AuthContext'
 
 export default function Dashboard() {
 	const { user, userRole, hasRole } = useCurrentUser()
-	const { logout } = useAuth()
 
 	return (
-		<div>
-			<h1>Dashboard</h1>
+		<SafeRender title='Dashboard'>
 			{user && userRole && (
 				<p>
 					Hi, {user.name}! Your role: {userRole}
@@ -32,22 +30,6 @@ export default function Dashboard() {
 			{hasRole(UserRole.ADMIN) && (
 				<button onClick={() => console.log('Admin Actions')}>Admin Functions</button>
 			)}
-			<button onClick={logout}>Logout</button>
-		</div>
+		</SafeRender>
 	)
 }
-
-// 'use client'
-
-// import { useAuth } from '@/providers/AuthContext'
-
-// export default function DashboardPage() {
-// 	const { logout } = useAuth()
-
-// 	return (
-// 		<div>
-// 			<h1>Dashboard</h1>
-// 			<button onClick={logout}>Logout</button>
-// 		</div>
-// 	)
-// }
