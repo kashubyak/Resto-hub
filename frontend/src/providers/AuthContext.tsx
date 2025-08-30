@@ -7,6 +7,7 @@ import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILogin } from '@/types/login.interface'
 import { initApiFromCookies } from '@/utils/api'
+import { initializeAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
 import { createContext, useContext, useEffect, type ReactNode } from 'react'
 
@@ -34,9 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		if (response.status === 200) {
 			initApiFromCookies()
 			const currentUser = await getCurrentUser()
-			setUser(currentUser.data)
-			setIsAuth(true)
-			updateUserRoleFromToken()
+			initializeAuth(currentUser.data)
 		}
 	}
 
@@ -67,9 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 			getCurrentUser()
 				.then(current => {
-					setUser(current.data)
-					setIsAuth(true)
-					updateUserRoleFromToken()
+					initializeAuth(current.data)
 				})
 				.catch(() => {
 					clearAuth()
