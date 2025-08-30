@@ -10,3 +10,7 @@ export function redirectToLogin(request: NextRequest, currentPath: string): Next
 export function redirectToHome(request: NextRequest): NextResponse {
 	return NextResponse.redirect(new URL('/', request.url))
 }
+
+export function redirectToNotFound(request: NextRequest): NextResponse {
+	return NextResponse.redirect(new URL(ROUTES.PUBLIC.NOT_FOUND, request.url))
+}

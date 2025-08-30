@@ -7,6 +7,7 @@ import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILogin } from '@/types/login.interface'
 import { initApiFromCookies } from '@/utils/api'
+import { initializeAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
 import { createContext, useContext, useEffect, type ReactNode } from 'react'
 
@@ -18,7 +19,15 @@ const AuthContext = createContext<IAuthContext>({
 })
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-	const { user, isAuth, setUser, setIsAuth, hydrated } = useAuthStore()
+	const {
+		user,
+		isAuth,
+		setUser,
+		setIsAuth,
+		hydrated,
+		updateUserRoleFromToken,
+		clearAuth,
+	} = useAuthStore()
 	const { setPendingAlert } = useAlertStore()
 
 	const login = async (data: ILogin) => {
@@ -26,8 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		if (response.status === 200) {
 			initApiFromCookies()
 			const currentUser = await getCurrentUser()
-			setUser(currentUser.data)
-			setIsAuth(true)
+			initializeAuth(currentUser.data)
 		}
 	}
 
@@ -36,8 +44,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const response = await logoutRequest()
 			Cookies.remove(AUTH.TOKEN)
 			Cookies.remove(AUTH.SUBDOMAIN)
-			setUser(null)
-			setIsAuth(false)
+			clearAuth()
+
 			setPendingAlert({
 				severity: 'success',
 				text: response.data.message,
@@ -55,17 +63,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		if (!hydrated) return
 		if (!user && Cookies.get(AUTH.TOKEN)) {
 			initApiFromCookies()
+
 			getCurrentUser()
 				.then(current => {
-					setUser(current.data)
-					setIsAuth(true)
+					initializeAuth(current.data)
 				})
 				.catch(() => {
-					setUser(null)
-					setIsAuth(false)
+					clearAuth()
 				})
 		}
-	}, [hydrated, user, setUser, setIsAuth])
+	}, [hydrated, user, setUser, setIsAuth, updateUserRoleFromToken, clearAuth])
 
 	const value = { user, isAuth, login, logout }
 
