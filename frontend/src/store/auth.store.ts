@@ -1,8 +1,8 @@
-// frontend/src/store/auth.store.ts
 import { AUTH } from '@/constants/auth.constant'
 import { UserRole } from '@/constants/pages.constant'
 import { decodeJWT } from '@/lib/middleware/jwt-decoder'
 import type { IUser } from '@/types/login.interface'
+import { clearAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -80,14 +80,7 @@ export const useAuthStore = create<IAuthStore>()(
 				return Date.now() < tokenValidUntil
 			},
 
-			clearAuth: () => {
-				set({
-					user: null,
-					isAuth: false,
-					userRole: null,
-					tokenValidUntil: null,
-				})
-			},
+			clearAuth: () => clearAuth(),
 		}),
 		{
 			name: 'user-storage',
