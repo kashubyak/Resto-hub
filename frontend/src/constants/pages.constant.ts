@@ -1,3 +1,9 @@
+export enum UserRole {
+	ADMIN = 'ADMIN',
+	COOK = 'COOK',
+	WAITER = 'WAITER',
+}
+
 export const ROUTES = {
 	PUBLIC: {
 		AUTH: {
@@ -16,10 +22,28 @@ export const ROUTES = {
 			},
 		},
 		API_PUBLIC: '/api/public',
+		NOT_FOUND: '/404',
 	} as const,
 
 	PRIVATE: {
-		DASHBOARD: '/',
+		SHARED: {
+			DASHBOARD: '/',
+			PROFILE: '/profile',
+		},
+		ADMIN: {
+			ROOT: '/admin',
+			STAFF: '/admin/staff',
+			SETTINGS: '/admin/settings',
+		},
+		COOK: {
+			ROOT: '/cook',
+			ORDERS: '/cook/free-orders',
+		},
+		WAITER: {
+			ROOT: '/waiter',
+			ORDERS: '/waiter/orders',
+			TABLES: '/waiter/tables',
+		},
 	} as const,
 } as const
 
@@ -39,3 +63,25 @@ export const AUTH_ROUTES_LIST: string[] = [
 	ROUTES.PUBLIC.AUTH.LOGIN,
 	ROUTES.PUBLIC.AUTH.REGISTER,
 ]
+
+const SHARED_ROUTES = [ROUTES.PRIVATE.SHARED.DASHBOARD, ROUTES.PRIVATE.SHARED.PROFILE]
+
+export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
+	[UserRole.ADMIN]: [
+		...SHARED_ROUTES,
+		ROUTES.PRIVATE.ADMIN.ROOT,
+		ROUTES.PRIVATE.ADMIN.STAFF,
+		ROUTES.PRIVATE.ADMIN.SETTINGS,
+	],
+	[UserRole.COOK]: [
+		...SHARED_ROUTES,
+		ROUTES.PRIVATE.COOK.ROOT,
+		ROUTES.PRIVATE.COOK.ORDERS,
+	],
+	[UserRole.WAITER]: [
+		...SHARED_ROUTES,
+		ROUTES.PRIVATE.WAITER.ROOT,
+		ROUTES.PRIVATE.WAITER.ORDERS,
+		ROUTES.PRIVATE.WAITER.TABLES,
+	],
+}
