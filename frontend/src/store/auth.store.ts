@@ -1,8 +1,8 @@
+// frontend/src/store/auth.store.ts
 import { AUTH } from '@/constants/auth.constant'
 import { UserRole } from '@/constants/pages.constant'
 import { decodeJWT } from '@/lib/middleware/jwt-decoder'
 import type { IUser } from '@/types/login.interface'
-import { convertToDays } from '@/utils/convertToDays'
 import Cookies from 'js-cookie'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -51,11 +51,7 @@ export const useAuthStore = create<IAuthStore>()(
 					set({ userRole: null, tokenValidUntil: null })
 					return false
 				}
-
-				const tokenExpiresIn = process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d'
-				const expiresInDays = convertToDays(tokenExpiresIn)
-				const tokenValidUntil = Date.now() + expiresInDays * 24 * 60 * 60 * 1000
-
+				const tokenValidUntil = decodedToken.exp * 1000
 				const currentState = get()
 
 				if (
