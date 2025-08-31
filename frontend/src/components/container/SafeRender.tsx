@@ -1,5 +1,6 @@
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { useEffect, useState, type ReactNode } from 'react'
+import { Loading } from '../ui/Loading'
 
 interface ISafeRenderProps {
 	children: ReactNode
@@ -24,7 +25,7 @@ export const SafeRender = ({
 		return (
 			<div>
 				{title && <h1>{title}</h1>}
-				<p>Loading...</p>
+				<Loading />
 			</div>
 		)
 	}
