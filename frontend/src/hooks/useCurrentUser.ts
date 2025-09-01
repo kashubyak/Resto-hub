@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/store/auth.store'
 import { useEffect, useState } from 'react'
+import { useLoadingProgress } from './useLoadingProgress'
 
 export function useCurrentUser() {
 	const {
@@ -12,21 +13,14 @@ export function useCurrentUser() {
 		isTokenValid,
 	} = useAuthStore()
 
-	const [loadingProgress, setLoadingProgress] = useState(0)
+	const [isInitializing, setIsInitializing] = useState(true)
+	const isLoading = !hydrated || (hydrated && isAuth && (!user || !userRole))
 
-	useEffect(() => {
-		const updateProgress = () => {
-			let progress = 0
-			if (hydrated) progress += 50
-			if (isAuth) progress += 25
-			if (user) progress += 15
-			if (userRole) progress += 10
-
-			setLoadingProgress(progress)
-		}
-
-		updateProgress()
-	}, [hydrated, isAuth, user, userRole])
+	const loadingProgress = useLoadingProgress({
+		isLoading: isInitializing,
+		minDuration: 1500,
+		steps: 25,
+	})
 
 	useEffect(() => {
 		if (hydrated && isAuth && (!isTokenValid() || !userRole)) {
@@ -34,11 +28,21 @@ export function useCurrentUser() {
 		}
 	}, [hydrated, isAuth, userRole, isTokenValid, updateUserRoleFromToken])
 
+	useEffect(() => {
+		if (hydrated) {
+			const timer = setTimeout(() => {
+				setIsInitializing(false)
+			}, 800)
+
+			return () => clearTimeout(timer)
+		}
+	}, [hydrated, user, userRole])
+
 	return {
 		user,
 		userRole,
 		isAuth,
-		loading: !hydrated,
+		loading: isLoading || isInitializing,
 		loadingProgress,
 		hasRole,
 	}
