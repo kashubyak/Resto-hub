@@ -5,7 +5,6 @@ interface NetworkRequest {
 	progress: number
 	completed: boolean
 	timestamp: number
-	interval?: NodeJS.Timeout
 }
 
 const networkRequests = new Map<string, NetworkRequest>()
@@ -32,7 +31,6 @@ export function useNetworkProgress() {
 		}
 
 		progressListeners.add(updateProgress)
-
 		return () => {
 			progressListeners.delete(updateProgress)
 		}
@@ -47,51 +45,30 @@ export function useNetworkProgress() {
 
 export function startNetworkRequest(url: string): string {
 	const requestId = `${url}_${Date.now()}_${Math.random()}`
-
-	const interval = setInterval(() => {
-		const request = networkRequests.get(requestId)
-		if (!request || request.completed) {
-			clearInterval(interval)
-			return
-		}
-
-		const increment = Math.random() * 10 + 5
-		const newProgress = Math.min(request.progress + increment, 85)
-
-		networkRequests.set(requestId, {
-			...request,
-			progress: newProgress,
-		})
-
-		notifyListeners()
-	}, 150 + Math.random() * 100)
-
 	networkRequests.set(requestId, {
 		url,
 		progress: 0,
 		completed: false,
 		timestamp: Date.now(),
-		interval,
 	})
-
 	notifyListeners()
 	return requestId
+}
+
+export function updateNetworkProgress(requestId: string, loaded: number, total?: number) {
+	const request = networkRequests.get(requestId)
+	if (!request) return
+
+	const progress = total ? Math.min((loaded / total) * 100, 99) : request.progress
+	networkRequests.set(requestId, { ...request, progress })
+	notifyListeners()
 }
 
 export function completeNetworkRequest(requestId: string) {
 	const request = networkRequests.get(requestId)
 	if (request) {
-		if (request.interval) clearInterval(request.interval)
-
-		networkRequests.set(requestId, {
-			...request,
-			progress: 100,
-			completed: true,
-			interval: undefined,
-		})
-
+		networkRequests.set(requestId, { ...request, progress: 100, completed: true })
 		notifyListeners()
-
 		setTimeout(() => {
 			networkRequests.delete(requestId)
 			notifyListeners()
@@ -100,10 +77,6 @@ export function completeNetworkRequest(requestId: string) {
 }
 
 export function failNetworkRequest(requestId: string) {
-	const request = networkRequests.get(requestId)
-	if (request?.interval) {
-		clearInterval(request.interval)
-	}
 	networkRequests.delete(requestId)
 	notifyListeners()
 }

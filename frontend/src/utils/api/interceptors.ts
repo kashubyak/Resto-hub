@@ -5,10 +5,12 @@ import {
 	completeNetworkRequest,
 	failNetworkRequest,
 	startNetworkRequest,
+	updateNetworkProgress,
 } from '@/hooks/useNetworkProgress'
 import { refreshToken } from '@/services/auth.service'
 import { useAlertStore } from '@/store/alert.store'
 import type { IAxiosError } from '@/types/error.interface'
+import type { AxiosProgressEvent } from 'axios'
 import Cookies from 'js-cookie'
 import { convertToDays } from '../convertToDays'
 import { parseBackendError } from '../errorHandler'
@@ -19,6 +21,10 @@ import { getGlobalShowAlert } from './globalAlert'
 api.interceptors.request.use(config => {
 	const requestId = startNetworkRequest(config.url || 'unknown')
 	config.headers['X-Request-ID'] = requestId
+
+	config.onDownloadProgress = (event: AxiosProgressEvent) => {
+		updateNetworkProgress(requestId, event.loaded ?? 0, event.total ?? undefined)
+	}
 
 	config.headers = config.headers || {}
 	const token = Cookies.get(AUTH.TOKEN)

@@ -1,6 +1,10 @@
 import { useAuthStore } from '@/store/auth.store'
 import { useEffect, useState } from 'react'
-import { useLoadingProgress } from './useLoadingProgress'
+import {
+	completeNetworkRequest,
+	startNetworkRequest,
+	useNetworkProgress,
+} from './useNetworkProgress'
 
 export function useCurrentUser() {
 	const {
@@ -14,13 +18,7 @@ export function useCurrentUser() {
 	} = useAuthStore()
 
 	const [isInitializing, setIsInitializing] = useState(true)
-	const isLoading = !hydrated || (hydrated && isAuth && (!user || !userRole))
-
-	const loadingProgress = useLoadingProgress({
-		isLoading: isInitializing,
-		minDuration: 1500,
-		steps: 25,
-	})
+	const { totalProgress } = useNetworkProgress()
 
 	useEffect(() => {
 		if (hydrated && isAuth && (!isTokenValid() || !userRole)) {
@@ -29,21 +27,27 @@ export function useCurrentUser() {
 	}, [hydrated, isAuth, userRole, isTokenValid, updateUserRoleFromToken])
 
 	useEffect(() => {
-		if (hydrated) {
+		if (hydrated && !user && !userRole) {
+			const fakeRequestId = startNetworkRequest('fetch-user')
 			const timer = setTimeout(() => {
+				completeNetworkRequest(fakeRequestId)
 				setIsInitializing(false)
 			}, 800)
-
 			return () => clearTimeout(timer)
+		} else {
+			setIsInitializing(false)
 		}
 	}, [hydrated, user, userRole])
+
+	const isLoading =
+		!hydrated || (hydrated && isAuth && (!user || !userRole)) || isInitializing
 
 	return {
 		user,
 		userRole,
 		isAuth,
-		loading: isLoading || isInitializing,
-		loadingProgress,
+		loading: isLoading,
+		totalProgress,
 		hasRole,
 	}
 }

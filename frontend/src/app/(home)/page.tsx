@@ -6,10 +6,10 @@ import { UserRole } from '@/constants/pages.constant'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 export default function Dashboard() {
-	const { user, userRole, hasRole, loadingProgress } = useCurrentUser()
+	const { user, userRole, hasRole } = useCurrentUser()
 
 	return (
-		<SafeRender title='Loading Dashboard...' loadingProgress={loadingProgress}>
+		<SafeRender title='Loading Dashboard...' showNetworkProgress>
 			{user && userRole && (
 				<p>
 					Hi, {user.name}! Your role: {userRole}
