@@ -9,6 +9,7 @@ interface ISafeRenderProps {
 	title?: string
 	waitForUser?: boolean
 	showNetworkProgress?: boolean
+	minLoadingTime?: number // анти-блим
 }
 
 export const SafeRender = ({
@@ -17,23 +18,27 @@ export const SafeRender = ({
 	title = 'Loading...',
 	waitForUser = true,
 	showNetworkProgress = false,
+	minLoadingTime = 400,
 }: ISafeRenderProps) => {
 	const { loading: userLoading, totalProgress: userProgress } = useCurrentUser()
 	const { totalProgress: networkProgress, isLoading: networkLoading } =
 		useNetworkProgress()
-	const [isMounted, setIsMounted] = useState(false)
+	const [showLoader, setShowLoader] = useState(true)
 
 	useEffect(() => {
-		const timer = setTimeout(() => setIsMounted(true), 50)
+		let timer: NodeJS.Timeout
+
+		if (!userLoading && !networkLoading) {
+			timer = setTimeout(() => setShowLoader(false), minLoadingTime)
+		} else {
+			setShowLoader(true)
+		}
+
 		return () => clearTimeout(timer)
-	}, [])
+	}, [userLoading, networkLoading, minLoadingTime])
 
-	const isLoading =
-		!isMounted || (waitForUser && userLoading) || (showNetworkProgress && networkLoading)
-
-	if (isLoading) {
+	if (showLoader) {
 		if (fallback) return fallback as React.ReactElement
-
 		const finalProgress =
 			showNetworkProgress && networkLoading ? networkProgress : userProgress
 

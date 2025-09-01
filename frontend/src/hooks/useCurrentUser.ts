@@ -1,10 +1,6 @@
 import { useAuthStore } from '@/store/auth.store'
 import { useEffect, useState } from 'react'
-import {
-	completeNetworkRequest,
-	startNetworkRequest,
-	useNetworkProgress,
-} from './useNetworkProgress'
+import { useNetworkProgress } from './useNetworkProgress'
 
 export function useCurrentUser() {
 	const {
@@ -21,32 +17,23 @@ export function useCurrentUser() {
 	const { totalProgress } = useNetworkProgress()
 
 	useEffect(() => {
-		if (hydrated && isAuth && (!isTokenValid() || !userRole)) {
-			updateUserRoleFromToken()
-		}
-	}, [hydrated, isAuth, userRole, isTokenValid, updateUserRoleFromToken])
+		if (!hydrated) return
 
-	useEffect(() => {
-		if (hydrated && !user && !userRole) {
-			const fakeRequestId = startNetworkRequest('fetch-user')
-			const timer = setTimeout(() => {
-				completeNetworkRequest(fakeRequestId)
-				setIsInitializing(false)
-			}, 800)
-			return () => clearTimeout(timer)
-		} else {
+		const run = async () => {
+			if (isAuth && (!isTokenValid() || !userRole)) {
+				await Promise.resolve(updateUserRoleFromToken())
+			}
 			setIsInitializing(false)
 		}
-	}, [hydrated, user, userRole])
 
-	const isLoading =
-		!hydrated || (hydrated && isAuth && (!user || !userRole)) || isInitializing
+		run()
+	}, [hydrated, isAuth, userRole, isTokenValid, updateUserRoleFromToken])
 
 	return {
 		user,
 		userRole,
 		isAuth,
-		loading: isLoading,
+		loading: !hydrated || isInitializing,
 		totalProgress,
 		hasRole,
 	}
