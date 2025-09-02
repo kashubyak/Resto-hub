@@ -1,32 +1,35 @@
 import { useCurrentUser } from '@/hooks/useCurrentUser'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useNetworkProgress } from '@/hooks/useNetworkProgress'
+import { type ReactNode } from 'react'
+import { Loading } from '../ui/Loading'
 
 interface ISafeRenderProps {
 	children: ReactNode
 	fallback?: ReactNode
 	title?: string
 	waitForUser?: boolean
+	showNetworkProgress?: boolean
 }
+
 export const SafeRender = ({
 	children,
 	fallback,
-	title,
+	title = 'Loading...',
 	waitForUser = true,
+	showNetworkProgress = false,
 }: ISafeRenderProps) => {
-	const { loading } = useCurrentUser()
-	const [isMounted, setIsMounted] = useState(false)
+	const { loading: userLoading, totalProgress: userProgress } = useCurrentUser()
+	const { totalProgress: networkProgress, isLoading: networkLoading } =
+		useNetworkProgress()
 
-	useEffect(() => setIsMounted(true), [])
-	const isLoading = !isMounted || (waitForUser && loading)
+	const isLoading = (waitForUser && userLoading) || networkLoading
+
 	if (isLoading) {
 		if (fallback) return fallback as React.ReactElement
+		const finalProgress =
+			showNetworkProgress && networkLoading ? networkProgress : userProgress
 
-		return (
-			<div>
-				{title && <h1>{title}</h1>}
-				<p>Loading...</p>
-			</div>
-		)
+		return <Loading progress={finalProgress} title={title} />
 	}
 
 	return children as React.ReactElement

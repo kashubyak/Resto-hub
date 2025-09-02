@@ -53,9 +53,7 @@ export const LocationPicker = ({
 						onChange={e => handleSearch(e.target.value)}
 						onKeyDown={handleKeyDown}
 						onFocus={() => {
-							if (searchResults.length > 0) {
-								setShowResults(true)
-							}
+							if (searchResults.length > 0) setShowResults(true)
 						}}
 						label='Enter the name of the city in any language (Kyiv, Paris, London)'
 						InputProps={{

@@ -19,9 +19,7 @@ export async function refreshAccessToken(request: NextRequest): Promise<RefreshR
 			credentials: 'include',
 		})
 
-		if (!response.ok) {
-			return { success: false, error: `HTTP ${response.status}` }
-		}
+		if (!response.ok) return { success: false, error: `HTTP ${response.status}` }
 
 		const data = await response.json()
 		if (data.token) return { success: true, token: data.token }
