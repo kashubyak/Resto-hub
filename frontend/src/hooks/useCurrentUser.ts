@@ -20,9 +20,7 @@ export function useCurrentUser() {
 		if (!hydrated) return
 
 		const initialize = async () => {
-			if (isAuth && (!isTokenValid() || !userRole)) {
-				await updateUserRoleFromToken()
-			}
+			if (isAuth && (!isTokenValid() || !userRole)) await updateUserRoleFromToken()
 			setInitialized(true)
 		}
 

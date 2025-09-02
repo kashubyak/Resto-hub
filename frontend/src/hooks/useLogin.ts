@@ -20,11 +20,8 @@ export const useLogin = () => {
 		try {
 			await login(data)
 			const redirectTo = searchParams.get('redirect')
-			if (redirectTo && redirectTo.startsWith('/auth')) {
-				router.push(redirectTo)
-			} else {
-				router.push('/')
-			}
+			if (redirectTo && redirectTo.startsWith('/auth')) router.push(redirectTo)
+			else router.push('/')
 		} catch (err: unknown) {
 			useAlertStore.getState().setPendingAlert({
 				severity: 'error',

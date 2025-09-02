@@ -16,9 +16,7 @@ const getReadableAddress = (results: google.maps.GeocoderResult[]): string => {
 	for (const result of results) {
 		const address = result.formatted_address
 		const plusCodePattern = /^[A-Z0-9+]{4,}/
-		if (!plusCodePattern.test(address)) {
-			return address
-		}
+		if (!plusCodePattern.test(address)) return address
 	}
 
 	const firstResult = results[0]

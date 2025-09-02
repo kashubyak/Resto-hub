@@ -28,18 +28,15 @@ api.interceptors.request.use(config => {
 
 	config.headers = config.headers || {}
 	const token = Cookies.get(AUTH.TOKEN)
-	if (token) {
-		config.headers.Authorization = `Bearer ${token}`
-	}
+	if (token) config.headers.Authorization = `Bearer ${token}`
+
 	return config
 })
 
 api.interceptors.response.use(
 	response => {
 		const requestId = response.config.headers['X-Request-ID'] as string
-		if (requestId) {
-			completeNetworkRequest(requestId)
-		}
+		if (requestId) completeNetworkRequest(requestId)
 
 		if (response.config.url?.includes(API_URL.AUTH.LOGIN))
 			getGlobalShowAlert()?.('success', 'Successfully logged in.')
@@ -50,9 +47,7 @@ api.interceptors.response.use(
 	},
 	async error => {
 		const requestId = error.config?.headers?.['X-Request-ID'] as string
-		if (requestId) {
-			failNetworkRequest(requestId)
-		}
+		if (requestId) failNetworkRequest(requestId)
 
 		const originalRequest = error.config
 		if (error.response?.status === 401 && !originalRequest._retry) {

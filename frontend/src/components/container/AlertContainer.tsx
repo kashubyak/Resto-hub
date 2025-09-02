@@ -23,7 +23,6 @@ const AlertContainer = styled('div')(() => ({
 
 export const AlertDisplay = () => {
 	const { alerts, removeAlert, pauseAlertTimer, resumeAlertTimer } = useAlert()
-
 	if (alerts.length === 0) return null
 
 	return (
