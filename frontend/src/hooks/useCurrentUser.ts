@@ -13,27 +13,27 @@ export function useCurrentUser() {
 		isTokenValid,
 	} = useAuthStore()
 
-	const [isInitializing, setIsInitializing] = useState(true)
+	const [initialized, setInitialized] = useState(false)
 	const { totalProgress } = useNetworkProgress()
 
 	useEffect(() => {
 		if (!hydrated) return
 
-		const run = async () => {
+		const initialize = async () => {
 			if (isAuth && (!isTokenValid() || !userRole)) {
-				await Promise.resolve(updateUserRoleFromToken())
+				await updateUserRoleFromToken()
 			}
-			setIsInitializing(false)
+			setInitialized(true)
 		}
 
-		run()
+		initialize()
 	}, [hydrated, isAuth, userRole, isTokenValid, updateUserRoleFromToken])
 
 	return {
 		user,
 		userRole,
 		isAuth,
-		loading: !hydrated || isInitializing,
+		loading: !hydrated || !initialized,
 		totalProgress,
 		hasRole,
 	}
