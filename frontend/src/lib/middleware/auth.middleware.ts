@@ -22,9 +22,8 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
 				const refreshResult = await refreshAccessToken(request)
 				if (refreshResult.success && refreshResult.token) {
 					const newDecodedToken = decodeJWT(refreshResult.token)
-					if (newDecodedToken && hasRoleAccess(newDecodedToken.role, pathname)) {
+					if (newDecodedToken && hasRoleAccess(newDecodedToken.role, pathname))
 						return setNewTokenAndContinue(refreshResult.token)
-					}
 				}
 				return redirectToLogin(request, pathname)
 			}
@@ -36,9 +35,8 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
 		const refreshResult = await refreshAccessToken(request)
 		if (refreshResult.success && refreshResult.token) {
 			const decodedToken = decodeJWT(refreshResult.token)
-			if (decodedToken && hasRoleAccess(decodedToken.role, pathname)) {
+			if (decodedToken && hasRoleAccess(decodedToken.role, pathname))
 				return setNewTokenAndContinue(refreshResult.token)
-			}
 		}
 		return redirectToLogin(request, pathname)
 	}

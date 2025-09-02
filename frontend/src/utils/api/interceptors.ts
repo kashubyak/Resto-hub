@@ -1,9 +1,16 @@
 import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
+import {
+	completeNetworkRequest,
+	failNetworkRequest,
+	startNetworkRequest,
+	updateNetworkProgress,
+} from '@/hooks/useNetworkProgress'
 import { refreshToken } from '@/services/auth.service'
 import { useAlertStore } from '@/store/alert.store'
 import type { IAxiosError } from '@/types/error.interface'
+import type { AxiosProgressEvent } from 'axios'
 import Cookies from 'js-cookie'
 import { convertToDays } from '../convertToDays'
 import { parseBackendError } from '../errorHandler'
@@ -12,16 +19,25 @@ import { api } from './axiosInstances'
 import { getGlobalShowAlert } from './globalAlert'
 
 api.interceptors.request.use(config => {
+	const requestId = startNetworkRequest(config.url || 'unknown')
+	config.headers['X-Request-ID'] = requestId
+
+	config.onDownloadProgress = (event: AxiosProgressEvent) => {
+		updateNetworkProgress(requestId, event.loaded ?? 0, event.total ?? undefined)
+	}
+
 	config.headers = config.headers || {}
 	const token = Cookies.get(AUTH.TOKEN)
-	if (token) {
-		config.headers.Authorization = `Bearer ${token}`
-	}
+	if (token) config.headers.Authorization = `Bearer ${token}`
+
 	return config
 })
 
 api.interceptors.response.use(
 	response => {
+		const requestId = response.config.headers['X-Request-ID'] as string
+		if (requestId) completeNetworkRequest(requestId)
+
 		if (response.config.url?.includes(API_URL.AUTH.LOGIN))
 			getGlobalShowAlert()?.('success', 'Successfully logged in.')
 		if (response.config.url?.includes(API_URL.AUTH.REGISTER))
@@ -30,6 +46,9 @@ api.interceptors.response.use(
 		return response
 	},
 	async error => {
+		const requestId = error.config?.headers?.['X-Request-ID'] as string
+		if (requestId) failNetworkRequest(requestId)
+
 		const originalRequest = error.config
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
@@ -52,6 +71,9 @@ api.interceptors.response.use(
 					.then(token => {
 						if (token) {
 							originalRequest.headers['Authorization'] = `Bearer ${token}`
+							originalRequest.headers['X-Request-ID'] = startNetworkRequest(
+								originalRequest.url || 'retry',
+							)
 						}
 						return api(originalRequest)
 					})
@@ -76,6 +98,9 @@ api.interceptors.response.use(
 					api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 					processQueue(null, newToken)
 					originalRequest.headers['Authorization'] = `Bearer ${newToken}`
+					originalRequest.headers['X-Request-ID'] = startNetworkRequest(
+						originalRequest.url || 'refresh-retry',
+					)
 
 					getGlobalShowAlert()?.('info', 'Session refreshed successfully.')
 					return api(originalRequest)

@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/store/auth.store'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useNetworkProgress } from './useNetworkProgress'
 
 export function useCurrentUser() {
 	const {
@@ -12,15 +13,26 @@ export function useCurrentUser() {
 		isTokenValid,
 	} = useAuthStore()
 
+	const [initialized, setInitialized] = useState(false)
+	const { totalProgress } = useNetworkProgress()
+
 	useEffect(() => {
-		if (hydrated && isAuth && (!isTokenValid() || !userRole)) updateUserRoleFromToken()
+		if (!hydrated) return
+
+		const initialize = async () => {
+			if (isAuth && (!isTokenValid() || !userRole)) await updateUserRoleFromToken()
+			setInitialized(true)
+		}
+
+		initialize()
 	}, [hydrated, isAuth, userRole, isTokenValid, updateUserRoleFromToken])
 
 	return {
 		user,
 		userRole,
 		isAuth,
-		loading: !hydrated,
+		loading: !hydrated || !initialized,
+		totalProgress,
 		hasRole,
 	}
 }

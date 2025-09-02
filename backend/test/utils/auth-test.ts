@@ -54,9 +54,7 @@ export const getAuthSubUser = async (
     .expect(201);
 
   const id = registerRes.body.id;
-  if (!id) {
-    throw new Error('User registration response did not include an ID.');
-  }
+  if (!id) throw new Error('User registration response did not include an ID.');
 
   const loginRes = await request(app.getHttpServer())
     .post(`${BASE_URL.AUTH}/login`)

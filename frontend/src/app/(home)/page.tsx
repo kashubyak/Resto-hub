@@ -9,7 +9,7 @@ export default function Dashboard() {
 	const { user, userRole, hasRole } = useCurrentUser()
 
 	return (
-		<SafeRender title='Dashboard'>
+		<SafeRender title='Loading Dashboard...' showNetworkProgress>
 			{user && userRole && (
 				<p>
 					Hi, {user.name}! Your role: {userRole}

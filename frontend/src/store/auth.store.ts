@@ -18,7 +18,7 @@ interface IAuthStore {
 	setHydrated: (state: boolean) => void
 	setUserRole: (role: UserRole | null) => void
 	setTokenValidUntil: (timestamp: number | null) => void
-	updateUserRoleFromToken: () => boolean
+	updateUserRoleFromToken: () => Promise<boolean>
 	hasRole: (role: UserRole | UserRole[]) => boolean
 	isTokenValid: () => boolean
 	clearAuth: () => void
@@ -39,7 +39,7 @@ export const useAuthStore = create<IAuthStore>()(
 			setUserRole: role => set({ userRole: role }),
 			setTokenValidUntil: timestamp => set({ tokenValidUntil: timestamp }),
 
-			updateUserRoleFromToken: () => {
+			updateUserRoleFromToken: async () => {
 				const token = Cookies.get(AUTH.TOKEN)
 				if (!token) {
 					set({ userRole: null, tokenValidUntil: null })
@@ -51,6 +51,7 @@ export const useAuthStore = create<IAuthStore>()(
 					set({ userRole: null, tokenValidUntil: null })
 					return false
 				}
+
 				const tokenValidUntil = decodedToken.exp * 1000
 				const currentState = get()
 
@@ -60,7 +61,7 @@ export const useAuthStore = create<IAuthStore>()(
 				) {
 					set({
 						userRole: decodedToken.role,
-						tokenValidUntil: tokenValidUntil,
+						tokenValidUntil,
 					})
 				}
 
@@ -76,8 +77,7 @@ export const useAuthStore = create<IAuthStore>()(
 
 			isTokenValid: () => {
 				const { tokenValidUntil } = get()
-				if (!tokenValidUntil) return false
-				return Date.now() < tokenValidUntil
+				return !!tokenValidUntil && Date.now() < tokenValidUntil
 			},
 
 			clearAuth: () => clearAuth(),
