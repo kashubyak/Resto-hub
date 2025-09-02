@@ -65,14 +65,9 @@ export function updateNetworkProgress(requestId: string, loaded: number, total?:
 }
 
 export function completeNetworkRequest(requestId: string) {
-	const request = networkRequests.get(requestId)
-	if (request) {
-		networkRequests.set(requestId, { ...request, progress: 100, completed: true })
+	if (networkRequests.has(requestId)) {
+		networkRequests.delete(requestId)
 		notifyListeners()
-		setTimeout(() => {
-			networkRequests.delete(requestId)
-			notifyListeners()
-		}, 300)
 	}
 }
 
