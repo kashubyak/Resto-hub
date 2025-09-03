@@ -109,6 +109,9 @@ body {
 	.border-border {
 		border-color: var(--border);
 	}
+	.active-item {
+		background-color: var(--active-item);
+	}
 	.focus\:ring-primary:focus {
 		box-shadow: 0 0 0 2px var(--primary);
 	}
