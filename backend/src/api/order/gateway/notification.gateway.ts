@@ -24,7 +24,7 @@ type NotificationData =
   | boolean
   | null;
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ cors: true, transports: ['websocket'] })
 @Injectable()
 export class NotificationsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
