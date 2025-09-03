@@ -121,6 +121,9 @@ body {
 	.hover\:bg-primary:hover {
 		background-color: var(--primary-hover);
 	}
+	.hover\:text-foreground:hover {
+		color: var(--foreground);
+	}
 	.hover\:bg-secondary:hover {
 		background-color: var(--secondary-hover);
 	}
@@ -132,5 +135,8 @@ body {
 	}
 	.hover\:bg-info:hover {
 		background-color: var(--info-hover);
+	}
+	.hover\:bg-secondary:hover {
+		background-color: var(--secondary-hover);
 	}
 }
