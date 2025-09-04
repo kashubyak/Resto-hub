@@ -33,9 +33,9 @@ export const Sidebar = () => {
 					className='p-2 rounded-lg hover:bg-secondary-foreground/10'
 				>
 					{collapsed ? (
-						<ChevronRightIcon fontSize='small' />
+						<ChevronRightIcon fontSize='medium' />
 					) : (
-						<ChevronLeftIcon fontSize='small' />
+						<ChevronLeftIcon fontSize='medium' />
 					)}
 				</button>
 			</div>
