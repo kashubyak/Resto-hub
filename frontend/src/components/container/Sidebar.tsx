@@ -25,37 +25,39 @@ export const Sidebar = () => {
 				collapsed ? 'w-16' : 'w-56',
 			)}
 		>
-			<div className='flex items-center justify-between p-4 border-b border-border'>
-				{!collapsed && (
+			<div
+				className={cn(
+					'flex items-center justify-between border-b border-border',
+					collapsed ? 'p-2' : 'p-4',
+				)}
+			>
+				{!collapsed ? (
 					<>
 						<div className='w-10 h-10 flex items-center justify-center'>
-							<Image src='/Resto Hub Logo Sora.png' alt='Logo' width={30} height={30} />
+							<Image src='/Resto Hub Logo Sora.png' alt='Logo' width={40} height={40} />
 						</div>
 						<button
 							onClick={() => setCollapsed(true)}
 							className='w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground'
+							aria-label='Collapse sidebar'
 						>
 							<ChevronLeftIcon fontSize='medium' />
 						</button>
 					</>
-				)}
-
-				{collapsed && (
+				) : (
 					<button
 						onClick={() => setCollapsed(false)}
-						className='group w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground relative'
+						className='group w-full h-10 flex items-center rounded-lg px-3 py-2 hover:bg-secondary hover:text-foreground relative'
+						aria-label='Expand sidebar'
 					>
-						<Image
-							src='/Resto Hub Logo Sora.png'
-							alt='Logo'
-							width={30}
-							height={30}
-							className='absolute transition-opacity duration-200 group-hover:opacity-0'
-						/>
-						<ChevronRightIcon
-							fontSize='medium'
-							className='absolute opacity-0 transition-opacity duration-200 group-hover:opacity-100'
-						/>
+						<span className='relative w-6 h-6'>
+							<span className='absolute inset-0 flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0'>
+								<Image src='/Resto Hub Logo Sora.png' alt='Logo' width={30} height={30} />
+							</span>
+							<span className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
+								<ChevronRightIcon fontSize='small' />
+							</span>
+						</span>
 					</button>
 				)}
 			</div>
@@ -66,13 +68,19 @@ export const Sidebar = () => {
 						key={route.path}
 						href={route.path}
 						className={cn(
-							'flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-secondary hover:text-foreground',
+							'flex items-center rounded-lg px-3 py-2 transition-colors hover:bg-secondary hover:text-foreground',
 							pathname === route.path ? 'bg-accent text-foreground font-medium' : '',
-							collapsed ? 'justify-center px-2' : '',
 						)}
 					>
 						<span className='flex items-center justify-center w-6 h-6'>{route.icon}</span>
-						{!collapsed && <span className='truncate'>{route.name}</span>}
+						<span
+							className={cn(
+								'ml-3 whitespace-nowrap overflow-hidden transition-all duration-300',
+								collapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto',
+							)}
+						>
+							{route.name}
+						</span>
 					</Link>
 				))}
 			</nav>
