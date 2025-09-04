@@ -16,7 +16,8 @@ const routes = [
 
 export const Sidebar = () => {
 	const pathname = usePathname()
-	const [collapsed, isCollapsed] = useState(false)
+	const [collapsed, setCollapsed] = useState(false)
+
 	return (
 		<aside
 			className={cn(
@@ -26,19 +27,39 @@ export const Sidebar = () => {
 		>
 			<div className='flex items-center justify-between p-4 border-b border-border'>
 				{!collapsed && (
-					<Image src='/Resto Hub Logo Sora.png' alt='Logo' width={40} height={40} />
+					<>
+						<div className='w-10 h-10 flex items-center justify-center'>
+							<Image src='/Resto Hub Logo Sora.png' alt='Logo' width={30} height={30} />
+						</div>
+						<button
+							onClick={() => setCollapsed(true)}
+							className='w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground'
+						>
+							<ChevronLeftIcon fontSize='medium' />
+						</button>
+					</>
 				)}
-				<button
-					onClick={() => isCollapsed(!collapsed)}
-					className='p-2 rounded-lg hover:bg-secondary-foreground/10'
-				>
-					{collapsed ? (
-						<ChevronRightIcon fontSize='medium' />
-					) : (
-						<ChevronLeftIcon fontSize='medium' />
-					)}
-				</button>
+
+				{collapsed && (
+					<button
+						onClick={() => setCollapsed(false)}
+						className='group w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground relative'
+					>
+						<Image
+							src='/Resto Hub Logo Sora.png'
+							alt='Logo'
+							width={30}
+							height={30}
+							className='absolute transition-opacity duration-200 group-hover:opacity-0'
+						/>
+						<ChevronRightIcon
+							fontSize='medium'
+							className='absolute opacity-0 transition-opacity duration-200 group-hover:opacity-100'
+						/>
+					</button>
+				)}
 			</div>
+
 			<nav className='flex-1 p-2 space-y-1'>
 				{routes.map(route => (
 					<Link
@@ -47,10 +68,11 @@ export const Sidebar = () => {
 						className={cn(
 							'flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-secondary hover:text-foreground',
 							pathname === route.path ? 'bg-accent text-foreground font-medium' : '',
+							collapsed ? 'justify-center px-2' : '',
 						)}
 					>
 						<span className='flex items-center justify-center w-6 h-6'>{route.icon}</span>
-						<span className='truncate'>{route.name}</span>
+						{!collapsed && <span className='truncate'>{route.name}</span>}
 					</Link>
 				))}
 			</nav>
