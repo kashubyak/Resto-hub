@@ -10,12 +10,7 @@ interface SidebarHeaderProps {
 
 export const SidebarHeader = ({ collapsed, setCollapsed }: SidebarHeaderProps) => {
 	return (
-		<div
-			className={cn(
-				'flex items-center justify-between border-b border-border',
-				collapsed ? 'p-2' : 'p-4',
-			)}
-		>
+		<div className={cn('flex items-center justify-between border-b border-border p-2')}>
 			{!collapsed ? (
 				<>
 					<div className='w-10 h-10 flex items-center justify-center'>
@@ -32,7 +27,7 @@ export const SidebarHeader = ({ collapsed, setCollapsed }: SidebarHeaderProps) =
 			) : (
 				<button
 					onClick={() => setCollapsed(false)}
-					className='group w-full h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground relative overflow-hidden'
+					className='group w-12 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground relative overflow-hidden'
 					aria-label='Expand sidebar'
 				>
 					<span className='relative w-full h-full flex items-center justify-center'>
@@ -40,9 +35,9 @@ export const SidebarHeader = ({ collapsed, setCollapsed }: SidebarHeaderProps) =
 							<Image
 								src='/Resto Hub Logo Sora.png'
 								alt='Logo'
-								width={32}
-								height={32}
-								className='w-8 h-8 object-contain'
+								width={40}
+								height={40}
+								className='w-8 h-8 object-contain rounded-sm'
 							/>
 						</span>
 						<span className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
