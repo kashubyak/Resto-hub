@@ -30,14 +30,14 @@ export const SidebarHeader = ({ collapsed, setCollapsed }: SidebarHeaderProps) =
 					className='group w-12 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground relative overflow-hidden'
 					aria-label='Expand sidebar'
 				>
-					<span className='relative w-full h-full flex items-center justify-center'>
+					<span className='relative w-10 h-10 flex items-center justify-center'>
 						<span className='absolute inset-0 flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0'>
 							<Image
 								src='/Resto Hub Logo Sora.png'
 								alt='Logo'
 								width={40}
 								height={40}
-								className='w-8 h-8 object-contain rounded-sm'
+								className='object-contain rounded-sm'
 							/>
 						</span>
 						<span className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
