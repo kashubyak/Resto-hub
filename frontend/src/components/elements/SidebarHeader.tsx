@@ -1,4 +1,3 @@
-import { cn } from '@/utils/cn'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import Image from 'next/image'
@@ -10,7 +9,7 @@ interface SidebarHeaderProps {
 
 export const SidebarHeader = ({ collapsed, setCollapsed }: SidebarHeaderProps) => {
 	return (
-		<div className={cn('flex items-center justify-between border-b border-border p-2')}>
+		<div className='flex items-center justify-between border-b border-border p-2'>
 			{!collapsed ? (
 				<>
 					<div className='w-10 h-10 flex items-center justify-center'>

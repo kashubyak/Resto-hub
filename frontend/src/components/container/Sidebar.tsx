@@ -1,20 +1,16 @@
 'use client'
 
-import { ROUTES } from '@/constants/pages.constant'
+import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { cn } from '@/utils/cn'
-import AudiotrackIcon from '@mui/icons-material/Audiotrack'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { SidebarHeader } from '../elements/SidebarHeader'
 
-const routes = [
-	{ path: ROUTES.PRIVATE.ADMIN.ROOT, name: 'Home', icon: <AudiotrackIcon /> },
-]
-
 export const Sidebar = () => {
 	const pathname = usePathname()
 	const [collapsed, setCollapsed] = useState(false)
+	const { routes } = useUserRoutes()
 
 	return (
 		<aside
@@ -24,7 +20,6 @@ export const Sidebar = () => {
 			)}
 		>
 			<SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
-
 			<nav className='flex-1 p-2 space-y-1'>
 				{routes.map(route => (
 					<Link
@@ -35,7 +30,9 @@ export const Sidebar = () => {
 							pathname === route.path ? 'bg-accent text-foreground font-medium' : '',
 						)}
 					>
-						<span className='flex items-center justify-center w-6 h-6'>{route.icon}</span>
+						<span className='flex items-center justify-center w-6 h-6'>
+							<route.icon />
+						</span>
 						<span
 							className={cn(
 								'ml-3 whitespace-nowrap overflow-hidden transition-all duration-300',
