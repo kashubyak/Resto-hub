@@ -15,8 +15,8 @@ export const Sidebar = () => {
 	return (
 		<aside
 			className={cn(
-				'h-screen border-r border-border bg-secondary text-secondary-foreground flex flex-col transition-all duration-300',
-				collapsed ? 'w-16' : 'w-56',
+				'h-screen border-r border-border text-secondary-foreground flex flex-col transition-all duration-300',
+				collapsed ? 'w-16 bg-background' : 'w-56 bg-secondary',
 			)}
 		>
 			<SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
