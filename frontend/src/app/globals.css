@@ -11,7 +11,7 @@
 	--primary-hover: #328df6;
 	--secondary: #f5f6fa;
 	--secondary-foreground: #8c8e92;
-	--secondary-hover: #f1f2f8;
+	--secondary-hover: #eceef5;
 	--success: #16a34a;
 	--success-hover: #15803d;
 	--destructive: #c20b0a;
@@ -50,7 +50,7 @@
 		--border: #242a37;
 		--input: #0e1217;
 		--stable-light: #fff;
-		--active-item: #73777f;
+		--active-item: #202735;
 	}
 }
 

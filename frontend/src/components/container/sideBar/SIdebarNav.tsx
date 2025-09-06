@@ -15,8 +15,10 @@ export const SidebarNav = ({ collapsed, routes, pathname }: ISidebarNavProps) =>
 					key={route.path}
 					href={route.path}
 					className={cn(
-						'flex items-center rounded-lg px-3 py-2 transition-colors hover:bg-secondary hover:text-foreground',
-						pathname === route.path ? 'bg-accent text-foreground font-medium' : '',
+						'flex items-center rounded-lg px-3 py-2 transition-colors',
+						pathname === route.path
+							? 'active-item text-foreground font-medium'
+							: 'text-muted-foreground hover:bg-secondary hover:text-foreground',
 					)}
 				>
 					<span className='flex items-center justify-center w-6 h-6'>
