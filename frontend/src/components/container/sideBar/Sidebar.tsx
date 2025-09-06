@@ -4,10 +4,10 @@ import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { cn } from '@/utils/cn'
 import CloseIcon from '@mui/icons-material/Close'
 import Image from 'next/image'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { SidebarHeader } from './SidebarHeader'
+import { SidebarNav } from './SIdebarNav'
 
 interface SidebarProps {
 	mobileOpen: boolean
@@ -28,30 +28,7 @@ export const Sidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
 				)}
 			>
 				<SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
-				<nav className='flex-1 p-2 space-y-1'>
-					{routes.map(route => (
-						<Link
-							key={route.path}
-							href={route.path}
-							className={cn(
-								'flex items-center rounded-lg px-3 py-2 transition-colors hover:bg-secondary hover:text-foreground',
-								pathname === route.path ? 'bg-accent text-foreground font-medium' : '',
-							)}
-						>
-							<span className='flex items-center justify-center w-6 h-6'>
-								<route.icon />
-							</span>
-							<span
-								className={cn(
-									'ml-3 whitespace-nowrap overflow-hidden transition-all duration-300',
-									collapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto',
-								)}
-							>
-								{route.name}
-							</span>
-						</Link>
-					))}
-				</nav>
+				<SidebarNav collapsed={collapsed} routes={routes} pathname={pathname} />
 			</aside>
 			<div
 				className={cn(
@@ -86,24 +63,7 @@ export const Sidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
 							<CloseIcon />
 						</button>
 					</div>
-					<nav className='flex-1 p-2 space-y-1'>
-						{routes.map(route => (
-							<Link
-								key={route.path}
-								href={route.path}
-								onClick={() => setMobileOpen(false)}
-								className={cn(
-									'flex items-center rounded-lg px-3 py-2 transition-colors hover:bg-secondary hover:text-foreground',
-									pathname === route.path ? 'bg-accent text-foreground font-medium' : '',
-								)}
-							>
-								<span className='flex items-center justify-center w-6 h-6'>
-									<route.icon />
-								</span>
-								<span className='ml-3'>{route.name}</span>
-							</Link>
-						))}
-					</nav>
+					<SidebarNav collapsed={collapsed} routes={routes} pathname={pathname} />
 				</aside>
 			</div>
 		</>
