@@ -1,12 +1,12 @@
 'use client'
 
 import { Header } from '@/components/container/Header'
-import { Sidebar } from '@/components/container/Sidebar'
+import { Sidebar } from '@/components/container/sideBar/Sidebar'
 import React, { useState } from 'react'
 
 type Props = { children: React.ReactNode }
 
-export default function DashboardShell({ children }: Props) {
+export default function SidebarShell({ children }: Props) {
 	const [mobileOpen, setMobileOpen] = useState(false)
 
 	return (

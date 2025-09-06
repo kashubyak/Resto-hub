@@ -1,4 +1,4 @@
-import DashboardShell from '@/components/layout/DashboardShell'
+import SidebarShell from '@/components/layout/SidebarShell'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-	return <DashboardShell>{children}</DashboardShell>
+	return <SidebarShell>{children}</SidebarShell>
 }
