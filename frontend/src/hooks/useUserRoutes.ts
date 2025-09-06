@@ -8,6 +8,7 @@ import PersonIcon from '@mui/icons-material/Person'
 import RestaurantIcon from '@mui/icons-material/Restaurant'
 import SettingsIcon from '@mui/icons-material/Settings'
 import TableRestaurantIcon from '@mui/icons-material/TableRestaurant'
+import { usePathname } from 'next/navigation'
 import { useMemo, type ComponentType } from 'react'
 
 interface IRouteConfig {
@@ -80,6 +81,7 @@ const ALL_ROUTES: IRouteConfig[] = [
 ]
 export const useUserRoutes = () => {
 	const { userRole } = useAuthStore()
+	const pathname = usePathname()
 
 	const userRoutes = useMemo(() => {
 		if (!userRole) return []
@@ -94,8 +96,13 @@ export const useUserRoutes = () => {
 		}
 	}, [userRole])
 
+	const currentRoute = useMemo(() => {
+		return userRoutes.find(route => route.path === pathname) || null
+	}, [pathname, userRoutes])
+
 	return {
 		routes: userRoutes,
 		hasAccess,
+		currentRoute,
 	}
 }

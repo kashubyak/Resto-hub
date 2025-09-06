@@ -1,5 +1,6 @@
 'use client'
 
+import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { cn } from '@/utils/cn'
 import MenuIcon from '@mui/icons-material/Menu'
 
@@ -9,6 +10,8 @@ interface HeaderProps {
 }
 
 export const Header = ({ onOpenSidebar, isSidebarOpen }: HeaderProps) => {
+	const { currentRoute } = useUserRoutes()
+
 	return (
 		<header className='h-14 border-b border-border flex items-center justify-between px-4 bg-background md:hidden'>
 			<button
@@ -21,7 +24,7 @@ export const Header = ({ onOpenSidebar, isSidebarOpen }: HeaderProps) => {
 			>
 				<MenuIcon />
 			</button>
-			<span className='font-semibold'>Dashboard</span>
+			<span className='font-semibold'> {currentRoute?.name ?? 'Page'}</span>
 		</header>
 	)
 }
