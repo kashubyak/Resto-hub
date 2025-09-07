@@ -13,7 +13,7 @@ export const Header = ({ onOpenSidebar, isSidebarOpen }: HeaderProps) => {
 	const { currentRoute } = useUserRoutes()
 
 	return (
-		<header className='h-14 border-b border-border flex items-center justify-between px-4 bg-background md:hidden'>
+		<header className='h-[3.685rem] border-b border-border flex items-center justify-between px-4 bg-background md:hidden'>
 			<button
 				onClick={onOpenSidebar}
 				className={cn(
