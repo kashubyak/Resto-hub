@@ -63,7 +63,11 @@ export const Sidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
 							<CloseIcon />
 						</button>
 					</div>
-					<SidebarNav collapsed={collapsed} routes={routes} pathname={pathname} />
+					<SidebarNav
+						collapsed={collapsed && !mobileOpen}
+						routes={routes}
+						pathname={pathname}
+					/>
 				</aside>
 			</div>
 		</>
