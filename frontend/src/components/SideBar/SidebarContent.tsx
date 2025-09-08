@@ -50,7 +50,7 @@ export const SidebarContent = ({
 				<SidebarNav collapsed={collapsed} routes={routes} pathname={pathname} />
 			</div>
 
-			<div className='p-2 flex items-center justify-between'>
+			<div className='p-2 border-t border-border flex items-center justify-between'>
 				<div className='flex items-center gap-2 overflow-hidden'>
 					<Image
 						src={user?.avatarUrl || '/Resto Hub Logo Sora.png'}
@@ -60,15 +60,24 @@ export const SidebarContent = ({
 						className='rounded-full'
 					/>
 					{!collapsed && (
-						<>
-							<span className='truncate text-sm font-medium'>{user?.name}</span>
-							<span className='truncate text-sm font-medium'>{user?.email}</span>
-						</>
+						<div className='flex flex-col min-w-0'>
+							<span className='text-sm font-medium text-foreground truncate'>
+								{user?.name || 'Unknown'}
+							</span>
+							<span className='text-xs text-muted-foreground truncate'>
+								{user?.email || 'no-email@example.com'}
+							</span>
+						</div>
 					)}
 				</div>
-				<button className='p-2 rounded-lg hover:bg-secondary transition-colors duration-200'>
-					<MoreVertIcon fontSize='small' />
-				</button>
+				{!collapsed && (
+					<button
+						className='ml-2 p-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors'
+						aria-label='User menu'
+					>
+						<MoreVertIcon fontSize='small' />
+					</button>
+				)}
 			</div>
 		</div>
 	)
