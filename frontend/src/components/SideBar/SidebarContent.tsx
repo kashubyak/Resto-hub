@@ -32,7 +32,7 @@ export const SidebarContent = ({
 				) : (
 					<div className='flex items-center justify-between border-b border-border p-2'>
 						<div className='w-10 h-10 flex items-center justify-center'>
-							<Image src='/Resto Hub Logo Sora.png' alt='Logo' width={40} height={40} />
+							<Image src='/Resto-Hub.png' alt='Logo' width={40} height={40} />
 						</div>
 						<button
 							onClick={onClose}
@@ -53,7 +53,7 @@ export const SidebarContent = ({
 			<div className='p-2 border-t border-border flex items-center justify-between'>
 				<div className='flex items-center gap-2 overflow-hidden'>
 					<Image
-						src={user?.avatarUrl || '/Resto Hub Logo Sora.png'}
+						src={user?.avatarUrl || '/Resto-Hub.png'}
 						alt='User avatar'
 						width={40}
 						height={40}
