@@ -19,7 +19,7 @@ export const SideBarUser = ({ collapsed }: ISideBarUser) => {
 							alt='User avatar'
 							width={40}
 							height={40}
-							className='rounded-full'
+							className='rounded-md'
 						/>
 						<div className='flex flex-col min-w-0'>
 							<span className='text-sm font-medium text-foreground truncate'>
@@ -48,7 +48,7 @@ export const SideBarUser = ({ collapsed }: ISideBarUser) => {
 								alt='User avatar'
 								width={40}
 								height={40}
-								className='object-cover rounded-full'
+								className='object-cover rounded-md'
 							/>
 						</span>
 						<span className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100'>

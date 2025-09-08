@@ -13,7 +13,13 @@ export const SidebarHeader = ({ collapsed, setCollapsed }: SidebarHeaderProps) =
 			{!collapsed ? (
 				<>
 					<div className='w-10 h-10 flex items-center justify-center'>
-						<Image src='/Resto-Hub.png' alt='Logo' width={40} height={40} />
+						<Image
+							src='/Resto-Hub.png'
+							alt='Logo'
+							width={40}
+							height={40}
+							className='object-contain rounded-md'
+						/>
 					</div>
 					<button
 						onClick={() => setCollapsed(true)}
@@ -36,7 +42,7 @@ export const SidebarHeader = ({ collapsed, setCollapsed }: SidebarHeaderProps) =
 								alt='Logo'
 								width={40}
 								height={40}
-								className='object-contain rounded-sm'
+								className='object-contain rounded-md'
 							/>
 						</span>
 						<span className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
