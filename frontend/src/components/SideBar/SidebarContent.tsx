@@ -1,5 +1,7 @@
+import { useAuth } from '@/providers/AuthContext'
 import { cn } from '@/utils/cn'
 import CloseIcon from '@mui/icons-material/Close'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Image from 'next/image'
 import { SidebarHeader } from './SidebarHeader'
 import { SidebarNav } from './SidebarNav'
@@ -21,29 +23,53 @@ export const SidebarContent = ({
 	pathname,
 	onClose,
 }: SidebarContentProps) => {
+	const { user } = useAuth()
 	return (
-		<>
-			{mode === 'desktop' ? (
-				<SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
-			) : (
-				<div className='flex items-center justify-between border-b border-border p-2'>
-					<div className='w-10 h-10 flex items-center justify-center'>
-						<Image src='/Resto Hub Logo Sora.png' alt='Logo' width={40} height={40} />
+		<div className='flex flex-col h-full justify-between'>
+			<div>
+				{mode === 'desktop' ? (
+					<SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
+				) : (
+					<div className='flex items-center justify-between border-b border-border p-2'>
+						<div className='w-10 h-10 flex items-center justify-center'>
+							<Image src='/Resto Hub Logo Sora.png' alt='Logo' width={40} height={40} />
+						</div>
+						<button
+							onClick={onClose}
+							className={cn(
+								'p-2 rounded-lg hover:bg-secondary',
+								'transition-colors duration-200',
+							)}
+							aria-label='Open menu'
+						>
+							<CloseIcon />
+						</button>
 					</div>
-					<button
-						onClick={onClose}
-						className={cn(
-							'p-2 rounded-lg hover:bg-secondary',
-							'transition-colors duration-200',
-						)}
-						aria-label='Open menu'
-					>
-						<CloseIcon />
-					</button>
-				</div>
-			)}
+				)}
 
-			<SidebarNav collapsed={collapsed} routes={routes} pathname={pathname} />
-		</>
+				<SidebarNav collapsed={collapsed} routes={routes} pathname={pathname} />
+			</div>
+
+			<div className='p-2 flex items-center justify-between'>
+				<div className='flex items-center gap-2 overflow-hidden'>
+					<Image
+						src={user?.avatarUrl || '/Resto Hub Logo Sora.png'}
+						alt='User avatar'
+						width={40}
+						height={40}
+						className='rounded-full'
+					/>
+					{!collapsed && (
+						<>
+							<span className='truncate text-sm font-medium'>{user?.name}</span>
+							<span className='truncate text-sm font-medium'>{user?.email}</span>
+						</>
+					)}
+				</div>
+				<button className='p-2 rounded-lg hover:bg-secondary transition-colors duration-200'>
+					<MoreVertIcon fontSize='small' />
+				</button>
+			</div>
+		</div>
 	)
 }
