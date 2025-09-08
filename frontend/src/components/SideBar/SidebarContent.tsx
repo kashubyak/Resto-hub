@@ -62,17 +62,15 @@ export const SidebarContent = ({
 					{!collapsed && (
 						<div className='flex flex-col min-w-0'>
 							<span className='text-sm font-medium text-foreground truncate'>
-								{user?.name || 'Unknown'}
+								{user?.name}
 							</span>
-							<span className='text-xs text-muted-foreground truncate'>
-								{user?.email || 'no-email@example.com'}
-							</span>
+							<span className='text-xs text-secondary truncate'>{user?.email}</span>
 						</div>
 					)}
 				</div>
 				{!collapsed && (
 					<button
-						className='ml-2 p-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors'
+						className='w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground'
 						aria-label='User menu'
 					>
 						<MoreVertIcon fontSize='small' />
