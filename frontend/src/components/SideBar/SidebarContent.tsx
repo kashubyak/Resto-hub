@@ -2,7 +2,7 @@ import { cn } from '@/utils/cn'
 import CloseIcon from '@mui/icons-material/Close'
 import Image from 'next/image'
 import { SidebarHeader } from './SidebarHeader'
-import { SidebarNav } from './SIdebarNav'
+import { SidebarNav } from './SidebarNav'
 
 interface SidebarContentProps {
 	mode: 'desktop' | 'mobile'
