@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
 			{
 				protocol: 'https',
 				hostname: 'resto-hub.s3.eu-central-1.amazonaws.com',
+				port: '',
 				pathname: '/**',
 			},
 		],
