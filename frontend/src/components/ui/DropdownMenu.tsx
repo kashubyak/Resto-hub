@@ -9,6 +9,7 @@ export interface IMenuItem {
 	onClick: () => void
 	disabled?: boolean
 	className?: string
+	isDivider?: boolean
 }
 
 interface IPosition {
@@ -38,34 +39,37 @@ export const DropdownMenu: FC<IDropdownMenuProps> = ({
 	const menuContent = (
 		<div
 			ref={menuRef}
-			className={`fixed z-50 min-w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 ${className}`}
+			className={`fixed z-50 min-w-42 rounded-lg border border-border bg-secondary overflow-hidden ${className}`}
 			style={{
 				top: position.top,
 				left: position.left,
 			}}
 		>
-			{items.map(item => (
-				<button
-					key={item.id}
-					onClick={() => {
-						if (!item.disabled) {
-							item.onClick()
-							onClose()
-						}
-					}}
-					disabled={item.disabled}
-					className={`
-            w-full text-left px-4 py-2 text-sm text-gray-700 
-            hover:bg-gray-100 hover:text-gray-900 
-            disabled:opacity-50 disabled:cursor-not-allowed
-            first:rounded-t-lg last:rounded-b-lg
-            transition-colors duration-150
-            ${item.className || ''}
-          `}
-				>
-					{item.label}
-				</button>
-			))}
+			<div className='p-1.5'>
+				{items.map(item =>
+					item.isDivider ? (
+						<div key={item.id} className='my-1 border-t border-border' />
+					) : (
+						<button
+							key={item.id}
+							onClick={() => {
+								if (!item.disabled) {
+									item.onClick()
+									onClose()
+								}
+							}}
+							disabled={item.disabled}
+							className={`
+                w-full px-3 py-2 text-sm flex items-center gap-2
+                hover: hover:bg-secondary hover:text-foreground rounded-lg
+                ${item.className || ''}
+              `}
+						>
+							{item.label}
+						</button>
+					),
+				)}
+			</div>
 		</div>
 	)
 

@@ -17,31 +17,23 @@ export const SideBarUser = ({ collapsed }: ISideBarUser) => {
 		{
 			id: 'profile',
 			label: 'Profile',
-			onClick: () => {
-				console.log('Open profile')
-			},
+			onClick: () => console.log('Open profile'),
 		},
 		{
 			id: 'settings',
 			label: 'Settings',
-			onClick: () => {
-				console.log('Open settings')
-			},
+			onClick: () => console.log('Open settings'),
 		},
 		{
 			id: 'divider',
-			label: '─────────────────',
+			label: '',
 			onClick: () => {},
-			disabled: true,
-			className: 'cursor-default hover:bg-transparent text-gray-300 text-center',
+			isDivider: true,
 		},
 		{
 			id: 'logout',
 			label: 'Logout',
-			onClick: () => {
-				logout()
-			},
-			className: 'text-red-600 hover:bg-red-50 hover:text-red-700',
+			onClick: logout,
 		},
 	]
 
