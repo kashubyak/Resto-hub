@@ -1,5 +1,6 @@
 import { useDropdownMenu } from '@/hooks/useDropdownMenu'
 import { useAuth } from '@/providers/AuthContext'
+import LogoutIcon from '@mui/icons-material/Logout'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Image from 'next/image'
 import { DropdownMenu, type IMenuItem } from '../ui/DropdownMenu'
@@ -34,6 +35,7 @@ export const SideBarUser = ({ collapsed }: ISideBarUser) => {
 			id: 'logout',
 			label: 'Logout',
 			onClick: logout,
+			icon: <LogoutIcon fontSize='small' />,
 		},
 	]
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { type FC } from 'react'
+import { type FC, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 export interface IMenuItem {
@@ -10,6 +10,7 @@ export interface IMenuItem {
 	disabled?: boolean
 	className?: string
 	isDivider?: boolean
+	icon?: ReactNode
 }
 
 interface IPosition {
@@ -59,13 +60,10 @@ export const DropdownMenu: FC<IDropdownMenuProps> = ({
 								}
 							}}
 							disabled={item.disabled}
-							className={`
-                w-full px-3 py-2 text-sm flex items-center gap-2
-                hover: hover:bg-secondary hover:text-foreground rounded-lg
-                ${item.className || ''}
-              `}
+							className={`w-full px-3 py-2 text-sm flex items-center justify-between hover:bg-secondary rounded-lg ${item.className}`}
 						>
-							{item.label}
+							<span>{item.label}</span>
+							{item.icon && <span className='ml-2 text-foreground'>{item.icon}</span>}
 						</button>
 					),
 				)}
