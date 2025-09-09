@@ -1,16 +1,52 @@
+import { useDropdownMenu } from '@/hooks/useDropdownMenu'
 import { useAuth } from '@/providers/AuthContext'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Image from 'next/image'
+import { DropdownMenu, type MenuItem } from '../ui/DropdownMenu'
 
 interface ISideBarUser {
 	collapsed: boolean
 }
 
 export const SideBarUser = ({ collapsed }: ISideBarUser) => {
-	const { user } = useAuth()
+	const { user, logout } = useAuth()
+	const { isOpen, position, toggleMenu, closeMenu, menuRef, buttonRef } =
+		useDropdownMenu()
+
+	const menuItems: MenuItem[] = [
+		{
+			id: 'profile',
+			label: 'Profile',
+			onClick: () => {
+				console.log('Open profile')
+			},
+		},
+		{
+			id: 'settings',
+			label: 'Settings',
+			onClick: () => {
+				console.log('Open settings')
+			},
+		},
+		{
+			id: 'divider',
+			label: '─────────────────',
+			onClick: () => {},
+			disabled: true,
+			className: 'cursor-default hover:bg-transparent text-gray-300 text-center',
+		},
+		{
+			id: 'logout',
+			label: 'Logout',
+			onClick: () => {
+				logout()
+			},
+			className: 'text-red-600 hover:bg-red-50 hover:text-red-700',
+		},
+	]
 
 	return (
-		<div className='p-2 border-t border-border flex items-center justify-between'>
+		<div className='p-2 border-t border-border flex items-center justify-between relative'>
 			{!collapsed ? (
 				<>
 					<div className='flex items-center gap-2 overflow-hidden'>
@@ -29,17 +65,24 @@ export const SideBarUser = ({ collapsed }: ISideBarUser) => {
 						</div>
 					</div>
 					<button
-						className='w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground'
+						ref={buttonRef}
+						onClick={toggleMenu}
+						className='w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground transition-colors duration-150'
 						aria-label='User menu'
+						aria-expanded={isOpen}
+						aria-haspopup='true'
 					>
 						<MoreVertIcon fontSize='small' />
 					</button>
 				</>
 			) : (
 				<button
-					onClick={() => {}}
-					className='group w-12 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground relative overflow-hidden'
+					ref={buttonRef}
+					onClick={toggleMenu}
+					className='group w-12 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground relative overflow-hidden transition-colors duration-150'
 					aria-label='User menu'
+					aria-expanded={isOpen}
+					aria-haspopup='true'
 				>
 					<span className='relative w-10 h-10 flex items-center justify-center'>
 						<span className='absolute inset-0 flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0'>
@@ -57,6 +100,14 @@ export const SideBarUser = ({ collapsed }: ISideBarUser) => {
 					</span>
 				</button>
 			)}
+
+			<DropdownMenu
+				isOpen={isOpen}
+				position={position}
+				menuRef={menuRef}
+				items={menuItems}
+				onClose={closeMenu}
+			/>
 		</div>
 	)
 }
