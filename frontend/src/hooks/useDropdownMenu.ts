@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-interface Position {
+interface IPosition {
 	top: number
 	left: number
 }
 
 export const useDropdownMenu = () => {
 	const [isOpen, setIsOpen] = useState(false)
-	const [position, setPosition] = useState<Position>({ top: 0, left: 0 })
+	const [position, setPosition] = useState<IPosition>({ top: 0, left: 0 })
 	const menuRef = useRef<HTMLDivElement>(null)
 	const buttonRef = useRef<HTMLButtonElement>(null)
 

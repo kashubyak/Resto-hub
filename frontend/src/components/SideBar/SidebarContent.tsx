@@ -5,7 +5,7 @@ import { SidebarHeader } from './SidebarHeader'
 import { SidebarNav } from './SidebarNav'
 import { SideBarUser } from './SideBarUser'
 
-interface SidebarContentProps {
+interface ISidebarContentProps {
 	mode: 'desktop' | 'mobile'
 	collapsed: boolean
 	setCollapsed: (value: boolean) => void
@@ -21,7 +21,7 @@ export const SidebarContent = ({
 	routes,
 	pathname,
 	onClose,
-}: SidebarContentProps) => {
+}: ISidebarContentProps) => {
 	return (
 		<div className='flex flex-col h-full justify-between'>
 			<div>

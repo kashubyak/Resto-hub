@@ -6,12 +6,12 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { SidebarContent } from './SidebarContent'
 
-interface SidebarProps {
+interface ISidebarProps {
 	mobileOpen: boolean
 	setMobileOpen: (value: boolean) => void
 }
 
-export const Sidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
+export const Sidebar = ({ mobileOpen, setMobileOpen }: ISidebarProps) => {
 	const pathname = usePathname()
 	const [collapsed, setCollapsed] = useState(false)
 	const { routes } = useUserRoutes()

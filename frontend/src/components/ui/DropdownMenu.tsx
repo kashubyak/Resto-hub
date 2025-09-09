@@ -3,7 +3,7 @@
 import { type FC } from 'react'
 import { createPortal } from 'react-dom'
 
-export interface MenuItem {
+export interface IMenuItem {
 	id: string
 	label: string
 	onClick: () => void
@@ -11,21 +11,21 @@ export interface MenuItem {
 	className?: string
 }
 
-interface Position {
+interface IPosition {
 	top: number
 	left: number
 }
 
-interface DropdownMenuProps {
+interface IDropdownMenuProps {
 	isOpen: boolean
-	position: Position
+	position: IPosition
 	menuRef: React.RefObject<HTMLDivElement | null>
-	items: MenuItem[]
+	items: IMenuItem[]
 	onClose: () => void
 	className?: string
 }
 
-export const DropdownMenu: FC<DropdownMenuProps> = ({
+export const DropdownMenu: FC<IDropdownMenuProps> = ({
 	isOpen,
 	position,
 	menuRef,

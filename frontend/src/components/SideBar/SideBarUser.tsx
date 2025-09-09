@@ -2,7 +2,7 @@ import { useDropdownMenu } from '@/hooks/useDropdownMenu'
 import { useAuth } from '@/providers/AuthContext'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Image from 'next/image'
-import { DropdownMenu, type MenuItem } from '../ui/DropdownMenu'
+import { DropdownMenu, type IMenuItem } from '../ui/DropdownMenu'
 
 interface ISideBarUser {
 	collapsed: boolean
@@ -13,7 +13,7 @@ export const SideBarUser = ({ collapsed }: ISideBarUser) => {
 	const { isOpen, position, toggleMenu, closeMenu, menuRef, buttonRef } =
 		useDropdownMenu()
 
-	const menuItems: MenuItem[] = [
+	const menuItems: IMenuItem[] = [
 		{
 			id: 'profile',
 			label: 'Profile',

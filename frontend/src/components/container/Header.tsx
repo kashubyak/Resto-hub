@@ -4,12 +4,12 @@ import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { cn } from '@/utils/cn'
 import MenuIcon from '@mui/icons-material/Menu'
 
-interface HeaderProps {
+interface IHeaderProps {
 	onOpenSidebar: () => void
 	isSidebarOpen: boolean
 }
 
-export const Header = ({ onOpenSidebar, isSidebarOpen }: HeaderProps) => {
+export const Header = ({ onOpenSidebar, isSidebarOpen }: IHeaderProps) => {
 	const { currentRoute } = useUserRoutes()
 
 	return (
