@@ -41,8 +41,8 @@ export const DropdownMenu: FC<IDropdownMenuProps> = ({
 			ref={menuRef}
 			className={`fixed z-50 min-w-42 rounded-lg border border-border bg-secondary overflow-hidden ${className}`}
 			style={{
-				top: position.top,
-				left: position.left,
+				top: `${position.top}px`,
+				left: `${position.left}px`,
 			}}
 		>
 			<div className='p-1.5'>

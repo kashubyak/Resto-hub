@@ -7,78 +7,93 @@ interface IPosition {
 	left: number
 }
 
-export const useDropdownMenu = () => {
+export const useDropdownMenu = (offset = 8, margin = 8) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [position, setPosition] = useState<IPosition>({ top: 0, left: 0 })
-	const menuRef = useRef<HTMLDivElement>(null)
-	const buttonRef = useRef<HTMLButtonElement>(null)
+	const menuRef = useRef<HTMLDivElement | null>(null)
+	const buttonRef = useRef<HTMLButtonElement | null>(null)
+	const anchorRectRef = useRef<DOMRect | null>(null)
 
-	const openMenu = useCallback(() => setIsOpen(true), [])
 	const closeMenu = useCallback(() => setIsOpen(false), [])
-	const toggleMenu = useCallback(() => setIsOpen(prev => !prev), [])
+	const openMenu = useCallback(() => {
+		const btn = buttonRef.current
+		if (!btn) return
+		const rect = btn.getBoundingClientRect()
+		anchorRectRef.current = rect
+		setPosition({
+			top: Math.round(rect.bottom + offset),
+			left: Math.round(rect.left),
+		})
+		setIsOpen(true)
+	}, [offset])
 
-	const calculatePosition = useCallback(() => {
-		if (!buttonRef.current) return
-
-		const buttonRect = buttonRef.current.getBoundingClientRect()
-		const menuHeight = 200
-		const menuWidth = 200
-		const viewportHeight = window.innerHeight
-		const viewportWidth = window.innerWidth
-
-		const spaceBelow = viewportHeight - buttonRect.bottom
-		const spaceAbove = buttonRect.top
-
-		let top = buttonRect.bottom + window.scrollY + 4
-		let left = buttonRect.left + window.scrollX
-
-		if (spaceBelow < menuHeight && spaceAbove > menuHeight)
-			top = buttonRect.top + window.scrollY - menuHeight - 4
-
-		if (left + menuWidth > viewportWidth)
-			left = buttonRect.right + window.scrollX - menuWidth
-
-		if (left < 0) left = 4
-
-		setPosition({ top, left })
-	}, [])
+	const toggleMenu = useCallback(() => {
+		if (isOpen) closeMenu()
+		else openMenu()
+	}, [isOpen, openMenu, closeMenu])
 
 	useEffect(() => {
-		if (isOpen) {
-			calculatePosition()
+		if (!isOpen) return
 
-			const handleResize = () => calculatePosition()
-			window.addEventListener('resize', handleResize)
+		const adjust = () => {
+			const anchor = anchorRectRef.current
+			const menu = menuRef.current
+			if (!anchor || !menu) return
 
-			return () => window.removeEventListener('resize', handleResize)
-		}
-	}, [isOpen, calculatePosition])
+			const menuRect = menu.getBoundingClientRect()
+			let left = anchor.left
+			let top = anchor.bottom + offset
 
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
 			if (
-				menuRef.current &&
-				!menuRef.current.contains(event.target as Node) &&
-				buttonRef.current &&
-				!buttonRef.current.contains(event.target as Node)
+				top + menuRect.height > window.innerHeight - margin &&
+				anchor.top > menuRect.height + margin
 			)
+				top = anchor.top - menuRect.height - offset
+
+			if (left + menuRect.width > window.innerWidth - margin) {
+				const candidateLeft = anchor.right - menuRect.width
+				left = Math.max(margin, candidateLeft)
+			}
+
+			if (left < margin) left = margin
+			setPosition({ top: Math.round(top), left: Math.round(left) })
+		}
+
+		const raf = requestAnimationFrame(adjust)
+
+		const onResize = () => adjust()
+		window.addEventListener('resize', onResize)
+		window.addEventListener('scroll', onResize, true)
+
+		return () => {
+			cancelAnimationFrame(raf)
+			window.removeEventListener('resize', onResize)
+			window.removeEventListener('scroll', onResize, true)
+		}
+	}, [isOpen, offset, margin])
+
+	useEffect(() => {
+		if (!isOpen) return
+
+		const onDocClick = (e: Event) => {
+			const target = e.target as Node | null
+			if (!menuRef.current || !buttonRef.current) return
+			if (!menuRef.current.contains(target) && !buttonRef.current.contains(target))
 				closeMenu()
 		}
 
-		if (isOpen) {
-			document.addEventListener('mousedown', handleClickOutside)
-			return () => document.removeEventListener('mousedown', handleClickOutside)
-		}
-	}, [isOpen, closeMenu])
-
-	useEffect(() => {
-		const handleEscape = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') closeMenu()
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') closeMenu()
 		}
 
-		if (isOpen) {
-			document.addEventListener('keydown', handleEscape)
-			return () => document.removeEventListener('keydown', handleEscape)
+		document.addEventListener('mousedown', onDocClick)
+		document.addEventListener('touchstart', onDocClick)
+		document.addEventListener('keydown', onKey)
+
+		return () => {
+			document.removeEventListener('mousedown', onDocClick)
+			document.removeEventListener('touchstart', onDocClick)
+			document.removeEventListener('keydown', onKey)
 		}
 	}, [isOpen, closeMenu])
 
