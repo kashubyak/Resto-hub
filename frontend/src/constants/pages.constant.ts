@@ -39,7 +39,9 @@ export const ROUTES = {
 		SHARED: {
 			DASHBOARD: '/',
 		},
-		ADMIN: {},
+		ADMIN: {
+			DISH: '/dish',
+		},
 		COOK: {},
 		WAITER: {},
 	} as const,
@@ -65,7 +67,7 @@ export const AUTH_ROUTES_LIST: string[] = [
 const SHARED_ROUTES = [ROUTES.PRIVATE.SHARED.DASHBOARD]
 
 export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
-	[UserRole.ADMIN]: [...SHARED_ROUTES],
+	[UserRole.ADMIN]: [...SHARED_ROUTES, ROUTES.PRIVATE.ADMIN.DISH],
 	[UserRole.COOK]: [...SHARED_ROUTES],
 	[UserRole.WAITER]: [...SHARED_ROUTES],
 }
@@ -76,5 +78,11 @@ export const ALL_ROUTES: IRouteConfig[] = [
 		name: 'Dashboard',
 		icon: DashboardIcon,
 		roles: [UserRole.ADMIN, UserRole.COOK, UserRole.WAITER],
+	},
+	{
+		path: ROUTES.PRIVATE.ADMIN.DISH,
+		name: 'Dishes',
+		icon: DashboardIcon,
+		roles: [UserRole.ADMIN],
 	},
 ]
