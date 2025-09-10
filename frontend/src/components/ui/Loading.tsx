@@ -1,6 +1,6 @@
 import { Box, CircularProgress, LinearProgress, Typography } from '@mui/material'
 
-interface LoadingProps {
+interface ILoadingProps {
 	progress?: number
 	title?: string
 	overlay?: boolean
@@ -10,7 +10,7 @@ export const Loading = ({
 	progress,
 	title = 'Loading...',
 	overlay = true,
-}: LoadingProps) => {
+}: ILoadingProps) => {
 	const content = (
 		<Box
 			display='flex'

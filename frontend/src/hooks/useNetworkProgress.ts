@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 
-interface NetworkRequest {
+interface INetworkRequest {
 	url: string
 	progress: number
 	completed: boolean
 	timestamp: number
 }
 
-const networkRequests = new Map<string, NetworkRequest>()
+const networkRequests = new Map<string, INetworkRequest>()
 const progressListeners = new Set<(progress: number) => void>()
 
 function notifyListeners() {

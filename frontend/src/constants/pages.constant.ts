@@ -1,7 +1,17 @@
+import DashboardIcon from '@mui/icons-material/Dashboard'
+import type { ComponentType } from 'react'
+
 export enum UserRole {
 	ADMIN = 'ADMIN',
 	COOK = 'COOK',
 	WAITER = 'WAITER',
+}
+
+interface IRouteConfig {
+	path: string
+	name: string
+	icon: ComponentType
+	roles: UserRole[]
 }
 
 export const ROUTES = {
@@ -28,22 +38,10 @@ export const ROUTES = {
 	PRIVATE: {
 		SHARED: {
 			DASHBOARD: '/',
-			PROFILE: '/profile',
 		},
-		ADMIN: {
-			ROOT: '/admin',
-			STAFF: '/admin/staff',
-			SETTINGS: '/admin/settings',
-		},
-		COOK: {
-			ROOT: '/cook',
-			ORDERS: '/cook/free-orders',
-		},
-		WAITER: {
-			ROOT: '/waiter',
-			ORDERS: '/waiter/orders',
-			TABLES: '/waiter/tables',
-		},
+		ADMIN: {},
+		COOK: {},
+		WAITER: {},
 	} as const,
 } as const
 
@@ -64,24 +62,19 @@ export const AUTH_ROUTES_LIST: string[] = [
 	ROUTES.PUBLIC.AUTH.REGISTER,
 ]
 
-const SHARED_ROUTES = [ROUTES.PRIVATE.SHARED.DASHBOARD, ROUTES.PRIVATE.SHARED.PROFILE]
+const SHARED_ROUTES = [ROUTES.PRIVATE.SHARED.DASHBOARD]
 
 export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
-	[UserRole.ADMIN]: [
-		...SHARED_ROUTES,
-		ROUTES.PRIVATE.ADMIN.ROOT,
-		ROUTES.PRIVATE.ADMIN.STAFF,
-		ROUTES.PRIVATE.ADMIN.SETTINGS,
-	],
-	[UserRole.COOK]: [
-		...SHARED_ROUTES,
-		ROUTES.PRIVATE.COOK.ROOT,
-		ROUTES.PRIVATE.COOK.ORDERS,
-	],
-	[UserRole.WAITER]: [
-		...SHARED_ROUTES,
-		ROUTES.PRIVATE.WAITER.ROOT,
-		ROUTES.PRIVATE.WAITER.ORDERS,
-		ROUTES.PRIVATE.WAITER.TABLES,
-	],
+	[UserRole.ADMIN]: [...SHARED_ROUTES],
+	[UserRole.COOK]: [...SHARED_ROUTES],
+	[UserRole.WAITER]: [...SHARED_ROUTES],
 }
+
+export const ALL_ROUTES: IRouteConfig[] = [
+	{
+		path: ROUTES.PRIVATE.SHARED.DASHBOARD,
+		name: 'Dashboard',
+		icon: DashboardIcon,
+		roles: [UserRole.ADMIN, UserRole.COOK, UserRole.WAITER],
+	},
+]

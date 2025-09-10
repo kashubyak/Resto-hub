@@ -4,21 +4,21 @@ type Coordinates = {
 	address: string
 }
 
-interface PlacePredictionText {
+interface IPlacePredictionText {
 	text: string
 }
 
-interface PlacePrediction {
+interface IPlacePrediction {
 	placeId: string
-	mainText: PlacePredictionText
-	secondaryText?: PlacePredictionText
+	mainText: IPlacePredictionText
+	secondaryText?: IPlacePredictionText
 }
 
-interface AutocompleteSuggestionResult {
-	suggestions: Suggestion[]
+interface IAutocompleteSuggestionResult {
+	suggestions: ISuggestion[]
 }
 
-export interface LocationPickerProps {
+export interface ILocationPickerProps {
 	onSelectLocation: (location: Coordinates) => void
 }
 
@@ -29,14 +29,14 @@ export interface ISearchResult {
 	fullAddress: string
 }
 
-export interface Suggestion {
-	placePrediction: PlacePrediction
+export interface ISuggestion {
+	placePrediction: IPlacePrediction
 }
 
-export interface AutocompleteSuggestionStatic {
+export interface IAutocompleteSuggestionStatic {
 	fetchAutocompleteSuggestions: (opts: {
 		input: string
 		includedRegionCodes: string[]
 		includedPrimaryTypes: string[]
-	}) => Promise<AutocompleteSuggestionResult>
+	}) => Promise<IAutocompleteSuggestionResult>
 }

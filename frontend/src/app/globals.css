@@ -11,7 +11,7 @@
 	--primary-hover: #328df6;
 	--secondary: #f5f6fa;
 	--secondary-foreground: #8c8e92;
-	--secondary-hover: #f1f2f8;
+	--secondary-hover: #eceef5;
 	--success: #16a34a;
 	--success-hover: #15803d;
 	--destructive: #c20b0a;
@@ -50,7 +50,7 @@
 		--border: #242a37;
 		--input: #0e1217;
 		--stable-light: #fff;
-		--active-item: #73777f;
+		--active-item: #202735;
 	}
 }
 
@@ -109,6 +109,9 @@ body {
 	.border-border {
 		border-color: var(--border);
 	}
+	.active-item {
+		background-color: var(--active-item);
+	}
 	.focus\:ring-primary:focus {
 		box-shadow: 0 0 0 2px var(--primary);
 	}
@@ -117,6 +120,9 @@ body {
 	}
 	.hover\:bg-primary:hover {
 		background-color: var(--primary-hover);
+	}
+	.hover\:text-foreground:hover {
+		color: var(--foreground);
 	}
 	.hover\:bg-secondary:hover {
 		background-color: var(--secondary-hover);
@@ -129,5 +135,8 @@ body {
 	}
 	.hover\:bg-info:hover {
 		background-color: var(--info-hover);
+	}
+	.hover\:bg-secondary:hover {
+		background-color: var(--secondary-hover);
 	}
 }
