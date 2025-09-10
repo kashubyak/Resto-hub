@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { SubUserDto } from 'src/common/interface/user.interface';
+import { ISubUserDto } from 'src/common/interface/user.interface';
 import * as request from 'supertest';
 import { BASE_URL, companyData, HOST, localhost, logoPath } from './constants';
 import { attachCompanyFormFields, makeRequest } from './form-utils';
@@ -38,7 +38,7 @@ export const getAuthToken = async (
 export const getAuthSubUser = async (
   app: INestApplication,
   adminToken: string,
-  dto: SubUserDto,
+  dto: ISubUserDto,
 ): Promise<{ token: string; id: number }> => {
   const registerRes = await makeRequest(
     app,

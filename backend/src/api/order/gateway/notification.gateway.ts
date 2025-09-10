@@ -10,7 +10,7 @@ import * as jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import { socket_rooms } from 'src/common/constants';
 
-interface CustomJwtPayload {
+interface ICustomJwtPayload {
   sub: number;
   role: Role;
   iat?: number;
@@ -48,7 +48,7 @@ export class NotificationsGateway
       const decoded = jwt.verify(token, secret);
 
       if (typeof decoded === 'string') throw new Error('Invalid token format');
-      const payload = decoded as unknown as CustomJwtPayload;
+      const payload = decoded as unknown as ICustomJwtPayload;
       if (typeof payload.sub !== 'number' || !payload.role)
         throw new Error('Invalid token payload');
 

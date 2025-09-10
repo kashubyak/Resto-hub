@@ -3,7 +3,7 @@
 import { ROUTES } from '@/constants/pages.constant'
 import Link from 'next/link'
 
-interface AuthContainerProps {
+interface IAuthContainerProps {
 	title: string
 	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
 	children: React.ReactNode
@@ -17,7 +17,7 @@ export const AuthContainer = ({
 	children,
 	encType,
 	isLogin = false,
-}: AuthContainerProps) => {
+}: IAuthContainerProps) => {
 	return (
 		<div className='w-screen h-screen bg-background text-foreground flex items-center justify-center p-4'>
 			<div className='w-full max-w-xl border border-border text-muted-foreground rounded-xl shadow-xl max-h-10/12 overflow-y-auto p-6'>

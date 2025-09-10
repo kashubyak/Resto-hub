@@ -1,10 +1,10 @@
 import { API_URL } from '@/config/api'
 import { useAlert } from '@/providers/AlertContext'
 import type {
-	AutocompleteSuggestionStatic,
+	IAutocompleteSuggestionStatic,
+	ILocationPickerProps,
 	ISearchResult,
-	LocationPickerProps,
-	Suggestion,
+	ISuggestion,
 } from '@/types/locationPicker.interface'
 import { useJsApiLoader } from '@react-google-maps/api'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -40,7 +40,7 @@ const getReadableAddress = (results: google.maps.GeocoderResult[]): string => {
 	return addressParts.length > 0 ? addressParts.join(', ') : firstResult.formatted_address
 }
 
-interface ExtendedLocationPickerProps extends LocationPickerProps {
+interface IExtendedLocationPickerProps extends ILocationPickerProps {
 	initialLocation?: {
 		lat: number
 		lng: number
@@ -51,7 +51,7 @@ interface ExtendedLocationPickerProps extends LocationPickerProps {
 export const useLocationPicker = ({
 	onSelectLocation,
 	initialLocation,
-}: ExtendedLocationPickerProps) => {
+}: IExtendedLocationPickerProps) => {
 	const [position, setPosition] = useState<{ lat: number; lng: number } | null>(
 		initialLocation ? { lat: initialLocation.lat, lng: initialLocation.lng } : null,
 	)
@@ -96,7 +96,7 @@ export const useLocationPicker = ({
 			setIsSearching(true)
 			try {
 				const lib = (await window.google.maps.importLibrary('places')) as {
-					AutocompleteSuggestion: AutocompleteSuggestionStatic
+					AutocompleteSuggestion: IAutocompleteSuggestionStatic
 				}
 				const { suggestions } =
 					await lib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
@@ -105,7 +105,7 @@ export const useLocationPicker = ({
 						includedPrimaryTypes: ['locality', 'geocode'],
 					})
 
-				const formatted = suggestions.map((s: Suggestion) => ({
+				const formatted = suggestions.map((s: ISuggestion) => ({
 					placeId: s.placePrediction.placeId,
 					mainText: s.placePrediction.mainText.text,
 					secondaryText: s.placePrediction.secondaryText?.text || '',

@@ -1,3 +1,5 @@
+import type { UserRole } from '@/constants/pages.constant'
+
 export interface ILogin {
 	subdomain: string
 	email: string
@@ -7,7 +9,7 @@ export interface IUser {
 	id: string
 	name: string
 	email: string
-	role: 'ADMIN' | 'WAITER' | 'COOK'
+	role: UserRole
 	avatarUrl: string
 	createdAt: string
 	updatedAt: string
