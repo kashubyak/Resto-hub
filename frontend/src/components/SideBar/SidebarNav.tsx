@@ -1,13 +1,17 @@
+'use client'
+
+import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { cn } from '@/utils/cn'
 import Link from 'next/link'
 
 interface ISidebarNavProps {
 	collapsed: boolean
-	routes: { name: string; path: string; icon: React.ElementType }[]
 	pathname: string
 }
 
-export const SidebarNav = ({ collapsed, routes, pathname }: ISidebarNavProps) => {
+export const SidebarNav = ({ collapsed, pathname }: ISidebarNavProps) => {
+	const { routes } = useUserRoutes()
+
 	return (
 		<nav className='flex-1 p-2 space-y-1'>
 			{routes.map(route => (

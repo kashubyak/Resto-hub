@@ -1,13 +1,13 @@
 import { API_URL } from '@/config/api'
 import { NextRequest } from 'next/server'
 
-interface RefreshResult {
+interface IRefreshResult {
 	success: boolean
 	token?: string
 	error?: string
 }
 
-export async function refreshAccessToken(request: NextRequest): Promise<RefreshResult> {
+export async function refreshAccessToken(request: NextRequest): Promise<IRefreshResult> {
 	try {
 		const refreshUrl = buildRefreshUrl()
 		const response = await fetch(refreshUrl, {

@@ -1,4 +1,4 @@
-import { ALL_ROUTES, ROLE_ROUTES_MAP } from '@/constants/pages.constant'
+import { ALL_ROUTES } from '@/constants/pages.constant'
 import { useAuthStore } from '@/store/auth.store'
 import { usePathname } from 'next/navigation'
 import { useMemo } from 'react'
@@ -9,15 +9,7 @@ export const useUserRoutes = () => {
 
 	const userRoutes = useMemo(() => {
 		if (!userRole) return []
-		const allowedPaths = ROLE_ROUTES_MAP[userRole] || []
-		return ALL_ROUTES.filter(route => allowedPaths.includes(route.path))
-	}, [userRole])
-
-	const hasAccess = useMemo(() => {
-		return (path: string): boolean => {
-			if (!userRole) return false
-			return ROLE_ROUTES_MAP[userRole]?.includes(path) || false
-		}
+		return ALL_ROUTES.filter(route => route.roles.includes(userRole))
 	}, [userRole])
 
 	const currentRoute = useMemo(() => {
@@ -26,7 +18,6 @@ export const useUserRoutes = () => {
 
 	return {
 		routes: userRoutes,
-		hasAccess,
 		currentRoute,
 	}
 }
