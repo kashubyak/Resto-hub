@@ -9,7 +9,6 @@ interface ISidebarContentProps {
 	mode: 'desktop' | 'mobile'
 	collapsed: boolean
 	setCollapsed: (value: boolean) => void
-	routes: { name: string; path: string; icon: React.ElementType }[]
 	pathname: string
 	onClose: () => void
 }
@@ -18,7 +17,6 @@ export const SidebarContent = ({
 	mode,
 	collapsed,
 	setCollapsed,
-	routes,
 	pathname,
 	onClose,
 }: ISidebarContentProps) => {
@@ -45,7 +43,7 @@ export const SidebarContent = ({
 					</div>
 				)}
 
-				<SidebarNav collapsed={collapsed} routes={routes} pathname={pathname} />
+				<SidebarNav collapsed={collapsed} pathname={pathname} />
 			</div>
 			<SideBarUser collapsed={collapsed} />
 		</div>

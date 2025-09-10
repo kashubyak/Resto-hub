@@ -1,6 +1,5 @@
 'use client'
 
-import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { cn } from '@/utils/cn'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -14,7 +13,6 @@ interface ISidebarProps {
 export const Sidebar = ({ mobileOpen, setMobileOpen }: ISidebarProps) => {
 	const pathname = usePathname()
 	const [collapsed, setCollapsed] = useState(false)
-	const { routes } = useUserRoutes()
 
 	return (
 		<>
@@ -28,7 +26,6 @@ export const Sidebar = ({ mobileOpen, setMobileOpen }: ISidebarProps) => {
 					mode='desktop'
 					collapsed={collapsed}
 					setCollapsed={setCollapsed}
-					routes={routes}
 					pathname={pathname}
 					onClose={() => setMobileOpen(false)}
 				/>
@@ -56,7 +53,6 @@ export const Sidebar = ({ mobileOpen, setMobileOpen }: ISidebarProps) => {
 						mode='mobile'
 						collapsed={collapsed && !mobileOpen}
 						setCollapsed={setCollapsed}
-						routes={routes}
 						pathname={pathname}
 						onClose={() => setMobileOpen(false)}
 					/>
