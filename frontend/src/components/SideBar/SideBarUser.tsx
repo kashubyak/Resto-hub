@@ -16,16 +16,6 @@ export const SideBarUser = ({ collapsed }: ISideBarUser) => {
 
 	const menuItems: IMenuItem[] = [
 		{
-			id: 'profile',
-			label: 'Profile',
-			onClick: () => console.log('Open profile'),
-		},
-		{
-			id: 'settings',
-			label: 'Settings',
-			onClick: () => console.log('Open settings'),
-		},
-		{
 			id: 'divider',
 			label: '',
 			onClick: () => {},

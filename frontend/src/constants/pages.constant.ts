@@ -1,11 +1,4 @@
-import AudiotrackIcon from '@mui/icons-material/Audiotrack'
 import DashboardIcon from '@mui/icons-material/Dashboard'
-import GroupIcon from '@mui/icons-material/Group'
-import LocalDiningIcon from '@mui/icons-material/LocalDining'
-import PersonIcon from '@mui/icons-material/Person'
-import RestaurantIcon from '@mui/icons-material/Restaurant'
-import SettingsIcon from '@mui/icons-material/Settings'
-import TableRestaurantIcon from '@mui/icons-material/TableRestaurant'
 import type { ComponentType } from 'react'
 
 export enum UserRole {
@@ -45,22 +38,10 @@ export const ROUTES = {
 	PRIVATE: {
 		SHARED: {
 			DASHBOARD: '/',
-			PROFILE: '/profile',
 		},
-		ADMIN: {
-			ROOT: '/admin',
-			STAFF: '/admin/staff',
-			SETTINGS: '/admin/settings',
-		},
-		COOK: {
-			ROOT: '/cook',
-			ORDERS: '/cook/free-orders',
-		},
-		WAITER: {
-			ROOT: '/waiter',
-			ORDERS: '/waiter/orders',
-			TABLES: '/waiter/tables',
-		},
+		ADMIN: {},
+		COOK: {},
+		WAITER: {},
 	} as const,
 } as const
 
@@ -81,26 +62,12 @@ export const AUTH_ROUTES_LIST: string[] = [
 	ROUTES.PUBLIC.AUTH.REGISTER,
 ]
 
-const SHARED_ROUTES = [ROUTES.PRIVATE.SHARED.DASHBOARD, ROUTES.PRIVATE.SHARED.PROFILE]
+const SHARED_ROUTES = [ROUTES.PRIVATE.SHARED.DASHBOARD]
 
 export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
-	[UserRole.ADMIN]: [
-		...SHARED_ROUTES,
-		ROUTES.PRIVATE.ADMIN.ROOT,
-		ROUTES.PRIVATE.ADMIN.STAFF,
-		ROUTES.PRIVATE.ADMIN.SETTINGS,
-	],
-	[UserRole.COOK]: [
-		...SHARED_ROUTES,
-		ROUTES.PRIVATE.COOK.ROOT,
-		ROUTES.PRIVATE.COOK.ORDERS,
-	],
-	[UserRole.WAITER]: [
-		...SHARED_ROUTES,
-		ROUTES.PRIVATE.WAITER.ROOT,
-		ROUTES.PRIVATE.WAITER.ORDERS,
-		ROUTES.PRIVATE.WAITER.TABLES,
-	],
+	[UserRole.ADMIN]: [...SHARED_ROUTES],
+	[UserRole.COOK]: [...SHARED_ROUTES],
+	[UserRole.WAITER]: [...SHARED_ROUTES],
 }
 
 export const ALL_ROUTES: IRouteConfig[] = [
@@ -109,59 +76,5 @@ export const ALL_ROUTES: IRouteConfig[] = [
 		name: 'Dashboard',
 		icon: DashboardIcon,
 		roles: [UserRole.ADMIN, UserRole.COOK, UserRole.WAITER],
-	},
-	{
-		path: ROUTES.PRIVATE.SHARED.PROFILE,
-		name: 'Profile',
-		icon: PersonIcon,
-		roles: [UserRole.ADMIN, UserRole.COOK, UserRole.WAITER],
-	},
-	{
-		path: ROUTES.PRIVATE.ADMIN.ROOT,
-		name: 'Admin Panel',
-		icon: AudiotrackIcon,
-		roles: [UserRole.ADMIN],
-	},
-	{
-		path: ROUTES.PRIVATE.ADMIN.STAFF,
-		name: 'Staff',
-		icon: GroupIcon,
-		roles: [UserRole.ADMIN],
-	},
-	{
-		path: ROUTES.PRIVATE.ADMIN.SETTINGS,
-		name: 'Settings',
-		icon: SettingsIcon,
-		roles: [UserRole.ADMIN],
-	},
-	{
-		path: ROUTES.PRIVATE.COOK.ROOT,
-		name: 'Kitchen',
-		icon: RestaurantIcon,
-		roles: [UserRole.COOK],
-	},
-	{
-		path: ROUTES.PRIVATE.COOK.ORDERS,
-		name: 'Free Orders',
-		icon: LocalDiningIcon,
-		roles: [UserRole.COOK],
-	},
-	{
-		path: ROUTES.PRIVATE.WAITER.ROOT,
-		name: 'Waiter Panel',
-		icon: LocalDiningIcon,
-		roles: [UserRole.WAITER],
-	},
-	{
-		path: ROUTES.PRIVATE.WAITER.ORDERS,
-		name: 'Orders',
-		icon: LocalDiningIcon,
-		roles: [UserRole.WAITER],
-	},
-	{
-		path: ROUTES.PRIVATE.WAITER.TABLES,
-		name: 'Tables',
-		icon: TableRestaurantIcon,
-		roles: [UserRole.WAITER],
 	},
 ]
