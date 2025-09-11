@@ -43,7 +43,7 @@ export const SidebarContent = ({
 
 				<SidebarNav collapsed={collapsed} pathname={pathname} />
 			</div>
-			<SideBarUser collapsed={collapsed} />
+			<SideBarUser />
 		</div>
 	)
 }

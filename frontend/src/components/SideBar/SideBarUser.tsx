@@ -1,15 +1,13 @@
 import { useDropdownMenu } from '@/hooks/useDropdownMenu'
 import { useAuth } from '@/providers/AuthContext'
+import { useSidebarStore } from '@/store/sidebar.store'
 import LogoutIcon from '@mui/icons-material/Logout'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Image from 'next/image'
 import { DropdownMenu, type IMenuItem } from '../ui/DropdownMenu'
 
-interface ISideBarUser {
-	collapsed: boolean
-}
-
-export const SideBarUser = ({ collapsed }: ISideBarUser) => {
+export const SideBarUser = () => {
+	const collapsed = useSidebarStore(state => state.collapsed)
 	const { user, logout } = useAuth()
 	const { isOpen, position, toggleMenu, closeMenu, menuRef, buttonRef } =
 		useDropdownMenu()
