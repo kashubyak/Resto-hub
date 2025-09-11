@@ -1,18 +1,13 @@
 'use client'
 
+import { useSidebarStore } from '@/store/sidebar.store'
 import { cn } from '@/utils/cn'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
 import { SidebarContent } from './SidebarContent'
 
-interface ISidebarProps {
-	mobileOpen: boolean
-	setMobileOpen: (value: boolean) => void
-}
-
-export const Sidebar = ({ mobileOpen, setMobileOpen }: ISidebarProps) => {
+export const Sidebar = () => {
 	const pathname = usePathname()
-	const [collapsed, setCollapsed] = useState(false)
+	const { mobileOpen, setMobileOpen, collapsed, setCollapsed } = useSidebarStore()
 
 	return (
 		<>
