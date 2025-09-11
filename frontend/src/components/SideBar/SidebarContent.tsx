@@ -1,6 +1,10 @@
+'use client'
+
+import { useSidebarStore } from '@/store/sidebar.store'
 import { cn } from '@/utils/cn'
 import CloseIcon from '@mui/icons-material/Close'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { SidebarHeader } from './SidebarHeader'
 import { SidebarNav } from './SidebarNav'
 import { SideBarUser } from './SideBarUser'
@@ -8,16 +12,12 @@ import { SideBarUser } from './SideBarUser'
 interface ISidebarContentProps {
 	mode: 'desktop' | 'mobile'
 	collapsed: boolean
-	pathname: string
-	onClose: () => void
 }
 
-export const SidebarContent = ({
-	mode,
-	collapsed,
-	pathname,
-	onClose,
-}: ISidebarContentProps) => {
+export const SidebarContent = ({ mode, collapsed }: ISidebarContentProps) => {
+	const setMobileOpen = useSidebarStore(state => state.setMobileOpen)
+	const pathname = usePathname()
+
 	return (
 		<div className='flex flex-col h-full justify-between'>
 			<div>
@@ -29,7 +29,7 @@ export const SidebarContent = ({
 							<Image src='/Resto-Hub.png' alt='Logo' width={40} height={40} />
 						</div>
 						<button
-							onClick={onClose}
+							onClick={() => setMobileOpen(false)}
 							className={cn(
 								'p-2 rounded-lg hover:bg-secondary',
 								'transition-colors duration-200',

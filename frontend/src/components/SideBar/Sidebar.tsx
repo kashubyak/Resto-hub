@@ -2,11 +2,9 @@
 
 import { useSidebarStore } from '@/store/sidebar.store'
 import { cn } from '@/utils/cn'
-import { usePathname } from 'next/navigation'
 import { SidebarContent } from './SidebarContent'
 
 export const Sidebar = () => {
-	const pathname = usePathname()
 	const { mobileOpen, setMobileOpen, collapsed } = useSidebarStore()
 
 	return (
@@ -17,12 +15,7 @@ export const Sidebar = () => {
 					collapsed ? 'w-16 bg-background' : 'w-56 bg-secondary',
 				)}
 			>
-				<SidebarContent
-					mode='desktop'
-					collapsed={collapsed}
-					pathname={pathname}
-					onClose={() => setMobileOpen(false)}
-				/>
+				<SidebarContent mode='desktop' collapsed={collapsed} />
 			</aside>
 
 			<div
@@ -43,12 +36,7 @@ export const Sidebar = () => {
 						mobileOpen ? 'translate-x-0' : '-translate-x-full',
 					)}
 				>
-					<SidebarContent
-						mode='mobile'
-						collapsed={collapsed && !mobileOpen}
-						pathname={pathname}
-						onClose={() => setMobileOpen(false)}
-					/>
+					<SidebarContent mode='mobile' collapsed={collapsed && !mobileOpen} />
 				</aside>
 			</div>
 		</>
