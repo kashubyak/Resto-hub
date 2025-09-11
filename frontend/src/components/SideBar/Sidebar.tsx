@@ -7,7 +7,7 @@ import { SidebarContent } from './SidebarContent'
 
 export const Sidebar = () => {
 	const pathname = usePathname()
-	const { mobileOpen, setMobileOpen, collapsed, setCollapsed } = useSidebarStore()
+	const { mobileOpen, setMobileOpen, collapsed } = useSidebarStore()
 
 	return (
 		<>
@@ -20,7 +20,6 @@ export const Sidebar = () => {
 				<SidebarContent
 					mode='desktop'
 					collapsed={collapsed}
-					setCollapsed={setCollapsed}
 					pathname={pathname}
 					onClose={() => setMobileOpen(false)}
 				/>
@@ -47,7 +46,6 @@ export const Sidebar = () => {
 					<SidebarContent
 						mode='mobile'
 						collapsed={collapsed && !mobileOpen}
-						setCollapsed={setCollapsed}
 						pathname={pathname}
 						onClose={() => setMobileOpen(false)}
 					/>

@@ -1,13 +1,10 @@
+import { useSidebarStore } from '@/store/sidebar.store'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import Image from 'next/image'
 
-interface ISidebarHeaderProps {
-	collapsed: boolean
-	setCollapsed: (collapsed: boolean) => void
-}
-
-export const SidebarHeader = ({ collapsed, setCollapsed }: ISidebarHeaderProps) => {
+export const SidebarHeader = () => {
+	const { collapsed, setCollapsed } = useSidebarStore()
 	return (
 		<div className='flex items-center justify-between border-b border-border p-2'>
 			{!collapsed ? (

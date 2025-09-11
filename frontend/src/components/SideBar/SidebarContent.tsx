@@ -8,7 +8,6 @@ import { SideBarUser } from './SideBarUser'
 interface ISidebarContentProps {
 	mode: 'desktop' | 'mobile'
 	collapsed: boolean
-	setCollapsed: (value: boolean) => void
 	pathname: string
 	onClose: () => void
 }
@@ -16,7 +15,6 @@ interface ISidebarContentProps {
 export const SidebarContent = ({
 	mode,
 	collapsed,
-	setCollapsed,
 	pathname,
 	onClose,
 }: ISidebarContentProps) => {
@@ -24,7 +22,7 @@ export const SidebarContent = ({
 		<div className='flex flex-col h-full justify-between'>
 			<div>
 				{mode === 'desktop' ? (
-					<SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
+					<SidebarHeader />
 				) : (
 					<div className='flex items-center justify-between border-b border-border p-2'>
 						<div className='w-10 h-10 flex items-center justify-center'>
