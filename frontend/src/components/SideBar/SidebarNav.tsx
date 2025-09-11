@@ -3,14 +3,16 @@
 import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { cn } from '@/utils/cn'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 interface ISidebarNavProps {
 	collapsed: boolean
-	pathname: string
 }
 
-export const SidebarNav = ({ collapsed, pathname }: ISidebarNavProps) => {
+export const SidebarNav = ({ collapsed }: ISidebarNavProps) => {
 	const { routes } = useUserRoutes()
+		const pathname = usePathname()
+	
 
 	return (
 		<nav className='flex-1 p-2 space-y-1'>
