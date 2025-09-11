@@ -1,4 +1,5 @@
 import DashboardIcon from '@mui/icons-material/Dashboard'
+import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
 import type { ComponentType } from 'react'
 
 export enum UserRole {
@@ -82,7 +83,7 @@ export const ALL_ROUTES: IRouteConfig[] = [
 	{
 		path: ROUTES.PRIVATE.ADMIN.DISH,
 		name: 'Dishes',
-		icon: DashboardIcon,
+		icon: RestaurantMenuIcon,
 		roles: [UserRole.ADMIN],
 	},
 ]
