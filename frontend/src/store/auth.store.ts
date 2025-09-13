@@ -3,6 +3,7 @@ import { UserRole } from '@/constants/pages.constant'
 import { decodeJWT } from '@/lib/middleware/jwt-decoder'
 import type { IUser } from '@/types/login.interface'
 import { clearAuth } from '@/utils/auth-helpers'
+import { convertToDays } from '@/utils/convertToDays'
 import Cookies from 'js-cookie'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -23,6 +24,7 @@ interface IAuthStore {
 	isTokenValid: () => boolean
 	clearAuth: () => void
 }
+const JWT_EXPIRES_IN = process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d'
 
 export const useAuthStore = create<IAuthStore>()(
 	persist(
@@ -52,18 +54,18 @@ export const useAuthStore = create<IAuthStore>()(
 					return false
 				}
 
-				const tokenValidUntil = decodedToken.exp * 1000
-				const currentState = get()
+				const tokenValidUntil =
+					Date.now() + convertToDays(JWT_EXPIRES_IN) * 24 * 60 * 60 * 1000
 
+				const currentState = get()
 				if (
 					currentState.userRole !== decodedToken.role ||
 					currentState.tokenValidUntil !== tokenValidUntil
-				) {
+				)
 					set({
 						userRole: decodedToken.role,
 						tokenValidUntil,
 					})
-				}
 
 				return true
 			},
