@@ -10,12 +10,52 @@ type DishModalProps = {
 
 export const DishModal = ({ open, onClose }: DishModalProps) => {
 	return (
-		<Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
-			<DialogTitle>Create Dish</DialogTitle>
-			<DialogContent>
-				<p className='text-sm text-foreground'>Form fields will be here...</p>
+		<Dialog
+			open={open}
+			onClose={onClose}
+			fullWidth
+			sx={{
+				'& .MuiBackdrop-root': {
+					backdropFilter: 'blur(.625rem)',
+					backgroundColor: 'var(--background)/30',
+				},
+				'& .MuiPaper-root': {
+					maxWidth: 'none',
+					borderRadius: '.625rem',
+					backgroundColor: 'var(--muted)',
+					color: 'var(--foreground)',
+					display: 'flex',
+					flexDirection: 'column',
+				},
+			}}
+		>
+			<DialogTitle
+				sx={{
+					fontSize: '1.25rem',
+					fontWeight: 'bold',
+				}}
+			>
+				Create dish
+			</DialogTitle>
+			<DialogContent
+				sx={{
+					flex: 1,
+					padding: '1.5rem',
+					overflowY: 'auto',
+					borderBottom: '.0625rem solid var(--border)',
+					borderTop: '.0625rem solid var(--border)',
+				}}
+			>
+				<p className='text-sm'>Form fields will be here...</p>
 			</DialogContent>
-			<DialogActions>
+			<DialogActions
+				sx={{
+					display: 'flex',
+					gap: '.75rem',
+					padding: '1rem 1.5rem',
+					justifyContent: 'flex-end',
+				}}
+			>
 				<AuthButton type='button' text='Cancel' onClick={onClose} />
 				<AuthButton
 					type='button'
