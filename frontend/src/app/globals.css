@@ -12,7 +12,7 @@
 	--secondary: #f5f6fa;
 	--secondary-foreground: #8c8e92;
 	--secondary-hover: #eceef5;
-	--success: #16a34a;
+	--success: #3E5F44;
 	--success-hover: #15803d;
 	--destructive: #c20b0a;
 	--destructive-hover: #dc2626;
@@ -35,12 +35,12 @@
 		--muted-foreground: #949fb7;
 		--primary: #3187f3;
 		--primary-foreground: #e0e6f2;
-		--primary-hover: #3b82f6;
+		--primary-hover: #4c8aef;
 		--secondary: #0c1018;
 		--secondary-foreground: #b7b8ba;
 		--secondary-hover: #151a24;
-		--success: #16a34a;
-		--success-hover: #15803d;
+		--success: #07b201;
+		--success-hover: #08c102;
 		--destructive: #c20b0a;
 		--destructive-hover: #dc2626;
 		--warning: #eab308;
