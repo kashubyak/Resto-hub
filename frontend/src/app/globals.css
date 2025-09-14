@@ -88,6 +88,9 @@ body {
 	.text-secondary-foreground {
 		color: var(--secondary-foreground);
 	}
+	.bg-success {
+		background-color: var(--success);
+	}
 	.bg-destructive {
 		background-color: var(--destructive);
 	}
@@ -126,6 +129,9 @@ body {
 	}
 	.hover\:bg-secondary:hover {
 		background-color: var(--secondary-hover);
+	}
+	.hover\:bg-success:hover {
+		background-color: var(--success-hover);
 	}
 	.hover\:bg-destructive:hover {
 		background-color: var(--destructive-hover);
