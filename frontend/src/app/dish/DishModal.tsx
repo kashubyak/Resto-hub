@@ -1,6 +1,8 @@
 'use client'
 
 import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { useDishModal } from '@/hooks/useDishModal'
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
 
 type DishModalProps = {
@@ -9,6 +11,7 @@ type DishModalProps = {
 }
 
 export const DishModal = ({ open, onClose }: DishModalProps) => {
+	const { onSubmit, register, errors, handleSubmit } = useDishModal()
 	return (
 		<Dialog
 			open={open}
@@ -43,27 +46,36 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					overflowY: 'auto',
 				}}
 			>
-				<p className='text-sm'>Form fields will be here...</p>
+				<form className='py-1.5' onSubmit={handleSubmit(onSubmit)}>
+					<Input
+						register={register('name', {
+							required: 'Dish name is required',
+							validate: {},
+						})}
+						label='Dish name'
+						error={errors.name?.message}
+						type='text'
+					/>
+					<DialogActions
+						sx={{
+							display: 'flex',
+							gap: '.75rem',
+							padding: '1rem 1.5rem',
+							justifyContent: 'flex-end',
+						}}
+					>
+						<Button type='button' text='Cancel' onClick={onClose} />
+						<Button
+							type='button'
+							text='Create'
+							onClick={() => {
+								onClose()
+							}}
+							className='w-auto px-4 py-2 bg-success text-foreground hover:bg-success'
+						/>
+					</DialogActions>
+				</form>
 			</DialogContent>
-
-			<DialogActions
-				sx={{
-					display: 'flex',
-					gap: '.75rem',
-					padding: '1rem 1.5rem',
-					justifyContent: 'flex-end',
-				}}
-			>
-				<Button type='button' text='Cancel' onClick={onClose} />
-				<Button
-					type='button'
-					text='Create'
-					onClick={() => {
-						onClose()
-					}}
-					className='w-auto px-4 py-2 bg-success text-foreground hover:bg-success'
-				/>
-			</DialogActions>
 		</Dialog>
 	)
 }
