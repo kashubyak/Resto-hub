@@ -17,12 +17,11 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 			sx={{
 				'& .MuiBackdrop-root': {
 					backdropFilter: 'blur(.625rem)',
-					backgroundColor: 'var(--background)/30',
 				},
 				'& .MuiPaper-root': {
 					maxWidth: 'none',
 					borderRadius: '.625rem',
-					backgroundColor: 'var(--muted)',
+					backgroundColor: 'var(--secondary)',
 					color: 'var(--foreground)',
 					display: 'flex',
 					flexDirection: 'column',
@@ -40,14 +39,13 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 			<DialogContent
 				sx={{
 					flex: 1,
-					padding: '1.5rem',
+					padding: '0 1.5rem',
 					overflowY: 'auto',
-					borderBottom: '.0625rem solid var(--border)',
-					borderTop: '.0625rem solid var(--border)',
 				}}
 			>
 				<p className='text-sm'>Form fields will be here...</p>
 			</DialogContent>
+
 			<DialogActions
 				sx={{
 					display: 'flex',
