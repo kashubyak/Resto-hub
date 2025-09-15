@@ -1,7 +1,7 @@
 'use client'
 
-import { AuthInput } from '@/components/ui/AuthInput'
 import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 import { useLogin } from '@/hooks/useLogin'
 import { AuthContainer } from '../../components/container/AuthContainer'
 
@@ -10,7 +10,7 @@ export const Login = () => {
 	return (
 		<AuthContainer title='Authorization' onSubmit={handleSubmit(onSubmit)} isLogin={true}>
 			<div className='space-y-3'>
-				<AuthInput
+				<Input
 					type='text'
 					label='Subdomain'
 					register={register('subdomain', {
@@ -59,7 +59,7 @@ export const Login = () => {
 					})}
 					error={errors.subdomain?.message}
 				/>
-				<AuthInput
+				<Input
 					type='email'
 					label='Email'
 					register={register('email', {
@@ -107,7 +107,7 @@ export const Login = () => {
 					})}
 					error={errors.email?.message}
 				/>
-				<AuthInput
+				<Input
 					type='password'
 					label='Password'
 					register={register('password', {

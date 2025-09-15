@@ -2,8 +2,8 @@
 
 import { LocationPicker } from '@/components/elements/LocationPicker'
 import { UploadImage } from '@/components/elements/UploadImage'
-import { AuthInput } from '@/components/ui/AuthInput'
 import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 import { useRegisterCompany } from '@/hooks/useRegisterCompany'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AuthContainer } from '../../components/container/AuthContainer'
@@ -43,7 +43,7 @@ export const RegisterCompany = () => {
 						transition={{ duration: 0.3 }}
 						className='space-y-3'
 					>
-						<AuthInput
+						<Input
 							type='text'
 							label='Company Name'
 							register={register('name', {
@@ -70,7 +70,7 @@ export const RegisterCompany = () => {
 							})}
 							error={errors.name?.message}
 						/>
-						<AuthInput
+						<Input
 							type='text'
 							label='Subdomain'
 							register={register('subdomain', {
@@ -143,7 +143,7 @@ export const RegisterCompany = () => {
 						transition={{ duration: 0.3 }}
 						className='space-y-3'
 					>
-						<AuthInput
+						<Input
 							type='text'
 							label='Admin Name'
 							register={register('adminName', {
@@ -180,7 +180,7 @@ export const RegisterCompany = () => {
 							})}
 							error={errors.adminName?.message}
 						/>
-						<AuthInput
+						<Input
 							type='email'
 							label='Admin Email'
 							register={register('adminEmail', {
@@ -229,7 +229,7 @@ export const RegisterCompany = () => {
 							})}
 							error={errors.adminEmail?.message}
 						/>
-						<AuthInput
+						<Input
 							type='password'
 							label='Admin Password'
 							register={register('adminPassword', {
@@ -270,7 +270,7 @@ export const RegisterCompany = () => {
 							})}
 							error={errors.adminPassword?.message}
 						/>
-						<AuthInput
+						<Input
 							type='password'
 							label='Confirm Password'
 							register={register('confirmPassword', {

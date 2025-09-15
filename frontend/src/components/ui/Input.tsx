@@ -5,13 +5,13 @@ import { IconButton, InputAdornment, TextField, type TextFieldProps } from '@mui
 import { useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
-type AuthInputProps = {
+type InputProps = {
 	error?: string
 	register?: UseFormRegisterReturn
 	type: 'text' | 'email' | 'password' | 'number'
 } & Omit<TextFieldProps, 'type' | 'error'>
 
-export const AuthInput = ({ register, error, type, ...rest }: AuthInputProps) => {
+export const Input = ({ register, error, type, ...rest }: InputProps) => {
 	const [showPassword, setShowPassword] = useState(false)
 	const isPasswordField = type === 'password'
 	const togglePasswordVisibility = () => setShowPassword(!showPassword)

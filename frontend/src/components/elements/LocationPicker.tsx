@@ -3,7 +3,7 @@ import { useLocationPicker } from '@/hooks/useLocationPicker'
 import type { ILocationPickerProps } from '@/types/locationPicker.interface'
 import Close from '@mui/icons-material/Close'
 import { GoogleMap, Marker } from '@react-google-maps/api'
-import { AuthInput } from '../ui/AuthInput'
+import { Input } from '../ui/Input'
 
 const containerStyle = {
 	width: '100%',
@@ -47,7 +47,7 @@ export const LocationPicker = ({
 		<div className='flex flex-col gap-4'>
 			<div className='relative'>
 				<div className='relative'>
-					<AuthInput
+					<Input
 						type='text'
 						value={searchValue}
 						onChange={e => handleSearch(e.target.value)}
