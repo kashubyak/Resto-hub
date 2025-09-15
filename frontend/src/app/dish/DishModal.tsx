@@ -12,7 +12,8 @@ type DishModalProps = {
 }
 
 export const DishModal = ({ open, onClose }: DishModalProps) => {
-	const { onSubmit, register, errors, handleSubmit } = useDishModal()
+	const { onSubmit, register, errors, handleSubmit } = useDishModal(onClose)
+
 	return (
 		<Dialog
 			open={open}
@@ -20,10 +21,11 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 			fullWidth
 			sx={{
 				'& .MuiBackdrop-root': {
-					backdropFilter: 'blur(.1875rem)',
+					backdropFilter: 'blur(6px)',
 				},
 				'& .MuiPaper-root': {
 					maxWidth: 'none',
+					minHeight: '90vh',
 					borderRadius: '.625rem',
 					backgroundColor: 'var(--secondary)',
 					color: 'var(--foreground)',
@@ -36,98 +38,124 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 				sx={{
 					fontSize: '1.25rem',
 					fontWeight: 'bold',
+					borderBottom: '1px solid var(--border)',
 				}}
 			>
 				Create dish
 			</DialogTitle>
-			<DialogContent
-				sx={{
-					flex: 1,
-					padding: '0 1.5rem',
-					overflowY: 'auto',
-				}}
+
+			<form
+				onSubmit={handleSubmit(onSubmit)}
+				style={{ display: 'flex', flex: 1, flexDirection: 'column' }}
 			>
-				<form className='py-1.5' onSubmit={handleSubmit(onSubmit)}>
+				<DialogContent
+					sx={{
+						flex: 1,
+						padding: '1.5rem',
+						overflowY: 'auto',
+					}}
+				>
 					<Input
 						register={register('name', {
 							required: 'Dish name is required',
-							validate: {},
+							minLength: { value: 2, message: 'At least 2 characters' },
+							maxLength: { value: 100, message: 'Max 100 characters' },
 						})}
 						label='Dish name'
 						error={errors.name?.message}
 						type='text'
 					/>
+
 					<Input
 						register={register('description', {
 							required: 'Dish description is required',
-							validate: {},
+							minLength: { value: 5, message: 'At least 5 characters' },
 						})}
 						label='Dish description'
 						error={errors.description?.message}
 						type='text'
 					/>
+
 					<Input
 						register={register('price', {
 							required: 'Dish price is required',
-							validate: {},
+							valueAsNumber: true,
+							min: { value: 1, message: 'Price must be greater than 0' },
 						})}
-						label='Dish price'
+						label='Price'
+						type='number'
 						error={errors.price?.message}
-						type='text'
 					/>
+
 					<Input
 						register={register('categoryId', {
 							required: 'Dish category is required',
-							validate: {},
+							valueAsNumber: true,
 						})}
-						label='Dish category'
+						label='Category ID'
+						type='number'
 						error={errors.categoryId?.message}
+					/>
+
+					<Input
+						{...register('ingredients', {
+							required: 'At least one ingredient is required',
+						})}
+						label='Enter ingredients, separated by commas'
+						className='w-full p-2 rounded bg-background text-foreground border border-border mt-2'
 						type='text'
 					/>
+					{errors.ingredients && (
+						<p className='text-destructive text-sm'>{errors.ingredients.message}</p>
+					)}
+
 					<UploadImage
-						label='Dish Image'
-						register={register('imageUrl')}
+						label='Dish image'
+						register={register('imageUrl', {
+							required: 'Dish image is required',
+						})}
 						error={errors.imageUrl?.message}
-						// onDataChange={(preview, file) => handleImageData('image', preview, file)}
 					/>
+
 					<Input
 						register={register('weightGr', {
 							required: 'Dish weight is required',
-							validate: {},
+							valueAsNumber: true,
+							min: { value: 1, message: 'Weight must be greater than 0' },
 						})}
-						label='Dish weight'
+						label='Weight (g)'
+						type='number'
 						error={errors.weightGr?.message}
-						type='text'
 					/>
+
 					<Input
 						register={register('calories', {
-							required: 'Dish calories are required',
-							validate: {},
+							required: 'Calories are required',
+							valueAsNumber: true,
+							min: { value: 1, message: 'Calories must be greater than 0' },
 						})}
-						label='Dish calories'
+						label='Calories'
+						type='number'
 						error={errors.calories?.message}
-						type='text'
 					/>
-					<DialogActions
-						sx={{
-							display: 'flex',
-							gap: '.75rem',
-							padding: '1rem 1.5rem',
-							justifyContent: 'flex-end',
-						}}
-					>
-						<Button type='button' text='Cancel' onClick={onClose} />
-						<Button
-							type='button'
-							text='Create'
-							onClick={() => {
-								onClose()
-							}}
-							className='w-auto px-4 py-2 bg-success text-foreground hover:bg-success'
-						/>
-					</DialogActions>
-				</form>
-			</DialogContent>
+				</DialogContent>
+
+				<DialogActions
+					sx={{
+						display: 'flex',
+						gap: '.75rem',
+						padding: '1rem 1.5rem',
+						borderTop: '1px solid var(--border)',
+					}}
+				>
+					<Button type='button' text='Cancel' onClick={onClose} />
+					<Button
+						type='submit'
+						text='Create'
+						className='w-auto px-4 py-2 bg-success text-foreground hover:bg-success'
+					/>
+				</DialogActions>
+			</form>
 		</Dialog>
 	)
 }

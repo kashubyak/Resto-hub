@@ -4,39 +4,56 @@ import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useForm } from 'react-hook-form'
 
-interface IFormValues {
+export interface IFormValues {
 	name: string
 	description: string
 	price: number
 	categoryId: number
-	ingredients: string[]
+	ingredients: string // вводимо як рядок через textarea, потім парсимо
 	imageUrl: FileList
 	weightGr: number
 	calories: number
 }
-export const useDishModal = () => {
+
+export const useDishModal = (onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
+		reset,
 	} = useForm<IFormValues>({
 		mode: 'onChange',
 	})
+
 	const onSubmit = async (data: IFormValues) => {
-		console.log(data)
 		try {
 			const formData = new FormData()
-			formData.append('name', data.name)
-			formData.append('description', data.description)
+			formData.append('name', data.name.trim())
+			formData.append('description', data.description.trim())
 			formData.append('price', data.price.toString())
 			formData.append('categoryId', data.categoryId.toString())
-			data.ingredients.forEach(ingredient => formData.append('ingredients', ingredient))
+
+			data.ingredients
+				.split(',')
+				.map(i => i.trim())
+				.filter(Boolean)
+				.forEach(ingredient => formData.append('ingredients', ingredient))
+
 			formData.append('weightGr', data.weightGr.toString())
 			formData.append('calories', data.calories.toString())
+
+			if (data.imageUrl && data.imageUrl.length > 0) {
+				formData.append('imageUrl', data.imageUrl[0])
+			}
+
 			const response = await createDish(formData)
-			console.log(response)
-			if (response.status === 201) showSuccess('Dish created successfully')
+			if (response.status === 201) {
+				showSuccess('Dish created successfully')
+				reset()
+				onClose()
+			}
 		} catch (err) {
 			showError(parseBackendError(err as IAxiosError).join('\n'))
 		}
