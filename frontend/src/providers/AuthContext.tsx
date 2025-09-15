@@ -1,8 +1,11 @@
 'use client'
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
-import { login as loginRequest, logout as logoutRequest } from '@/services/auth.service'
-import { getCurrentUser } from '@/services/user.service'
+import {
+	login as loginRequest,
+	logout as logoutRequest,
+} from '@/services/auth/auth.service'
+import { getCurrentUser } from '@/services/user/user.service'
 import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILogin } from '@/types/login.interface'

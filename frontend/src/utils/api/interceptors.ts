@@ -7,7 +7,7 @@ import {
 	startNetworkRequest,
 	updateNetworkProgress,
 } from '@/hooks/useNetworkProgress'
-import { refreshToken } from '@/services/auth.service'
+import { refreshToken } from '@/services/auth/auth.service'
 import { useAlertStore } from '@/store/alert.store'
 import type { IAxiosError } from '@/types/error.interface'
 import type { AxiosProgressEvent } from 'axios'

@@ -1,4 +1,5 @@
 import { useAlert } from '@/providers/AlertContext'
+import { createDish } from '@/services/dish/create-dish.service'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useForm } from 'react-hook-form'
@@ -21,7 +22,6 @@ export const useDishModal = () => {
 		handleSubmit,
 		formState: { errors },
 		watch,
-		setValue,
 	} = useForm<IFormValues>({
 		mode: 'onChange',
 	})
@@ -37,8 +37,8 @@ export const useDishModal = () => {
 			formData.append('weightGr', data.weightGr.toString())
 			formData.append('calories', data.calories.toString())
 			formData.append('available', data.available.toString())
-			if (data.imageUrl?.[0]) formData.append('imageUrl', data.imageUrl?.[0])
-			// await createDish(formData)
+			const response = await createDish(formData)
+			console.log(response)
 		} catch (err) {
 			showError(parseBackendError(err as IAxiosError).join('\n'))
 		}

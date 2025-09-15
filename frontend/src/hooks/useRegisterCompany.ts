@@ -1,6 +1,6 @@
 import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
-import { registerCompany } from '@/services/company.service'
+import { registerCompany } from '@/services/auth/company.service'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useRouter, useSearchParams } from 'next/navigation'
