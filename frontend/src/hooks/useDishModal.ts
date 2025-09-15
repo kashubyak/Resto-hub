@@ -16,7 +16,7 @@ interface IFormValues {
 	available: boolean
 }
 export const useDishModal = () => {
-	const { showError } = useAlert()
+	const { showError, showSuccess } = useAlert()
 	const {
 		register,
 		handleSubmit,
@@ -39,6 +39,7 @@ export const useDishModal = () => {
 			formData.append('available', data.available.toString())
 			const response = await createDish(formData)
 			console.log(response)
+			if (response.status === 201) showSuccess('Dish created successfully')
 		} catch (err) {
 			showError(parseBackendError(err as IAxiosError).join('\n'))
 		}
