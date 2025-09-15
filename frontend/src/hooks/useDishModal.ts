@@ -21,7 +21,6 @@ export const useDishModal = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-		watch,
 	} = useForm<IFormValues>({
 		mode: 'onChange',
 	})

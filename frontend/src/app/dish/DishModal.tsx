@@ -1,5 +1,6 @@
 'use client'
 
+import { UploadImage } from '@/components/elements/UploadImage'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useDishModal } from '@/hooks/useDishModal'
@@ -54,6 +55,66 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 						})}
 						label='Dish name'
 						error={errors.name?.message}
+						type='text'
+					/>
+					<Input
+						register={register('description', {
+							required: 'Dish description is required',
+							validate: {},
+						})}
+						label='Dish description'
+						error={errors.description?.message}
+						type='text'
+					/>
+					<Input
+						register={register('price', {
+							required: 'Dish price is required',
+							validate: {},
+						})}
+						label='Dish price'
+						error={errors.price?.message}
+						type='text'
+					/>
+					<Input
+						register={register('categoryId', {
+							required: 'Dish category is required',
+							validate: {},
+						})}
+						label='Dish category'
+						error={errors.categoryId?.message}
+						type='text'
+					/>
+					<UploadImage
+						label='Dish Image'
+						register={register('imageUrl')}
+						error={errors.imageUrl?.message}
+						// onDataChange={(preview, file) => handleImageData('image', preview, file)}
+					/>
+					<Input
+						register={register('weightGr', {
+							required: 'Dish weight is required',
+							validate: {},
+						})}
+						label='Dish weight'
+						error={errors.weightGr?.message}
+						type='text'
+					/>
+					<Input
+						register={register('calories', {
+							required: 'Dish calories are required',
+							validate: {},
+						})}
+						label='Dish calories'
+						error={errors.calories?.message}
+						type='text'
+					/>
+					<Input
+						register={register('available', {
+							required: 'Dish availability is required',
+							validate: {},
+						})}
+						label='Dish availability'
+						error={errors.available?.message}
 						type='text'
 					/>
 					<DialogActions
