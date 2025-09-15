@@ -38,7 +38,7 @@ export const refreshToken = async (): Promise<{ token: string }> => {
 	return response.data
 }
 
-export const logout = async () => {
-	const response = await api.post(API_URL.AUTH.LOGOUT, {}, { withCredentials: true })
+export const logout = () => {
+	const response = api.post(API_URL.AUTH.LOGOUT, {}, { withCredentials: true })
 	return response
 }
