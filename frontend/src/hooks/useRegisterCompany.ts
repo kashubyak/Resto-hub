@@ -110,7 +110,7 @@ export const useRegisterCompany = () => {
 			formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
 			const response = await registerCompany(formData)
 
-			if (response.status == 201)
+			if (response.status === 201)
 				await login({
 					subdomain: data.subdomain,
 					email: data.adminEmail,
