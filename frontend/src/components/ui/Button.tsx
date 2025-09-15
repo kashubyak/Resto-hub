@@ -2,14 +2,14 @@
 
 import { cn } from '@/utils/cn'
 
-type AuthButtonProps = {
+type ButtonProps = {
 	type: 'submit' | 'button' | 'reset'
 	onClick?: () => void
 	text: string
 	className?: string
 }
 
-export const AuthButton = ({ type, text, onClick, className }: AuthButtonProps) => {
+export const Button = ({ type, text, onClick, className }: ButtonProps) => {
 	return (
 		<button
 			type={type}

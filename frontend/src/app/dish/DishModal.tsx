@@ -1,6 +1,6 @@
 'use client'
 
-import { AuthButton } from '@/components/ui/AuthButton'
+import { Button } from '@/components/ui/Button'
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
 
 type DishModalProps = {
@@ -16,7 +16,7 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 			fullWidth
 			sx={{
 				'& .MuiBackdrop-root': {
-					backdropFilter: 'blur(.625rem)',
+					backdropFilter: 'blur(.1875rem)',
 				},
 				'& .MuiPaper-root': {
 					maxWidth: 'none',
@@ -54,8 +54,8 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					justifyContent: 'flex-end',
 				}}
 			>
-				<AuthButton type='button' text='Cancel' onClick={onClose} />
-				<AuthButton
+				<Button type='button' text='Cancel' onClick={onClose} />
+				<Button
 					type='button'
 					text='Create'
 					onClick={() => {

@@ -1,6 +1,6 @@
 'use client'
 import { useLocationPicker } from '@/hooks/useLocationPicker'
-import type { LocationPickerProps } from '@/types/locationPicker.interface'
+import type { ILocationPickerProps } from '@/types/locationPicker.interface'
 import Close from '@mui/icons-material/Close'
 import { GoogleMap, Marker } from '@react-google-maps/api'
 import { AuthInput } from '../ui/AuthInput'
@@ -15,7 +15,7 @@ const defaultCenter = {
 	lng: 30.5234,
 }
 
-interface ExtendedLocationPickerProps extends LocationPickerProps {
+interface ExtendedLocationPickerProps extends ILocationPickerProps {
 	initialLocation?: {
 		lat: number
 		lng: number

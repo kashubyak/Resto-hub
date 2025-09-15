@@ -2,8 +2,8 @@
 
 import { LocationPicker } from '@/components/elements/LocationPicker'
 import { UploadImage } from '@/components/elements/UploadImage'
-import { AuthButton } from '@/components/ui/AuthButton'
 import { AuthInput } from '@/components/ui/AuthInput'
+import { Button } from '@/components/ui/Button'
 import { useRegisterCompany } from '@/hooks/useRegisterCompany'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AuthContainer } from '../../components/container/AuthContainer'
@@ -112,7 +112,6 @@ export const RegisterCompany = () => {
 									},
 									balanced: value => {
 										const letters = (value.match(/[a-z]/g) || []).length
-										const numbers = (value.match(/[0-9]/g) || []).length
 										return letters >= 2 || 'Subdomain must contain at least 2 letters'
 									},
 								},
@@ -132,7 +131,7 @@ export const RegisterCompany = () => {
 							savedPreview={savedPreviews.logo}
 							onDataChange={(preview, file) => handleImageData('logo', preview, file)}
 						/>
-						<AuthButton type='submit' text='Next' />
+						<Button type='submit' text='Next' />
 					</motion.div>
 				)}
 				{step === 1 && (
@@ -294,8 +293,8 @@ export const RegisterCompany = () => {
 							onDataChange={(preview, file) => handleImageData('avatar', preview, file)}
 						/>
 						<div className='flex justify-between gap-4'>
-							<AuthButton type='button' text='Back' onClick={() => setStep(0)} />
-							<AuthButton type='submit' text='Register' />
+							<Button type='button' text='Back' onClick={() => setStep(0)} />
+							<Button type='submit' text='Register' />
 						</div>
 					</motion.div>
 				)}

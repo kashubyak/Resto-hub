@@ -1,7 +1,7 @@
 'use client'
 
-import { AuthButton } from '@/components/ui/AuthButton'
 import { AuthInput } from '@/components/ui/AuthInput'
+import { Button } from '@/components/ui/Button'
 import { useLogin } from '@/hooks/useLogin'
 import { AuthContainer } from '../../components/container/AuthContainer'
 
@@ -138,7 +138,7 @@ export const Login = () => {
 					})}
 					error={errors.password?.message}
 				/>
-				<AuthButton type='submit' text='Login' />
+				<Button type='submit' text='Login' />
 			</div>
 		</AuthContainer>
 	)

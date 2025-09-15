@@ -1,6 +1,6 @@
 'use client'
 
-import { AuthButton } from '@/components/ui/AuthButton'
+import { Button } from '@/components/ui/Button'
 import { useState } from 'react'
 import { DishModal } from './DishModal'
 
@@ -9,7 +9,7 @@ export default function DishesPage() {
 
 	return (
 		<div className='flex justify-between items-center p-4 border-b'>
-			<AuthButton
+			<Button
 				type='button'
 				text='Create new dish'
 				onClick={() => setIsModalOpen(true)}
