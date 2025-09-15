@@ -13,7 +13,6 @@ interface IFormValues {
 	imageUrl: FileList
 	weightGr: number
 	calories: number
-	available: boolean
 }
 export const useDishModal = () => {
 	const { showError, showSuccess } = useAlert()
@@ -35,7 +34,6 @@ export const useDishModal = () => {
 			data.ingredients.forEach(ingredient => formData.append('ingredients', ingredient))
 			formData.append('weightGr', data.weightGr.toString())
 			formData.append('calories', data.calories.toString())
-			formData.append('available', data.available.toString())
 			const response = await createDish(formData)
 			console.log(response)
 			if (response.status === 201) showSuccess('Dish created successfully')

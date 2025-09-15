@@ -108,15 +108,6 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 						error={errors.calories?.message}
 						type='text'
 					/>
-					<Input
-						register={register('available', {
-							required: 'Dish availability is required',
-							validate: {},
-						})}
-						label='Dish availability'
-						error={errors.available?.message}
-						type='text'
-					/>
 					<DialogActions
 						sx={{
 							display: 'flex',
