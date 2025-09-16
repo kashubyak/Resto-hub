@@ -50,7 +50,7 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 				<DialogContent
 					sx={{
 						flex: 1,
-						padding: '1.5rem',
+						padding: '1rem',
 						overflowY: 'auto',
 						display: 'flex',
 						flexDirection: 'column',
@@ -62,8 +62,21 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					<Input
 						register={register('name', {
 							required: 'Dish name is required',
-							minLength: { value: 2, message: 'At least 2 characters' },
-							maxLength: { value: 100, message: 'Max 100 characters' },
+							validate: {
+								minLength: v =>
+									v.trim().length >= 2 || 'Dish name must be at least 2 characters',
+								maxLength: v =>
+									v.trim().length <= 100 || 'Dish name can be at most 100 characters',
+								noOnlySpaces: v =>
+									v.trim().length > 0 || 'Dish name cannot be only spaces',
+								validCharacters: v =>
+									/^[\p{L}\p{N}\s\-&.,'()]+$/u.test(v) ||
+									'Dish name can only contain letters, numbers, spaces, and basic punctuation',
+								noConsecutiveSpaces: v =>
+									!/\s{2,}/.test(v) || 'Dish name cannot have consecutive spaces',
+								startsWithLetter: v =>
+									/^[\p{L}]/u.test(v) || 'Dish name must start with a letter',
+							},
 						})}
 						label='Dish name'
 						error={errors.name?.message}
@@ -73,7 +86,19 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					<Input
 						register={register('description', {
 							required: 'Dish description is required',
-							minLength: { value: 5, message: 'At least 5 characters' },
+							validate: {
+								minLength: v =>
+									v.trim().length >= 5 || 'Description must be at least 5 characters',
+								maxLength: v =>
+									v.trim().length <= 500 || 'Description can be at most 500 characters',
+								noOnlySpaces: v =>
+									v.trim().length > 0 || 'Description cannot be only spaces',
+								validCharacters: v =>
+									/^[\p{L}\p{N}\s\-&.,'()!?]+$/u.test(v) ||
+									'Description can only contain letters, numbers, spaces, and basic punctuation',
+								noConsecutiveSpaces: v =>
+									!/\s{2,}/.test(v) || 'Description cannot have consecutive spaces',
+							},
 						})}
 						label='Dish description'
 						error={errors.description?.message}
@@ -84,7 +109,10 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 						register={register('price', {
 							required: 'Dish price is required',
 							valueAsNumber: true,
-							min: { value: 1, message: 'Price must be greater than 0' },
+							validate: {
+								isPositive: v => v > 0 || 'Price must be greater than 0',
+								isNumber: v => !isNaN(v) || 'Price must be a number',
+							},
 						})}
 						label='Price'
 						type='number'
@@ -93,22 +121,59 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 
 					<Input
 						register={register('categoryId', {
-							required: 'Dish category is required',
+							required: 'Category ID is required',
 							valueAsNumber: true,
+							validate: {
+								isPositive: v => v > 0 || 'Category ID must be greater than 0',
+								isInteger: v => Number.isInteger(v) || 'Category ID must be an integer',
+							},
 						})}
 						label='Category ID'
 						type='number'
 						error={errors.categoryId?.message}
 					/>
+
 					<IngredientsInput
 						setValue={setValue}
 						error={errors.ingredients?.message}
 						label='Ingredients'
+						register={register('ingredients', {
+							required: 'At least one ingredient is required',
+							validate: {
+								notEmpty: v =>
+									(Array.isArray(v) && v.length > 0) ||
+									'Please add at least one ingredient',
+								validEach: v =>
+									v.every(
+										(i: string) =>
+											/^[\p{L}\s\-&.,'()]+$/u.test(i) &&
+											i.trim().length >= 2 &&
+											i.trim().length <= 50,
+									) ||
+									'Each ingredient must be 2–50 chars and contain only valid characters',
+								noDuplicates: v =>
+									new Set(v.map(i => i.toLowerCase())).size === v.length ||
+									'Ingredients must not contain duplicates',
+							},
+						})}
 					/>
+
 					<UploadImage
 						label='Dish image'
 						register={register('imageUrl', {
 							required: 'Dish image is required',
+							validate: {
+								isFileList: v => v instanceof FileList || 'Invalid file input',
+								hasFile: v => (v && v.length > 0) || 'Image is required',
+								validType: v =>
+									!v?.[0] ||
+									['image/jpeg', 'image/png', 'image/webp'].includes(v[0].type) ||
+									'Only JPG, PNG, or WebP allowed',
+								maxSize: v =>
+									!v?.[0] ||
+									v[0].size <= 5 * 1024 * 1024 ||
+									'Image must be smaller than 5MB',
+							},
 						})}
 						error={errors.imageUrl?.message}
 					/>
@@ -117,7 +182,10 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 						register={register('weightGr', {
 							required: 'Dish weight is required',
 							valueAsNumber: true,
-							min: { value: 1, message: 'Weight must be greater than 0' },
+							validate: {
+								isPositive: v => v > 0 || 'Weight must be greater than 0',
+								maxValue: v => v <= 100000 || 'Weight is too large',
+							},
 						})}
 						label='Weight (g)'
 						type='number'
@@ -128,7 +196,10 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 						register={register('calories', {
 							required: 'Calories are required',
 							valueAsNumber: true,
-							min: { value: 1, message: 'Calories must be greater than 0' },
+							validate: {
+								isPositive: v => v > 0 || 'Calories must be greater than 0',
+								maxValue: v => v <= 5000 || 'Calories value is unrealistic',
+							},
 						})}
 						label='Calories'
 						type='number'

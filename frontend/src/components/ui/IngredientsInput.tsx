@@ -3,16 +3,22 @@
 import type { IFormValues } from '@/hooks/useDishModal'
 import { X } from '@mui/icons-material'
 import { useState, type KeyboardEvent } from 'react'
-import type { UseFormSetValue } from 'react-hook-form'
+import type { UseFormRegisterReturn, UseFormSetValue } from 'react-hook-form'
 import { Input } from './Input'
 
 type IngredientsInputProps = {
 	setValue: UseFormSetValue<IFormValues>
+	register?: UseFormRegisterReturn
 	label: string
 	error?: string
 }
 
-export const IngredientsInput = ({ setValue, label, error }: IngredientsInputProps) => {
+export const IngredientsInput = ({
+	setValue,
+	label,
+	error,
+	register,
+}: IngredientsInputProps) => {
 	const [ingredients, setIngredients] = useState<string[]>([])
 	const [inputValue, setInputValue] = useState('')
 
@@ -47,6 +53,7 @@ export const IngredientsInput = ({ setValue, label, error }: IngredientsInputPro
 				onChange={e => setInputValue(e.target.value)}
 				onKeyDown={handleKeyDown}
 				label={label}
+				register={register}
 				className='w-full p-2 rounded bg-background text-foreground border border-border'
 			/>
 
