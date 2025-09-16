@@ -9,7 +9,7 @@ export interface IFormValues {
 	description: string
 	price: number
 	categoryId: number
-	ingredients: string // вводимо як рядок через textarea, потім парсимо
+	ingredients: string[]
 	imageUrl: FileList
 	weightGr: number
 	calories: number
@@ -23,6 +23,7 @@ export const useDishModal = (onClose: () => void) => {
 		handleSubmit,
 		formState: { errors },
 		reset,
+		setValue,
 	} = useForm<IFormValues>({
 		mode: 'onChange',
 	})
@@ -34,13 +35,7 @@ export const useDishModal = (onClose: () => void) => {
 			formData.append('description', data.description.trim())
 			formData.append('price', data.price.toString())
 			formData.append('categoryId', data.categoryId.toString())
-
-			data.ingredients
-				.split(',')
-				.map(i => i.trim())
-				.filter(Boolean)
-				.forEach(ingredient => formData.append('ingredients', ingredient))
-
+			data.ingredients.forEach(ingredient => formData.append('ingredients', ingredient))
 			formData.append('weightGr', data.weightGr.toString())
 			formData.append('calories', data.calories.toString())
 
@@ -59,5 +54,5 @@ export const useDishModal = (onClose: () => void) => {
 		}
 	}
 
-	return { onSubmit, register, errors, handleSubmit }
+	return { onSubmit, register, errors, handleSubmit, setValue }
 }

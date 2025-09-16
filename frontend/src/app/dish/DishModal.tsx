@@ -2,6 +2,7 @@
 
 import { UploadImage } from '@/components/elements/UploadImage'
 import { Button } from '@/components/ui/Button'
+import { IngredientsInput } from '@/components/ui/IngredientsInput'
 import { Input } from '@/components/ui/Input'
 import { useDishModal } from '@/hooks/useDishModal'
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
@@ -12,7 +13,7 @@ type DishModalProps = {
 }
 
 export const DishModal = ({ open, onClose }: DishModalProps) => {
-	const { onSubmit, register, errors, handleSubmit } = useDishModal(onClose)
+	const { onSubmit, register, errors, handleSubmit, setValue } = useDishModal(onClose)
 
 	return (
 		<Dialog
@@ -99,19 +100,11 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 						type='number'
 						error={errors.categoryId?.message}
 					/>
-
-					<Input
-						{...register('ingredients', {
-							required: 'At least one ingredient is required',
-						})}
-						label='Enter ingredients, separated by commas'
-						className='w-full p-2 rounded bg-background text-foreground border border-border mt-2'
-						type='text'
+					<IngredientsInput
+						setValue={setValue}
+						error={errors.ingredients?.message}
+						label='Ingredients'
 					/>
-					{errors.ingredients && (
-						<p className='text-destructive text-sm'>{errors.ingredients.message}</p>
-					)}
-
 					<UploadImage
 						label='Dish image'
 						register={register('imageUrl', {
