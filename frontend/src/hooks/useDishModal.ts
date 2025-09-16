@@ -1,19 +1,9 @@
 import { useAlert } from '@/providers/AlertContext'
 import { createDish } from '@/services/dish/create-dish.service'
+import type { IFormValues } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useForm } from 'react-hook-form'
-
-export interface IFormValues {
-	name: string
-	description: string
-	price: number
-	categoryId: number
-	ingredients: string[]
-	imageUrl: FileList
-	weightGr: number
-	calories: number
-}
 
 export const useDishModal = (onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()

@@ -1,7 +1,7 @@
 'use client'
 
 import { IngredientsInput } from '@/components/ui/IngredientsInput'
-import type { IFormValues } from '@/hooks/useDishModal'
+import type { IFormValues } from '@/types/dish.interface'
 import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 
 type IngredientsSectionProps = {

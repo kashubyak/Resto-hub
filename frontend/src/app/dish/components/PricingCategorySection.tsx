@@ -1,7 +1,7 @@
 'use client'
 
 import { Input } from '@/components/ui/Input'
-import type { IFormValues } from '@/hooks/useDishModal'
+import type { IFormValues } from '@/types/dish.interface'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 
 type PricingCategorySectionProps = {
