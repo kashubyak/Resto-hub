@@ -2,6 +2,7 @@
 
 :root {
 	--background: #fcfcfc;
+	--background-rgb: 252, 252, 252;
 	--foreground: #0a0e13;
 	--muted: #f5f6fa;
 	--muted-hover: #f1f2f8;
@@ -29,6 +30,7 @@
 @media (prefers-color-scheme: dark) {
 	:root {
 		--background: #05070a;
+		--background-rgb: 5, 7, 10;
 		--foreground: #fff;
 		--muted: #0a0e13;
 		--muted-hover: #151a24;
@@ -51,6 +53,7 @@
 		--input: #0e1217;
 		--stable-light: #fff;
 		--active-item: #202735;
+		--backdrop: #504f4f4d;
 	}
 }
 

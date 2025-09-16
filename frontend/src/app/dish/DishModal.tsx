@@ -21,7 +21,8 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 			fullWidth
 			sx={{
 				'& .MuiBackdrop-root': {
-					backdropFilter: 'blur(6px)',
+					backdropFilter: 'blur(3px)',
+					backgroundColor: 'rgba(var(--background-rgb), 0.3)',
 				},
 				'& .MuiPaper-root': {
 					maxWidth: 'none',
@@ -44,15 +45,17 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 				Create dish
 			</DialogTitle>
 
-			<form
-				onSubmit={handleSubmit(onSubmit)}
-				style={{ display: 'flex', flex: 1, flexDirection: 'column' }}
-			>
+			<form onSubmit={handleSubmit(onSubmit)} className='flex flex-1 flex-col'>
 				<DialogContent
 					sx={{
 						flex: 1,
 						padding: '1.5rem',
 						overflowY: 'auto',
+						display: 'flex',
+						flexDirection: 'column',
+						'& > *:not(:last-child)': {
+							marginBottom: '1rem',
+						},
 					}}
 				>
 					<Input
