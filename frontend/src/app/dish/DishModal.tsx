@@ -163,16 +163,10 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 						register={register('imageUrl', {
 							required: 'Dish image is required',
 							validate: {
-								isFileList: v => v instanceof FileList || 'Invalid file input',
-								hasFile: v => (v && v.length > 0) || 'Image is required',
 								validType: v =>
 									!v?.[0] ||
 									['image/jpeg', 'image/png', 'image/webp'].includes(v[0].type) ||
 									'Only JPG, PNG, or WebP allowed',
-								maxSize: v =>
-									!v?.[0] ||
-									v[0].size <= 5 * 1024 * 1024 ||
-									'Image must be smaller than 5MB',
 							},
 						})}
 						error={errors.imageUrl?.message}

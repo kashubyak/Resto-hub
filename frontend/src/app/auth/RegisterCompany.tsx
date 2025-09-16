@@ -124,9 +124,7 @@ export const RegisterCompany = () => {
 						/>
 						<UploadImage
 							label='Company Logo'
-							register={register('logoUrl', {
-								validate: validateLogo,
-							})}
+							register={register('logoUrl', { validate: validateLogo })}
 							error={errors.logoUrl?.message}
 							savedPreview={savedPreviews.logo}
 							onDataChange={(preview, file) => handleImageData('logo', preview, file)}
@@ -285,9 +283,7 @@ export const RegisterCompany = () => {
 						/>
 						<UploadImage
 							label='Admin avatar'
-							register={register('avatarUrl', {
-								validate: validateAvatar,
-							})}
+							register={register('avatarUrl', { validate: validateAvatar })}
 							error={errors.avatarUrl?.message}
 							savedPreview={savedPreviews.avatar}
 							onDataChange={(preview, file) => handleImageData('avatar', preview, file)}
