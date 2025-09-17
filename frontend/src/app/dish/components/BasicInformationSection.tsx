@@ -39,7 +39,6 @@ export const BasicInformationSection = ({
 					})}
 					label='Dish Name'
 					error={errors.name?.message}
-					type='text'
 				/>
 
 				<Input

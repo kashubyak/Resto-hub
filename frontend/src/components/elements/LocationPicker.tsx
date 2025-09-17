@@ -48,7 +48,6 @@ export const LocationPicker = ({
 			<div className='relative'>
 				<div className='relative'>
 					<Input
-						type='text'
 						value={searchValue}
 						onChange={e => handleSearch(e.target.value)}
 						onKeyDown={handleKeyDown}

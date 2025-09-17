@@ -49,7 +49,6 @@ export const IngredientsInput = ({
 		<div className='w-full'>
 			<div className='flex items-center gap-2'>
 				<Input
-					type='text'
 					value={inputValue}
 					onChange={e => setInputValue(e.target.value)}
 					onKeyDown={handleKeyDown}

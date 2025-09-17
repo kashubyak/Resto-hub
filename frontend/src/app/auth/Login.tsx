@@ -11,7 +11,6 @@ export const Login = () => {
 		<AuthContainer title='Authorization' onSubmit={handleSubmit(onSubmit)} isLogin={true}>
 			<div className='space-y-3'>
 				<Input
-					type='text'
 					label='Subdomain'
 					register={register('subdomain', {
 						required: 'Subdomain is required',
