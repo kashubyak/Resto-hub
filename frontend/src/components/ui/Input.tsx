@@ -8,12 +8,21 @@ import type { UseFormRegisterReturn } from 'react-hook-form'
 type InputProps = {
 	error?: string
 	register?: UseFormRegisterReturn
-	type: 'text' | 'email' | 'password' | 'number'
-} & Omit<TextFieldProps, 'type' | 'error'>
+	type?: 'text' | 'email' | 'password' | 'number'
+	multiline?: boolean
+	rows?: number
+} & Omit<TextFieldProps, 'type' | 'error' | 'rows'>
 
-export const Input = ({ register, error, type, ...rest }: InputProps) => {
+export const Input = ({
+	register,
+	error,
+	type = 'text',
+	multiline = false,
+	rows = 4,
+	...rest
+}: InputProps) => {
 	const [showPassword, setShowPassword] = useState(false)
-	const isPasswordField = type === 'password'
+	const isPasswordField = type === 'password' && !multiline
 	const togglePasswordVisibility = () => setShowPassword(!showPassword)
 	const inputType = isPasswordField ? (showPassword ? 'text' : 'password') : type
 
@@ -22,7 +31,9 @@ export const Input = ({ register, error, type, ...rest }: InputProps) => {
 			<TextField
 				{...register}
 				{...rest}
-				type={inputType}
+				type={multiline ? undefined : inputType}
+				multiline={multiline}
+				minRows={multiline ? rows : undefined}
 				variant='outlined'
 				fullWidth
 				error={!!error}
@@ -92,6 +103,8 @@ export const Input = ({ register, error, type, ...rest }: InputProps) => {
 					'& .MuiFormHelperText-root': {
 						display: 'none',
 					},
+					minWidth: '300px',
+					maxWidth: '100%',
 					...rest.sx,
 				}}
 			/>

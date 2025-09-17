@@ -49,7 +49,7 @@ export const BasicInformationSection = ({
 							minLength: v =>
 								v.trim().length >= 5 || 'Description must be at least 5 characters',
 							maxLength: v =>
-								v.trim().length <= 500 || 'Description can be at most 500 characters',
+								v.trim().length <= 1000 || 'Description can be at most 1000 characters',
 							noOnlySpaces: v =>
 								v.trim().length > 0 || 'Description cannot be only spaces',
 							validCharacters: v =>
@@ -61,7 +61,8 @@ export const BasicInformationSection = ({
 					})}
 					label='Dish Description'
 					error={errors.description?.message}
-					type='text'
+					multiline
+					rows={4}
 				/>
 			</div>
 		</div>
