@@ -1,7 +1,7 @@
 'use client'
 
-import type { IFormValues } from '@/hooks/useDishModal'
-import { X } from '@mui/icons-material'
+import type { IFormValues } from '@/types/dish.interface'
+import { Close } from '@mui/icons-material'
 import { useState, type KeyboardEvent } from 'react'
 import type { UseFormRegisterReturn, UseFormSetValue } from 'react-hook-form'
 import { Input } from './Input'
@@ -46,36 +46,46 @@ export const IngredientsInput = ({
 	}
 
 	return (
-		<div>
-			<Input
-				type='text'
-				value={inputValue}
-				onChange={e => setInputValue(e.target.value)}
-				onKeyDown={handleKeyDown}
-				label={label}
-				register={register}
-				className='w-full p-2 rounded bg-background text-foreground border border-border'
-			/>
-
-			{error && <p className='text-destructive text-sm mt-1'>{error}</p>}
-
-			<div className='flex flex-wrap gap-2 mt-2'>
-				{ingredients.map(ingredient => (
-					<span
-						key={ingredient}
-						className='flex items-center gap-1 bg-muted text-foreground px-2 py-1 rounded-full text-sm'
-					>
-						{ingredient}
-						<button
-							type='button'
-							onClick={() => removeIngredient(ingredient)}
-							className='text-destructive hover:text-red-700'
-						>
-							<X />
-						</button>
-					</span>
-				))}
+		<div className='w-full'>
+			<div className='flex items-center gap-2'>
+				<Input
+					type='text'
+					value={inputValue}
+					onChange={e => setInputValue(e.target.value)}
+					onKeyDown={handleKeyDown}
+					label={label}
+					error={error}
+					register={register}
+					className='flex-1'
+				/>
+				<button
+					type='button'
+					onClick={addIngredient}
+					className='px-3 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium'
+				>
+					Add
+				</button>
 			</div>
+
+			{ingredients.length > 0 && (
+				<div className='flex flex-wrap gap-2 mt-3'>
+					{ingredients.map(ingredient => (
+						<div
+							key={ingredient}
+							className='flex items-center gap-1 bg-muted px-3 py-1 rounded-full text-sm text-foreground shadow-sm'
+						>
+							<span>{ingredient}</span>
+							<button
+								type='button'
+								onClick={() => removeIngredient(ingredient)}
+								className='text-muted-foreground hover:text-[var(--destructive)] transition'
+							>
+								<Close fontSize='small' />
+							</button>
+						</div>
+					))}
+				</div>
+			)}
 		</div>
 	)
 }
