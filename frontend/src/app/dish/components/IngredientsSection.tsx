@@ -1,10 +1,11 @@
+// frontend/src/app/dish/components/IngredientsSection.tsx
 'use client'
 
 import { Input } from '@/components/ui/Input'
 import type { IFormValues } from '@/types/dish.interface'
 import AddIcon from '@mui/icons-material/Add'
 import CloseIcon from '@mui/icons-material/Close'
-import { Chip, IconButton } from '@mui/material'
+import { Chip, IconButton, useMediaQuery, useTheme } from '@mui/material'
 import { useState } from 'react'
 import {
 	Controller,
@@ -28,10 +29,16 @@ export const IngredientsSection = ({
 	clearErrors,
 }: IngredientsSectionProps) => {
 	const [inputValue, setInputValue] = useState('')
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
 	return (
-		<div className='mb-6'>
-			<h3 className='text-lg font-semibold mb-4 text-foreground flex items-center gap-2'>
+		<div className={isMobile ? 'mb-4' : 'mb-6'}>
+			<h3
+				className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold ${
+					isMobile ? 'mb-3' : 'mb-4'
+				} text-foreground flex items-center gap-2`}
+			>
 				🥕 Ingredients
 			</h3>
 
@@ -92,49 +99,59 @@ export const IngredientsSection = ({
 
 					return (
 						<div className='w-full'>
-							<div className='flex gap-2 items-start'>
-								<Input
-									label='Add ingredient'
-									value={inputValue}
-									error={errors.ingredients?.message as string}
-									onChange={e => setInputValue(e.target.value)}
-									onKeyDown={e => {
-										if (e.key === 'Enter') {
-											e.preventDefault()
-											handleAdd()
-										}
-									}}
-								/>
+							<div
+								className={`flex ${isMobile ? 'flex-col gap-2' : 'gap-2 items-start'}`}
+							>
+								<div className='flex-1'>
+									<Input
+										label='Add ingredient'
+										value={inputValue}
+										error={errors.ingredients?.message as string}
+										onChange={e => setInputValue(e.target.value)}
+										onKeyDown={e => {
+											if (e.key === 'Enter') {
+												e.preventDefault()
+												handleAdd()
+											}
+										}}
+									/>
+								</div>
 								<IconButton
 									onClick={handleAdd}
 									sx={{
-										mt: 1,
+										mt: isMobile ? 0 : 1,
+										alignSelf: isMobile ? 'center' : 'flex-start',
 										borderRadius: '8px',
 										backgroundColor: 'var(--primary)',
 										color: 'var(--background)',
+										width: isMobile ? '100%' : 'auto',
+										height: isMobile ? '40px' : 'auto',
 										'&:hover': {
 											backgroundColor: 'var(--primary-hover)',
 										},
 									}}
 								>
 									<AddIcon />
+									{isMobile && <span className='ml-2 text-sm'>Add Ingredient</span>}
 								</IconButton>
 							</div>
 
-							<div className='flex flex-wrap gap-2 mt-3'>
+							<div className={`flex flex-wrap gap-2 ${isMobile ? 'mt-2' : 'mt-3'}`}>
 								{value.map((ingredient: string, idx: number) => (
 									<Chip
 										key={idx}
 										label={ingredient}
 										onDelete={() => handleDelete(ingredient)}
 										deleteIcon={<CloseIcon />}
+										size={isMobile ? 'small' : 'medium'}
 										sx={{
 											backgroundColor: 'var(--active-item)',
 											color: 'var(--foreground)',
 											borderRadius: '8px',
-											fontSize: '0.9rem',
+											fontSize: isMobile ? '0.8rem' : '0.9rem',
 											'& .MuiChip-deleteIcon': {
 												color: 'var(--foreground)',
+												fontSize: isMobile ? '1rem' : '1.2rem',
 												'&:hover': { color: 'var(--destructive)' },
 											},
 										}}

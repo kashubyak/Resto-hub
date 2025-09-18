@@ -2,7 +2,14 @@
 
 import { Button } from '@/components/ui/Button'
 import { useDishModal } from '@/hooks/useDishModal'
-import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
+import {
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	useMediaQuery,
+	useTheme,
+} from '@mui/material'
 import { BasicInformationSection } from './components/BasicInformationSection'
 import { ImageUploadSection } from './components/ImageUploadSection'
 import { IngredientsSection } from './components/IngredientsSection'
@@ -15,51 +22,72 @@ type DishModalProps = {
 }
 
 export const DishModal = ({ open, onClose }: DishModalProps) => {
-	const { onSubmit, register, errors, handleSubmit, control, setError, clearErrors, watch } =
-		useDishModal(onClose)
+	const {
+		onSubmit,
+		register,
+		errors,
+		handleSubmit,
+		control,
+		setError,
+		clearErrors,
+		watch,
+	} = useDishModal(onClose)
+
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
 	return (
 		<Dialog
 			open={open}
 			onClose={onClose}
 			fullWidth
-			maxWidth='md'
+			fullScreen={isMobile}
+			maxWidth={isMobile ? false : 'md'}
 			sx={{
 				'& .MuiBackdrop-root': {
 					backdropFilter: 'blur(8px)',
 					backgroundColor: 'rgba(var(--background-rgb), 0.3)',
 				},
 				'& .MuiPaper-root': {
-					borderRadius: '16px',
+					borderRadius: isMobile ? '0' : '16px',
 					backgroundColor: 'var(--secondary)',
 					color: 'var(--foreground)',
-					height: '90vh',
+					height: isMobile ? '100vh' : '90vh',
+					maxHeight: isMobile ? '100vh' : '90vh',
 					display: 'flex',
 					flexDirection: 'column',
+					margin: isMobile ? 0 : 'auto',
+					width: isMobile ? '100vw' : 'auto',
 				},
 			}}
 		>
 			<DialogTitle
 				sx={{
-					fontSize: '1.5rem',
+					fontSize: isMobile ? '1.25rem' : '1.5rem',
 					fontWeight: 'bold',
 					borderBottom: '1px solid var(--border)',
-					padding: '1.5rem 2rem',
+					padding: isMobile ? '1rem 1rem' : '1.5rem 2rem',
 					background: 'linear-gradient(135deg, var(--secondary) 0%, var(--muted) 100%)',
+					flexShrink: 0,
 				}}
 			>
 				🍽️ Create New Dish
 			</DialogTitle>
 
-			<form onSubmit={handleSubmit(onSubmit)} className='flex flex-1 flex-col'>
+			<form
+				onSubmit={handleSubmit(onSubmit)}
+				className='flex flex-1 flex-col overflow-hidden'
+			>
 				<DialogContent
 					sx={{
-						padding: '2rem',
+						padding: isMobile ? '1rem' : '2rem',
 						flex: 1,
 						overflow: 'hidden',
+						display: 'flex',
+						flexDirection: 'column',
 					}}
 				>
-					<div className='h-full overflow-y-auto'>
+					<div className={`flex-1 overflow-y-auto ${isMobile ? 'space-y-4' : ''}`}>
 						<BasicInformationSection register={register} errors={errors} watch={watch} />
 						<PricingCategorySection register={register} errors={errors} />
 						<IngredientsSection
@@ -68,7 +96,6 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 							setError={setError}
 							clearErrors={clearErrors}
 						/>
-
 						<ImageUploadSection register={register} errors={errors} />
 						<NutritionalInfoSection register={register} errors={errors} />
 					</div>
@@ -76,17 +103,26 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 
 				<DialogActions
 					sx={{
-						padding: '1.5rem 2rem',
-						gap: '1rem',
-						justifyContent: 'flex-end',
+						padding: isMobile ? '1rem' : '1.5rem 2rem',
+						gap: isMobile ? '0.5rem' : '1rem',
+						justifyContent: isMobile ? 'stretch' : 'flex-end',
 						borderTop: '1px solid var(--border)',
+						flexDirection: isMobile ? 'column-reverse' : 'row',
+						flexShrink: 0,
 					}}
 				>
-					<Button type='button' text='Cancel' onClick={onClose} />
+					<Button
+						type='button'
+						text='Cancel'
+						onClick={onClose}
+						className={isMobile ? 'w-full' : ''}
+					/>
 					<Button
 						type='submit'
 						text='Create'
-						className='w-auto px-4 py-2 bg-success text-foreground hover:bg-success'
+						className={`${
+							isMobile ? 'w-full' : 'w-auto px-4 py-2'
+						} bg-success text-foreground hover:bg-success`}
 					/>
 				</DialogActions>
 			</form>

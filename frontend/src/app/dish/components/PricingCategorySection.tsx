@@ -1,7 +1,9 @@
+// frontend/src/app/dish/components/PricingCategorySection.tsx
 'use client'
 
 import { Input } from '@/components/ui/Input'
 import type { IFormValues } from '@/types/dish.interface'
+import { useMediaQuery, useTheme } from '@mui/material'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 
 type PricingCategorySectionProps = {
@@ -13,12 +15,23 @@ export const PricingCategorySection = ({
 	register,
 	errors,
 }: PricingCategorySectionProps) => {
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
 	return (
-		<div className='mb-6'>
-			<h3 className='text-lg font-semibold mb-4 text-foreground flex items-center gap-2'>
+		<div className={isMobile ? 'mb-4' : 'mb-6'}>
+			<h3
+				className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold ${
+					isMobile ? 'mb-3' : 'mb-4'
+				} text-foreground flex items-center gap-2`}
+			>
 				💰 Pricing & Category
 			</h3>
-			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+			<div
+				className={`grid ${
+					isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-6'
+				}`}
+			>
 				<Input
 					register={register('price', {
 						required: 'Dish price is required',
