@@ -17,6 +17,7 @@ export const useDishModal = (onClose: () => void) => {
 		control,
 		setError,
 		clearErrors,
+		watch,
 	} = useForm<IFormValues>({
 		mode: 'onChange',
 		defaultValues: {
@@ -61,5 +62,6 @@ export const useDishModal = (onClose: () => void) => {
 		control,
 		setError,
 		clearErrors,
+		watch,
 	}
 }
