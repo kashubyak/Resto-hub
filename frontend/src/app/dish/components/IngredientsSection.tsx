@@ -1,3 +1,5 @@
+'use client'
+
 import { Input } from '@/components/ui/Input'
 import type { IFormValues } from '@/types/dish.interface'
 import AddIcon from '@mui/icons-material/Add'
@@ -37,6 +39,10 @@ export const IngredientsSection = ({
 				name='ingredients'
 				control={control}
 				defaultValue={[]}
+				rules={{
+					required: 'At least one ingredient is required',
+					validate: value => value.length > 0 || 'At least one ingredient is required',
+				}}
 				render={({ field: { value, onChange } }) => {
 					const handleAdd = () => {
 						const val = inputValue.trim()
@@ -85,7 +91,7 @@ export const IngredientsSection = ({
 					}
 
 					return (
-						<>
+						<div className='w-full'>
 							<div className='flex items-start gap-2'>
 								<Input
 									label='Add ingredient'
@@ -101,7 +107,7 @@ export const IngredientsSection = ({
 								/>
 								<IconButton
 									onClick={handleAdd}
-									className='mt-1 rounded-lg bg-primary text-foreground hover:bg-primary/80'
+									className='mt-1 rounded-lg bg-primary text-background hover:bg-primary/80'
 								>
 									<AddIcon />
 								</IconButton>
@@ -118,7 +124,7 @@ export const IngredientsSection = ({
 									/>
 								))}
 							</div>
-						</>
+						</div>
 					)
 				}}
 			/>
