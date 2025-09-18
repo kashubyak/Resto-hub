@@ -15,7 +15,7 @@ type DishModalProps = {
 }
 
 export const DishModal = ({ open, onClose }: DishModalProps) => {
-	const { onSubmit, register, errors, handleSubmit, setValue } = useDishModal(onClose)
+	const { onSubmit, register, errors, handleSubmit, control, setError, clearErrors } = useDishModal(onClose)
 
 	return (
 		<Dialog
@@ -61,7 +61,13 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					<div className='h-full overflow-y-auto'>
 						<BasicInformationSection register={register} errors={errors} />
 						<PricingCategorySection register={register} errors={errors} />
-						<IngredientsSection register={register} setValue={setValue} errors={errors} />
+						<IngredientsSection
+							control={control}
+							errors={errors}
+							setError={setError}
+							clearErrors={clearErrors}
+						/>
+
 						<ImageUploadSection register={register} errors={errors} />
 						<NutritionalInfoSection register={register} errors={errors} />
 					</div>
