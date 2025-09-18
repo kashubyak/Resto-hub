@@ -92,7 +92,7 @@ export const IngredientsSection = ({
 
 					return (
 						<div className='w-full'>
-							<div className='flex items-start gap-2'>
+							<div className='flex gap-2 items-start'>
 								<Input
 									label='Add ingredient'
 									value={inputValue}
@@ -107,7 +107,15 @@ export const IngredientsSection = ({
 								/>
 								<IconButton
 									onClick={handleAdd}
-									className='mt-1 rounded-lg bg-primary text-background hover:bg-primary/80'
+									sx={{
+										mt: 1,
+										borderRadius: '8px',
+										backgroundColor: 'var(--primary)',
+										color: 'var(--background)',
+										'&:hover': {
+											backgroundColor: 'var(--primary-hover)',
+										},
+									}}
 								>
 									<AddIcon />
 								</IconButton>
@@ -120,7 +128,16 @@ export const IngredientsSection = ({
 										label={ingredient}
 										onDelete={() => handleDelete(ingredient)}
 										deleteIcon={<CloseIcon />}
-										className='bg-muted text-foreground'
+										sx={{
+											backgroundColor: 'var(--active-item)',
+											color: 'var(--foreground)',
+											borderRadius: '8px',
+											fontSize: '0.9rem',
+											'& .MuiChip-deleteIcon': {
+												color: 'var(--foreground)',
+												'&:hover': { color: 'var(--destructive)' },
+											},
+										}}
 									/>
 								))}
 							</div>
