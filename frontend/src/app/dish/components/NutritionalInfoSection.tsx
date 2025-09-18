@@ -1,4 +1,3 @@
-// frontend/src/app/dish/components/NutritionalInfoSection.tsx
 'use client'
 
 import { Input } from '@/components/ui/Input'

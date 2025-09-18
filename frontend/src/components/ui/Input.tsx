@@ -1,4 +1,3 @@
-// frontend/src/components/ui/Input.tsx
 'use client'
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
@@ -35,7 +34,6 @@ export const Input = ({
 	const theme = useTheme()
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-	// Тільки якщо size явно передано, використовуємо його. Інакше - стандартний medium
 	const finalSize = size || 'medium'
 
 	const isPasswordField = type === 'password' && !multiline
@@ -120,7 +118,6 @@ export const Input = ({
 					'& .MuiFormHelperText-root': {
 						display: 'none',
 					},
-					// Зберігаємо оригінальні розміри, тільки адаптуємо мінімальну ширину
 					minWidth: isMobile ? '100%' : '300px',
 					maxWidth: '100%',
 					...rest.sx,

@@ -1,4 +1,3 @@
-// frontend/src/app/dish/components/BasicInformationSection.tsx
 'use client'
 
 import { Input } from '@/components/ui/Input'

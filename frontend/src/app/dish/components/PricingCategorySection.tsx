@@ -1,4 +1,3 @@
-// frontend/src/app/dish/components/PricingCategorySection.tsx
 'use client'
 
 import { Input } from '@/components/ui/Input'
