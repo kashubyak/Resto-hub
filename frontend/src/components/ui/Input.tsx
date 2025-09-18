@@ -1,3 +1,4 @@
+// frontend/src/components/ui/Input.tsx
 'use client'
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
@@ -32,8 +33,7 @@ export const Input = ({
 }: InputProps) => {
 	const [showPassword, setShowPassword] = useState(false)
 	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-
+	const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 	const finalSize = size || 'medium'
 
 	const isPasswordField = type === 'password' && !multiline

@@ -2,11 +2,13 @@
 
 import { Button } from '@/components/ui/Button'
 import { useDishModal } from '@/hooks/useDishModal'
+import CloseIcon from '@mui/icons-material/Close'
 import {
 	Dialog,
 	DialogActions,
 	DialogContent,
 	DialogTitle,
+	IconButton,
 	useMediaQuery,
 	useTheme,
 } from '@mui/material'
@@ -34,7 +36,7 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 	} = useDishModal(onClose)
 
 	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+	const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
 	return (
 		<Dialog
@@ -69,9 +71,23 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					padding: isMobile ? '1rem 1rem' : '1.5rem 2rem',
 					background: 'linear-gradient(135deg, var(--secondary) 0%, var(--muted) 100%)',
 					flexShrink: 0,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
 				}}
 			>
-				🍽️ Create New Dish
+				<span>🍽️ Create New Dish</span>
+				<IconButton
+					onClick={onClose}
+					sx={{
+						color: 'var(--foreground)',
+						'&:hover': {
+							backgroundColor: 'color-mix(in oklab, var(--foreground) 10%, transparent)',
+						},
+					}}
+				>
+					<CloseIcon />
+				</IconButton>
 			</DialogTitle>
 
 			<form

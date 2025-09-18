@@ -17,7 +17,7 @@ export const BasicInformationSection = ({
 	watch,
 }: BasicInformationSectionProps) => {
 	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+	const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
 	const descriptionValue = watch('description') || ''
 	const descriptionLength = descriptionValue.length

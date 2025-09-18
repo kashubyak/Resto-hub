@@ -29,7 +29,7 @@ export const IngredientsSection = ({
 }: IngredientsSectionProps) => {
 	const [inputValue, setInputValue] = useState('')
 	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+	const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
 	return (
 		<div className={isMobile ? 'mb-4' : 'mb-6'}>
