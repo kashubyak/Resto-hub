@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form'
 
 export const useDishModal = (onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
-
 	const {
 		register,
 		handleSubmit,
@@ -37,12 +36,10 @@ export const useDishModal = (onClose: () => void) => {
 			)
 			formData.append('weightGr', data.weightGr.toString())
 			formData.append('calories', data.calories.toString())
-
-			if (data.imageUrl && data.imageUrl.length > 0) {
+			if (data.imageUrl && data.imageUrl.length > 0)
 				formData.append('imageUrl', data.imageUrl[0])
-			}
 
-			const response = await createDish(formData)
+			const response = await createDish(formData, { _hideGlobalError: true })
 			if (response.status === 201) {
 				showSuccess('Dish created successfully')
 				reset()

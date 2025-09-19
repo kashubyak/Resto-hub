@@ -50,6 +50,8 @@ api.interceptors.response.use(
 		if (requestId) failNetworkRequest(requestId)
 
 		const originalRequest = error.config
+		const shouldHideGlobalError = originalRequest?._hideGlobalError === true
+
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
 				if (typeof window !== 'undefined') {
@@ -139,18 +141,20 @@ api.interceptors.response.use(
 				status !== 401 &&
 				!originalRequest.url?.includes(API_URL.AUTH.LOGIN) &&
 				!originalRequest.url?.includes(API_URL.AUTH.REGISTER) &&
-				!originalRequest._hideGlobalError
+				!shouldHideGlobalError
+
 			if (shouldShowAlert)
 				useAlertStore.getState().setPendingAlert({
 					severity: 'error',
 					text: parseBackendError(error as IAxiosError).join('\n'),
 				})
 		}
-		if (!error.response)
+		if (!error.response && !shouldHideGlobalError)
 			useAlertStore.getState().setPendingAlert({
 				severity: 'error',
 				text: parseBackendError(error as IAxiosError).join('\n'),
 			})
+
 		return Promise.reject(error)
 	},
 )
