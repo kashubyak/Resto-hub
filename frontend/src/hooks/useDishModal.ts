@@ -1,19 +1,9 @@
 import { useAlert } from '@/providers/AlertContext'
 import { createDish } from '@/services/dish/create-dish.service'
+import type { IFormValues } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useForm } from 'react-hook-form'
-
-export interface IFormValues {
-	name: string
-	description: string
-	price: number
-	categoryId: number
-	ingredients: string[]
-	imageUrl: FileList
-	weightGr: number
-	calories: number
-}
 
 export const useDishModal = (onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
@@ -24,8 +14,15 @@ export const useDishModal = (onClose: () => void) => {
 		formState: { errors },
 		reset,
 		setValue,
+		control,
+		setError,
+		clearErrors,
+		watch,
 	} = useForm<IFormValues>({
 		mode: 'onChange',
+		defaultValues: {
+			ingredients: [],
+		},
 	})
 
 	const onSubmit = async (data: IFormValues) => {
@@ -35,7 +32,9 @@ export const useDishModal = (onClose: () => void) => {
 			formData.append('description', data.description.trim())
 			formData.append('price', data.price.toString())
 			formData.append('categoryId', data.categoryId.toString())
-			data.ingredients.forEach(ingredient => formData.append('ingredients', ingredient))
+			data.ingredients.forEach(ingredient =>
+				formData.append('ingredients', ingredient.trim()),
+			)
 			formData.append('weightGr', data.weightGr.toString())
 			formData.append('calories', data.calories.toString())
 
@@ -54,5 +53,15 @@ export const useDishModal = (onClose: () => void) => {
 		}
 	}
 
-	return { onSubmit, register, errors, handleSubmit, setValue }
+	return {
+		onSubmit,
+		register,
+		errors,
+		handleSubmit,
+		setValue,
+		control,
+		setError,
+		clearErrors,
+		watch,
+	}
 }

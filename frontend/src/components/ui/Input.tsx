@@ -1,32 +1,61 @@
 'use client'
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
-import { IconButton, InputAdornment, TextField, type TextFieldProps } from '@mui/material'
+import {
+	IconButton,
+	InputAdornment,
+	TextField,
+	useMediaQuery,
+	useTheme,
+	type TextFieldProps,
+} from '@mui/material'
 import { useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
 type InputProps = {
 	error?: string
 	register?: UseFormRegisterReturn
-	type: 'text' | 'email' | 'password' | 'number'
-} & Omit<TextFieldProps, 'type' | 'error'>
+	type?: 'text' | 'email' | 'password' | 'number'
+	multiline?: boolean
+	rows?: number
+	size?: 'small' | 'medium'
+} & Omit<TextFieldProps, 'type' | 'error' | 'rows' | 'size'>
 
-export const Input = ({ register, error, type, ...rest }: InputProps) => {
+export const Input = ({
+	register,
+	error,
+	type = 'text',
+	multiline = false,
+	rows = 4,
+	size,
+	...rest
+}: InputProps) => {
 	const [showPassword, setShowPassword] = useState(false)
-	const isPasswordField = type === 'password'
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+	const finalSize = size || 'medium'
+
+	const isPasswordField = type === 'password' && !multiline
 	const togglePasswordVisibility = () => setShowPassword(!showPassword)
 	const inputType = isPasswordField ? (showPassword ? 'text' : 'password') : type
+
+	const safeValue =
+		typeof rest.value === 'number' && Number.isNaN(rest.value) ? '' : rest.value
 
 	return (
 		<div className='flex flex-col'>
 			<TextField
 				{...register}
 				{...rest}
-				type={inputType}
+				value={safeValue}
+				type={multiline ? undefined : inputType}
+				multiline={multiline}
+				minRows={multiline ? rows : undefined}
 				variant='outlined'
 				fullWidth
 				error={!!error}
 				helperText={null}
+				size={finalSize}
 				InputProps={{
 					...rest.InputProps,
 					endAdornment: isPasswordField ? (
@@ -92,6 +121,8 @@ export const Input = ({ register, error, type, ...rest }: InputProps) => {
 					'& .MuiFormHelperText-root': {
 						display: 'none',
 					},
+					minWidth: isMobile ? '100%' : '300px',
+					maxWidth: '100%',
 					...rest.sx,
 				}}
 			/>

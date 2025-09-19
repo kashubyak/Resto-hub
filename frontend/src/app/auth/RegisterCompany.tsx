@@ -44,7 +44,6 @@ export const RegisterCompany = () => {
 						className='space-y-3'
 					>
 						<Input
-							type='text'
 							label='Company Name'
 							register={register('name', {
 								required: 'Company name is required',
@@ -71,7 +70,6 @@ export const RegisterCompany = () => {
 							error={errors.name?.message}
 						/>
 						<Input
-							type='text'
 							label='Subdomain'
 							register={register('subdomain', {
 								required: 'Subdomain is required',
@@ -142,7 +140,6 @@ export const RegisterCompany = () => {
 						className='space-y-3'
 					>
 						<Input
-							type='text'
 							label='Admin Name'
 							register={register('adminName', {
 								required: 'Admin name is required',

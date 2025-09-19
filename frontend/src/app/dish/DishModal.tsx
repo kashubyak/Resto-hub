@@ -1,11 +1,22 @@
 'use client'
 
-import { UploadImage } from '@/components/elements/UploadImage'
 import { Button } from '@/components/ui/Button'
-import { IngredientsInput } from '@/components/ui/IngredientsInput'
-import { Input } from '@/components/ui/Input'
 import { useDishModal } from '@/hooks/useDishModal'
-import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import {
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	IconButton,
+	useMediaQuery,
+	useTheme,
+} from '@mui/material'
+import { BasicInformationSection } from './components/BasicInformationSection'
+import { ImageUploadSection } from './components/ImageUploadSection'
+import { IngredientsSection } from './components/IngredientsSection'
+import { NutritionalInfoSection } from './components/NutritionalInfoSection'
+import { PricingCategorySection } from './components/PricingCategorySection'
 
 type DishModalProps = {
 	open: boolean
@@ -13,207 +24,126 @@ type DishModalProps = {
 }
 
 export const DishModal = ({ open, onClose }: DishModalProps) => {
-	const { onSubmit, register, errors, handleSubmit, setValue } = useDishModal(onClose)
+	const {
+		onSubmit,
+		register,
+		errors,
+		handleSubmit,
+		control,
+		setError,
+		clearErrors,
+		watch,
+	} = useDishModal(onClose)
 
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+	const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'xl'))
+	const safeClose = () => {
+		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+		onClose()
+	}
 	return (
 		<Dialog
 			open={open}
-			onClose={onClose}
+			onClose={safeClose}
 			fullWidth
-			sx={{
-				'& .MuiBackdrop-root': {
-					backdropFilter: 'blur(3px)',
-					backgroundColor: 'rgba(var(--background-rgb), 0.3)',
-				},
-				'& .MuiPaper-root': {
-					maxWidth: 'none',
-					minHeight: '90vh',
-					borderRadius: '.625rem',
+			fullScreen={isMobile}
+			maxWidth={false}
+			PaperProps={{
+				sx: {
+					width: isMobile ? '100vw' : isTablet ? '960px' : '720px',
+					maxWidth: '100%',
+					height: isMobile ? '100vh' : '90vh',
+					borderRadius: isMobile ? 0 : '16px',
 					backgroundColor: 'var(--secondary)',
 					color: 'var(--foreground)',
 					display: 'flex',
 					flexDirection: 'column',
 				},
 			}}
+			sx={{
+				'& .MuiBackdrop-root': {
+					backdropFilter: 'blur(8px)',
+					backgroundColor: 'rgba(var(--background-rgb), 0.3)',
+				},
+			}}
 		>
 			<DialogTitle
 				sx={{
-					fontSize: '1.25rem',
+					fontSize: isMobile ? '1.25rem' : '1.5rem',
 					fontWeight: 'bold',
 					borderBottom: '1px solid var(--border)',
+					padding: isMobile ? '1rem 1rem' : '1.5rem 2rem',
+					background: 'linear-gradient(135deg, var(--secondary) 0%, var(--muted) 100%)',
+					flexShrink: 0,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
 				}}
 			>
-				Create dish
-			</DialogTitle>
-
-			<form onSubmit={handleSubmit(onSubmit)} className='flex flex-1 flex-col'>
-				<DialogContent
+				<span>🍽️ Create New Dish</span>
+				<IconButton
+					onClick={safeClose}
 					sx={{
-						flex: 1,
-						padding: '1rem',
-						overflowY: 'auto',
-						display: 'flex',
-						flexDirection: 'column',
-						'& > *:not(:last-child)': {
-							marginBottom: '1rem',
+						color: 'var(--foreground)',
+						'&:hover': {
+							backgroundColor: 'color-mix(in oklab, var(--foreground) 10%, transparent)',
 						},
 					}}
 				>
-					<Input
-						register={register('name', {
-							required: 'Dish name is required',
-							validate: {
-								minLength: v =>
-									v.trim().length >= 2 || 'Dish name must be at least 2 characters',
-								maxLength: v =>
-									v.trim().length <= 100 || 'Dish name can be at most 100 characters',
-								noOnlySpaces: v =>
-									v.trim().length > 0 || 'Dish name cannot be only spaces',
-								validCharacters: v =>
-									/^[\p{L}\p{N}\s\-&.,'()]+$/u.test(v) ||
-									'Dish name can only contain letters, numbers, spaces, and basic punctuation',
-								noConsecutiveSpaces: v =>
-									!/\s{2,}/.test(v) || 'Dish name cannot have consecutive spaces',
-								startsWithLetter: v =>
-									/^[\p{L}]/u.test(v) || 'Dish name must start with a letter',
-							},
-						})}
-						label='Dish name'
-						error={errors.name?.message}
-						type='text'
-					/>
+					<CloseIcon />
+				</IconButton>
+			</DialogTitle>
 
-					<Input
-						register={register('description', {
-							required: 'Dish description is required',
-							validate: {
-								minLength: v =>
-									v.trim().length >= 5 || 'Description must be at least 5 characters',
-								maxLength: v =>
-									v.trim().length <= 500 || 'Description can be at most 500 characters',
-								noOnlySpaces: v =>
-									v.trim().length > 0 || 'Description cannot be only spaces',
-								validCharacters: v =>
-									/^[\p{L}\p{N}\s\-&.,'()!?]+$/u.test(v) ||
-									'Description can only contain letters, numbers, spaces, and basic punctuation',
-								noConsecutiveSpaces: v =>
-									!/\s{2,}/.test(v) || 'Description cannot have consecutive spaces',
-							},
-						})}
-						label='Dish description'
-						error={errors.description?.message}
-						type='text'
-					/>
-
-					<Input
-						register={register('price', {
-							required: 'Dish price is required',
-							valueAsNumber: true,
-							validate: {
-								isPositive: v => v > 0 || 'Price must be greater than 0',
-								isNumber: v => !isNaN(v) || 'Price must be a number',
-							},
-						})}
-						label='Price'
-						type='number'
-						error={errors.price?.message}
-					/>
-
-					<Input
-						register={register('categoryId', {
-							required: 'Category ID is required',
-							valueAsNumber: true,
-							validate: {
-								isPositive: v => v > 0 || 'Category ID must be greater than 0',
-								isInteger: v => Number.isInteger(v) || 'Category ID must be an integer',
-							},
-						})}
-						label='Category ID'
-						type='number'
-						error={errors.categoryId?.message}
-					/>
-
-					<IngredientsInput
-						setValue={setValue}
-						error={errors.ingredients?.message}
-						label='Ingredients'
-						register={register('ingredients', {
-							required: 'At least one ingredient is required',
-							validate: {
-								notEmpty: v =>
-									(Array.isArray(v) && v.length > 0) ||
-									'Please add at least one ingredient',
-								validEach: v =>
-									v.every(
-										(i: string) =>
-											/^[\p{L}\s\-&.,'()]+$/u.test(i) &&
-											i.trim().length >= 2 &&
-											i.trim().length <= 50,
-									) ||
-									'Each ingredient must be 2–50 chars and contain only valid characters',
-								noDuplicates: v =>
-									new Set(v.map(i => i.toLowerCase())).size === v.length ||
-									'Ingredients must not contain duplicates',
-							},
-						})}
-					/>
-
-					<UploadImage
-						label='Dish image'
-						register={register('imageUrl', {
-							required: 'Dish image is required',
-							validate: {
-								validType: v =>
-									!v?.[0] ||
-									['image/jpeg', 'image/png', 'image/webp'].includes(v[0].type) ||
-									'Only JPG, PNG, or WebP allowed',
-							},
-						})}
-						error={errors.imageUrl?.message}
-					/>
-
-					<Input
-						register={register('weightGr', {
-							required: 'Dish weight is required',
-							valueAsNumber: true,
-							validate: {
-								isPositive: v => v > 0 || 'Weight must be greater than 0',
-								maxValue: v => v <= 100000 || 'Weight is too large',
-							},
-						})}
-						label='Weight (g)'
-						type='number'
-						error={errors.weightGr?.message}
-					/>
-
-					<Input
-						register={register('calories', {
-							required: 'Calories are required',
-							valueAsNumber: true,
-							validate: {
-								isPositive: v => v > 0 || 'Calories must be greater than 0',
-								maxValue: v => v <= 5000 || 'Calories value is unrealistic',
-							},
-						})}
-						label='Calories'
-						type='number'
-						error={errors.calories?.message}
-					/>
+			<form
+				onSubmit={handleSubmit(onSubmit)}
+				className='flex flex-1 flex-col overflow-hidden'
+			>
+				<DialogContent
+					sx={{
+						padding: isMobile ? '1rem' : '2rem',
+						flex: 1,
+						overflow: 'hidden',
+						display: 'flex',
+						flexDirection: 'column',
+					}}
+				>
+					<div className={`flex-1 overflow-y-auto ${isMobile ? 'space-y-4' : ''}`}>
+						<BasicInformationSection register={register} errors={errors} watch={watch} />
+						<PricingCategorySection register={register} errors={errors} />
+						<IngredientsSection
+							control={control}
+							errors={errors}
+							setError={setError}
+							clearErrors={clearErrors}
+						/>
+						<ImageUploadSection register={register} errors={errors} />
+						<NutritionalInfoSection register={register} errors={errors} />
+					</div>
 				</DialogContent>
 
 				<DialogActions
 					sx={{
-						display: 'flex',
-						gap: '.75rem',
-						padding: '1rem 1.5rem',
+						padding: isMobile ? '1rem' : '1.5rem 2rem',
+						gap: isMobile ? '0.5rem' : '1rem',
+						justifyContent: isMobile ? 'stretch' : 'flex-end',
 						borderTop: '1px solid var(--border)',
+						flexDirection: isMobile ? 'column-reverse' : 'row',
+						flexShrink: 0,
 					}}
 				>
-					<Button type='button' text='Cancel' onClick={onClose} />
+					<Button
+						type='button'
+						text='Cancel'
+						onClick={safeClose}
+						className={isMobile ? 'w-full' : ''}
+					/>
 					<Button
 						type='submit'
 						text='Create'
-						className='w-auto px-4 py-2 bg-success text-foreground hover:bg-success'
+						className={`${
+							isMobile ? 'w-full' : 'w-auto px-4 py-2'
+						} bg-success text-foreground hover:bg-success`}
 					/>
 				</DialogActions>
 			</form>
