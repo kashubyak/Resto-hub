@@ -36,7 +36,8 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 	} = useDishModal(onClose)
 
 	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+	const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'xl'))
 
 	return (
 		<Dialog
@@ -44,22 +45,23 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 			onClose={onClose}
 			fullWidth
 			fullScreen={isMobile}
-			maxWidth={isMobile ? false : 'md'}
+			maxWidth={false}
+			PaperProps={{
+				sx: {
+					width: isMobile ? '100vw' : isTablet ? '960px' : '720px',
+					maxWidth: '100%',
+					height: isMobile ? '100vh' : '90vh',
+					borderRadius: isMobile ? 0 : '16px',
+					backgroundColor: 'var(--secondary)',
+					color: 'var(--foreground)',
+					display: 'flex',
+					flexDirection: 'column',
+				},
+			}}
 			sx={{
 				'& .MuiBackdrop-root': {
 					backdropFilter: 'blur(8px)',
 					backgroundColor: 'rgba(var(--background-rgb), 0.3)',
-				},
-				'& .MuiPaper-root': {
-					borderRadius: isMobile ? '0' : '16px',
-					backgroundColor: 'var(--secondary)',
-					color: 'var(--foreground)',
-					height: isMobile ? '100vh' : '90vh',
-					maxHeight: isMobile ? '100vh' : '90vh',
-					display: 'flex',
-					flexDirection: 'column',
-					margin: isMobile ? 0 : 'auto',
-					width: isMobile ? '100vw' : 'auto',
 				},
 			}}
 		>

@@ -15,20 +15,20 @@ export const NutritionalInfoSection = ({
 	errors,
 }: NutritionalInfoSectionProps) => {
 	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
 	return (
 		<div>
 			<h3
-				className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold ${
-					isMobile ? 'mb-3' : 'mb-4'
+				className={`${isFullScreen ? 'text-base' : 'text-lg'} font-semibold ${
+					isFullScreen ? 'mb-3' : 'mb-4'
 				} text-foreground flex items-center gap-2`}
 			>
 				📊 Nutritional Information
 			</h3>
 			<div
 				className={`grid ${
-					isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-6'
+					isFullScreen ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-6'
 				}`}
 			>
 				<Input

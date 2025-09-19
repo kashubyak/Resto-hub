@@ -17,17 +17,17 @@ export const BasicInformationSection = ({
 	watch,
 }: BasicInformationSectionProps) => {
 	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
 	const descriptionValue = watch('description') || ''
 	const descriptionLength = descriptionValue.length
 	const maxDescriptionLength = 1000
 
 	return (
-		<div className={isMobile ? 'mb-4' : 'mb-6'}>
+		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
 			<h3
-				className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold ${
-					isMobile ? 'mb-3' : 'mb-4'
+				className={`${isFullScreen ? 'text-base' : 'text-lg'} font-semibold ${
+					isFullScreen ? 'mb-3' : 'mb-4'
 				} text-foreground flex items-center gap-2`}
 			>
 				📝 Basic Information
@@ -77,7 +77,7 @@ export const BasicInformationSection = ({
 						label='Dish Description'
 						error={errors.description?.message}
 						multiline
-						rows={isMobile ? 3 : 4}
+						rows={isFullScreen ? 3 : 4}
 					/>
 					<p className='text-xs text-secondary-foreground mt-1 text-right'>
 						{descriptionLength} / {maxDescriptionLength}

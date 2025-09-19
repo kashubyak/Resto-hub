@@ -29,13 +29,13 @@ export const IngredientsSection = ({
 }: IngredientsSectionProps) => {
 	const [inputValue, setInputValue] = useState('')
 	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
 	return (
-		<div className={isMobile ? 'mb-4' : 'mb-6'}>
+		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
 			<h3
-				className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold ${
-					isMobile ? 'mb-3' : 'mb-4'
+				className={`${isFullScreen ? 'text-base' : 'text-lg'} font-semibold ${
+					isFullScreen ? 'mb-3' : 'mb-4'
 				} text-foreground flex items-center gap-2`}
 			>
 				🥕 Ingredients
@@ -99,7 +99,9 @@ export const IngredientsSection = ({
 					return (
 						<div className='w-full'>
 							<div
-								className={`flex ${isMobile ? 'flex-col gap-2' : 'gap-2 items-start'}`}
+								className={`flex ${
+									isFullScreen ? 'flex-col gap-2' : 'gap-2 items-start'
+								}`}
 							>
 								<div className='flex-1'>
 									<Input
@@ -118,39 +120,39 @@ export const IngredientsSection = ({
 								<IconButton
 									onClick={handleAdd}
 									sx={{
-										mt: isMobile ? 0 : 1,
-										alignSelf: isMobile ? 'center' : 'flex-start',
+										mt: isFullScreen ? 0 : 1,
+										alignSelf: isFullScreen ? 'center' : 'flex-start',
 										borderRadius: '8px',
 										backgroundColor: 'var(--primary)',
 										color: 'var(--background)',
-										width: isMobile ? '100%' : 'auto',
-										height: isMobile ? '40px' : 'auto',
+										width: isFullScreen ? '100%' : 'auto',
+										height: isFullScreen ? '40px' : 'auto',
 										'&:hover': {
 											backgroundColor: 'var(--primary-hover)',
 										},
 									}}
 								>
 									<AddIcon />
-									{isMobile && <span className='ml-2 text-sm'>Add Ingredient</span>}
+									{isFullScreen && <span className='ml-2 text-sm'>Add Ingredient</span>}
 								</IconButton>
 							</div>
 
-							<div className={`flex flex-wrap gap-2 ${isMobile ? 'mt-2' : 'mt-3'}`}>
+							<div className={`flex flex-wrap gap-2 ${isFullScreen ? 'mt-2' : 'mt-3'}`}>
 								{value.map((ingredient: string, idx: number) => (
 									<Chip
 										key={idx}
 										label={ingredient}
 										onDelete={() => handleDelete(ingredient)}
 										deleteIcon={<CloseIcon />}
-										size={isMobile ? 'small' : 'medium'}
+										size={isFullScreen ? 'small' : 'medium'}
 										sx={{
 											backgroundColor: 'var(--active-item)',
 											color: 'var(--foreground)',
 											borderRadius: '8px',
-											fontSize: isMobile ? '0.8rem' : '0.9rem',
+											fontSize: isFullScreen ? '0.8rem' : '0.9rem',
 											'& .MuiChip-deleteIcon': {
 												color: 'var(--foreground)',
-												fontSize: isMobile ? '1rem' : '1.2rem',
+												fontSize: isFullScreen ? '1rem' : '1.2rem',
 												'&:hover': { color: 'var(--destructive)' },
 											},
 										}}
