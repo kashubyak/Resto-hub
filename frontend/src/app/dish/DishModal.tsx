@@ -38,11 +38,14 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 	const theme = useTheme()
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 	const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'xl'))
-
+	const safeClose = () => {
+		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+		onClose()
+	}
 	return (
 		<Dialog
 			open={open}
-			onClose={onClose}
+			onClose={safeClose}
 			fullWidth
 			fullScreen={isMobile}
 			maxWidth={false}
@@ -80,7 +83,7 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 			>
 				<span>🍽️ Create New Dish</span>
 				<IconButton
-					onClick={onClose}
+					onClick={safeClose}
 					sx={{
 						color: 'var(--foreground)',
 						'&:hover': {
@@ -132,7 +135,7 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					<Button
 						type='button'
 						text='Cancel'
-						onClick={onClose}
+						onClick={safeClose}
 						className={isMobile ? 'w-full' : ''}
 					/>
 					<Button

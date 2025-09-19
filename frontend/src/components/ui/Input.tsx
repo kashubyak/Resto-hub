@@ -39,11 +39,15 @@ export const Input = ({
 	const togglePasswordVisibility = () => setShowPassword(!showPassword)
 	const inputType = isPasswordField ? (showPassword ? 'text' : 'password') : type
 
+	const safeValue =
+		typeof rest.value === 'number' && Number.isNaN(rest.value) ? '' : rest.value
+
 	return (
 		<div className='flex flex-col'>
 			<TextField
 				{...register}
 				{...rest}
+				value={safeValue}
 				type={multiline ? undefined : inputType}
 				multiline={multiline}
 				minRows={multiline ? rows : undefined}
