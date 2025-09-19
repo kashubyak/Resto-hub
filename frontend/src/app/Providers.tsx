@@ -5,11 +5,11 @@ import { AlertProvider, useAlert } from '@/providers/AlertContext'
 import { AuthProvider } from '@/providers/AuthContext'
 import { useAlertStore } from '@/store/alert.store'
 import { setGlobalAlertFunction } from '@/utils/api'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
 const AlertInitializer = () => {
 	const { showAlert } = useAlert()
-
 	useEffect(() => {
 		setGlobalAlertFunction((severity, text) =>
 			showAlert({
@@ -31,15 +31,18 @@ const AlertInitializer = () => {
 	}, [showAlert])
 	return null
 }
+const queryClient = new QueryClient()
 
 export function Providers({ children }: { children: React.ReactNode }) {
 	return (
-		<AlertProvider>
-			<AuthProvider>
-				<AlertInitializer />
-				{children}
-				<AlertDisplay />
-			</AuthProvider>
-		</AlertProvider>
+		<QueryClientProvider client={queryClient}>
+			<AlertProvider>
+				<AuthProvider>
+					<AlertInitializer />
+					{children}
+					<AlertDisplay />
+				</AuthProvider>
+			</AlertProvider>
+		</QueryClientProvider>
 	)
 }
