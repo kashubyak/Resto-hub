@@ -39,7 +39,6 @@ export const DishListItem: React.FC<DishListItemProps> = ({ dish }) => {
 					</div>
 
 					<p className='text-sm text-muted-foreground line-clamp-2'>{dish.description}</p>
-
 					<p className='text-xs text-muted-foreground'>
 						Category: {dish.category?.name ?? '—'}
 					</p>

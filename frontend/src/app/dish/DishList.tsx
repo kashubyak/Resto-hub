@@ -2,9 +2,9 @@
 
 import { useDishes } from '@/hooks/useDishes'
 import { useEffect, useRef, useState } from 'react'
-import { DishCard } from '../list/DishCard'
-import { DishListItem } from '../list/DishListItem'
-import { ViewModeToggle, type ViewMode } from '../list/ViewModeToggle'
+import { DishCard } from './components/list/DishCard'
+import { DishListItem } from './components/list/DishListItem'
+import { ViewModeToggle, type ViewMode } from './components/list/ViewModeToggle'
 
 export const DishList = () => {
 	const {
