@@ -61,7 +61,11 @@ export const DishList = () => {
 			)}
 
 			<div ref={loaderRef} className='h-12 flex items-center justify-center'>
-				{isFetchingNextPage && <span>Loading more...</span>}
+				{isFetchingNextPage && (
+					<div className='fixed inset-0 flex items-center justify-center bg-background/50'>
+						<div className='animate-spin rounded-full h-10 w-10 border-4 border-[var(--primary)] border-t-transparent' />
+					</div>
+				)}
 			</div>
 		</div>
 	)
