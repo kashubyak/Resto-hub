@@ -1,11 +1,11 @@
 const WS = process.env.NEXT_PUBLIC_WEBSOCKET_URL
-const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH || '/auth'
-const CATEGORY_BASE = process.env.NEXT_PUBLIC_CATEGORY
-const DISH_BASE = process.env.NEXT_PUBLIC_DISH
-const BASE_ORDER = process.env.NEXT_PUBLIC_ORDER
-const TABLE_BASE = process.env.NEXT_PUBLIC_TABLE
-const USER_BASE = process.env.NEXT_PUBLIC_USER
-const COMPANY_BASE = process.env.NEXT_PUBLIC_COMPANY
+const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH as string
+const CATEGORY_BASE = process.env.NEXT_PUBLIC_CATEGORY as string
+const DISH_BASE = process.env.NEXT_PUBLIC_DISH as string
+const BASE_ORDER = process.env.NEXT_PUBLIC_ORDER as string
+const TABLE_BASE = process.env.NEXT_PUBLIC_TABLE as string
+const USER_BASE = process.env.NEXT_PUBLIC_USER as string
+const COMPANY_BASE = process.env.NEXT_PUBLIC_COMPANY as string
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
 export const API_URL = {
