@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/Button'
 import { useState } from 'react'
 import { DishModal } from './DishModal'
-import { DishList } from './components/DishList'
+import { DishList } from './components/modal/DishList'
 
 export default function DishesPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false)

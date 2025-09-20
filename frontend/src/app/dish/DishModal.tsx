@@ -12,11 +12,11 @@ import {
 	useMediaQuery,
 	useTheme,
 } from '@mui/material'
-import { BasicInformationSection } from './components/BasicInformationSection'
-import { ImageUploadSection } from './components/ImageUploadSection'
-import { IngredientsSection } from './components/IngredientsSection'
-import { NutritionalInfoSection } from './components/NutritionalInfoSection'
-import { PricingCategorySection } from './components/PricingCategorySection'
+import { BasicInformationSection } from './components/modal/BasicInformationSection'
+import { ImageUploadSection } from './components/modal/ImageUploadSection'
+import { IngredientsSection } from './components/modal/IngredientsSection'
+import { NutritionalInfoSection } from './components/modal/NutritionalInfoSection'
+import { PricingCategorySection } from './components/modal/PricingCategorySection'
 
 type DishModalProps = {
 	open: boolean
