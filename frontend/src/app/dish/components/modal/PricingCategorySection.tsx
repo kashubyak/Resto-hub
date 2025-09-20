@@ -47,12 +47,11 @@ export const PricingCategorySection = ({
 
 				<Input
 					register={register('categoryId', {
-						required: 'Category ID is required',
-						valueAsNumber: true,
-						validate: {
-							isPositive: v => v > 0 || 'Category ID must be greater than 0',
-							isInteger: v => Number.isInteger(v) || 'Category ID must be an integer',
-						},
+						setValueAs: v => (v === '' ? null : Number(v)),
+						validate: value =>
+							value == null ||
+							(value > 0 && Number.isInteger(value)) ||
+							'Category ID must be a positive integer',
 					})}
 					label='Category ID'
 					type='number'

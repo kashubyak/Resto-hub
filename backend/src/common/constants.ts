@@ -7,7 +7,7 @@ export const socket_rooms = {
   KITCHEN: 'kitchen',
   WAITER: (waiterId: number) => `waiter-${waiterId}`,
 };
-export const size_of_image = 3;
+export const size_of_image = 10;
 
 const isTestEnv = process.env.NODE_ENV === 'test';
 export const folder_dish = isTestEnv ? 'test/dishes' : 'dishes';
