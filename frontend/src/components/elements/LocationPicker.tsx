@@ -60,7 +60,7 @@ export const LocationPicker = ({
 								<>
 									{isSearching && (
 										<div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
-											<div className='animate-spin rounded-full h-5 w-5 border-2 border-[var(--primary)] border-t-transparent'></div>
+											<div className='animate-spin rounded-full h-5 w-5 border-2 border-[var(--primary)] border-t-transparent' />
 										</div>
 									)}
 

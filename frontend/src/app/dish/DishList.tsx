@@ -31,7 +31,12 @@ export const DishList = () => {
 		return () => observer.disconnect()
 	}, [fetchNextPage, hasNextPage])
 
-	if (isLoading) return <div>Loading...</div>
+	if (isLoading)
+		return (
+			<div className='fixed inset-0 flex items-center justify-center bg-background/50'>
+				<div className='animate-spin rounded-full h-10 w-10 border-4 border-[var(--primary)] border-t-transparent' />
+			</div>
+		)
 	if (isError) return <div>Failed to load dishes</div>
 
 	return (
