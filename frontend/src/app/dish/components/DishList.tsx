@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from '@/components/ui/Button'
 import { useDishes } from '@/hooks/useDishes'
 import Image from 'next/image'
 import { useEffect, useRef } from 'react'
@@ -32,35 +33,48 @@ export const DishList = () => {
 	if (isError) return <div>Failed to load dishes</div>
 
 	return (
-		<div className='p-4'>
-			<h2 className='text-xl font-bold mb-4'>Dish List</h2>
+		<div className='p-6'>
+			<h2 className='text-2xl font-bold mb-6'>Dish List</h2>
 
-			<div className='grid gap-4'>
+			<div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
 				{allDishes.map(dish => (
 					<div
 						key={dish.id}
-						className='border p-4 rounded-md flex gap-4 items-center bg-secondary'
+						className='bg-card rounded-xl shadow-sm hover:shadow-md transition flex flex-col overflow-hidden'
 					>
-						<Image
-							src={dish.imageUrl}
-							alt={dish.name}
-							width={96}
-							height={96}
-							className='w-24 h-24 object-cover rounded-md'
-						/>
-						<div>
-							<h3 className='font-semibold'>{dish.name}</h3>
-							<p className='text-sm text-muted-foreground'>{dish.description}</p>
-							<p className='mt-1'>💲 {dish.price}</p>
+						<div className='bg-muted flex justify-center items-center p-2'>
+							<Image
+								src={dish.imageUrl}
+								alt={dish.name}
+								width={240}
+								height={240}
+								className='max-h-[200px] w-auto object-contain rounded-lg'
+							/>
+						</div>
+						<div className='p-4 flex flex-col gap-2 flex-grow'>
+							<h3 className='text-lg font-semibold'>{dish.name}</h3>
+							<p className='text-sm text-muted-foreground line-clamp-2'>
+								{dish.description}
+							</p>
+							<p className='text-base font-medium mt-1'>{dish.price}$</p>
 							<p className='text-xs text-muted-foreground'>
 								Category: {dish.category?.name ?? '—'}
 							</p>
+
+							<div className='mt-auto pt-3'>
+								<Button
+									type='submit'
+									onClick={() => {}}
+									text='More details'
+									className='w-full'
+								/>
+							</div>
 						</div>
 					</div>
 				))}
 			</div>
 
-			<div ref={loaderRef} className='h-10 flex items-center justify-center'>
+			<div ref={loaderRef} className='h-12 flex items-center justify-center'>
 				{isFetchingNextPage && <span>Loading more...</span>}
 			</div>
 		</div>

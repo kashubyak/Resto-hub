@@ -10,7 +10,7 @@ export default function DishesPage() {
 
 	return (
 		<div>
-			<div className='flex justify-between items-center p-4 border-b'>
+			<div className='flex justify-between items-center p-4 border-b border-border'>
 				<Button
 					type='button'
 					text='Create new dish'
