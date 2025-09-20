@@ -1,3 +1,5 @@
+import type { ICategory } from './category.interface'
+
 export interface IFormValues {
 	name: string
 	description: string
@@ -8,10 +10,22 @@ export interface IFormValues {
 	weightGr: number
 	calories: number
 }
-export interface IDish extends IFormValues {
+
+export interface IDish {
 	id: number
+	name: string
+	description: string
+	price: number
+	categoryId: number | null
+	ingredients: string[]
+	imageUrl: string
+	weightGr: number
+	calories: number
+	available: boolean
 	createdAt: string
 	updatedAt: string
+	companyId: number
+	category?: ICategory | null
 }
 
 export interface IDishResponse {
