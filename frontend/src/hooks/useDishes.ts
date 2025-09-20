@@ -3,7 +3,11 @@
 import { DISHES_QUERY_KEY } from '@/constants/query-keys.constant'
 import { getAllDishes } from '@/services/dish/get-dishes.service'
 import type { IDish, IDishResponse } from '@/types/dish.interface'
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import {
+	type InfiniteData,
+	useInfiniteQuery,
+	useQueryClient,
+} from '@tanstack/react-query'
 
 const LIMIT = 10
 
@@ -22,11 +26,31 @@ export const useDishes = () => {
 		queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
 	}
 
+	const addDishToCache = (newDish: IDish) => {
+		queryClient.setQueryData<InfiniteData<IDishResponse>>(
+			[DISHES_QUERY_KEY.ALL],
+			oldData => {
+				if (!oldData) return oldData
+				return {
+					...oldData,
+					pages: [
+						{
+							...oldData.pages[0],
+							data: [newDish, ...oldData.pages[0].data],
+						},
+						...oldData.pages.slice(1),
+					],
+				}
+			},
+		)
+	}
+
 	const allDishes: IDish[] = dishesQuery.data?.pages.flatMap(page => page.data) ?? []
 
 	return {
 		...dishesQuery,
 		allDishes,
 		refetchDishes,
+		addDishToCache,
 	}
 }

@@ -4,9 +4,11 @@ import type { IFormValues } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useForm } from 'react-hook-form'
+import { useDishes } from './useDishes'
 
 export const useDishModal = (onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
+	const { refetchDishes } = useDishes()
 	const {
 		register,
 		handleSubmit,
@@ -42,6 +44,7 @@ export const useDishModal = (onClose: () => void) => {
 			const response = await createDish(formData, { _hideGlobalError: true })
 			if (response.status === 201) {
 				showSuccess('Dish created successfully')
+				refetchDishes()
 				reset()
 				onClose()
 			}
