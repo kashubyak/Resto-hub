@@ -1,9 +1,10 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
 import { useDishes } from '@/hooks/useDishes'
-import Image from 'next/image'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { DishCard } from '../list/DishCard'
+import { DishListItem } from '../list/DishListItem'
+import { ViewModeToggle, type ViewMode } from '../list/ViewModeToggle'
 
 export const DishList = () => {
 	const {
@@ -15,6 +16,7 @@ export const DishList = () => {
 		isError,
 	} = useDishes()
 
+	const [viewMode, setViewMode] = useState<ViewMode>('grid')
 	const loaderRef = useRef<HTMLDivElement | null>(null)
 
 	useEffect(() => {
@@ -34,45 +36,24 @@ export const DishList = () => {
 
 	return (
 		<div className='p-6'>
-			<h2 className='text-2xl font-bold mb-6'>Dish List</h2>
-
-			<div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-				{allDishes.map(dish => (
-					<div
-						key={dish.id}
-						className='bg-card rounded-xl shadow-sm hover:shadow-md transition flex flex-col overflow-hidden'
-					>
-						<div className='bg-muted flex justify-center items-center p-2'>
-							<Image
-								src={dish.imageUrl}
-								alt={dish.name}
-								width={240}
-								height={240}
-								className='max-h-[200px] w-auto object-contain rounded-lg'
-							/>
-						</div>
-						<div className='p-4 flex flex-col gap-2 flex-grow'>
-							<h3 className='text-lg font-semibold'>{dish.name}</h3>
-							<p className='text-sm text-muted-foreground line-clamp-2'>
-								{dish.description}
-							</p>
-							<p className='text-base font-medium mt-1'>{dish.price}$</p>
-							<p className='text-xs text-muted-foreground'>
-								Category: {dish.category?.name ?? '—'}
-							</p>
-
-							<div className='mt-auto pt-3'>
-								<Button
-									type='submit'
-									onClick={() => {}}
-									text='More details'
-									className='w-full'
-								/>
-							</div>
-						</div>
-					</div>
-				))}
+			<div className='flex justify-between items-center mb-6'>
+				<h2 className='text-2xl font-bold'>Dish List</h2>
+				<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 			</div>
+
+			{viewMode === 'grid' ? (
+				<div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+					{allDishes.map(dish => (
+						<DishCard key={dish.id} dish={dish} />
+					))}
+				</div>
+			) : (
+				<div className='space-y-4'>
+					{allDishes.map(dish => (
+						<DishListItem key={dish.id} dish={dish} />
+					))}
+				</div>
+			)}
 
 			<div ref={loaderRef} className='h-12 flex items-center justify-center'>
 				{isFetchingNextPage && <span>Loading more...</span>}
