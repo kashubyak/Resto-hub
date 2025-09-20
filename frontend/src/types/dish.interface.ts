@@ -4,11 +4,12 @@ export interface IFormValues {
 	name: string
 	description: string
 	price: number
-	categoryId: number
+	categoryId?: number | null
 	ingredients: string[]
 	imageUrl: FileList
-	weightGr: number
-	calories: number
+	weightGr?: number | null
+	calories?: number | null
+	available?: boolean
 }
 
 export interface IDish {
