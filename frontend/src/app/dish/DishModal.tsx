@@ -110,7 +110,11 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 				>
 					<div className={`flex-1 overflow-y-auto ${isMobile ? 'space-y-4' : ''}`}>
 						<BasicInformationSection register={register} errors={errors} watch={watch} />
-						<PricingCategorySection register={register} errors={errors} />
+						<PricingCategorySection
+							register={register}
+							errors={errors}
+							control={control}
+						/>
 						<IngredientsSection
 							control={control}
 							errors={errors}

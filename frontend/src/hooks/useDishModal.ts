@@ -9,6 +9,7 @@ import { useDishes } from './useDishes'
 export const useDishModal = (onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
 	const { refetchDishes } = useDishes()
+
 	const {
 		register,
 		handleSubmit,
@@ -23,6 +24,7 @@ export const useDishModal = (onClose: () => void) => {
 		mode: 'onChange',
 		defaultValues: {
 			ingredients: [],
+			available: true,
 		},
 	})
 
@@ -40,7 +42,7 @@ export const useDishModal = (onClose: () => void) => {
 			if (data.weightGr != null) formData.append('weightGr', data.weightGr.toString())
 			if (data.calories != null) formData.append('calories', data.calories.toString())
 			formData.append('imageUrl', data.imageUrl[0])
-
+			formData.append('available', data.available.toString())
 			const response = await createDish(formData, { _hideGlobalError: true })
 			if (response.status === 201) {
 				showSuccess('Dish created successfully')

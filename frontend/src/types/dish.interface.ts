@@ -9,7 +9,7 @@ export interface IFormValues {
 	imageUrl: FileList
 	weightGr?: number | null
 	calories?: number | null
-	available?: boolean
+	available: boolean
 }
 
 export interface IDish {
