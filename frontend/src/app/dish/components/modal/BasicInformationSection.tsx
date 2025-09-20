@@ -21,7 +21,7 @@ export const BasicInformationSection = ({
 
 	const descriptionValue = watch('description') || ''
 	const descriptionLength = descriptionValue.length
-	const maxDescriptionLength = 1000
+	const maxDescriptionLength = 1500
 
 	return (
 		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
@@ -67,11 +67,6 @@ export const BasicInformationSection = ({
 									`Description can be at most ${maxDescriptionLength} characters`,
 								noOnlySpaces: v =>
 									v.trim().length > 0 || 'Description cannot be only spaces',
-								validCharacters: v =>
-									/^[\p{L}\p{N}\s\-&.,'()!?]+$/u.test(v) ||
-									'Description can only contain letters, numbers, spaces, and basic punctuation',
-								noConsecutiveSpaces: v =>
-									!/\s{2,}/.test(v) || 'Description cannot have consecutive spaces',
 							},
 						})}
 						label='Dish Description'
@@ -79,6 +74,7 @@ export const BasicInformationSection = ({
 						multiline
 						rows={isFullScreen ? 3 : 4}
 					/>
+
 					<p className='text-xs text-secondary-foreground mt-1 text-right'>
 						{descriptionLength} / {maxDescriptionLength}
 					</p>

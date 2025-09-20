@@ -32,14 +32,17 @@ export const useDishModal = (onClose: () => void) => {
 			formData.append('name', data.name.trim())
 			formData.append('description', data.description.trim())
 			formData.append('price', data.price.toString())
-			formData.append('categoryId', data.categoryId.toString())
+			if (data.categoryId != null)
+				formData.append('categoryId', data.categoryId.toString())
 			data.ingredients.forEach(ingredient =>
 				formData.append('ingredients', ingredient.trim()),
 			)
 			formData.append('weightGr', data.weightGr.toString())
 			formData.append('calories', data.calories.toString())
-			if (data.imageUrl && data.imageUrl.length > 0)
+
+			if (data.imageUrl && data.imageUrl.length > 0) {
 				formData.append('imageUrl', data.imageUrl[0])
+			}
 
 			const response = await createDish(formData, { _hideGlobalError: true })
 			if (response.status === 201) {
