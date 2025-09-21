@@ -1,7 +1,7 @@
 import { useSidebarStore } from '@/store/sidebar.store'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import Image from 'next/image'
+import { ViewableImage } from '../ImageViewer/ViewableImage'
 
 export const SidebarHeader = () => {
 	const { collapsed, setCollapsed } = useSidebarStore()
@@ -10,7 +10,7 @@ export const SidebarHeader = () => {
 			{!collapsed ? (
 				<>
 					<div className='w-10 h-10 flex items-center justify-center'>
-						<Image
+						<ViewableImage
 							src='/Resto-Hub.png'
 							alt='Logo'
 							width={40}
@@ -34,7 +34,7 @@ export const SidebarHeader = () => {
 				>
 					<span className='relative w-10 h-10 flex items-center justify-center'>
 						<span className='absolute inset-0 flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0'>
-							<Image
+							<ViewableImage
 								src='/Resto-Hub.png'
 								alt='Logo'
 								width={40}
