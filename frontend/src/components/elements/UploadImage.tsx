@@ -1,8 +1,9 @@
 'use client'
 
 import { useUploadImage } from '@/hooks/useUploadImage'
-import Image from 'next/image'
+import { Box } from '@mui/material'
 import type { UseFormRegisterReturn } from 'react-hook-form'
+import { ViewableImage } from '../ImageViewer/ViewableImage'
 
 type UploadImageProps = {
 	label?: string
@@ -29,6 +30,7 @@ export const UploadImage = ({
 		...restRegister
 	} = useUploadImage({ ...register, savedPreview, onDataChange })
 	const currentPreview = preview || savedPreview
+	const handleImageClick = () => inputRef.current?.click()
 
 	return (
 		<div className='flex flex-col gap-2 relative'>
@@ -39,24 +41,25 @@ export const UploadImage = ({
 				</div>
 			)}
 			{currentPreview ? (
-				<div
-					className='relative w-32 h-32 rounded-md overflow-hidden'
-					onClick={() => inputRef.current?.click()}
-				>
-					<Image
+				<Box sx={{ position: 'relative', display: 'inline-block' }}>
+					<ViewableImage
 						src={currentPreview}
 						alt='Preview'
-						fill
-						className='object-cover cursor-pointer'
+						width={128}
+						height={128}
+						className='object-cover cursor-pointer rounded-md'
+						onClick={handleImageClick}
+						showViewIcon
+						style={{ width: '128px', height: '128px' }}
 					/>
-				</div>
+				</Box>
 			) : (
 				<div
 					onDrop={handleDrop}
 					onDragOver={preventDefaults}
 					onDragEnter={preventDefaults}
 					onDragLeave={preventDefaults}
-					onClick={() => inputRef.current?.click()}
+					onClick={handleImageClick}
 					className='relative border-2 border-dashed border-[var(--muted-foreground)] p-6 rounded-md text-center cursor-pointer transition-colors hover:bg-muted/40'
 				>
 					<p className='text-muted-foreground'>Click or drag & drop an image</p>
