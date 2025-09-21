@@ -102,16 +102,27 @@ export const useUploadImage = ({
 		e.stopPropagation()
 	}
 
+	const isFileBeingDragged = (e: DragEvent): boolean => {
+		const types = e.dataTransfer?.types
+		if (!types) return false
+
+		return types.includes('Files')
+	}
+
 	useEffect(() => {
 		let dragCounter = 0
 
 		const handleDragEnter = (e: DragEvent) => {
+			if (!isFileBeingDragged(e)) return
+
 			e.preventDefault()
 			dragCounter++
 			setIsDragging(true)
 		}
 
 		const handleDragLeave = (e: DragEvent) => {
+			if (!isFileBeingDragged(e)) return
+
 			e.preventDefault()
 			dragCounter--
 			if (dragCounter <= 0) {
@@ -121,6 +132,7 @@ export const useUploadImage = ({
 		}
 
 		const handleDrop = (e: DragEvent) => {
+			if (!isFileBeingDragged(e)) return
 			e.preventDefault()
 			setIsDragging(false)
 			dragCounter = 0
@@ -128,17 +140,18 @@ export const useUploadImage = ({
 			const file = e.dataTransfer?.files?.[0]
 			if (file) handleFile(file)
 		}
+		const handleDragOver = (e: DragEvent) => e.preventDefault()
 
 		window.addEventListener('dragenter', handleDragEnter)
 		window.addEventListener('dragleave', handleDragLeave)
 		window.addEventListener('drop', handleDrop)
-		window.addEventListener('dragover', e => e.preventDefault())
+		window.addEventListener('dragover', handleDragOver)
 
 		return () => {
 			window.removeEventListener('dragenter', handleDragEnter)
 			window.removeEventListener('dragleave', handleDragLeave)
 			window.removeEventListener('drop', handleDrop)
-			window.removeEventListener('dragover', e => e.preventDefault())
+			window.removeEventListener('dragover', handleDragOver)
 		}
 	}, [handleFile])
 

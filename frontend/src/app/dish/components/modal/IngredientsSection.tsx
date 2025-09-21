@@ -87,15 +87,18 @@ export const IngredientsSection = ({
 	}
 
 	const handleDragStart = (e: React.DragEvent, index: number) => {
+		e.stopPropagation()
 		setDraggedIndex(index)
 		e.dataTransfer.effectAllowed = 'move'
 		e.dataTransfer.setData('text/html', e.currentTarget.outerHTML)
+		e.dataTransfer.setData('application/ingredient-drag', 'true')
 		setTimeout(() => {
 			if (e.currentTarget) (e.currentTarget as HTMLElement).style.opacity = '0.5'
 		}, 0)
 	}
 
 	const handleDragEnd = (e: React.DragEvent) => {
+		e.stopPropagation()
 		setDraggedIndex(null)
 		setDragOverIndex(null)
 		dragCounter.current = 0
@@ -104,16 +107,19 @@ export const IngredientsSection = ({
 
 	const handleDragOver = (e: React.DragEvent) => {
 		e.preventDefault()
+		e.stopPropagation()
 		e.dataTransfer.dropEffect = 'move'
 	}
 
 	const handleDragEnter = (e: React.DragEvent, index: number) => {
 		e.preventDefault()
+		e.stopPropagation()
 		dragCounter.current++
 		setDragOverIndex(index)
 	}
 
-	const handleDragLeave = () => {
+	const handleDragLeave = (e: React.DragEvent) => {
+		e.stopPropagation()
 		dragCounter.current--
 		if (dragCounter.current === 0) setDragOverIndex(null)
 	}
@@ -125,6 +131,7 @@ export const IngredientsSection = ({
 		onChange: (newValue: string[]) => void,
 	) => {
 		e.preventDefault()
+		e.stopPropagation()
 
 		if (draggedIndex === null || draggedIndex === dropIndex) return
 
@@ -211,11 +218,7 @@ export const IngredientsSection = ({
 									className={`
 										flex items-center gap-1 cursor-move transition-all duration-200
 										${draggedIndex === idx ? 'scale-105 rotate-2' : ''}
-										${
-											dragOverIndex === idx && draggedIndex !== idx
-												? 'scale-110 shadow-lg ring-2 ring-blue-400 ring-opacity-50'
-												: ''
-										}
+										${dragOverIndex === idx && draggedIndex !== idx ? 'scale-110 shadow-lg' : ''}
 										hover:scale-105 hover:shadow-md
 									`}
 									style={{
@@ -271,6 +274,16 @@ export const IngredientsSection = ({
 								</div>
 							))}
 						</div>
+
+						{value.length > 1 && (
+							<p
+								className={`text-xs text-muted-foreground ${
+									isFullScreen ? 'mt-1' : 'mt-2'
+								}`}
+							>
+								💡 Move ingredients to reorder
+							</p>
+						)}
 					</div>
 				)}
 			/>
