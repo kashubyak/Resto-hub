@@ -34,13 +34,8 @@ export const ImageViewer = ({ open, onClose, src, alt }: ImageViewerProps) => {
 	const [isFullscreen, setIsFullscreen] = useState(false)
 	const containerRef = useRef<HTMLDivElement>(null)
 
-	const handleZoomIn = useCallback(() => {
-		setZoom(prev => Math.min(prev * 1.2, 3))
-	}, [])
-
-	const handleZoomOut = useCallback(() => {
-		setZoom(prev => Math.max(prev / 1.2, 0.5))
-	}, [])
+	const handleZoomIn = useCallback(() => setZoom(prev => Math.min(prev * 1.2, 3)), [])
+	const handleZoomOut = useCallback(() => setZoom(prev => Math.max(prev / 1.2, 0.5)), [])
 
 	const handleFullscreen = useCallback(async () => {
 		if (!containerRef.current) return
@@ -93,6 +88,8 @@ export const ImageViewer = ({ open, onClose, src, alt }: ImageViewerProps) => {
 						right: 0,
 						bottom: 0,
 						zIndex: 9999,
+						margin: 0,
+						borderRadius: 0,
 					},
 				}}
 				TransitionComponent={Zoom}
@@ -116,6 +113,9 @@ export const ImageViewer = ({ open, onClose, src, alt }: ImageViewerProps) => {
 						position: 'relative',
 						overflow: 'hidden',
 						backgroundColor: 'rgba(0, 0, 0, 0.9)',
+						width: '100vw',
+						height: '100vh',
+						margin: 0,
 						cursor: zoom > 1 ? 'grab' : 'default',
 						'&:active': {
 							cursor: zoom > 1 ? 'grabbing' : 'default',
@@ -176,25 +176,29 @@ export const ImageViewer = ({ open, onClose, src, alt }: ImageViewerProps) => {
 					<Box
 						sx={{
 							position: 'relative',
-							width: '100%',
-							height: '100%',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
+							maxWidth: '90vw',
+							maxHeight: '90vh',
 							transform: `scale(${zoom})`,
 							transition: 'transform 0.2s ease-in-out',
 							cursor: 'pointer',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
 						}}
 						onDoubleClick={zoom === 1 ? handleZoomIn : handleZoomOut}
 					>
 						<Image
 							src={src}
 							alt={alt}
-							fill
+							width={0}
+							height={0}
+							sizes='90vw'
 							style={{
-								objectFit: 'contain',
+								width: 'auto',
+								height: 'auto',
 								maxWidth: '90vw',
 								maxHeight: '90vh',
+								objectFit: 'contain',
 							}}
 							quality={100}
 							priority
