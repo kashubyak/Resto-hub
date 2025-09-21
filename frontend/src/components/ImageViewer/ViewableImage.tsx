@@ -1,6 +1,6 @@
 'use client'
 
-import { useImageViewer } from '@/hooks/useImageViewer'
+import { useViewableImage } from '@/hooks/useViewableImage'
 import { Visibility as VisibilityIcon } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
 import Image from 'next/image'
@@ -27,7 +27,7 @@ export const ViewableImage = ({
 	onClick,
 	style,
 }: ViewableImageProps) => {
-	const { isOpen, imageSrc, imageAlt, openViewer, closeViewer } = useImageViewer()
+	const { isOpen, imageSrc, imageAlt, openViewer, closeViewer } = useViewableImage()
 
 	const handleImageClick = () => {
 		if (onClick) onClick()
