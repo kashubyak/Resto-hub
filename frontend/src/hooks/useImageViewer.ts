@@ -11,14 +11,24 @@ export const useImageViewer = () => {
 		imageSrc: null,
 		imageAlt: '',
 	})
+
 	const openViewer = useCallback(
 		(src: string, alt: string = 'Image') =>
-			setState({ isOpen: true, imageSrc: src, imageAlt: alt }),
+			setState({
+				isOpen: true,
+				imageSrc: src,
+				imageAlt: alt,
+			}),
 		[],
 	)
 
 	const closeViewer = useCallback(
-		() => setState({ isOpen: false, imageSrc: null, imageAlt: '' }),
+		() =>
+			setState({
+				isOpen: false,
+				imageSrc: null,
+				imageAlt: '',
+			}),
 		[],
 	)
 

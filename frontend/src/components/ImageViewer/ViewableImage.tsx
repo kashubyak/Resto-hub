@@ -29,9 +29,15 @@ export const ViewableImage = ({
 }: ViewableImageProps) => {
 	const { isOpen, imageSrc, imageAlt, openViewer, closeViewer } = useImageViewer()
 
-	const handleClick = () => {
+	const handleImageClick = () => {
 		if (onClick) onClick()
 		else openViewer(src, alt)
+	}
+
+	const handleViewIconClick = (e: React.MouseEvent) => {
+		e.preventDefault()
+		e.stopPropagation()
+		openViewer(src, alt)
 	}
 
 	return (
@@ -45,7 +51,7 @@ export const ViewableImage = ({
 						opacity: 1,
 					},
 				}}
-				onClick={handleClick}
+				onClick={handleImageClick}
 			>
 				<Image
 					src={src}
@@ -59,6 +65,7 @@ export const ViewableImage = ({
 				{showViewIcon && (
 					<IconButton
 						className='view-icon'
+						onClick={handleViewIconClick}
 						sx={{
 							position: 'absolute',
 							top: 8,

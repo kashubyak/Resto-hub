@@ -76,8 +76,7 @@ export const UploadImage = ({
 				{...restRegister}
 				className='hidden'
 			/>
-
-			{error && <span className='text-destructive-foreground text-sm'>{error}</span>}
+			{error && <span className='text-[var(--destructive)] text-sm'>{error}</span>}
 		</div>
 	)
 }
