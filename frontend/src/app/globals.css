@@ -97,9 +97,6 @@ body {
 	.bg-destructive {
 		background-color: var(--destructive);
 	}
-	.text-destructive-foreground {
-		color: var(--destructive-foreground);
-	}
 	.bg-warning {
 		background-color: var(--warning);
 	}

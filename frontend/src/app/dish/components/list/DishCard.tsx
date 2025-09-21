@@ -1,5 +1,5 @@
+import { ViewableImage } from '@/components/ImageViewer/ViewableImage'
 import { Button } from '@/components/ui/Button'
-import Image from 'next/image'
 
 interface IDish {
 	id: string | number
@@ -20,7 +20,7 @@ export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 	return (
 		<div className='bg-card rounded-xl shadow-sm hover:shadow-md transition flex flex-col overflow-hidden'>
 			<div className='bg-muted flex justify-center items-center p-2'>
-				<Image
+				<ViewableImage
 					src={dish.imageUrl}
 					alt={dish.name}
 					width={240}
