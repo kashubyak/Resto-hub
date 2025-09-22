@@ -2,7 +2,7 @@
 
 import { useViewableImage } from '@/hooks/useViewableImage'
 import { Visibility as VisibilityIcon } from '@mui/icons-material'
-import { Box, IconButton } from '@mui/material'
+import { Box, IconButton, useMediaQuery, useTheme } from '@mui/material'
 import Image from 'next/image'
 import { ImageViewer } from '../ImageViewer/ImageViewer'
 
@@ -28,6 +28,8 @@ export const ViewableImage = ({
 	style,
 }: ViewableImageProps) => {
 	const { isOpen, imageSrc, imageAlt, openViewer, closeViewer } = useViewableImage()
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
 	const handleImageClick = () => {
 		if (onClick) onClick()
@@ -72,7 +74,7 @@ export const ViewableImage = ({
 							right: 8,
 							backgroundColor: 'rgba(0, 0, 0, 0.5)',
 							color: 'white',
-							opacity: 0,
+							opacity: isMobile ? 1 : 0,
 							transition: 'opacity 0.2s ease-in-out',
 							'&:hover': {
 								backgroundColor: 'rgba(0, 0, 0, 0.7)',
