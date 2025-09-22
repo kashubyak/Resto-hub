@@ -9,23 +9,8 @@ interface IDishCardProps {
 export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 	return (
 		<div className='bg-background border border-border rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group'>
-			<div className='relative bg-muted h-48 overflow-hidden'>
-				<div className='absolute inset-0 flex items-center justify-center p-4'>
-					<Image
-						src={dish.imageUrl}
-						alt={dish.name}
-						width={300}
-						height={200}
-						className='max-w-full max-h-full object-contain rounded-lg group-hover:scale-105 transition-transform duration-300'
-						style={{
-							width: 'auto',
-							height: 'auto',
-							maxWidth: '100%',
-							maxHeight: '100%',
-						}}
-					/>
-				</div>
-
+			<div className='relative w-full aspect-video bg-muted overflow-hidden'>
+				<Image src={dish.imageUrl} alt={dish.name} fill className='object-contain' />
 				<div className='absolute top-3 left-3'>
 					<span
 						className={`px-2 py-1 text-xs font-medium rounded-full stable-light ${
@@ -86,13 +71,13 @@ export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 							{dish.ingredients.slice(0, 3).map((ingredient, index) => (
 								<span
 									key={index}
-									className='px-2 py-1 text-xs bg-muted text-muted-foreground rounded-full'
+									className='px-2 py-1 text-xs active-item text-foreground rounded-full'
 								>
 									{ingredient}
 								</span>
 							))}
 							{dish.ingredients.length > 3 && (
-								<span className='px-2 py-1 text-xs bg-muted text-muted-foreground rounded-full'>
+								<span className='px-2 py-1 text-xs active-item text-foreground rounded-full'>
 									+{dish.ingredients.length - 3} more
 								</span>
 							)}
