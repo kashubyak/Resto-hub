@@ -8,30 +8,104 @@ interface IDishCardProps {
 
 export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 	return (
-		<div className='bg-card rounded-xl shadow-sm hover:shadow-md transition flex flex-col overflow-hidden'>
-			<div className='bg-muted flex justify-center items-center p-2'>
-				<Image
-					src={dish.imageUrl}
-					alt={dish.name}
-					width={240}
-					height={240}
-					className='max-h-[200px] w-auto object-contain rounded-lg'
-				/>
-			</div>
-			<div className='p-4 flex flex-col gap-2 flex-grow'>
-				<h3 className='text-lg font-semibold'>{dish.name}</h3>
-				<p className='text-sm text-muted-foreground line-clamp-2'>{dish.description}</p>
-				<p className='text-base font-medium mt-1'>{dish.price}$</p>
-				<p className='text-xs text-muted-foreground'>
-					Category: {dish.category?.name ?? '—'}
-				</p>
+		<div className='bg-background border border-border rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group'>
+			<div className='relative bg-muted h-48 overflow-hidden'>
+				<div className='absolute inset-0 flex items-center justify-center p-4'>
+					<Image
+						src={dish.imageUrl}
+						alt={dish.name}
+						width={300}
+						height={200}
+						className='max-w-full max-h-full object-contain rounded-lg group-hover:scale-105 transition-transform duration-300'
+						style={{
+							width: 'auto',
+							height: 'auto',
+							maxWidth: '100%',
+							maxHeight: '100%',
+						}}
+					/>
+				</div>
 
-				<div className='mt-auto pt-3'>
+				<div className='absolute top-3 left-3'>
+					<span
+						className={`px-2 py-1 text-xs font-medium rounded-full stable-light ${
+							dish.available ? 'bg-success' : 'bg-destructive'
+						}`}
+					>
+						{dish.available ? 'Available' : 'Unavailable'}
+					</span>
+				</div>
+
+				{dish.category && (
+					<div className='absolute top-3 right-3'>
+						<span className='px-2 py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full'>
+							{dish.category.name}
+						</span>
+					</div>
+				)}
+			</div>
+
+			<div className='p-5 flex flex-col flex-grow'>
+				<div className='mb-4'>
+					<h3 className='text-lg font-semibold text-foreground mb-2 line-clamp-1'>
+						{dish.name}
+					</h3>
+					<p className='text-sm text-muted-foreground line-clamp-2 leading-relaxed'>
+						{dish.description}
+					</p>
+				</div>
+
+				<div className='mb-4'>
+					<span className='text-2xl font-bold text-primary'>${dish.price}</span>
+				</div>
+
+				<div className='grid grid-cols-2 gap-3 mb-4 text-xs'>
+					<div className='flex flex-col'>
+						<span className='text-muted-foreground uppercase tracking-wide'>Weight</span>
+						<span className='text-foreground font-medium mt-1'>
+							{dish.weightGr ? `${dish.weightGr}g` : '—'}
+						</span>
+					</div>
+
+					<div className='flex flex-col'>
+						<span className='text-muted-foreground uppercase tracking-wide'>
+							Calories
+						</span>
+						<span className='text-foreground font-medium mt-1'>
+							{dish.calories ? `${dish.calories} kcal` : '—'}
+						</span>
+					</div>
+				</div>
+
+				{dish.ingredients && dish.ingredients.length > 0 && (
+					<div className='mb-4'>
+						<span className='text-xs text-muted-foreground uppercase tracking-wide mb-2 block'>
+							Ingredients
+						</span>
+						<div className='flex flex-wrap gap-1'>
+							{dish.ingredients.slice(0, 3).map((ingredient, index) => (
+								<span
+									key={index}
+									className='px-2 py-1 text-xs bg-muted text-muted-foreground rounded-full'
+								>
+									{ingredient}
+								</span>
+							))}
+							{dish.ingredients.length > 3 && (
+								<span className='px-2 py-1 text-xs bg-muted text-muted-foreground rounded-full'>
+									+{dish.ingredients.length - 3} more
+								</span>
+							)}
+						</div>
+					</div>
+				)}
+
+				<div className='mt-auto pt-4'>
 					<Button
-						type='submit'
+						type='button'
 						onClick={() => {}}
-						text='More details'
-						className='w-full'
+						text='View Details'
+						className='w-full hover:bg-primary'
 					/>
 				</div>
 			</div>
