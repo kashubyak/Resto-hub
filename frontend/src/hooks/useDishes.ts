@@ -1,17 +1,14 @@
 'use client'
 
 import { DISHES_QUERY_KEY } from '@/constants/query-keys.constant'
+import { getDish } from '@/services/dish/get-dish.service'
 import { getAllDishes } from '@/services/dish/get-dishes.service'
 import type { IDish, IDishResponse } from '@/types/dish.interface'
-import {
-	type InfiniteData,
-	useInfiniteQuery,
-	useQueryClient,
-} from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
 
 const LIMIT = 10
 
-export const useDishes = () => {
+export const useDishes = (dishId?: number) => {
 	const queryClient = useQueryClient()
 
 	const dishesQuery = useInfiniteQuery<IDishResponse, Error>({
@@ -20,29 +17,17 @@ export const useDishes = () => {
 		getNextPageParam: lastPage =>
 			lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
 		initialPageParam: 1,
+		enabled: !dishId,
+	})
+
+	const dishQuery = useQuery<IDish, Error>({
+		queryKey: [DISHES_QUERY_KEY.DETAIL, dishId],
+		queryFn: () => getDish(dishId!),
+		enabled: !!dishId,
 	})
 
 	const refetchDishes = () => {
 		queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
-	}
-
-	const addDishToCache = (newDish: IDish) => {
-		queryClient.setQueryData<InfiniteData<IDishResponse>>(
-			[DISHES_QUERY_KEY.ALL],
-			oldData => {
-				if (!oldData) return oldData
-				return {
-					...oldData,
-					pages: [
-						{
-							...oldData.pages[0],
-							data: [newDish, ...oldData.pages[0].data],
-						},
-						...oldData.pages.slice(1),
-					],
-				}
-			},
-		)
 	}
 
 	const allDishes: IDish[] = dishesQuery.data?.pages.flatMap(page => page.data) ?? []
@@ -51,6 +36,6 @@ export const useDishes = () => {
 		...dishesQuery,
 		allDishes,
 		refetchDishes,
-		addDishToCache,
+		dishQuery,
 	}
 }
