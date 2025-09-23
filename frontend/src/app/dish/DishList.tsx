@@ -1,6 +1,9 @@
 'use client'
 
+import { Loading } from '@/components/ui/Loading'
+import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
+import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
 import { useEffect, useRef, useState } from 'react'
 import { DishCard } from './components/list/DishCard'
 import { DishListItem } from './components/list/DishListItem'
@@ -31,14 +34,16 @@ export const DishList = () => {
 		return () => observer.disconnect()
 	}, [fetchNextPage, hasNextPage])
 
-	if (isLoading)
-		return (
-			<div className='flex items-center justify-center py-20'>
-				<div className='animate-spin rounded-full h-10 w-10 border-4 border-[var(--primary)] border-t-transparent' />
-			</div>
-		)
+	if (isLoading) return <Loading />
 
-	if (isError) return <div>Failed to load dishes</div>
+	if (isError)
+		return (
+			<NotFound
+				icon={<RestaurantMenuIcon />}
+				title='Dishes Not Found'
+				message='Sorry, we could not load these dishes.'
+			/>
+		)
 
 	return (
 		<div className='p-6'>

@@ -1,7 +1,7 @@
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { useNetworkProgress } from '@/hooks/useNetworkProgress'
 import { type ReactNode } from 'react'
-import { Loading } from '../ui/Loading'
+import { LoadingPage } from '../ui/LoadingPage'
 
 interface ISafeRenderProps {
 	children: ReactNode
@@ -29,7 +29,7 @@ export const SafeRender = ({
 		const finalProgress =
 			showNetworkProgress && networkLoading ? networkProgress : userProgress
 
-		return <Loading progress={finalProgress} title={title} />
+		return <LoadingPage progress={finalProgress} title={title} />
 	}
 
 	return children as React.ReactElement

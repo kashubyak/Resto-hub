@@ -1,5 +1,7 @@
 'use client'
 import { Button } from '@/components/ui/Button'
+import { Loading } from '@/components/ui/Loading'
+import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
 import {
 	Cancel,
@@ -18,32 +20,16 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 	const { id } = use(params)
 	const { dishQuery } = useDishes(Number(id))
 
-	if (dishQuery.isLoading) {
-		return (
-			<div className='min-h-screen flex items-center justify-center bg-background'>
-				<div className='text-center space-y-6'>
-					<div className='w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto'></div>
-					<p className='text-xl text-muted-foreground'>Loading dish details...</p>
-				</div>
-			</div>
-		)
-	}
+	if (dishQuery.isLoading) return <Loading title='Loading dish details...' />
 
-	if (dishQuery.isError || !dishQuery.data) {
+	if (dishQuery.isError || !dishQuery.data)
 		return (
-			<div className='min-h-screen flex items-center justify-center bg-background'>
-				<div className='text-center space-y-8'>
-					<div className='text-9xl'>🍽️</div>
-					<div>
-						<h2 className='text-4xl font-bold mb-4'>Dish Not Found</h2>
-						<p className='text-muted-foreground text-xl'>
-							Sorry, we could not load this dish.
-						</p>
-					</div>
-				</div>
-			</div>
+			<NotFound
+				icon='🍽️'
+				title='Dish Not Found'
+				message='Sorry, we could not load this dish.'
+			/>
 		)
-	}
 
 	const dish = dishQuery.data
 
