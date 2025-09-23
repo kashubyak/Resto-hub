@@ -158,7 +158,7 @@ export class AuthService {
   }
 
   logoutUser(res: Response): { message: string } {
-    res.clearCookie('jid', { path: '/auth', httpOnly: true });
+    res.clearCookie('jid', { path: '/', httpOnly: true });
     return { message: 'Logged out successfully' };
   }
 
