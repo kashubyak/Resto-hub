@@ -35,7 +35,6 @@ export const DishList = () => {
 	}, [fetchNextPage, hasNextPage])
 
 	if (isLoading) return <Loading />
-
 	if (isError)
 		return (
 			<NotFound

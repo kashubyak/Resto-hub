@@ -92,13 +92,14 @@ export const DishListItem: React.FC<DishListItemProps> = ({ dish }) => {
 						)}
 
 						<div className='flex-shrink-0 sm:ml-4'>
-							<Button
-								type='button'
-								onClick={() => {}}
-								className='w-full hover:bg-primary'
-							>
-								<Link href={ROUTES.PRIVATE.ADMIN.DISH_ID(dish.id)}>View Details</Link>
-							</Button>
+							<Link href={ROUTES.PRIVATE.ADMIN.DISH_ID(dish.id)}>
+								<Button
+									type='button'
+									onClick={() => {}}
+									text='View Details'
+									className='w-full hover:bg-primary'
+								/>
+							</Link>
 						</div>
 					</div>
 				</div>

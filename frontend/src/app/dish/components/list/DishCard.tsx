@@ -88,9 +88,14 @@ export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 				)}
 
 				<div className='mt-auto pt-4'>
-					<Button type='button' onClick={() => {}} className='w-full hover:bg-primary'>
-						<Link href={ROUTES.PRIVATE.ADMIN.DISH_ID(dish.id)}>View Details</Link>
-					</Button>
+					<Link href={ROUTES.PRIVATE.ADMIN.DISH_ID(dish.id)}>
+						<Button
+							type='button'
+							onClick={() => {}}
+							className='w-full hover:bg-primary'
+							text='View Details'
+						/>
+					</Link>
 				</div>
 			</div>
 		</div>

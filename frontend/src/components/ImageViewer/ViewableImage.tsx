@@ -3,29 +3,24 @@
 import { useViewableImage } from '@/hooks/useViewableImage'
 import { Visibility as VisibilityIcon } from '@mui/icons-material'
 import { Box, IconButton, useMediaQuery, useTheme } from '@mui/material'
-import Image from 'next/image'
+import Image, { type ImageProps } from 'next/image'
 import { ImageViewer } from '../ImageViewer/ImageViewer'
 
-interface ViewableImageProps {
+interface ViewableImageProps extends Omit<ImageProps, 'src' | 'alt'> {
 	src: string
 	alt: string
-	width?: number
-	height?: number
-	className?: string
 	showViewIcon?: boolean
 	onClick?: () => void
-	style?: React.CSSProperties
 }
 
 export const ViewableImage = ({
 	src,
 	alt,
-	width,
-	height,
 	className,
 	showViewIcon = false,
 	onClick,
 	style,
+	...imageProps
 }: ViewableImageProps) => {
 	const { isOpen, imageSrc, imageAlt, openViewer, closeViewer } = useViewableImage()
 	const theme = useTheme()
@@ -42,6 +37,8 @@ export const ViewableImage = ({
 		openViewer(src, alt)
 	}
 
+	const isFill = 'fill' in imageProps && imageProps.fill
+
 	return (
 		<>
 			<Box
@@ -49,20 +46,15 @@ export const ViewableImage = ({
 					position: 'relative',
 					display: 'inline-block',
 					cursor: 'pointer',
+					width: isFill ? '100%' : undefined,
+					height: isFill ? '100%' : undefined,
 					'&:hover .view-icon': {
 						opacity: 1,
 					},
 				}}
 				onClick={handleImageClick}
 			>
-				<Image
-					src={src}
-					alt={alt}
-					width={width}
-					height={height}
-					className={className}
-					style={style}
-				/>
+				<Image src={src} alt={alt} className={className} style={style} {...imageProps} />
 
 				{showViewIcon && (
 					<IconButton
