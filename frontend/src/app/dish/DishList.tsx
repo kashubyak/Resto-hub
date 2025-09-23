@@ -2,7 +2,7 @@
 
 import { useDishes } from '@/hooks/useDishes'
 import { useEffect, useRef, useState } from 'react'
-import { DishCard } from './DishCard'
+import { DishCard } from './components/list/DishCard'
 import { DishListItem } from './components/list/DishListItem'
 import { ViewModeToggle, type ViewMode } from './components/list/ViewModeToggle'
 

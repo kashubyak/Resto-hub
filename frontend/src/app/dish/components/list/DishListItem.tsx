@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/Button'
+import { ROUTES } from '@/constants/pages.constant'
 import type { IDish } from '@/types/dish.interface'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface DishListItemProps {
 	dish: IDish
@@ -93,9 +95,10 @@ export const DishListItem: React.FC<DishListItemProps> = ({ dish }) => {
 							<Button
 								type='button'
 								onClick={() => {}}
-								text='View Details'
-								className='w-full sm:w-auto hover:bg-primary'
-							/>
+								className='w-full hover:bg-primary'
+							>
+								<Link href={ROUTES.PRIVATE.ADMIN.DISH_ID(dish.id)}>View Details</Link>
+							</Button>
 						</div>
 					</div>
 				</div>

@@ -42,6 +42,7 @@ export const ROUTES = {
 		},
 		ADMIN: {
 			DISH: '/dish',
+			DISH_ID: (id: number | string) => `/dish/${id}`,
 		},
 		COOK: {},
 		WAITER: {},

@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/Button'
+import { ROUTES } from '@/constants/pages.constant'
 import type { IDish } from '@/types/dish.interface'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface IDishCardProps {
 	dish: IDish
@@ -87,7 +89,7 @@ export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 
 				<div className='mt-auto pt-4'>
 					<Button type='button' onClick={() => {}} className='w-full hover:bg-primary'>
-						View Details
+						<Link href={ROUTES.PRIVATE.ADMIN.DISH_ID(dish.id)}>View Details</Link>
 					</Button>
 				</div>
 			</div>
