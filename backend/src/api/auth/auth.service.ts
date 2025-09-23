@@ -184,9 +184,9 @@ export class AuthService {
     res.cookie('jid', refreshToken, {
       httpOnly: true,
       secure: isProd,
-      sameSite: isProd ? 'strict' : 'none',
+      sameSite: isProd ? 'strict' : 'lax',
       ...(isProd ? { domain: `.${process.env.DOMAIN}` } : {}),
-      path: '/auth',
+      path: '/',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
   }
