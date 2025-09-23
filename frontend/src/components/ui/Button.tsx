@@ -1,15 +1,23 @@
 'use client'
 
 import { cn } from '@/utils/cn'
+import { type ReactNode } from 'react'
 
 type ButtonProps = {
-	type: 'submit' | 'button' | 'reset'
+	type?: 'submit' | 'button' | 'reset'
 	onClick?: () => void
-	text: string
+	text?: string
+	children?: ReactNode
 	className?: string
 }
 
-export const Button = ({ type, text, onClick, className }: ButtonProps) => {
+export const Button = ({
+	type = 'button',
+	onClick,
+	text,
+	children,
+	className,
+}: ButtonProps) => {
 	return (
 		<button
 			type={type}
@@ -19,7 +27,7 @@ export const Button = ({ type, text, onClick, className }: ButtonProps) => {
 				className,
 			)}
 		>
-			{text}
+			{children ?? text}
 		</button>
 	)
 }

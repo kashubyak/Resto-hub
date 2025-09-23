@@ -86,12 +86,9 @@ export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 				)}
 
 				<div className='mt-auto pt-4'>
-					<Button
-						type='button'
-						onClick={() => {}}
-						text='View Details'
-						className='w-full hover:bg-primary'
-					/>
+					<Button type='button' onClick={() => {}} className='w-full hover:bg-primary'>
+						View Details
+					</Button>
 				</div>
 			</div>
 		</div>
