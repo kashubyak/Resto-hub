@@ -12,12 +12,6 @@ export const SideBarUser = ({ collapsed }: { collapsed: boolean }) => {
 
 	const menuItems: IMenuItem[] = [
 		{
-			id: 'divider',
-			label: '',
-			onClick: () => {},
-			isDivider: true,
-		},
-		{
 			id: 'logout',
 			label: 'Logout',
 			onClick: logout,
