@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from '@/components/ui/Button'
 import { ROUTES } from '@/constants/pages.constant'
 import type { IDish } from '@/types/dish.interface'
@@ -11,14 +13,17 @@ interface IDishCardProps {
 export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 	return (
 		<div className='bg-background border border-border rounded-md shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group'>
-			<div className='relative w-full'>
+			<div className='w-full relative'>
 				<Image
 					src={dish.imageUrl}
 					alt={dish.name}
-					width={1920}
-					height={1080}
-					className='w-full h-auto block'
-					sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+					width={800}
+					height={450}
+					style={{ width: '100%', height: 'auto', display: 'block' }}
+					sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+					priority
+					placeholder='blur'
+					// blurDataURL='/placeholder.png'
 				/>
 			</div>
 
@@ -38,7 +43,7 @@ export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 
 						<div className='flex flex-wrap gap-2'>
 							<span
-								className={`px-2 py-1 text-xs font-medium rounded-full stable-light ${
+								className={`px-2 py-1 text-xs font-medium rounded-full ${
 									dish.available ? 'bg-success' : 'bg-destructive'
 								}`}
 							>
