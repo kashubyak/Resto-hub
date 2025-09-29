@@ -31,10 +31,25 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 				<DishImage imageUrl={dish.imageUrl} name={dish.name} />
 				<div className='lg:col-span-1 flex flex-col'>
 					<div className='flex-grow px-4 lg:px-6 lg:pr-0 py-2 space-y-6'>
-						<DishTopInfo dish={dish} />
+						<DishTopInfo
+							name={dish.name}
+							description={dish.description}
+							price={dish.price}
+							available={dish.available}
+							category={dish.category}
+						/>
 						<div className='space-y-6'>
-							<DishDownInfo dish={dish} />
-							<DishDetails dish={dish} />
+							<DishDownInfo
+								weightGr={dish.weightGr}
+								calories={dish.calories}
+								ingredients={dish.ingredients}
+							/>
+							<DishDetails
+								id={dish.id}
+								categoryId={dish.categoryId}
+								createdAt={dish.createdAt}
+								updatedAt={dish.updatedAt}
+							/>
 						</div>
 					</div>
 					<DishActions />
