@@ -12,8 +12,18 @@ export const DishListItem: React.FC<DishListItemProps> = ({ dish }) => {
 	return (
 		<div className='bg-background border border-border rounded-md shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group'>
 			<div className='flex flex-col sm:flex-row'>
-				<div className='relative w-full sm:w-[22rem] aspect-video bg-muted flex-shrink-0'>
-					<Image src={dish.imageUrl} alt={dish.name} fill className='object-contain' />
+				<div className='relative w-full sm:w-[22rem] flex-shrink-0'>
+					<Image
+						src={dish.imageUrl}
+						alt={dish.name}
+						width={800}
+						height={450}
+						style={{ width: '100%', height: 'auto', display: 'block' }}
+						sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 22rem'
+						priority
+						placeholder='blur'
+						blurDataURL='/placeholder.png'
+					/>
 				</div>
 
 				<div className='p-5 flex flex-col flex-grow justify-between'>

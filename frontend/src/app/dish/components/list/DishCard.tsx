@@ -23,7 +23,7 @@ export const DishCard: React.FC<IDishCardProps> = ({ dish }) => {
 					sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
 					priority
 					placeholder='blur'
-					// blurDataURL='/placeholder.png'
+					blurDataURL='/placeholder.png'
 				/>
 			</div>
 
