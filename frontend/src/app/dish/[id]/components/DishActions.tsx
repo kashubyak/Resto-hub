@@ -1,0 +1,42 @@
+import { Button } from '@/components/ui/Button'
+import { Category, Delete, Edit, RemoveCircle } from '@mui/icons-material'
+
+export const DishActions = () => {
+	return (
+		<div className='px-4 lg:px-6 lg:pr-0 py-6 bg-muted/30'>
+			<div className='space-y-4'>
+				<h3 className='text-base font-semibold text-foreground mb-4'>Actions</h3>
+				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2'>
+					<Button
+						className='h-10 inline-flex items-center justify-center font-semibold'
+						onClick={() => console.log('Update dish')}
+					>
+						<Edit className='w-4 h-4 mr-2' />
+						Update Dish
+					</Button>
+					<Button
+						className='h-10 inline-flex items-center justify-center font-semibold'
+						onClick={() => console.log('Assign category')}
+					>
+						<Category className='w-4 h-4 mr-2' />
+						Assign Category
+					</Button>
+					<Button
+						className='h-10 inline-flex items-center justify-center font-semibold'
+						onClick={() => console.log('Remove category')}
+					>
+						<RemoveCircle className='w-4 h-4 mr-2' />
+						Remove Category
+					</Button>
+					<Button
+						className='h-10 inline-flex items-center justify-center font-semibold'
+						onClick={() => console.log('Delete dish')}
+					>
+						<Delete className='w-4 h-4 mr-2' />
+						Delete Dish
+					</Button>
+				</div>
+			</div>
+		</div>
+	)
+}
