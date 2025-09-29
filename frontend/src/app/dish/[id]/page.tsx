@@ -27,15 +27,17 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 		<div className='min-h-screen bg-background p-6'>
 			<div className='flex flex-col lg:grid lg:grid-cols-3'>
 				<div className='lg:col-span-2 relative flex items-center justify-center lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:self-start'>
-					<div className='w-full h-[50vh] lg:h-[70vh] max-w-7xl relative'>
-						<ViewableImage
-							src={dish.imageUrl}
-							alt={dish.name}
-							fill
-							className='object-contain'
-							priority
-							sizes='(max-width: 1024px) 100vw, 66vw'
-						/>
+					<div className='relative w-full max-w-7xl'>
+						<div className='relative w-full aspect-[4/3] lg:h-[70vh]'>
+							<ViewableImage
+								src={dish.imageUrl}
+								alt={dish.name}
+								fill
+								className='object-contain'
+								priority
+								sizes='(max-width: 1024px) 100vw, 66vw'
+							/>
+						</div>
 					</div>
 				</div>
 
