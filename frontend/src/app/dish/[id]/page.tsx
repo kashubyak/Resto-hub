@@ -147,7 +147,7 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 					<div className='px-6 lg:px-6 py-6 bg-muted/30'>
 						<div className='space-y-4'>
 							<h3 className='text-base font-semibold text-foreground mb-4'>Actions</h3>
-							<div className='grid grid-cols-1 gap-3'>
+							<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2'>
 								<Button
 									className='h-10 inline-flex items-center justify-center font-semibold'
 									onClick={() => console.log('Update dish')}
