@@ -24,7 +24,7 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 	const dish = dishQuery.data
 
 	return (
-		<div className='min-h-screen bg-background p-6'>
+		<div className='min-h-screen bg-background p-3 lg:p-4'>
 			<div className='flex flex-col lg:grid lg:grid-cols-3'>
 				<div className='lg:col-span-2 relative flex items-center justify-center lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:self-start'>
 					<div className='relative w-full max-w-7xl'>
@@ -42,7 +42,7 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 				</div>
 
 				<div className='lg:col-span-1 flex flex-col'>
-					<div className='flex-grow px-6 lg:px-6 py-6 lg:py-2 space-y-6'>
+					<div className='flex-grow px-4 lg:px-6 lg:pr-0 py-2 space-y-6'>
 						<div className='space-y-3'>
 							<h1 className='text-3xl lg:text-4xl font-bold text-foreground leading-tight'>
 								{dish.name}
@@ -146,7 +146,7 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 						</div>
 					</div>
 
-					<div className='px-6 lg:px-6 py-6 bg-muted/30'>
+					<div className='px-4 lg:px-6 lg:pr-0 py-6 bg-muted/30'>
 						<div className='space-y-4'>
 							<h3 className='text-base font-semibold text-foreground mb-4'>Actions</h3>
 							<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2'>
