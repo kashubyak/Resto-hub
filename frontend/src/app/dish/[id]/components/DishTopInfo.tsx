@@ -32,10 +32,10 @@ export const DishTopInfo = ({
 						{category.name}
 					</span>
 				)}
-				<p className='text-base lg:text-lg text-muted-foreground leading-relaxed'>
-					{description}
-				</p>
 			</div>
+			<p className='text-base lg:text-lg text-muted-foreground leading-relaxed'>
+				{description}
+			</p>
 		</div>
 	)
 }
