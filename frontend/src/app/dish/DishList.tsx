@@ -3,7 +3,6 @@
 import { Loading } from '@/components/ui/Loading'
 import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
-import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
 import { useEffect, useRef, useState } from 'react'
 import { DishCard } from './components/list/DishCard'
 import { DishListItem } from './components/list/DishListItem'
@@ -38,7 +37,7 @@ export const DishList = () => {
 	if (isError)
 		return (
 			<NotFound
-				icon={<RestaurantMenuIcon />}
+				icon='🍽️'
 				title='Dishes Not Found'
 				message='Sorry, we could not load these dishes.'
 			/>

@@ -4,14 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { Loading } from '@/components/ui/Loading'
 import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
-import {
-	Category,
-	Delete,
-	Edit,
-	LocalOffer,
-	RemoveCircle,
-	Restaurant,
-} from '@mui/icons-material'
+import { Category, Delete, Edit, RemoveCircle, Restaurant } from '@mui/icons-material'
 import { use } from 'react'
 
 export default function DishPage({ params }: { params: Promise<{ id: string }> }) {
@@ -43,24 +36,6 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 							priority
 							sizes='(max-width: 1024px) 100vw, 66vw'
 						/>
-						<div className='absolute top-6 left-6'>
-							<div
-								className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold shadow-lg stable-light ${
-									dish.available ? 'bg-success' : 'bg-destructive'
-								}`}
-							>
-								{dish.available ? <>Available</> : <>Unavailable</>}
-							</div>
-						</div>
-
-						{dish.category && (
-							<div className='absolute top-6 right-6'>
-								<div className='inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground shadow-lg'>
-									<LocalOffer className='w-4 h-4 mr-2' />
-									{dish.category.name}
-								</div>
-							</div>
-						)}
 					</div>
 				</div>
 
@@ -73,9 +48,23 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 							<div className='text-3xl lg:text-3xl font-bold text-primary'>
 								${dish.price}
 							</div>
-							<p className='text-base lg:text-lg text-muted-foreground leading-relaxed'>
-								{dish.description}
-							</p>
+							<div className='flex items-center gap-3 flex-wrap'>
+								<span
+									className={`px-2 py-1 text-xs font-medium rounded-full stable-light ${
+										dish.available ? 'bg-success' : 'bg-destructive'
+									}`}
+								>
+									{dish.available ? 'Available' : 'Unavailable'}
+								</span>
+								{dish.category && (
+									<span className='px-2 py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full'>
+										{dish.category.name}
+									</span>
+								)}
+								<p className='text-base lg:text-lg text-muted-foreground leading-relaxed'>
+									{dish.description}
+								</p>
+							</div>
 						</div>
 
 						<div className='space-y-6'>
