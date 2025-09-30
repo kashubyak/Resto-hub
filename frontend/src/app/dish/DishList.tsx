@@ -51,7 +51,7 @@ export const DishList = () => {
 			</div>
 
 			{viewMode === 'grid' ? (
-				<div className='grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))]'>
+				<div className='grid gap-3 grid-cols-[repeat(auto-fit,minmax(320px,1fr))]'>
 					{allDishes.map(dish => (
 						<DishCard key={dish.id} dish={dish} />
 					))}
