@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { memo } from 'react'
 
 type Props = { children: React.ReactNode }
 
@@ -8,10 +9,11 @@ export async function generateMetadata({
 	params: Promise<{ mode?: string }>
 }): Promise<Metadata> {
 	const { mode } = await params
-	const title = mode === 'login' ? 'Login' : 'Register'
-	return { title }
+	return { title: mode === 'login' ? 'Login' : 'Register' }
 }
 
-export default function AuthLayout({ children }: Props) {
+function AuthLayoutComponent({ children }: Props) {
 	return <>{children}</>
 }
+
+export const AuthLayout = memo(AuthLayoutComponent)
