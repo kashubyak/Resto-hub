@@ -12,11 +12,11 @@ import {
 	useMediaQuery,
 	useTheme,
 } from '@mui/material'
-import { BasicInformationSection } from './components/BasicInformationSection'
-import { ImageUploadSection } from './components/ImageUploadSection'
-import { IngredientsSection } from './components/IngredientsSection'
-import { NutritionalInfoSection } from './components/NutritionalInfoSection'
-import { PricingCategorySection } from './components/PricingCategorySection'
+import { BasicInformationSection } from './components/modal/BasicInformationSection'
+import { ImageUploadSection } from './components/modal/ImageUploadSection'
+import { IngredientsSection } from './components/modal/IngredientsSection'
+import { NutritionalInfoSection } from './components/modal/NutritionalInfoSection'
+import { PricingCategorySection } from './components/modal/PricingCategorySection'
 
 type DishModalProps = {
 	open: boolean
@@ -72,9 +72,10 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 				sx={{
 					fontSize: isMobile ? '1.25rem' : '1.5rem',
 					fontWeight: 'bold',
+					color: 'var(--stable-light)',
 					borderBottom: '1px solid var(--border)',
 					padding: isMobile ? '1rem 1rem' : '1.5rem 2rem',
-					background: 'linear-gradient(135deg, var(--secondary) 0%, var(--muted) 100%)',
+					background: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
 					flexShrink: 0,
 					display: 'flex',
 					alignItems: 'center',
@@ -110,7 +111,11 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 				>
 					<div className={`flex-1 overflow-y-auto ${isMobile ? 'space-y-4' : ''}`}>
 						<BasicInformationSection register={register} errors={errors} watch={watch} />
-						<PricingCategorySection register={register} errors={errors} />
+						<PricingCategorySection
+							register={register}
+							errors={errors}
+							control={control}
+						/>
 						<IngredientsSection
 							control={control}
 							errors={errors}

@@ -2,7 +2,7 @@ import { useDropdownMenu } from '@/hooks/useDropdownMenu'
 import { useAuth } from '@/providers/AuthContext'
 import LogoutIcon from '@mui/icons-material/Logout'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import Image from 'next/image'
+import { ViewableImage } from '../ImageViewer/ViewableImage'
 import { DropdownMenu, type IMenuItem } from '../ui/DropdownMenu'
 
 export const SideBarUser = ({ collapsed }: { collapsed: boolean }) => {
@@ -11,12 +11,6 @@ export const SideBarUser = ({ collapsed }: { collapsed: boolean }) => {
 		useDropdownMenu()
 
 	const menuItems: IMenuItem[] = [
-		{
-			id: 'divider',
-			label: '',
-			onClick: () => {},
-			isDivider: true,
-		},
 		{
 			id: 'logout',
 			label: 'Logout',
@@ -30,7 +24,7 @@ export const SideBarUser = ({ collapsed }: { collapsed: boolean }) => {
 			{!collapsed ? (
 				<>
 					<div className='flex items-center gap-2 overflow-hidden'>
-						<Image
+						<ViewableImage
 							src={user?.avatarUrl || '/Resto-Hub.png'}
 							alt='User avatar'
 							width={40}
@@ -66,7 +60,7 @@ export const SideBarUser = ({ collapsed }: { collapsed: boolean }) => {
 				>
 					<span className='relative w-10 h-10 flex items-center justify-center'>
 						<span className='absolute inset-0 flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0'>
-							<Image
+							<ViewableImage
 								src={user?.avatarUrl || '/Resto-Hub.png'}
 								alt='User avatar'
 								width={40}

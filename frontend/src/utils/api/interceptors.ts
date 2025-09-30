@@ -12,6 +12,7 @@ import { useAlertStore } from '@/store/alert.store'
 import type { IAxiosError } from '@/types/error.interface'
 import type { AxiosProgressEvent } from 'axios'
 import Cookies from 'js-cookie'
+import { clearAuth } from '../auth-helpers'
 import { convertToDays } from '../convertToDays'
 import { parseBackendError } from '../errorHandler'
 import { getIsRefreshing, processQueue, pushToQueue, setIsRefreshing } from './authQueue'
@@ -57,6 +58,7 @@ api.interceptors.response.use(
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
 					Cookies.remove(AUTH.SUBDOMAIN)
+					clearAuth()
 					useAlertStore.getState().setPendingAlert({
 						severity: 'warning',
 						text: 'Your session has expired. Please log in again.',
@@ -112,6 +114,7 @@ api.interceptors.response.use(
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
 					Cookies.remove(AUTH.SUBDOMAIN)
+					clearAuth()
 					const currentPath = window.location.pathname
 					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(
 						currentPath,
@@ -122,6 +125,7 @@ api.interceptors.response.use(
 							text: parseBackendError(err as IAxiosError).join('\n'),
 						})
 					} catch {
+						clearAuth()
 						useAlertStore.getState().setPendingAlert({
 							severity: 'warning',
 							text: 'Your session has expired. Redirecting to login page.',

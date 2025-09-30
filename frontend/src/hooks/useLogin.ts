@@ -1,3 +1,4 @@
+import { ROUTES } from '@/constants/pages.constant'
 import { useAuth } from '@/providers/AuthContext'
 import { useAlertStore } from '@/store/alert.store'
 import type { ILogin } from '@/types/login.interface'
@@ -20,7 +21,7 @@ export const useLogin = () => {
 		try {
 			await login(data)
 			const redirectTo = searchParams.get('redirect')
-			if (redirectTo && redirectTo.startsWith('/auth')) router.push(redirectTo)
+			if (redirectTo && redirectTo.startsWith(ROUTES.PUBLIC.AUTH.ROOT)) router.push(redirectTo)
 			else router.push('/')
 		} catch (err: unknown) {
 			useAlertStore.getState().setPendingAlert({

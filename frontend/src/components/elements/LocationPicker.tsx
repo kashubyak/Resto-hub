@@ -60,7 +60,7 @@ export const LocationPicker = ({
 								<>
 									{isSearching && (
 										<div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
-											<div className='animate-spin rounded-full h-5 w-5 border-2 border-[var(--primary)] border-t-transparent'></div>
+											<div className='animate-spin rounded-full h-5 w-5 border-2 border-[var(--primary)] border-t-transparent' />
 										</div>
 									)}
 
@@ -114,7 +114,7 @@ export const LocationPicker = ({
 			</div>
 
 			<div className='bg-info rounded-md p-3'>
-				<div className='text-sm text-[var(--stable-light)]'>
+				<div className='text-sm stable-light'>
 					<div className='font-medium mb-1'>💡 How to use:</div>
 					<div className='space-y-1'>
 						<div>

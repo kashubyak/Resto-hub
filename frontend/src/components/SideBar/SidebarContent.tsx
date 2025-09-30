@@ -3,7 +3,7 @@
 import { useSidebarStore } from '@/store/sidebar.store'
 import { cn } from '@/utils/cn'
 import CloseIcon from '@mui/icons-material/Close'
-import Image from 'next/image'
+import { ViewableImage } from '../ImageViewer/ViewableImage'
 import { SidebarHeader } from './SidebarHeader'
 import { SidebarNav } from './SidebarNav'
 import { SideBarUser } from './SideBarUser'
@@ -24,7 +24,7 @@ export const SidebarContent = ({ mode, collapsed }: ISidebarContentProps) => {
 				) : (
 					<div className='flex items-center justify-between border-b border-border p-2'>
 						<div className='w-10 h-10 flex items-center justify-center'>
-							<Image src='/Resto-Hub.png' alt='Logo' width={40} height={40} />
+							<ViewableImage src='/Resto-Hub.png' alt='Logo' width={40} height={40} />
 						</div>
 						<button
 							onClick={() => setMobileOpen(false)}

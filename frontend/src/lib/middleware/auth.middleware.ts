@@ -25,7 +25,7 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
 					if (newDecodedToken && hasRoleAccess(newDecodedToken.role, pathname))
 						return setNewTokenAndContinue(refreshResult.token)
 				}
-				return redirectToLogin(request, pathname)
+				return handleSessionExpired(request, pathname)
 			}
 
 			if (!hasRoleAccess(decodedToken.role, pathname)) return redirectToNotFound(request)
@@ -38,7 +38,7 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
 			if (decodedToken && hasRoleAccess(decodedToken.role, pathname))
 				return setNewTokenAndContinue(refreshResult.token)
 		}
-		return redirectToLogin(request, pathname)
+		return handleSessionExpired(request, pathname)
 	}
 	return NextResponse.next()
 }
@@ -56,5 +56,22 @@ function setNewTokenAndContinue(token: string): NextResponse {
 		path: '/',
 	})
 
+	return response
+}
+
+function handleSessionExpired(request: NextRequest, currentPath: string): NextResponse {
+	const response = redirectToLogin(request, currentPath)
+	const alertPayload = {
+		severity: 'warning',
+		text: 'Your session has expired. Please log in again.',
+	}
+	response.cookies.set(
+		'pending-alert',
+		encodeURIComponent(JSON.stringify(alertPayload)),
+		{
+			path: '/',
+			httpOnly: false,
+		},
+	)
 	return response
 }

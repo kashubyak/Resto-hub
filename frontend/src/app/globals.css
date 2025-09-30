@@ -79,6 +79,9 @@ body {
 	.text-primary {
 		color: var(--primary);
 	}
+	.stable-light {
+		color: var(--stable-light);
+	}
 	.bg-primary {
 		background-color: var(--primary);
 	}
@@ -96,9 +99,6 @@ body {
 	}
 	.bg-destructive {
 		background-color: var(--destructive);
-	}
-	.text-destructive-foreground {
-		color: var(--destructive-foreground);
 	}
 	.bg-warning {
 		background-color: var(--warning);

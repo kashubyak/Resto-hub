@@ -64,6 +64,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 	useEffect(() => {
 		if (!hydrated) return
+		const pending = Cookies.get('pending-alert')
+		if (pending) {
+			try {
+				const alertObj = JSON.parse(decodeURIComponent(pending))
+				setPendingAlert(alertObj)
+			} catch (e) {
+			} finally {
+				Cookies.remove('pending-alert')
+			}
+		}
+
 		if (!user && Cookies.get(AUTH.TOKEN)) {
 			initApiFromCookies()
 
@@ -75,7 +86,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 					clearAuth()
 				})
 		}
-	}, [hydrated, user, setUser, setIsAuth, updateUserRoleFromToken, clearAuth])
+	}, [
+		hydrated,
+		user,
+		setUser,
+		setIsAuth,
+		updateUserRoleFromToken,
+		clearAuth,
+		setPendingAlert,
+	])
 
 	const value = { user, isAuth, login, logout }
 

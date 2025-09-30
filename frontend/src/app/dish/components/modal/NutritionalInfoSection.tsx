@@ -33,12 +33,9 @@ export const NutritionalInfoSection = ({
 			>
 				<Input
 					register={register('weightGr', {
-						required: 'Dish weight is required',
-						valueAsNumber: true,
-						validate: {
-							isPositive: v => v > 0 || 'Weight must be greater than 0',
-							maxValue: v => v <= 100000 || 'Weight is too large',
-						},
+						setValueAs: v => (v === '' ? null : Number(v)),
+						validate: value =>
+							value == null || value > 0 || 'Weight must be greater than 0',
 					})}
 					label='Weight (grams)'
 					type='number'
@@ -47,12 +44,9 @@ export const NutritionalInfoSection = ({
 
 				<Input
 					register={register('calories', {
-						required: 'Calories are required',
-						valueAsNumber: true,
-						validate: {
-							isPositive: v => v > 0 || 'Calories must be greater than 0',
-							maxValue: v => v <= 5000 || 'Calories value is unrealistic',
-						},
+						setValueAs: v => (v === '' ? null : Number(v)),
+						validate: value =>
+							value == null || value > 0 || 'Calories must be greater than 0',
 					})}
 					label='Calories'
 					type='number'

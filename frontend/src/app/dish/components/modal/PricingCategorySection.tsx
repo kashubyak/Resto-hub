@@ -1,0 +1,165 @@
+'use client'
+import { Input } from '@/components/ui/Input'
+import type { IFormValues } from '@/types/dish.interface'
+import {
+	FormControl,
+	FormControlLabel,
+	FormLabel,
+	Radio,
+	RadioGroup,
+	useMediaQuery,
+	useTheme,
+} from '@mui/material'
+import {
+	Controller,
+	type Control,
+	type FieldErrors,
+	type UseFormRegister,
+} from 'react-hook-form'
+
+type PricingCategorySectionProps = {
+	register: UseFormRegister<IFormValues>
+	errors: FieldErrors<IFormValues>
+	control: Control<IFormValues>
+}
+
+export const PricingCategorySection = ({
+	register,
+	errors,
+	control,
+}: PricingCategorySectionProps) => {
+	const theme = useTheme()
+	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+
+	return (
+		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
+			<h3
+				className={`${isFullScreen ? 'text-base' : 'text-lg'} font-semibold ${
+					isFullScreen ? 'mb-3' : 'mb-4'
+				} text-foreground flex items-center gap-2`}
+			>
+				💰 Pricing & Category
+			</h3>
+			<div
+				className={`grid ${
+					isFullScreen ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-6'
+				}`}
+			>
+				<Input
+					register={register('price', {
+						required: 'Dish price is required',
+						valueAsNumber: true,
+						validate: {
+							isPositive: v => v > 0 || 'Price must be greater than 0',
+							isNumber: v => !isNaN(v) || 'Price must be a number',
+						},
+					})}
+					label='Price ($)'
+					type='number'
+					error={errors.price?.message}
+				/>
+				<Input
+					register={register('categoryId', {
+						setValueAs: v => (v === '' ? null : Number(v)),
+						validate: value =>
+							value == null ||
+							(value > 0 && Number.isInteger(value)) ||
+							'Category ID must be a positive integer',
+					})}
+					label='Category ID'
+					type='number'
+					error={errors.categoryId?.message}
+				/>
+			</div>
+
+			<div className={isFullScreen ? 'mt-4' : 'mt-6'}>
+				<Controller
+					name='available'
+					control={control}
+					defaultValue={true}
+					render={({ field: { value, onChange } }) => (
+						<FormControl component='fieldset'>
+							<FormLabel
+								component='legend'
+								sx={{
+									color: 'var(--foreground)',
+									fontSize: '1rem',
+									fontWeight: 600,
+									marginBottom: '0.75rem',
+									whiteSpace: 'nowrap',
+									'&.Mui-focused': {
+										color: 'var(--foreground)',
+									},
+								}}
+							>
+								🍽️ Dish Availability
+							</FormLabel>
+							<RadioGroup
+								value={value}
+								onChange={e => onChange(e.target.value === 'true')}
+								row={!isFullScreen}
+								sx={{
+									gap: isFullScreen ? '0.5rem' : '1rem',
+									flexDirection: 'row',
+								}}
+							>
+								<FormControlLabel
+									value={true}
+									control={
+										<Radio
+											sx={{
+												color: 'var(--muted-foreground)',
+												'&.Mui-checked': {
+													color: 'var(--success)',
+												},
+												'&:hover': {
+													backgroundColor:
+														'color-mix(in oklab, var(--success) 10%, transparent)',
+												},
+											}}
+										/>
+									}
+									label='Available'
+									sx={{
+										'& .MuiFormControlLabel-label': {
+											color: 'var(--foreground)',
+											fontSize: isFullScreen ? '0.875rem' : '0.95rem',
+											fontWeight: value === true ? 600 : 400,
+										},
+										margin: 0,
+									}}
+								/>
+								<FormControlLabel
+									value={false}
+									control={
+										<Radio
+											sx={{
+												color: 'var(--muted-foreground)',
+												'&.Mui-checked': {
+													color: 'var(--destructive)',
+												},
+												'&:hover': {
+													backgroundColor:
+														'color-mix(in oklab, var(--destructive) 10%, transparent)',
+												},
+											}}
+										/>
+									}
+									label='Not Available'
+									sx={{
+										'& .MuiFormControlLabel-label': {
+											color: 'var(--foreground)',
+											fontSize: isFullScreen ? '0.875rem' : '0.95rem',
+											fontWeight: value === false ? 600 : 400,
+										},
+										margin: 0,
+									}}
+								/>
+							</RadioGroup>
+						</FormControl>
+					)}
+				/>
+			</div>
+		</div>
+	)
+}

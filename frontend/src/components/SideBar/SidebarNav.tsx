@@ -11,8 +11,7 @@ interface ISidebarNavProps {
 
 export const SidebarNav = ({ collapsed }: ISidebarNavProps) => {
 	const { routes } = useUserRoutes()
-		const pathname = usePathname()
-	
+	const pathname = usePathname()
 
 	return (
 		<nav className='flex-1 p-2 space-y-1'>
