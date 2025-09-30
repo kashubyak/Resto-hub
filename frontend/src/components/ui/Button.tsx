@@ -9,6 +9,7 @@ type ButtonProps = {
 	text?: string
 	children?: ReactNode
 	className?: string
+	disabled?: boolean
 }
 
 export const Button = ({
@@ -17,11 +18,13 @@ export const Button = ({
 	text,
 	children,
 	className,
+	disabled,
 }: ButtonProps) => {
 	return (
 		<button
 			type={type}
 			onClick={onClick}
+			disabled={disabled}
 			className={cn(
 				'w-full bg-primary text-primary-foreground hover:bg-primary mt-2 py-2 px-4 rounded-md font-semibold',
 				className,

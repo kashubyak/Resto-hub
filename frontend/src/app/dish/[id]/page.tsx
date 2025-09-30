@@ -52,7 +52,7 @@ export default function DishPage({ params }: { params: Promise<{ id: string }> }
 							/>
 						</div>
 					</div>
-					<DishActions />
+					<DishActions id={dish.id} />
 				</div>
 			</div>
 		</div>

@@ -1,7 +1,10 @@
 import { Button } from '@/components/ui/Button'
+import { useDishes } from '@/hooks/useDishes'
 import { Category, Delete, Edit, RemoveCircle } from '@mui/icons-material'
 
-export const DishActions = () => {
+export const DishActions = ({ id }: { id: number }) => {
+	const { deleteDishMutation } = useDishes()
+
 	return (
 		<div className='px-4 lg:px-6 lg:pr-0 py-6 bg-muted/30'>
 			<div className='space-y-4'>
@@ -29,11 +32,12 @@ export const DishActions = () => {
 						Remove Category
 					</Button>
 					<Button
-						className='h-10 inline-flex items-center justify-center font-semibold'
-						onClick={() => console.log('Delete dish')}
+						className='h-10 inline-flex items-center justify-center font-semibold bg-destructive hover:bg-destructive'
+						onClick={() => deleteDishMutation.mutate(id)}
+						disabled={deleteDishMutation.isPending}
 					>
 						<Delete className='w-4 h-4 mr-2' />
-						Delete Dish
+						{deleteDishMutation.isPending ? 'Deleting...' : 'Delete Dish'}
 					</Button>
 				</div>
 			</div>
