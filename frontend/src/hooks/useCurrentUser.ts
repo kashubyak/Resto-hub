@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/store/auth.store'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNetworkProgress } from './useNetworkProgress'
 
 export function useCurrentUser() {
@@ -16,23 +16,24 @@ export function useCurrentUser() {
 	const [initialized, setInitialized] = useState(false)
 	const { totalProgress } = useNetworkProgress()
 
+	const initialize = useCallback(async () => {
+		if (isAuth && (!isTokenValid() || !userRole)) await updateUserRoleFromToken()
+		setInitialized(true)
+	}, [isAuth, userRole, isTokenValid, updateUserRoleFromToken])
+
 	useEffect(() => {
-		if (!hydrated) return
+		if (hydrated) initialize()
+	}, [hydrated, initialize])
 
-		const initialize = async () => {
-			if (isAuth && (!isTokenValid() || !userRole)) await updateUserRoleFromToken()
-			setInitialized(true)
-		}
-
-		initialize()
-	}, [hydrated, isAuth, userRole, isTokenValid, updateUserRoleFromToken])
-
-	return {
-		user,
-		userRole,
-		isAuth,
-		loading: !hydrated || !initialized,
-		totalProgress,
-		hasRole,
-	}
+	return useMemo(
+		() => ({
+			user,
+			userRole,
+			isAuth,
+			loading: !hydrated || !initialized,
+			totalProgress,
+			hasRole,
+		}),
+		[user, userRole, isAuth, hydrated, initialized, totalProgress, hasRole],
+	)
 }
