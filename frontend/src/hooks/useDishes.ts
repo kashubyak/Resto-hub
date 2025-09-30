@@ -2,10 +2,10 @@
 
 import { ROUTES } from '@/constants/pages.constant'
 import { DISHES_QUERY_KEY } from '@/constants/query-keys.constant'
+import { useAlert } from '@/providers/AlertContext'
 import { deleteDish } from '@/services/dish/delete-dish.service'
 import { getDish } from '@/services/dish/get-dish.service'
 import { getAllDishes } from '@/services/dish/get-dishes.service'
-import { useAlertStore } from '@/store/alert.store'
 import type { IDish, IDishResponse } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
@@ -22,7 +22,7 @@ const LIMIT = 10
 export const useDishes = (dishId?: number) => {
 	const queryClient = useQueryClient()
 	const router = useRouter()
-	const { setPendingAlert } = useAlertStore()
+	const { showSuccess, showError } = useAlert()
 
 	const dishesQuery = useInfiniteQuery<IDishResponse, Error>({
 		queryKey: [DISHES_QUERY_KEY.ALL],
@@ -42,18 +42,12 @@ export const useDishes = (dishId?: number) => {
 	const deleteDishMutation = useMutation({
 		mutationFn: (id: number) => deleteDish(id),
 		onSuccess: () => {
-			setPendingAlert({
-				severity: 'success',
-				text: 'Dish deleted successfully',
-			})
+			showSuccess('Dish deleted successfully')
 			queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
 			router.push(ROUTES.PRIVATE.ADMIN.DISH)
 		},
 		onError: (err: unknown) => {
-			setPendingAlert({
-				severity: 'error',
-				text: parseBackendError(err as IAxiosError).join('\n'),
-			})
+			showError(parseBackendError(err as IAxiosError).join('\n'))
 		},
 	})
 
