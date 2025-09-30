@@ -72,9 +72,10 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 				sx={{
 					fontSize: isMobile ? '1.25rem' : '1.5rem',
 					fontWeight: 'bold',
+					color: 'var(--stable-light)',
 					borderBottom: '1px solid var(--border)',
 					padding: isMobile ? '1rem 1rem' : '1.5rem 2rem',
-					background: 'linear-gradient(135deg, var(--secondary) 0%, var(--muted) 100%)',
+					background: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
 					flexShrink: 0,
 					display: 'flex',
 					alignItems: 'center',

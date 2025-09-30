@@ -30,7 +30,7 @@ export const ConfirmDialog = ({
 	message = 'This action cannot be undone.',
 	confirmText = 'Confirm',
 	cancelText = 'Cancel',
-	danger = true,
+	danger,
 }: IConfirmDialogProps) => {
 	const theme = useTheme()
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -70,9 +70,10 @@ export const ConfirmDialog = ({
 					fontWeight: 'bold',
 					borderBottom: '1px solid var(--border)',
 					padding: '1rem 1rem',
+					color: 'var(--stable-light)',
 					background: danger
-						? 'linear-gradient(135deg, var(--destructive) 0%, var(--muted) 100%)'
-						: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 100%)',
+						? 'linear-gradient(135deg, var(--destructive) 0%, var(--muted) 90%)'
+						: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
