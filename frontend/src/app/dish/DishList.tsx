@@ -44,14 +44,14 @@ export const DishList = () => {
 		)
 
 	return (
-		<div className='p-6'>
+		<div className='p-3 sm:p-6'>
 			<div className='flex justify-between items-center mb-6'>
 				<h2 className='text-2xl font-bold'>Dish List</h2>
 				<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 			</div>
 
 			{viewMode === 'grid' ? (
-				<div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+				<div className='grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))]'>
 					{allDishes.map(dish => (
 						<DishCard key={dish.id} dish={dish} />
 					))}
