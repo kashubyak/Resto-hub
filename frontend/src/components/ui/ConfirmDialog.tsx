@@ -22,6 +22,7 @@ interface IConfirmDialogProps {
 	cancelText?: string
 	danger?: boolean
 }
+
 export const ConfirmDialog = ({
 	open,
 	onClose,
@@ -46,7 +47,6 @@ export const ConfirmDialog = ({
 			open={open}
 			onClose={safeClose}
 			fullWidth
-			fullScreen={isMobile}
 			maxWidth={false}
 			PaperProps={{
 				sx: {
@@ -69,7 +69,7 @@ export const ConfirmDialog = ({
 					fontSize: isMobile ? '1.25rem' : '1.5rem',
 					fontWeight: 'bold',
 					borderBottom: '1px solid var(--border)',
-					padding: '1rem 1rem',
+					padding: '1rem',
 					color: 'var(--stable-light)',
 					background: danger
 						? 'linear-gradient(135deg, var(--destructive) 0%, var(--muted) 90%)'
@@ -95,8 +95,8 @@ export const ConfirmDialog = ({
 
 			<DialogContent
 				sx={{
-					padding: '1rem',
-					color: 'var(--muted-foreground)',
+					padding: '1rem !important',
+					color: 'var(--secondary-foreground)',
 					fontSize: '0.95rem',
 				}}
 			>
@@ -106,10 +106,13 @@ export const ConfirmDialog = ({
 			<DialogActions
 				sx={{
 					padding: '1rem',
-					gap: '0.5rem',
+					gap: isMobile ? '0.25rem' : '0.75rem',
 					justifyContent: isMobile ? 'stretch' : 'flex-end',
 					borderTop: '1px solid var(--border)',
 					flexDirection: isMobile ? 'column-reverse' : 'row',
+					'& > :not(style) ~ :not(style)': {
+						marginLeft: 0,
+					},
 				}}
 			>
 				<Button
