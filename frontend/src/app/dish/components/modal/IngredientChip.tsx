@@ -20,21 +20,21 @@ type IngredientChipProps = {
 	onDelete: () => void
 }
 
-export const IngredientChip = memo(
-	({
-		ingredient,
-		idx,
-		isFullScreen,
-		draggedIndex,
-		dragOverIndex,
-		onDragStart,
-		onDragEnd,
-		onDragOver,
-		onDragEnter,
-		onDragLeave,
-		onDrop,
-		onDelete,
-	}: IngredientChipProps) => (
+function IngredientChipComponent({
+	ingredient,
+	idx,
+	isFullScreen,
+	draggedIndex,
+	dragOverIndex,
+	onDragStart,
+	onDragEnd,
+	onDragOver,
+	onDragEnter,
+	onDragLeave,
+	onDrop,
+	onDelete,
+}: IngredientChipProps) {
+	return (
 		<div
 			key={`${ingredient}-${idx}`}
 			draggable
@@ -101,7 +101,7 @@ export const IngredientChip = memo(
 				}}
 			/>
 		</div>
-	),
-)
+	)
+}
 
-IngredientChip.displayName = 'IngredientChip'
+export const IngredientChip = memo(IngredientChipComponent)

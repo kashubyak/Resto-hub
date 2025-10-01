@@ -6,8 +6,9 @@ import { useSidebarStore } from '@/store/sidebar.store'
 import { cn } from '@/utils/cn'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useParams, usePathname } from 'next/navigation'
+import { memo, type JSX } from 'react'
 
-export const Header = () => {
+function HeaderComponent(): JSX.Element {
 	const { currentRoute } = useUserRoutes()
 	const { setMobileOpen, mobileOpen } = useSidebarStore()
 	const params = useParams()
@@ -31,3 +32,5 @@ export const Header = () => {
 		</header>
 	)
 }
+
+export const Header = memo(HeaderComponent)

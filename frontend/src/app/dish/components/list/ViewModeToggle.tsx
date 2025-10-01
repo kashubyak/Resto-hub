@@ -9,19 +9,19 @@ interface ViewModeToggleProps {
 	onViewModeChange: (mode: ViewMode) => void
 }
 
-const GridViewIcon = () => (
+const GridViewIconSVG = () => (
 	<svg width={20} height={20} viewBox='0 0 24 24' fill='currentColor'>
 		<path d='M3 3v8h8V3H3zm6 6H5V5h4v4zm-6 4v8h8v-8H3zm6 6H5v-4h4v4zm4-16v8h8V3h-8zm6 6h-4V5h4v4zm-6 4v8h8v-8h-8zm6 6h-4v-4h4v4z' />
 	</svg>
 )
-GridViewIcon.displayName = 'GridViewIcon'
+export const GridViewIcon = memo(GridViewIconSVG)
 
-const ListViewIcon = () => (
+const ListViewIconSVG = () => (
 	<svg width={20} height={20} viewBox='0 0 24 24' fill='currentColor'>
 		<path d='M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z' />
 	</svg>
 )
-ListViewIcon.displayName = 'ListViewIcon'
+export const ListViewIcon = memo(ListViewIconSVG)
 
 const ViewModeToggleComponent = ({ viewMode, onViewModeChange }: ViewModeToggleProps) => {
 	const handleGrid = useCallback(() => onViewModeChange('grid'), [onViewModeChange])
@@ -56,4 +56,3 @@ const ViewModeToggleComponent = ({ viewMode, onViewModeChange }: ViewModeToggleP
 }
 
 export const ViewModeToggle = memo(ViewModeToggleComponent)
-ViewModeToggle.displayName = 'ViewModeToggle'
