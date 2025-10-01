@@ -68,6 +68,7 @@ export const useLocationPicker = ({
 	const [searchResults, setSearchResults] = useState<ISearchResult[]>([])
 	const [showResults, setShowResults] = useState(false)
 	const [isSearching, setIsSearching] = useState(false)
+
 	const { showError, showWarning } = useAlert()
 
 	const mapRef = useRef<google.maps.Map | null>(null)
@@ -94,6 +95,7 @@ export const useLocationPicker = ({
 
 	useEffect(() => {
 		if (isInitializedRef.current || !initialLocation) return
+
 		if (initialLocation.address && !locationState.position) {
 			setLocationState({
 				position: { lat: initialLocation.lat, lng: initialLocation.lng },
@@ -150,22 +152,14 @@ export const useLocationPicker = ({
 	const handleSearch = useCallback(
 		(value: string) => {
 			setLocationState(prev => ({ ...prev, searchValue: value }))
-
-			if (searchTimeoutRef.current) {
-				clearTimeout(searchTimeoutRef.current)
-			}
-
-			searchTimeoutRef.current = setTimeout(() => {
-				searchPlaces(value)
-			}, SEARCH_DEBOUNCE_MS)
+			if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+			searchTimeoutRef.current = setTimeout(() => searchPlaces(value), SEARCH_DEBOUNCE_MS)
 		},
 		[searchPlaces],
 	)
 
 	const handleClear = useCallback(() => {
-		if (searchTimeoutRef.current) {
-			clearTimeout(searchTimeoutRef.current)
-		}
+		if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
 
 		setLocationState({ position: null, searchValue: '' })
 		setSearchResults([])
@@ -228,7 +222,10 @@ export const useLocationPicker = ({
 		[onSelectLocation],
 	)
 
-	const onMapLoad = useCallback((map: google.maps.Map) => (mapRef.current = map), [])
+	const onMapLoad = useCallback((map: google.maps.Map): void => {
+		mapRef.current = map
+	}, [])
+
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent<HTMLInputElement>) => {
 			if (e.key === 'Enter' && searchResults.length > 0) {
