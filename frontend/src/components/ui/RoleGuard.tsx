@@ -1,6 +1,6 @@
 import type { UserRole } from '@/constants/pages.constant'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
-import type { JSX, ReactNode } from 'react'
+import { memo, useMemo, type JSX, type ReactNode } from 'react'
 
 interface IRoleGuardProps {
 	allowedRoles: UserRole | UserRole[]
@@ -8,15 +8,22 @@ interface IRoleGuardProps {
 	fallback?: ReactNode
 }
 
-export const RoleGuard = ({
-	allowedRoles,
-	children,
-	fallback = null,
-}: IRoleGuardProps) => {
-	const { userRole } = useCurrentUser()
-	if (!userRole) return fallback as JSX.Element
+export const RoleGuard = memo<IRoleGuardProps>(
+	({ allowedRoles, children, fallback = null }) => {
+		const { userRole } = useCurrentUser()
+		const roles = useMemo(
+			() => (Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]),
+			[allowedRoles],
+		)
 
-	const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]
-	const hasAccess = roles.includes(userRole)
-	return hasAccess ? (children as JSX.Element) : (fallback as JSX.Element)
-}
+		const hasAccess = useMemo(() => {
+			if (!userRole) return false
+			return roles.includes(userRole)
+		}, [userRole, roles])
+
+		if (!userRole) return fallback as JSX.Element
+		return hasAccess ? (children as JSX.Element) : (fallback as JSX.Element)
+	},
+)
+
+RoleGuard.displayName = 'RoleGuard'
