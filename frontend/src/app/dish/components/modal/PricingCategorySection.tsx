@@ -1,6 +1,7 @@
 'use client'
 import { Input } from '@/components/ui/Input'
 import type { IFormValues } from '@/types/dish.interface'
+import { categoryIdValidation, priceValidation } from '@/validation/dish.validation'
 import {
 	FormControl,
 	FormControlLabel,
@@ -10,6 +11,7 @@ import {
 	useMediaQuery,
 	useTheme,
 } from '@mui/material'
+import { memo } from 'react'
 import {
 	Controller,
 	type Control,
@@ -23,7 +25,7 @@ type PricingCategorySectionProps = {
 	control: Control<IFormValues>
 }
 
-export const PricingCategorySection = ({
+const PricingCategorySectionFunction = ({
 	register,
 	errors,
 	control,
@@ -46,26 +48,13 @@ export const PricingCategorySection = ({
 				}`}
 			>
 				<Input
-					register={register('price', {
-						required: 'Dish price is required',
-						valueAsNumber: true,
-						validate: {
-							isPositive: v => v > 0 || 'Price must be greater than 0',
-							isNumber: v => !isNaN(v) || 'Price must be a number',
-						},
-					})}
+					register={register('price', priceValidation)}
 					label='Price ($)'
 					type='number'
 					error={errors.price?.message}
 				/>
 				<Input
-					register={register('categoryId', {
-						setValueAs: v => (v === '' ? null : Number(v)),
-						validate: value =>
-							value == null ||
-							(value > 0 && Number.isInteger(value)) ||
-							'Category ID must be a positive integer',
-					})}
+					register={register('categoryId', categoryIdValidation)}
 					label='Category ID'
 					type='number'
 					error={errors.categoryId?.message}
@@ -163,3 +152,4 @@ export const PricingCategorySection = ({
 		</div>
 	)
 }
+export const PricingCategorySection = memo(PricingCategorySectionFunction)

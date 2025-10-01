@@ -8,7 +8,7 @@ import { emailValidation, passwordValidation } from '@/validation/login.validati
 import { subdomainValidation } from '@/validation/register.validation'
 import { memo } from 'react'
 
-function LoginComponent() {
+const LoginComponent = () => {
 	const { register, handleSubmit, errors, onSubmit } = useLogin()
 
 	return (

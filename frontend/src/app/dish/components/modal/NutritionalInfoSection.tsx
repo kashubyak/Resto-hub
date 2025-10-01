@@ -2,7 +2,9 @@
 
 import { Input } from '@/components/ui/Input'
 import type { IFormValues } from '@/types/dish.interface'
+import { caloriesValidation, weightValidation } from '@/validation/dish.validation'
 import { useMediaQuery, useTheme } from '@mui/material'
+import { memo } from 'react'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 
 type NutritionalInfoSectionProps = {
@@ -10,7 +12,7 @@ type NutritionalInfoSectionProps = {
 	errors: FieldErrors<IFormValues>
 }
 
-export const NutritionalInfoSection = ({
+const NutritionalInfoSectionFunction = ({
 	register,
 	errors,
 }: NutritionalInfoSectionProps) => {
@@ -32,22 +34,14 @@ export const NutritionalInfoSection = ({
 				}`}
 			>
 				<Input
-					register={register('weightGr', {
-						setValueAs: v => (v === '' ? null : Number(v)),
-						validate: value =>
-							value == null || value > 0 || 'Weight must be greater than 0',
-					})}
+					register={register('weightGr', weightValidation)}
 					label='Weight (grams)'
 					type='number'
 					error={errors.weightGr?.message}
 				/>
 
 				<Input
-					register={register('calories', {
-						setValueAs: v => (v === '' ? null : Number(v)),
-						validate: value =>
-							value == null || value > 0 || 'Calories must be greater than 0',
-					})}
+					register={register('calories', caloriesValidation)}
 					label='Calories'
 					type='number'
 					error={errors.calories?.message}
@@ -56,3 +50,4 @@ export const NutritionalInfoSection = ({
 		</div>
 	)
 }
+export const NutritionalInfoSection = memo(NutritionalInfoSectionFunction)

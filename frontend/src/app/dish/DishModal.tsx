@@ -12,6 +12,7 @@ import {
 	useMediaQuery,
 	useTheme,
 } from '@mui/material'
+import { useCallback, useMemo } from 'react'
 import { BasicInformationSection } from './components/modal/BasicInformationSection'
 import { ImageUploadSection } from './components/modal/ImageUploadSection'
 import { IngredientsSection } from './components/modal/IngredientsSection'
@@ -38,10 +39,26 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 	const theme = useTheme()
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 	const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'xl'))
-	const safeClose = () => {
+
+	const safeClose = useCallback(() => {
 		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
 		onClose()
-	}
+	}, [onClose])
+
+	const paperSx = useMemo(
+		() => ({
+			width: isMobile ? '100vw' : isTablet ? '960px' : '720px',
+			maxWidth: '100%',
+			height: isMobile ? '100vh' : '90vh',
+			borderRadius: isMobile ? 0 : '16px',
+			backgroundColor: 'var(--secondary)',
+			color: 'var(--foreground)',
+			display: 'flex',
+			flexDirection: 'column',
+		}),
+		[isMobile, isTablet],
+	)
+
 	return (
 		<Dialog
 			open={open}
@@ -49,18 +66,7 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 			fullWidth
 			fullScreen={isMobile}
 			maxWidth={false}
-			PaperProps={{
-				sx: {
-					width: isMobile ? '100vw' : isTablet ? '960px' : '720px',
-					maxWidth: '100%',
-					height: isMobile ? '100vh' : '90vh',
-					borderRadius: isMobile ? 0 : '16px',
-					backgroundColor: 'var(--secondary)',
-					color: 'var(--foreground)',
-					display: 'flex',
-					flexDirection: 'column',
-				},
-			}}
+			PaperProps={{ sx: paperSx }}
 			sx={{
 				'& .MuiBackdrop-root': {
 					backdropFilter: 'blur(8px)',
@@ -83,15 +89,7 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 				}}
 			>
 				<span>🍽️ Create New Dish</span>
-				<IconButton
-					onClick={safeClose}
-					sx={{
-						color: 'var(--foreground)',
-						'&:hover': {
-							backgroundColor: 'color-mix(in oklab, var(--foreground) 10%, transparent)',
-						},
-					}}
-				>
+				<IconButton onClick={safeClose}>
 					<CloseIcon />
 				</IconButton>
 			</DialogTitle>

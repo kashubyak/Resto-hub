@@ -18,7 +18,7 @@ import { memo, useCallback } from 'react'
 
 const stepTransition = { duration: 0.3 }
 
-function RegisterCompanyComponent() {
+const RegisterCompanyComponent = () => {
 	const {
 		handleSubmit,
 		onSubmit,

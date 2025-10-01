@@ -6,7 +6,7 @@ import { UserRole } from '@/constants/pages.constant'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { memo, useCallback } from 'react'
 
-function DashboardComponent() {
+const DashboardComponent = () => {
 	const { user, userRole, hasRole } = useCurrentUser()
 
 	const handleAdminActions = useCallback(() => {

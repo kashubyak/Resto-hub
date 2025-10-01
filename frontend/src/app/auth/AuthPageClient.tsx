@@ -6,7 +6,7 @@ import { memo, useEffect } from 'react'
 import { Login } from './Login'
 import { RegisterCompany } from './RegisterCompany'
 
-function AuthPageClientComponent({ mode }: { mode: 'login' | 'register' }) {
+const AuthPageClientComponent = ({ mode }: { mode: 'login' | 'register' }) => {
 	const router = useRouter()
 	useEffect(() => {
 		if (!mode) router.replace(ROUTES.PUBLIC.AUTH.LOGIN)

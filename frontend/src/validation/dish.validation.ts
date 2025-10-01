@@ -1,0 +1,59 @@
+export const dishNameValidation = {
+	required: 'Dish name is required',
+	validate: {
+		minLength: (value: string) =>
+			value.trim().length >= 2 || 'Dish name must be at least 2 characters',
+		maxLength: (value: string) =>
+			value.trim().length <= 100 || 'Dish name can be at most 100 characters',
+		noOnlySpaces: (value: string) =>
+			value.trim().length > 0 || 'Dish name cannot be only spaces',
+		validCharacters: (value: string) =>
+			/^[\p{L}\p{N}\s\-&.,'()]+$/u.test(value) ||
+			'Dish name can only contain letters, numbers, spaces, and basic punctuation',
+		noConsecutiveSpaces: (value: string) =>
+			!/\s{2,}/.test(value) || 'Dish name cannot have consecutive spaces',
+		startsWithLetter: (value: string) =>
+			/^[\p{L}]/u.test(value) || 'Dish name must start with a letter',
+	},
+}
+
+export const imageValidation = {
+	required: 'Dish image is required',
+	validate: {
+		validType: (value: FileList | null) =>
+			!value?.[0] ||
+			['image/jpeg', 'image/png', 'image/webp'].includes(value[0].type) ||
+			'Only JPG, PNG, or WebP allowed',
+	},
+}
+
+export const weightValidation = {
+	setValueAs: (value: string) => (value === '' ? null : Number(value)),
+	validate: (value: number | null | undefined) =>
+		value == null || value > 0 || 'Weight must be greater than 0',
+}
+
+export const caloriesValidation = {
+	setValueAs: (value: string) => (value === '' ? null : Number(value)),
+	validate: (value: number | null | undefined) =>
+		value == null || value > 0 || 'Calories must be greater than 0',
+}
+
+export const priceValidation = {
+	required: 'Dish price is required',
+	valueAsNumber: true,
+	validate: {
+		isPositive: (value: number | undefined) =>
+			(typeof value === 'number' && value > 0) || 'Price must be greater than 0',
+		isNumber: (value: number | undefined) =>
+			(typeof value === 'number' && !isNaN(value)) || 'Price must be a number',
+	},
+}
+
+export const categoryIdValidation = {
+	setValueAs: (value: string) => (value === '' ? null : Number(value)),
+	validate: (value: number | null | undefined) =>
+		value == null ||
+		(value > 0 && Number.isInteger(value)) ||
+		'Category ID must be a positive integer',
+}
