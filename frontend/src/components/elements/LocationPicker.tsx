@@ -17,14 +17,14 @@ const DEFAULT_CENTER = {
 	lng: 30.5234,
 }
 
-const MAP_OPTIONS = {
+const getMapOptions = () => ({
 	disableDefaultUI: true,
 	fullscreenControl: true,
 	fullscreenControlOptions: {
-		position: google?.maps?.ControlPosition?.TOP_RIGHT || 2,
+		position: google?.maps?.ControlPosition?.TOP_RIGHT ?? 2,
 	},
 	gestureHandling: 'greedy' as const,
-}
+})
 
 interface ExtendedLocationPickerProps extends ILocationPickerProps {
 	initialLocation?: {
@@ -142,6 +142,9 @@ export const LocationPicker = memo(
 		const mapCenter = useMemo(() => position || DEFAULT_CENTER, [position])
 		const mapZoom = useMemo(() => (position ? 12 : 6), [position])
 		const markerTitle = useMemo(() => searchValue || 'Selected Location', [searchValue])
+
+		const mapOptions = useMemo(() => (isLoaded ? getMapOptions() : undefined), [isLoaded])
+
 		const handleFocus = useMemo(
 			() => () => {
 				if (searchResults.length > 0) setShowResults(true)
@@ -185,14 +188,14 @@ export const LocationPicker = memo(
 				<HelpInfo />
 
 				<div className='rounded-lg overflow-hidden shadow-sm'>
-					{isLoaded && (
+					{isLoaded && mapOptions && (
 						<GoogleMap
 							mapContainerStyle={CONTAINER_STYLE}
 							center={mapCenter}
 							zoom={mapZoom}
 							onLoad={onMapLoad}
 							onClick={handleMapClick}
-							options={MAP_OPTIONS}
+							options={mapOptions}
 						>
 							{position && (
 								<Marker
