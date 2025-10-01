@@ -4,14 +4,13 @@ import { SafeRender } from '@/components/container/SafeRender'
 import { RoleGuard } from '@/components/ui/RoleGuard'
 import { UserRole } from '@/constants/pages.constant'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
-import { memo, useCallback } from 'react'
 
-const DashboardComponent = () => {
+export default function DashboardPage() {
 	const { user, userRole, hasRole } = useCurrentUser()
 
-	const handleAdminActions = useCallback(() => {
+	const handleAdminActions = () => {
 		console.log('Admin Actions')
-	}, [])
+	}
 
 	return (
 		<SafeRender title='Loading Dashboard...' showNetworkProgress>
@@ -41,5 +40,3 @@ const DashboardComponent = () => {
 		</SafeRender>
 	)
 }
-
-export const Dashboard = memo(DashboardComponent)

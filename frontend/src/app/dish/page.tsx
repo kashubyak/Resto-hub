@@ -1,14 +1,12 @@
 'use client'
 
 import { Button } from '@/components/ui/Button'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { DishList } from './DishList'
 import { DishModal } from './DishModal'
 
 export default function DishesPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false)
-	const openModal = useCallback(() => setIsModalOpen(true), [])
-	const closeModal = useCallback(() => setIsModalOpen(false), [])
 
 	return (
 		<div>
@@ -16,10 +14,10 @@ export default function DishesPage() {
 				<Button
 					type='button'
 					text='Create new dish'
-					onClick={openModal}
+					onClick={() => setIsModalOpen(true)}
 					className='w-auto px-6 py-2'
 				/>
-				<DishModal open={isModalOpen} onClose={closeModal} />
+				<DishModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
 			</div>
 
 			<DishList />
