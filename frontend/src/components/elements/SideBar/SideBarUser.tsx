@@ -2,8 +2,8 @@ import { useDropdownMenu } from '@/hooks/useDropdownMenu'
 import { useAuth } from '@/providers/AuthContext'
 import LogoutIcon from '@mui/icons-material/Logout'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import { ViewableImage } from '../ImageViewer/ViewableImage'
 import { DropdownMenu, type IMenuItem } from '../../ui/DropdownMenu'
+import { ViewableImage } from '../ImageViewer/ViewableImage'
 
 export const SideBarUser = ({ collapsed }: { collapsed: boolean }) => {
 	const { user, logout } = useAuth()
