@@ -1,5 +1,6 @@
 'use client'
 
+import { AuthContainer } from '@/components/container/AuthContainer'
 import { LocationPicker } from '@/components/elements/LocationPicker'
 import { UploadImage } from '@/components/elements/UploadImage'
 import { Button } from '@/components/ui/Button'
@@ -14,7 +15,6 @@ import {
 } from '@/validation/register.validation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { memo, useCallback } from 'react'
-import { AuthContainer } from '../../components/container/AuthContainer'
 
 const stepTransition = { duration: 0.3 }
 
