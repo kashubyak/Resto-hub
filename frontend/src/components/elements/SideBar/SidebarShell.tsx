@@ -1,12 +1,12 @@
 'use client'
 
 import { Header } from '@/components/container/Header'
-import React from 'react'
+import React, { memo } from 'react'
 import { Sidebar } from './Sidebar'
 
 type Props = { children: React.ReactNode }
 
-export const SidebarShell = ({ children }: Props) => {
+export const SidebarShell = memo(({ children }: Props) => {
 	return (
 		<div className='flex h-screen'>
 			<Sidebar />
@@ -16,4 +16,6 @@ export const SidebarShell = ({ children }: Props) => {
 			</div>
 		</div>
 	)
-}
+})
+
+SidebarShell.displayName = 'SidebarShell'
