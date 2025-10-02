@@ -72,22 +72,21 @@ export const useUploadImage = ({
 				showError('Only image files are allowed')
 				return
 			}
+
 			if (file.size > size_of_image * 1024 * 1024) {
 				showError(`File size must be less than ${size_of_image}MB`)
 				return
 			}
 
 			const reader = new FileReader()
+
 			reader.onloadend = () => {
 				const result = reader.result as string
 				setPreview(result)
 				onDataChange?.(result, file)
 				showSuccess('Image uploaded successfully')
 			}
-
-			reader.onerror = () => {
-				showError('Error reading the file')
-			}
+			reader.onerror = () => showError('Error reading the file')
 
 			reader.readAsDataURL(file)
 
@@ -146,6 +145,7 @@ export const useUploadImage = ({
 			const file = e.dataTransfer?.files?.[0]
 			if (file) handleFile(file)
 		}
+
 		const handleDragOver = (e: DragEvent) => e.preventDefault()
 
 		window.addEventListener('dragenter', handleDragEnter)
@@ -175,9 +175,8 @@ export const useUploadImage = ({
 		const input = inputRef.current
 		if (!input) return
 		input.addEventListener('change', handleChange)
-		return () => {
-			input.removeEventListener('change', handleChange)
-		}
+
+		return () => input.removeEventListener('change', handleChange)
 	}, [handleFile])
 
 	return {
