@@ -63,4 +63,4 @@ export const API_URL = {
 	COMPANY: {
 		ROOT: COMPANY_BASE,
 	},
-}
+} as const

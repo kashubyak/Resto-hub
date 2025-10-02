@@ -11,6 +11,7 @@ import {
 	useMediaQuery,
 	useTheme,
 } from '@mui/material'
+import { memo, useCallback, useMemo } from 'react'
 
 interface IConfirmDialogProps {
 	open: boolean
@@ -23,32 +24,35 @@ interface IConfirmDialogProps {
 	danger?: boolean
 }
 
-export const ConfirmDialog = ({
-	open,
-	onClose,
-	onConfirm,
-	title = 'Are you sure?',
-	message = 'This action cannot be undone.',
-	confirmText = 'Confirm',
-	cancelText = 'Cancel',
-	danger,
-}: IConfirmDialogProps) => {
-	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-	const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'xl'))
+export const ConfirmDialog = memo<IConfirmDialogProps>(
+	({
+		open,
+		onClose,
+		onConfirm,
+		title = 'Are you sure?',
+		message = 'This action cannot be undone.',
+		confirmText = 'Confirm',
+		cancelText = 'Cancel',
+		danger = false,
+	}) => {
+		const theme = useTheme()
+		const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+		const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'xl'))
 
-	const safeClose = () => {
-		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
-		onClose()
-	}
+		const safeClose = useCallback(() => {
+			if (document.activeElement instanceof HTMLElement) {
+				document.activeElement.blur()
+			}
+			onClose()
+		}, [onClose])
 
-	return (
-		<Dialog
-			open={open}
-			onClose={safeClose}
-			fullWidth
-			maxWidth={false}
-			PaperProps={{
+		const handleConfirm = useCallback(() => {
+			onConfirm()
+			safeClose()
+		}, [onConfirm, safeClose])
+
+		const paperProps = useMemo(
+			() => ({
 				sx: {
 					width: isMobile ? '100vw' : isTablet ? '480px' : '400px',
 					maxWidth: '100%',
@@ -56,85 +60,113 @@ export const ConfirmDialog = ({
 					backgroundColor: 'var(--secondary)',
 					color: 'var(--foreground)',
 				},
-			}}
-			sx={{
+			}),
+			[isMobile, isTablet],
+		)
+
+		const dialogSx = useMemo(
+			() => ({
 				'& .MuiBackdrop-root': {
 					backdropFilter: 'blur(8px)',
 					backgroundColor: 'rgba(var(--background-rgb), 0.3)',
 				},
-			}}
-		>
-			<DialogTitle
-				sx={{
-					fontSize: isMobile ? '1.25rem' : '1.5rem',
-					fontWeight: 'bold',
-					borderBottom: '1px solid var(--border)',
-					padding: '1rem',
-					color: 'var(--stable-light)',
-					background: danger
-						? 'linear-gradient(135deg, var(--destructive) 0%, var(--muted) 90%)'
-						: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between',
-				}}
-			>
-				<span>{title}</span>
-				<IconButton
-					onClick={safeClose}
-					sx={{
-						color: 'var(--foreground)',
-						'&:hover': {
-							backgroundColor: 'color-mix(in oklab, var(--foreground) 10%, transparent)',
-						},
-					}}
-				>
-					<CloseIcon />
-				</IconButton>
-			</DialogTitle>
+			}),
+			[],
+		)
 
-			<DialogContent
-				sx={{
-					padding: '1rem !important',
-					color: 'var(--secondary-foreground)',
-					fontSize: '0.95rem',
-				}}
-			>
-				{message}
-			</DialogContent>
+		const titleSx = useMemo(
+			() => ({
+				fontSize: isMobile ? '1.25rem' : '1.5rem',
+				fontWeight: 'bold',
+				borderBottom: '1px solid var(--border)',
+				padding: '1rem',
+				color: 'var(--stable-light)',
+				background: danger
+					? 'linear-gradient(135deg, var(--destructive) 0%, var(--muted) 90%)'
+					: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'space-between',
+			}),
+			[isMobile, danger],
+		)
 
-			<DialogActions
-				sx={{
-					padding: '1rem',
-					gap: isMobile ? '0.25rem' : '0.75rem',
-					justifyContent: isMobile ? 'stretch' : 'flex-end',
-					borderTop: '1px solid var(--border)',
-					flexDirection: isMobile ? 'column-reverse' : 'row',
-					'& > :not(style) ~ :not(style)': {
-						marginLeft: 0,
-					},
-				}}
+		const actionsSx = useMemo(
+			() => ({
+				padding: '1rem',
+				gap: isMobile ? '0.25rem' : '0.75rem',
+				justifyContent: isMobile ? 'stretch' : 'flex-end',
+				borderTop: '1px solid var(--border)',
+				flexDirection: isMobile ? 'column-reverse' : 'row',
+				'& > :not(style) ~ :not(style)': {
+					marginLeft: 0,
+				},
+			}),
+			[isMobile],
+		)
+
+		const confirmButtonClass = useMemo(() => {
+			const widthClass = isMobile ? 'w-full' : 'px-4 py-2'
+			const colorClass = danger
+				? 'bg-destructive hover:bg-destructive text-foreground'
+				: 'bg-success hover:bg-success text-foreground'
+			return `${widthClass} ${colorClass}`
+		}, [isMobile, danger])
+
+		const contentSx = useMemo(
+			() => ({
+				padding: '1rem !important',
+				color: 'var(--secondary-foreground)',
+				fontSize: '0.95rem',
+			}),
+			[],
+		)
+
+		const iconButtonSx = useMemo(
+			() => ({
+				color: 'var(--foreground)',
+				'&:hover': {
+					backgroundColor: 'color-mix(in oklab, var(--foreground) 10%, transparent)',
+				},
+			}),
+			[],
+		)
+
+		return (
+			<Dialog
+				open={open}
+				onClose={safeClose}
+				fullWidth
+				maxWidth={false}
+				PaperProps={paperProps}
+				sx={dialogSx}
 			>
-				<Button
-					type='button'
-					text={cancelText}
-					onClick={safeClose}
-					className={isMobile ? 'w-full' : ''}
-				/>
-				<Button
-					type='button'
-					onClick={() => {
-						onConfirm()
-						safeClose()
-					}}
-					text={confirmText}
-					className={`${isMobile ? 'w-full' : 'px-4 py-2'} ${
-						danger
-							? 'bg-destructive hover:bg-destructive text-foreground'
-							: 'bg-success hover:bg-success text-foreground'
-					}`}
-				/>
-			</DialogActions>
-		</Dialog>
-	)
-}
+				<DialogTitle sx={titleSx}>
+					<span>{title}</span>
+					<IconButton onClick={safeClose} sx={iconButtonSx}>
+						<CloseIcon />
+					</IconButton>
+				</DialogTitle>
+
+				<DialogContent sx={contentSx}>{message}</DialogContent>
+
+				<DialogActions sx={actionsSx}>
+					<Button
+						type='button'
+						text={cancelText}
+						onClick={safeClose}
+						className={isMobile ? 'w-full' : ''}
+					/>
+					<Button
+						type='button'
+						onClick={handleConfirm}
+						text={confirmText}
+						className={confirmButtonClass}
+					/>
+				</DialogActions>
+			</Dialog>
+		)
+	},
+)
+
+ConfirmDialog.displayName = 'ConfirmDialog'

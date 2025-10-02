@@ -2,7 +2,7 @@ import { MAX_LENGTH_ALERT } from '@/constants/alert.constant'
 import type { AlertSeverity } from '@/types/alert.interface'
 import Alert from '@mui/material/Alert'
 import { styled } from '@mui/material/styles'
-import { useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 
 interface IAlertProps {
 	severity: AlertSeverity
@@ -41,11 +41,17 @@ const CustomAlert = styled(Alert)(() => ({
 	},
 }))
 
-export const AlertUI = ({ severity, text }: IAlertProps) => {
+export const AlertUI = memo<IAlertProps>(({ severity, text }) => {
 	const [expanded, setExpanded] = useState(false)
 
-	const isLong = text.length > MAX_LENGTH_ALERT
-	const displayText = expanded || !isLong ? text : text.slice(0, MAX_LENGTH_ALERT) + '...'
+	const isLong = useMemo(() => text.length > MAX_LENGTH_ALERT, [text.length])
+
+	const displayText = useMemo(() => {
+		if (!isLong || expanded) return text
+		return text.slice(0, MAX_LENGTH_ALERT) + '...'
+	}, [text, isLong, expanded])
+
+	const handleToggle = useCallback(() => setExpanded(prev => !prev), [])
 
 	return (
 		<CustomAlert severity={severity}>
@@ -53,11 +59,13 @@ export const AlertUI = ({ severity, text }: IAlertProps) => {
 			{isLong && (
 				<span
 					className='ml-2 underline cursor-pointer text-xs opacity-80 text-nowrap'
-					onClick={() => setExpanded(!expanded)}
+					onClick={handleToggle}
 				>
 					{expanded ? 'Show less' : 'Show more'}
 				</span>
 			)}
 		</CustomAlert>
 	)
-}
+})
+
+AlertUI.displayName = 'AlertUI'

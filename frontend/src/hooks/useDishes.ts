@@ -6,7 +6,7 @@ import { useAlert } from '@/providers/AlertContext'
 import { deleteDish } from '@/services/dish/delete-dish.service'
 import { getDish } from '@/services/dish/get-dish.service'
 import { getAllDishes } from '@/services/dish/get-dishes.service'
-import type { IDish, IDishResponse } from '@/types/dish.interface'
+import type { IDish, IDishListResponse } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import {
@@ -16,6 +16,7 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useCallback, useMemo } from 'react'
 
 const LIMIT = 10
 
@@ -24,9 +25,15 @@ export const useDishes = (dishId?: number) => {
 	const router = useRouter()
 	const { showSuccess, showError } = useAlert()
 
-	const dishesQuery = useInfiniteQuery<IDishResponse, Error>({
+	const dishesQuery = useInfiniteQuery<IDishListResponse, Error>({
 		queryKey: [DISHES_QUERY_KEY.ALL],
-		queryFn: ({ pageParam }) => getAllDishes((pageParam as number) ?? 1, LIMIT),
+		queryFn: async ({ pageParam }) => {
+			const response = await getAllDishes({
+				page: pageParam as number,
+				limit: LIMIT,
+			})
+			return response.data
+		},
 		getNextPageParam: lastPage =>
 			lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
 		initialPageParam: 1,
@@ -35,27 +42,42 @@ export const useDishes = (dishId?: number) => {
 
 	const dishQuery = useQuery<IDish, Error>({
 		queryKey: [DISHES_QUERY_KEY.DETAIL, dishId],
-		queryFn: () => getDish(dishId!),
+		queryFn: async () => {
+			const response = await getDish(dishId!)
+			return response.data
+		},
 		enabled: !!dishId,
 	})
 
+	const handleDeleteSuccess = useCallback(() => {
+		showSuccess('Dish deleted successfully')
+		queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
+		router.push(ROUTES.PRIVATE.ADMIN.DISH)
+	}, [showSuccess, queryClient, router])
+
+	const handleDeleteError = useCallback(
+		(err: unknown) => showError(parseBackendError(err as IAxiosError).join('\n')),
+		[showError],
+	)
+
 	const deleteDishMutation = useMutation({
-		mutationFn: (id: number) => deleteDish(id),
-		onSuccess: () => {
-			showSuccess('Dish deleted successfully')
-			queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
-			router.push(ROUTES.PRIVATE.ADMIN.DISH)
+		mutationFn: async (id: number) => {
+			const response = await deleteDish(id)
+			return response.data
 		},
-		onError: (err: unknown) => {
-			showError(parseBackendError(err as IAxiosError).join('\n'))
-		},
+		onSuccess: handleDeleteSuccess,
+		onError: handleDeleteError,
 	})
 
-	const refetchDishes = () => {
-		queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
-	}
+	const refetchDishes = useCallback(
+		() => queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] }),
+		[queryClient],
+	)
 
-	const allDishes: IDish[] = dishesQuery.data?.pages.flatMap(page => page.data) ?? []
+	const allDishes = useMemo<IDish[]>(
+		() => dishesQuery.data?.pages.flatMap(page => page.data) ?? [],
+		[dishesQuery.data?.pages],
+	)
 
 	return {
 		...dishesQuery,

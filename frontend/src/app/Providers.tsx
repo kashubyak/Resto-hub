@@ -6,7 +6,7 @@ import { AuthProvider } from '@/providers/AuthContext'
 import { useAlertStore } from '@/store/alert.store'
 import { setGlobalAlertFunction } from '@/utils/api'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 const AlertInitializer = () => {
 	const { showAlert } = useAlert()
@@ -21,21 +21,23 @@ const AlertInitializer = () => {
 
 	useEffect(() => {
 		const pending = useAlertStore.getState().consumePendingAlert()
-		if (pending) {
+		if (pending)
 			showAlert({
 				severity: pending.severity,
 				text: pending.text,
 				duration: pending.duration,
 			})
-		}
 	}, [showAlert])
+
 	return null
 }
-const queryClient = new QueryClient()
 
 export function Providers({ children }: { children: React.ReactNode }) {
+	const queryClientRef = useRef<QueryClient>(null)
+	if (!queryClientRef.current) queryClientRef.current = new QueryClient()
+
 	return (
-		<QueryClientProvider client={queryClient}>
+		<QueryClientProvider client={queryClientRef.current}>
 			<AlertProvider>
 				<AuthProvider>
 					<AlertInitializer />

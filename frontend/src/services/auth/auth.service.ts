@@ -1,11 +1,19 @@
 import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth.constant'
-import type { ILogin } from '@/types/login.interface'
+import type { ApiResponse } from '@/types/api.interface'
+import type {
+	ILoginRequest,
+	ILoginResponse,
+	ILogoutResponse,
+	IRefreshTokenResponse,
+} from '@/types/auth.interface'
 import api, { refreshApi, setApiSubdomain } from '@/utils/api'
 import { convertToDays } from '@/utils/convertToDays'
 import Cookies from 'js-cookie'
 
-export const login = async (data: ILogin) => {
+export const login = async (
+	data: ILoginRequest,
+): Promise<ApiResponse<ILoginResponse>> => {
 	Cookies.set(AUTH.SUBDOMAIN, data.subdomain, {
 		expires: 365,
 		secure: true,
@@ -13,7 +21,7 @@ export const login = async (data: ILogin) => {
 	})
 	setApiSubdomain(data.subdomain)
 
-	const response = await api.post(API_URL.AUTH.LOGIN, {
+	const response = await api.post<ILoginResponse>(API_URL.AUTH.LOGIN, {
 		email: data.email,
 		password: data.password,
 	})
@@ -26,19 +34,24 @@ export const login = async (data: ILogin) => {
 			sameSite: 'strict',
 		})
 	}
+
 	return response
 }
 
-export const refreshToken = async (): Promise<{ token: string }> => {
-	const response = await refreshApi.post(
+export const refreshToken = async (): Promise<ApiResponse<IRefreshTokenResponse>> => {
+	const response = await refreshApi.post<IRefreshTokenResponse>(
 		API_URL.AUTH.REFRESH,
 		{},
 		{ withCredentials: true },
 	)
-	return response.data
+	return response
 }
 
-export const logout = () => {
-	const response = api.post(API_URL.AUTH.LOGOUT, {}, { withCredentials: true })
+export const logout = async (): Promise<ApiResponse<ILogoutResponse>> => {
+	const response = await api.post<ILogoutResponse>(
+		API_URL.AUTH.LOGOUT,
+		{},
+		{ withCredentials: true },
+	)
 	return response
 }

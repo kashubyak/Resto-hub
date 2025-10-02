@@ -4,6 +4,7 @@ import { useAlert } from '@/providers/AlertContext'
 import CloseIcon from '@mui/icons-material/Close'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
+import { memo } from 'react'
 import { AlertUI } from '../ui/Alert'
 
 const AlertContainer = styled('div')(() => ({
@@ -21,7 +22,7 @@ const AlertContainer = styled('div')(() => ({
 	},
 }))
 
-export const AlertDisplay = () => {
+function AlertDisplayComponent() {
 	const { alerts, removeAlert, pauseAlertTimer, resumeAlertTimer } = useAlert()
 	if (alerts.length === 0) return null
 
@@ -54,3 +55,4 @@ export const AlertDisplay = () => {
 		</AlertContainer>
 	)
 }
+export const AlertDisplay = memo(AlertDisplayComponent)

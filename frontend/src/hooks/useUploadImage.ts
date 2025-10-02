@@ -11,6 +11,23 @@ type UseUploadImageParams = {
 	onDataChange?: (preview: string | null, file: File | null) => void
 }
 
+const createFileFromBase64 = (base64: string, fileName: string = 'image.jpg'): File => {
+	const arr = base64.split(',')
+	const mime = arr[0].match(/:(.*?);/)![1]
+	const bstr = atob(arr[1])
+	let n = bstr.length
+	const u8arr = new Uint8Array(n)
+	while (n--) {
+		u8arr[n] = bstr.charCodeAt(n)
+	}
+	return new File([u8arr], fileName, { type: mime })
+}
+
+const isFileBeingDragged = (e: DragEvent): boolean => {
+	const types = e.dataTransfer?.types
+	return types ? types.includes('Files') : false
+}
+
 export const useUploadImage = ({
 	register,
 	savedPreview,
@@ -22,36 +39,29 @@ export const useUploadImage = ({
 
 	const inputRef = useRef<HTMLInputElement | null>(null)
 	const isDispatching = useRef(false)
+	const isInitializedRef = useRef(false)
+	const dragCounterRef = useRef(0)
+
 	const { ref, ...restRegister } = register
 
-	const createFileFromBase64 = (base64: string, fileName: string = 'image.jpg'): File => {
-		const arr = base64.split(',')
-		const mime = arr[0].match(/:(.*?);/)![1]
-		const bstr = atob(arr[1])
-		let n = bstr.length
-		const u8arr = new Uint8Array(n)
-		while (n--) {
-			u8arr[n] = bstr.charCodeAt(n)
-		}
-		return new File([u8arr], fileName, { type: mime })
-	}
-
 	useEffect(() => {
-		if (savedPreview && !preview) {
-			setPreview(savedPreview)
-			if (inputRef.current && savedPreview.startsWith('data:')) {
-				try {
-					const file = createFileFromBase64(savedPreview)
-					const dataTransfer = new DataTransfer()
-					dataTransfer.items.add(file)
-					inputRef.current.files = dataTransfer.files
+		if (isInitializedRef.current || !savedPreview || preview) return
 
-					isDispatching.current = true
-					const event = new Event('change', { bubbles: true })
-					inputRef.current.dispatchEvent(event)
-				} catch (error) {
-					showError(parseBackendError(error as IAxiosError).join('\n'))
-				}
+		setPreview(savedPreview)
+		isInitializedRef.current = true
+
+		if (inputRef.current && savedPreview.startsWith('data:')) {
+			try {
+				const file = createFileFromBase64(savedPreview)
+				const dataTransfer = new DataTransfer()
+				dataTransfer.items.add(file)
+				inputRef.current.files = dataTransfer.files
+
+				isDispatching.current = true
+				const event = new Event('change', { bubbles: true })
+				inputRef.current.dispatchEvent(event)
+			} catch (error) {
+				showError(parseBackendError(error as IAxiosError).join('\n'))
 			}
 		}
 	}, [savedPreview, preview, showError])
@@ -62,12 +72,14 @@ export const useUploadImage = ({
 				showError('Only image files are allowed')
 				return
 			}
+
 			if (file.size > size_of_image * 1024 * 1024) {
 				showError(`File size must be less than ${size_of_image}MB`)
 				return
 			}
 
 			const reader = new FileReader()
+
 			reader.onloadend = () => {
 				const result = reader.result as string
 				setPreview(result)
@@ -75,6 +87,7 @@ export const useUploadImage = ({
 				showSuccess('Image uploaded successfully')
 			}
 			reader.onerror = () => showError('Error reading the file')
+
 			reader.readAsDataURL(file)
 
 			if (inputRef.current) {
@@ -90,44 +103,36 @@ export const useUploadImage = ({
 		[onDataChange, showSuccess, showError],
 	)
 
-	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault()
-		setIsDragging(false)
-		const file = e.dataTransfer.files?.[0]
-		if (file) handleFile(file)
-	}
+	const handleDrop = useCallback(
+		(e: React.DragEvent<HTMLDivElement>) => {
+			e.preventDefault()
+			setIsDragging(false)
+			const file = e.dataTransfer.files?.[0]
+			if (file) handleFile(file)
+		},
+		[handleFile],
+	)
 
-	const preventDefaults = (e: React.DragEvent<HTMLDivElement>) => {
+	const preventDefaults = useCallback((e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault()
 		e.stopPropagation()
-	}
-
-	const isFileBeingDragged = (e: DragEvent): boolean => {
-		const types = e.dataTransfer?.types
-		if (!types) return false
-
-		return types.includes('Files')
-	}
+	}, [])
 
 	useEffect(() => {
-		let dragCounter = 0
-
 		const handleDragEnter = (e: DragEvent) => {
 			if (!isFileBeingDragged(e)) return
-
 			e.preventDefault()
-			dragCounter++
+			dragCounterRef.current++
 			setIsDragging(true)
 		}
 
 		const handleDragLeave = (e: DragEvent) => {
 			if (!isFileBeingDragged(e)) return
-
 			e.preventDefault()
-			dragCounter--
-			if (dragCounter <= 0) {
+			dragCounterRef.current--
+			if (dragCounterRef.current <= 0) {
 				setIsDragging(false)
-				dragCounter = 0
+				dragCounterRef.current = 0
 			}
 		}
 
@@ -135,11 +140,12 @@ export const useUploadImage = ({
 			if (!isFileBeingDragged(e)) return
 			e.preventDefault()
 			setIsDragging(false)
-			dragCounter = 0
+			dragCounterRef.current = 0
 
 			const file = e.dataTransfer?.files?.[0]
 			if (file) handleFile(file)
 		}
+
 		const handleDragOver = (e: DragEvent) => e.preventDefault()
 
 		window.addEventListener('dragenter', handleDragEnter)
@@ -167,11 +173,10 @@ export const useUploadImage = ({
 		}
 
 		const input = inputRef.current
-		input?.addEventListener('change', handleChange)
+		if (!input) return
+		input.addEventListener('change', handleChange)
 
-		return () => {
-			input?.removeEventListener('change', handleChange)
-		}
+		return () => input.removeEventListener('change', handleChange)
 	}, [handleFile])
 
 	return {

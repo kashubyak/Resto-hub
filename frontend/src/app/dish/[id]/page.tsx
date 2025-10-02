@@ -1,4 +1,5 @@
 'use client'
+
 import { Loading } from '@/components/ui/Loading'
 import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'

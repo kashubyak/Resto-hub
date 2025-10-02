@@ -8,11 +8,19 @@ import {
 import { getCurrentUser } from '@/services/user/user.service'
 import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
-import type { IAuthContext, ILogin } from '@/types/login.interface'
+import type { IAuthContext, ILoginRequest } from '@/types/auth.interface'
 import { initApiFromCookies } from '@/utils/api'
 import { initializeAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
-import { createContext, useContext, useEffect, type ReactNode } from 'react'
+import {
+	createContext,
+	memo,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	type ReactNode,
+} from 'react'
 
 const AuthContext = createContext<IAuthContext>({
 	user: null,
@@ -21,28 +29,20 @@ const AuthContext = createContext<IAuthContext>({
 	logout: async () => {},
 })
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-	const {
-		user,
-		isAuth,
-		setUser,
-		setIsAuth,
-		hydrated,
-		updateUserRoleFromToken,
-		clearAuth,
-	} = useAuthStore()
+export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
+	const { user, isAuth, hydrated, clearAuth } = useAuthStore()
 	const { setPendingAlert } = useAlertStore()
 
-	const login = async (data: ILogin) => {
+	const login = useCallback(async (data: ILoginRequest) => {
 		const response = await loginRequest(data)
 		if (response.status === 200) {
 			initApiFromCookies()
 			const currentUser = await getCurrentUser()
 			initializeAuth(currentUser.data)
 		}
-	}
+	}, [])
 
-	const logout = async () => {
+	const logout = useCallback(async () => {
 		try {
 			const response = await logoutRequest()
 			Cookies.remove(AUTH.TOKEN)
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				text: 'Logout failed. Please try again later.',
 			})
 		}
-	}
+	}, [clearAuth, setPendingAlert])
 
 	useEffect(() => {
 		if (!hydrated) return
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			try {
 				const alertObj = JSON.parse(decodeURIComponent(pending))
 				setPendingAlert(alertObj)
-			} catch (e) {
+			} catch {
 			} finally {
 				Cookies.remove('pending-alert')
 			}
@@ -77,28 +77,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 		if (!user && Cookies.get(AUTH.TOKEN)) {
 			initApiFromCookies()
-
 			getCurrentUser()
-				.then(current => {
-					initializeAuth(current.data)
-				})
-				.catch(() => {
-					clearAuth()
-				})
+				.then(current => initializeAuth(current.data))
+				.catch(() => clearAuth())
 		}
-	}, [
-		hydrated,
-		user,
-		setUser,
-		setIsAuth,
-		updateUserRoleFromToken,
-		clearAuth,
-		setPendingAlert,
-	])
+	}, [hydrated, user, clearAuth, setPendingAlert])
 
-	const value = { user, isAuth, login, logout }
+	const contextValue = useMemo(
+		() => ({
+			user,
+			isAuth,
+			login,
+			logout,
+		}),
+		[user, isAuth, login, logout],
+	)
 
-	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+	return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+})
+
+AuthProvider.displayName = 'AuthProvider'
+
+export const useAuth = () => {
+	const context = useContext(AuthContext)
+	if (!context) throw new Error('useAuth must be used within AuthProvider')
+	return context
 }
-
-export const useAuth = () => useContext(AuthContext)

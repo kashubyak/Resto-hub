@@ -8,8 +8,7 @@ export async function generateMetadata({
 	params: Promise<{ mode?: string }>
 }): Promise<Metadata> {
 	const { mode } = await params
-	const title = mode === 'login' ? 'Login' : 'Register'
-	return { title }
+	return { title: mode === 'login' ? 'Login' : 'Register' }
 }
 
 export default function AuthLayout({ children }: Props) {

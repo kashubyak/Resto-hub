@@ -5,12 +5,14 @@ import Cookies from 'js-cookie'
 import { parseBackendError } from '../errorHandler'
 import { api } from './axiosInstances'
 
-export function setApiSubdomain(subdomain?: string) {
+export function setApiSubdomain(subdomain?: string): void {
 	const apiBase = process.env.NEXT_PUBLIC_API_URL ?? ''
+
 	if (!subdomain) {
 		api.defaults.baseURL = apiBase
 		return
 	}
+
 	try {
 		const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
 		const url = new URL(apiBase)
@@ -25,9 +27,10 @@ export function setApiSubdomain(subdomain?: string) {
 	}
 }
 
-export function initApiFromCookies() {
+export function initApiFromCookies(): void {
 	const subdomain = Cookies.get(AUTH.SUBDOMAIN)
 	if (subdomain) setApiSubdomain(subdomain)
+
 	const token = Cookies.get(AUTH.TOKEN)
 	if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`
 }

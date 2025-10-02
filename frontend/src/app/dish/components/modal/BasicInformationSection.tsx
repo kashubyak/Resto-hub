@@ -1,16 +1,18 @@
 'use client'
 
 import { Input } from '@/components/ui/Input'
-import type { IFormValues } from '@/types/dish.interface'
+import type { IDishFormValues } from '@/types/dish.interface'
+import { dishNameValidation } from '@/validation/dish.validation'
 import { useMediaQuery, useTheme } from '@mui/material'
 import type { FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form'
 
 type BasicInformationSectionProps = {
-	register: UseFormRegister<IFormValues>
-	errors: FieldErrors<IFormValues>
-	watch: UseFormWatch<IFormValues>
+	register: UseFormRegister<IDishFormValues>
+	errors: FieldErrors<IDishFormValues>
+	watch: UseFormWatch<IDishFormValues>
 }
 
+const maxDescriptionLength = 1500
 export const BasicInformationSection = ({
 	register,
 	errors,
@@ -21,7 +23,6 @@ export const BasicInformationSection = ({
 
 	const descriptionValue = watch('description') || ''
 	const descriptionLength = descriptionValue.length
-	const maxDescriptionLength = 1500
 
 	return (
 		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
@@ -34,23 +35,7 @@ export const BasicInformationSection = ({
 			</h3>
 			<div className='grid grid-cols-1 gap-4'>
 				<Input
-					register={register('name', {
-						required: 'Dish name is required',
-						validate: {
-							minLength: v =>
-								v.trim().length >= 2 || 'Dish name must be at least 2 characters',
-							maxLength: v =>
-								v.trim().length <= 100 || 'Dish name can be at most 100 characters',
-							noOnlySpaces: v => v.trim().length > 0 || 'Dish name cannot be only spaces',
-							validCharacters: v =>
-								/^[\p{L}\p{N}\s\-&.,'()]+$/u.test(v) ||
-								'Dish name can only contain letters, numbers, spaces, and basic punctuation',
-							noConsecutiveSpaces: v =>
-								!/\s{2,}/.test(v) || 'Dish name cannot have consecutive spaces',
-							startsWithLetter: v =>
-								/^[\p{L}]/u.test(v) || 'Dish name must start with a letter',
-						},
-					})}
+					register={register('name', dishNameValidation)}
 					label='Dish Name'
 					error={errors.name?.message}
 				/>

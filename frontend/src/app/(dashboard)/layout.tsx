@@ -1,4 +1,4 @@
-import { SidebarShell } from '@/components/SideBar'
+import { SidebarShell } from '@/components/elements/SideBar'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {

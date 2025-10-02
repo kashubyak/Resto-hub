@@ -1,12 +1,10 @@
 'use client'
 
 import { Input } from '@/components/ui/Input'
-import type { IFormValues } from '@/types/dish.interface'
+import type { IDishFormValues } from '@/types/dish.interface'
 import AddIcon from '@mui/icons-material/Add'
-import CloseIcon from '@mui/icons-material/Close'
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
-import { Chip, IconButton, useMediaQuery, useTheme } from '@mui/material'
-import { useRef, useState } from 'react'
+import { IconButton, useMediaQuery, useTheme } from '@mui/material'
+import { useCallback, useRef, useState } from 'react'
 import {
 	Controller,
 	type Control,
@@ -14,12 +12,13 @@ import {
 	type UseFormClearErrors,
 	type UseFormSetError,
 } from 'react-hook-form'
+import { IngredientChip } from './IngredientChip'
 
 type IngredientsSectionProps = {
-	control: Control<IFormValues>
-	errors: FieldErrors<IFormValues>
-	setError: UseFormSetError<IFormValues>
-	clearErrors: UseFormClearErrors<IFormValues>
+	control: Control<IDishFormValues>
+	errors: FieldErrors<IDishFormValues>
+	setError: UseFormSetError<IDishFormValues>
+	clearErrors: UseFormClearErrors<IDishFormValues>
 }
 
 export const IngredientsSection = ({
@@ -36,116 +35,118 @@ export const IngredientsSection = ({
 	const theme = useTheme()
 	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-	const handleAdd = (value: string[], onChange: (newValue: string[]) => void) => {
-		const val = inputValue.trim()
+	const handleAdd = useCallback(
+		(value: string[], onChange: (newValue: string[]) => void) => {
+			const val = inputValue.trim()
 
-		if (!val) {
-			setError('ingredients', {
-				type: 'required',
-				message: 'Ingredient is required',
-			})
-			return
-		}
+			if (!val) {
+				setError('ingredients', {
+					type: 'required',
+					message: 'Ingredient is required',
+				})
+				return
+			}
 
-		if (value.includes(val)) {
-			setError('ingredients', {
-				type: 'duplicate',
-				message: 'Duplicate ingredients are not allowed',
-			})
-			return
-		}
+			if (value.includes(val)) {
+				setError('ingredients', {
+					type: 'duplicate',
+					message: 'Duplicate ingredients are not allowed',
+				})
+				return
+			}
 
-		if (!/^[\p{L}\p{N}\s\-&,.'()]{2,50}$/u.test(val)) {
-			setError('ingredients', {
-				type: 'pattern',
-				message: 'Invalid ingredient format (2–50 chars)',
-			})
-			return
-		}
+			if (!/^[\p{L}\p{N}\s\-&,.'()]{2,50}$/u.test(val)) {
+				setError('ingredients', {
+					type: 'pattern',
+					message: 'Invalid ingredient format (2–50 chars)',
+				})
+				return
+			}
 
-		onChange([...value, val])
-		setInputValue('')
-		clearErrors('ingredients')
-	}
-
-	const handleDelete = (
-		ingredient: string,
-		value: string[],
-		onChange: (newValue: string[]) => void,
-	) => {
-		const updated = value.filter(i => i !== ingredient)
-		onChange(updated)
-
-		if (updated.length === 0) {
-			setError('ingredients', {
-				type: 'required',
-				message: 'At least one ingredient is required',
-			})
-		} else {
+			onChange([...value, val])
+			setInputValue('')
 			clearErrors('ingredients')
-		}
-	}
+		},
+		[inputValue, setError, clearErrors],
+	)
 
-	const handleDragStart = (e: React.DragEvent, index: number) => {
+	const handleDelete = useCallback(
+		(ingredient: string, value: string[], onChange: (newValue: string[]) => void) => {
+			const updated = value.filter(i => i !== ingredient)
+			onChange(updated)
+
+			if (updated.length === 0)
+				setError('ingredients', {
+					type: 'required',
+					message: 'At least one ingredient is required',
+				})
+			else clearErrors('ingredients')
+		},
+		[setError, clearErrors],
+	)
+
+	const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
 		e.stopPropagation()
 		setDraggedIndex(index)
 		e.dataTransfer.effectAllowed = 'move'
-		e.dataTransfer.setData('text/html', e.currentTarget.outerHTML)
 		e.dataTransfer.setData('application/ingredient-drag', 'true')
 		setTimeout(() => {
-			if (e.currentTarget) (e.currentTarget as HTMLElement).style.opacity = '0.5'
+			;(e.currentTarget as HTMLElement).style.opacity = '0.5'
 		}, 0)
-	}
+	}, [])
 
-	const handleDragEnd = (e: React.DragEvent) => {
+	const handleDragEnd = useCallback((e: React.DragEvent) => {
 		e.stopPropagation()
 		setDraggedIndex(null)
 		setDragOverIndex(null)
 		dragCounter.current = 0
 		;(e.currentTarget as HTMLElement).style.opacity = '1'
-	}
+	}, [])
 
-	const handleDragOver = (e: React.DragEvent) => {
+	const handleDragOver = useCallback((e: React.DragEvent) => {
 		e.preventDefault()
 		e.stopPropagation()
 		e.dataTransfer.dropEffect = 'move'
-	}
+	}, [])
 
-	const handleDragEnter = (e: React.DragEvent, index: number) => {
+	const handleDragEnter = useCallback((e: React.DragEvent, index: number) => {
 		e.preventDefault()
 		e.stopPropagation()
 		dragCounter.current++
 		setDragOverIndex(index)
-	}
+	}, [])
 
-	const handleDragLeave = (e: React.DragEvent) => {
+	const handleDragLeave = useCallback((e: React.DragEvent) => {
 		e.stopPropagation()
 		dragCounter.current--
 		if (dragCounter.current === 0) setDragOverIndex(null)
-	}
+	}, [])
 
-	const handleDrop = (
-		e: React.DragEvent,
-		dropIndex: number,
-		value: string[],
-		onChange: (newValue: string[]) => void,
-	) => {
-		e.preventDefault()
-		e.stopPropagation()
+	const handleDrop = useCallback(
+		(
+			e: React.DragEvent,
+			dropIndex: number,
+			value: string[],
+			onChange: (newValue: string[]) => void,
+		) => {
+			e.preventDefault()
+			e.stopPropagation()
 
-		if (draggedIndex === null || draggedIndex === dropIndex) return
+			if (draggedIndex === null || draggedIndex === dropIndex) return
 
-		const newIngredients = [...value]
-		const draggedItem = newIngredients[draggedIndex]
+			const newIngredients = [...value]
+			const draggedItem = newIngredients[draggedIndex]
 
-		newIngredients.splice(draggedIndex, 1)
-		newIngredients.splice(dropIndex, 0, draggedItem)
+			newIngredients.splice(draggedIndex, 1)
+			newIngredients.splice(dropIndex, 0, draggedItem)
 
-		onChange(newIngredients)
-		setDraggedIndex(null)
-		setDragOverIndex(null)
-		dragCounter.current = 0
-	}
+			onChange(newIngredients)
+			setDraggedIndex(null)
+			setDragOverIndex(null)
+			dragCounter.current = 0
+		},
+		[draggedIndex],
+	)
 
 	return (
 		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
@@ -205,73 +206,22 @@ export const IngredientsSection = ({
 						</div>
 
 						<div className={`flex flex-wrap gap-2 ${isFullScreen ? 'mt-2' : 'mt-3'}`}>
-							{value.map((ingredient: string, idx: number) => (
-								<div
+							{value.map((ingredient, idx) => (
+								<IngredientChip
 									key={`${ingredient}-${idx}`}
-									draggable
-									onDragStart={e => handleDragStart(e, idx)}
+									ingredient={ingredient}
+									idx={idx}
+									isFullScreen={isFullScreen}
+									draggedIndex={draggedIndex}
+									dragOverIndex={dragOverIndex}
+									onDragStart={handleDragStart}
 									onDragEnd={handleDragEnd}
 									onDragOver={handleDragOver}
-									onDragEnter={e => handleDragEnter(e, idx)}
+									onDragEnter={handleDragEnter}
 									onDragLeave={handleDragLeave}
 									onDrop={e => handleDrop(e, idx, value, onChange)}
-									className={`
-										flex items-center gap-1 cursor-move transition-all duration-200
-										${draggedIndex === idx ? 'scale-105 rotate-2' : ''}
-										${dragOverIndex === idx && draggedIndex !== idx ? 'scale-110 shadow-lg' : ''}
-										hover:scale-105 hover:shadow-md
-									`}
-									style={{
-										transform:
-											draggedIndex === idx
-												? 'scale(1.05) rotate(2deg)'
-												: dragOverIndex === idx && draggedIndex !== idx
-												? 'scale(1.1)'
-												: 'scale(1)',
-										transition: 'all 0.2s ease-in-out',
-									}}
-								>
-									<DragIndicatorIcon
-										sx={{
-											color: 'var(--muted-foreground)',
-											fontSize: isFullScreen ? '1rem' : '1.2rem',
-											cursor: 'grab',
-											opacity: 0.6,
-											'&:hover': {
-												opacity: 1,
-											},
-										}}
-									/>
-									<Chip
-										label={ingredient}
-										onDelete={() => handleDelete(ingredient, value, onChange)}
-										deleteIcon={<CloseIcon />}
-										size={isFullScreen ? 'small' : 'medium'}
-										sx={{
-											backgroundColor:
-												dragOverIndex === idx && draggedIndex !== idx
-													? 'var(--primary)'
-													: 'var(--active-item)',
-											color:
-												dragOverIndex === idx && draggedIndex !== idx
-													? 'var(--background)'
-													: 'var(--foreground)',
-											borderRadius: '8px',
-											fontSize: isFullScreen ? '0.8rem' : '0.9rem',
-											transition: 'all 0.2s ease-in-out',
-											'& .MuiChip-deleteIcon': {
-												color:
-													dragOverIndex === idx && draggedIndex !== idx
-														? 'var(--background)'
-														: 'var(--foreground)',
-												fontSize: isFullScreen ? '1rem' : '1.2rem',
-												'&:hover': {
-													color: 'var(--destructive)',
-												},
-											},
-										}}
-									/>
-								</div>
+									onDelete={() => handleDelete(ingredient, value, onChange)}
+								/>
 							))}
 						</div>
 
