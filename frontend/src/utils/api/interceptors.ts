@@ -9,6 +9,7 @@ import {
 } from '@/hooks/useNetworkProgress'
 import { refreshToken } from '@/services/auth/auth.service'
 import { useAlertStore } from '@/store/alert.store'
+import type { CustomAxiosRequestConfig } from '@/types/axios.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import type { AxiosProgressEvent } from 'axios'
 import Cookies from 'js-cookie'
@@ -50,7 +51,7 @@ api.interceptors.response.use(
 		const requestId = error.config?.headers?.['X-Request-ID'] as string
 		if (requestId) failNetworkRequest(requestId)
 
-		const originalRequest = error.config
+		const originalRequest = error.config as CustomAxiosRequestConfig
 		const shouldHideGlobalError = originalRequest?._hideGlobalError === true
 
 		if (error.response?.status === 401 && !originalRequest._retry) {
@@ -74,6 +75,7 @@ api.interceptors.response.use(
 				})
 					.then(token => {
 						if (token) {
+							originalRequest.headers = originalRequest.headers || {}
 							originalRequest.headers['Authorization'] = `Bearer ${token}`
 							originalRequest.headers['X-Request-ID'] = startNetworkRequest(
 								originalRequest.url || 'retry',
@@ -103,6 +105,8 @@ api.interceptors.response.use(
 
 					api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 					processQueue(null, newToken)
+
+					originalRequest.headers = originalRequest.headers || {}
 					originalRequest.headers['Authorization'] = `Bearer ${newToken}`
 					originalRequest.headers['X-Request-ID'] = startNetworkRequest(
 						originalRequest.url || 'refresh-retry',
@@ -149,17 +153,20 @@ api.interceptors.response.use(
 				!originalRequest.url?.includes(API_URL.AUTH.REGISTER) &&
 				!shouldHideGlobalError
 
-			if (shouldShowAlert)
+			if (shouldShowAlert) {
 				useAlertStore.getState().setPendingAlert({
 					severity: 'error',
 					text: parseBackendError(error as IAxiosError).join('\n'),
 				})
+			}
 		}
-		if (!error.response && !shouldHideGlobalError)
+
+		if (!error.response && !shouldHideGlobalError) {
 			useAlertStore.getState().setPendingAlert({
 				severity: 'error',
 				text: parseBackendError(error as IAxiosError).join('\n'),
 			})
+		}
 
 		return Promise.reject(error)
 	},
