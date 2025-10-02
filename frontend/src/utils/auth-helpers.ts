@@ -1,14 +1,14 @@
 import { useAuthStore } from '@/store/auth.store'
 import type { IUser } from '@/types/user.interface'
 
-export function initializeAuth(user: IUser) {
+export function initializeAuth(user: IUser): void {
 	const { setUser, setIsAuth, updateUserRoleFromToken } = useAuthStore.getState()
 	setUser(user)
 	setIsAuth(true)
 	updateUserRoleFromToken()
 }
 
-export function clearAuth() {
+export function clearAuth(): void {
 	const { setUser, setIsAuth, setUserRole, setTokenValidUntil } = useAuthStore.getState()
 	setUser(null)
 	setIsAuth(false)

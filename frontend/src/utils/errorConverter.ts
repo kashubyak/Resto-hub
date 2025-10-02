@@ -1,30 +1,16 @@
 import type { IApiErrorResponse, IAxiosError } from '@/types/error.interface'
 
 export const toAxiosError = (error: unknown): IAxiosError => {
-	if (
-		typeof error === 'object' &&
-		error !== null &&
-		'response' in error &&
-		'message' in error
-	) {
-		return error as IAxiosError
-	}
-
-	const message =
-		error instanceof Error
-			? error.message
-			: typeof error === 'string'
-			? error
-			: 'Unknown error'
-
+	if (isAxiosError(error)) return error
+	const message = extractErrorMessage(error)
 	const fallbackResponse: IApiErrorResponse = {
-		message: message,
+		message,
 		error: 'Unknown Error',
 		statusCode: 500,
 	}
 
 	return {
-		message: message,
+		message,
 		response: {
 			data: fallbackResponse,
 			status: 500,
@@ -40,6 +26,18 @@ export const isAxiosError = (error: unknown): error is IAxiosError => {
 		error !== null &&
 		'response' in error &&
 		'message' in error &&
-		typeof error.message === 'string'
+		typeof (error as IAxiosError).message === 'string'
 	)
+}
+
+const extractErrorMessage = (error: unknown): string => {
+	if (error instanceof Error) return error.message
+	if (typeof error === 'string') return error
+
+	if (typeof error === 'object' && error !== null && 'message' in error) {
+		const msg = (error as { message: unknown }).message
+		if (typeof msg === 'string') return msg
+	}
+
+	return 'Unknown error'
 }
