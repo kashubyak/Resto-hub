@@ -1,15 +1,15 @@
 'use client'
 
 import { Input } from '@/components/ui/Input'
-import type { IFormValues } from '@/types/dish.interface'
+import type { IDish } from '@/types/dish.interface'
 import { caloriesValidation, weightValidation } from '@/validation/dish.validation'
 import { useMediaQuery, useTheme } from '@mui/material'
 import { memo } from 'react'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 
 type NutritionalInfoSectionProps = {
-	register: UseFormRegister<IFormValues>
-	errors: FieldErrors<IFormValues>
+	register: UseFormRegister<IDish>
+	errors: FieldErrors<IDish>
 }
 
 const NutritionalInfoSectionFunction = ({

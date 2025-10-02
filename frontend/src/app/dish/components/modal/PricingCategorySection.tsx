@@ -1,6 +1,6 @@
 'use client'
 import { Input } from '@/components/ui/Input'
-import type { IFormValues } from '@/types/dish.interface'
+import type { IDish } from '@/types/dish.interface'
 import { categoryIdValidation, priceValidation } from '@/validation/dish.validation'
 import {
 	FormControl,
@@ -20,9 +20,9 @@ import {
 } from 'react-hook-form'
 
 type PricingCategorySectionProps = {
-	register: UseFormRegister<IFormValues>
-	errors: FieldErrors<IFormValues>
-	control: Control<IFormValues>
+	register: UseFormRegister<IDish>
+	errors: FieldErrors<IDish>
+	control: Control<IDish>
 }
 
 const PricingCategorySectionFunction = ({

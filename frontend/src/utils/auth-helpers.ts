@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/store/auth.store'
-import type { IUser } from '@/types/login.interface'
+import type { IUser } from '@/types/user.interface'
 
 export function initializeAuth(user: IUser) {
 	const { setUser, setIsAuth, updateUserRoleFromToken } = useAuthStore.getState()

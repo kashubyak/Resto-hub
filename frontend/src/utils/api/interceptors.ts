@@ -88,7 +88,9 @@ api.interceptors.response.use(
 			setIsRefreshing(true)
 
 			try {
-				const { token: newToken } = await refreshToken()
+				const {
+					data: { token: newToken },
+				} = await refreshToken()
 				if (newToken) {
 					const tokenExpiresInDays = convertToDays(
 						process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d',

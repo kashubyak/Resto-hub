@@ -8,7 +8,7 @@ import {
 import { getCurrentUser } from '@/services/user/user.service'
 import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
-import type { IAuthContext, ILogin } from '@/types/login.interface'
+import type { IAuthContext, ILoginRequest } from '@/types/auth.interface'
 import { initApiFromCookies } from '@/utils/api'
 import { initializeAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
@@ -33,7 +33,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 	const { user, isAuth, hydrated, clearAuth } = useAuthStore()
 	const { setPendingAlert } = useAlertStore()
 
-	const login = useCallback(async (data: ILogin) => {
+	const login = useCallback(async (data: ILoginRequest) => {
 		const response = await loginRequest(data)
 		if (response.status === 200) {
 			initApiFromCookies()

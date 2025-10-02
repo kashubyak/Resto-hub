@@ -1,14 +1,14 @@
 'use client'
 
 import { UploadImage } from '@/components/elements/UploadImage'
-import type { IFormValues } from '@/types/dish.interface'
+import type { IDishFormValues } from '@/types/dish.interface'
 import { imageValidation } from '@/validation/dish.validation'
 import { memo } from 'react'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 
 type ImageUploadSectionProps = {
-	register: UseFormRegister<IFormValues>
-	errors: FieldErrors<IFormValues>
+	register: UseFormRegister<IDishFormValues>
+	errors: FieldErrors<IDishFormValues>
 }
 
 const ImageUploadSectionFunction = ({ register, errors }: ImageUploadSectionProps) => {

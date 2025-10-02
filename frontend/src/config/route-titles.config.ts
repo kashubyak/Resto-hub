@@ -9,12 +9,6 @@ export const DYNAMIC_ROUTE_TITLES: Record<string, (id: string) => string> = {
 	[API_URL.USER.ROOT]: id => `User #${id}`,
 }
 
-/**
- * @param pathname
- * @param params
- * @param fallbackName
- * @returns
- */
 export const getPageTitle = (
 	pathname: string,
 	params: Readonly<{ [key: string]: string | string[] | undefined }>,

@@ -1,15 +1,20 @@
+import type { IPaginatedResponse } from './api.interface'
 import type { ICategory } from './category.interface'
 
-export interface IFormValues {
+export interface ICreateDishRequest {
 	name: string
 	description: string
 	price: number
 	categoryId?: number | null
 	ingredients: string[]
-	imageUrl: FileList
+	image: File
 	weightGr?: number | null
 	calories?: number | null
 	available: boolean
+}
+
+export interface IUpdateDishRequest extends Partial<ICreateDishRequest> {
+	id: number
 }
 
 export interface IDish {
@@ -20,8 +25,8 @@ export interface IDish {
 	categoryId: number | null
 	ingredients: string[]
 	imageUrl: string
-	weightGr: number
-	calories: number
+	weightGr: number | null
+	calories: number | null
 	available: boolean
 	createdAt: string
 	updatedAt: string
@@ -29,10 +34,30 @@ export interface IDish {
 	category?: ICategory | null
 }
 
-export interface IDishResponse {
-	data: IDish[]
-	total: number
-	page: number
-	limit: number
-	totalPages: number
+export interface ICreateDishResponse {
+	data: IDish
+	message: string
+}
+
+export interface IUpdateDishResponse {
+	data: IDish
+	message: string
+}
+
+export interface IDeleteDishResponse {
+	message: string
+}
+
+export type IDishListResponse = IPaginatedResponse<IDish>
+
+export interface IDishFormValues {
+	name: string
+	description: string
+	price: number
+	categoryId?: number | null
+	ingredients: string[]
+	imageUrl: FileList
+	weightGr?: number | null
+	calories?: number | null
+	available: boolean
 }

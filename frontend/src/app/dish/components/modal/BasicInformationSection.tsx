@@ -1,15 +1,15 @@
 'use client'
 
 import { Input } from '@/components/ui/Input'
-import type { IFormValues } from '@/types/dish.interface'
+import type { IDish } from '@/types/dish.interface'
 import { dishNameValidation } from '@/validation/dish.validation'
 import { useMediaQuery, useTheme } from '@mui/material'
 import type { FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form'
 
 type BasicInformationSectionProps = {
-	register: UseFormRegister<IFormValues>
-	errors: FieldErrors<IFormValues>
-	watch: UseFormWatch<IFormValues>
+	register: UseFormRegister<IDish>
+	errors: FieldErrors<IDish>
+	watch: UseFormWatch<IDish>
 }
 
 const maxDescriptionLength = 1500

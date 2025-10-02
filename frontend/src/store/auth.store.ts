@@ -1,7 +1,7 @@
 import { AUTH } from '@/constants/auth.constant'
 import { UserRole } from '@/constants/pages.constant'
 import { decodeJWT } from '@/lib/middleware/jwt-decoder'
-import type { IUser } from '@/types/login.interface'
+import type { IUser } from '@/types/user.interface'
 import { clearAuth } from '@/utils/auth-helpers'
 import { convertToDays } from '@/utils/convertToDays'
 import Cookies from 'js-cookie'

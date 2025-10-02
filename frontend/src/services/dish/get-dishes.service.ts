@@ -1,10 +1,19 @@
 import { API_URL } from '@/config/api'
-import type { IDishResponse } from '@/types/dish.interface'
+import type { ApiResponse, IPaginationParams } from '@/types/api.interface'
+import type { IServerSideRequestConfig } from '@/types/axios.interface'
+import type { IDishListResponse } from '@/types/dish.interface'
 import api from '@/utils/api'
 
-export const getAllDishes = async (page?: number, limit?: number) => {
-	const response = await api.get<IDishResponse>(API_URL.DISH.ROOT, {
-		params: { page, limit },
+export const getAllDishes = async (
+	params?: IPaginationParams,
+	config?: IServerSideRequestConfig,
+): Promise<ApiResponse<IDishListResponse>> => {
+	const response = await api.get<IDishListResponse>(API_URL.DISH.ROOT, {
+		params: {
+			page: params?.page,
+			limit: params?.limit,
+		},
+		...config,
 	})
-	return response.data
+	return response
 }

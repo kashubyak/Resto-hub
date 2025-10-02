@@ -1,6 +1,6 @@
 import { useAlert } from '@/providers/AlertContext'
 import { createDish } from '@/services/dish/create-dish.service'
-import type { IFormValues } from '@/types/dish.interface'
+import type { IDishFormValues } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useForm } from 'react-hook-form'
@@ -20,7 +20,7 @@ export const useDishModal = (onClose: () => void) => {
 		setError,
 		clearErrors,
 		watch,
-	} = useForm<IFormValues>({
+	} = useForm<IDishFormValues>({
 		mode: 'onChange',
 		defaultValues: {
 			ingredients: [],
@@ -28,7 +28,7 @@ export const useDishModal = (onClose: () => void) => {
 		},
 	})
 
-	const onSubmit = async (data: IFormValues) => {
+	const onSubmit = async (data: IDishFormValues) => {
 		try {
 			const formData = new FormData()
 			formData.append('name', data.name.trim())
