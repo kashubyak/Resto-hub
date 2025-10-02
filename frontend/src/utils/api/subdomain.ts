@@ -19,9 +19,7 @@ export function setApiSubdomain(subdomain?: string): void {
 		url.hostname = `${subdomain}.${rootDomain}`
 		api.defaults.baseURL = url.toString()
 	} catch (error) {
-		console.error('Failed to set API subdomain:', error)
 		api.defaults.baseURL = apiBase
-
 		useAlertStore.getState().setPendingAlert({
 			severity: 'error',
 			text: parseBackendError(error as IAxiosError).join('\n'),
