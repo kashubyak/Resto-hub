@@ -128,34 +128,34 @@ export const useImageViewer = ({ open, onClose }: UseImageViewerProps) => {
 	const handleTouchEnd = useCallback(() => setIsDragging(false), [])
 
 	useEffect(() => {
-		if (isDragging) {
-			const handleGlobalMouseMove = (e: MouseEvent) => {
-				const deltaX = e.clientX - dragStart.x
-				const deltaY = e.clientY - dragStart.y
+		if (!isDragging) return
 
-				setPosition({
-					x: initialPosition.x + deltaX,
-					y: initialPosition.y + deltaY,
-				})
-			}
+		const handleGlobalMouseMove = (e: MouseEvent) => {
+			const deltaX = e.clientX - dragStart.x
+			const deltaY = e.clientY - dragStart.y
 
-			const handleGlobalMouseUp = () => setIsDragging(false)
+			setPosition({
+				x: initialPosition.x + deltaX,
+				y: initialPosition.y + deltaY,
+			})
+		}
 
-			document.addEventListener('mousemove', handleGlobalMouseMove)
-			document.addEventListener('mouseup', handleGlobalMouseUp)
+		const handleGlobalMouseUp = () => setIsDragging(false)
 
-			return () => {
-				document.removeEventListener('mousemove', handleGlobalMouseMove)
-				document.removeEventListener('mouseup', handleGlobalMouseUp)
-			}
+		document.addEventListener('mousemove', handleGlobalMouseMove)
+		document.addEventListener('mouseup', handleGlobalMouseUp)
+
+		return () => {
+			document.removeEventListener('mousemove', handleGlobalMouseMove)
+			document.removeEventListener('mouseup', handleGlobalMouseUp)
 		}
 	}, [isDragging, dragStart, initialPosition])
 
-	const getCursor = () => {
+	const getCursor = useCallback(() => {
 		if (zoom <= 1) return 'default'
 		if (isDragging) return 'grabbing'
 		return 'grab'
-	}
+	}, [zoom, isDragging])
 
 	const handleDoubleClick = zoom === 1 ? handleZoomIn : handleZoomOut
 

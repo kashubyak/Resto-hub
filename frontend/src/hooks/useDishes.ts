@@ -16,6 +16,7 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useCallback, useMemo } from 'react'
 
 const LIMIT = 10
 
@@ -48,26 +49,35 @@ export const useDishes = (dishId?: number) => {
 		enabled: !!dishId,
 	})
 
+	const handleDeleteSuccess = useCallback(() => {
+		showSuccess('Dish deleted successfully')
+		queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
+		router.push(ROUTES.PRIVATE.ADMIN.DISH)
+	}, [showSuccess, queryClient, router])
+
+	const handleDeleteError = useCallback(
+		(err: unknown) => showError(parseBackendError(err as IAxiosError).join('\n')),
+		[showError],
+	)
+
 	const deleteDishMutation = useMutation({
 		mutationFn: async (id: number) => {
 			const response = await deleteDish(id)
 			return response.data
 		},
-		onSuccess: () => {
-			showSuccess('Dish deleted successfully')
-			queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
-			router.push(ROUTES.PRIVATE.ADMIN.DISH)
-		},
-		onError: (err: unknown) => {
-			showError(parseBackendError(err as IAxiosError).join('\n'))
-		},
+		onSuccess: handleDeleteSuccess,
+		onError: handleDeleteError,
 	})
 
-	const refetchDishes = () => {
-		queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
-	}
+	const refetchDishes = useCallback(
+		() => queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] }),
+		[queryClient],
+	)
 
-	const allDishes: IDish[] = dishesQuery.data?.pages.flatMap(page => page.data) ?? []
+	const allDishes = useMemo<IDish[]>(
+		() => dishesQuery.data?.pages.flatMap(page => page.data) ?? [],
+		[dishesQuery.data?.pages],
+	)
 
 	return {
 		...dishesQuery,

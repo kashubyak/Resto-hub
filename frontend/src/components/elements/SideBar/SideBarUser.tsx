@@ -2,6 +2,7 @@
 
 import { useDropdownMenu } from '@/hooks/useDropdownMenu'
 import { useAuth } from '@/providers/AuthContext'
+import type { IUser } from '@/types/user.interface'
 import LogoutIcon from '@mui/icons-material/Logout'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { memo, useMemo } from 'react'
@@ -15,7 +16,7 @@ const ExpandedUserView = memo(
 		toggleMenu,
 		isOpen,
 	}: {
-		user: { name?: string; email?: string; avatarUrl?: string } | null
+		user: IUser | null
 		buttonRef: React.RefObject<HTMLButtonElement | null>
 		toggleMenu: () => void
 		isOpen: boolean
@@ -58,7 +59,7 @@ const CollapsedUserView = memo(
 		toggleMenu,
 		isOpen,
 	}: {
-		user: { avatarUrl?: string } | null
+		user: IUser | null
 		buttonRef: React.RefObject<HTMLButtonElement | null>
 		toggleMenu: () => void
 		isOpen: boolean

@@ -1,7 +1,7 @@
 'use client'
 
 import { Input } from '@/components/ui/Input'
-import type { IDish } from '@/types/dish.interface'
+import type { IDishFormValues } from '@/types/dish.interface'
 import AddIcon from '@mui/icons-material/Add'
 import { IconButton, useMediaQuery, useTheme } from '@mui/material'
 import { useCallback, useRef, useState } from 'react'
@@ -15,10 +15,10 @@ import {
 import { IngredientChip } from './IngredientChip'
 
 type IngredientsSectionProps = {
-	control: Control<IDish>
-	errors: FieldErrors<IDish>
-	setError: UseFormSetError<IDish>
-	clearErrors: UseFormClearErrors<IDish>
+	control: Control<IDishFormValues>
+	errors: FieldErrors<IDishFormValues>
+	setError: UseFormSetError<IDishFormValues>
+	clearErrors: UseFormClearErrors<IDishFormValues>
 }
 
 export const IngredientsSection = ({

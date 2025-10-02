@@ -119,6 +119,7 @@ export const useLocationPicker = ({
 				const lib = (await window.google.maps.importLibrary('places')) as {
 					AutocompleteSuggestion: IAutocompleteSuggestionStatic
 				}
+
 				const { suggestions } =
 					await lib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
 						input: query,
@@ -137,6 +138,7 @@ export const useLocationPicker = ({
 
 				setSearchResults(formatted)
 				setShowResults(formatted.length > 0)
+
 				if (formatted.length === 0) showWarning(`No results found for "${query}"`)
 			} catch {
 				setSearchResults([])
@@ -204,6 +206,7 @@ export const useLocationPicker = ({
 	const handleMapClick = useCallback(
 		(event: google.maps.MapMouseEvent) => {
 			if (!event.latLng || !geocoder.current) return
+
 			const lat = event.latLng.lat()
 			const lng = event.latLng.lng()
 
