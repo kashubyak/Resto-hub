@@ -15,6 +15,7 @@ import {
 	useMutation,
 	useQuery,
 	useQueryClient,
+	type InfiniteData,
 } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
@@ -70,16 +71,38 @@ export const useDishes = (dishId?: number) => {
 		onError: handleDeleteDishError,
 	})
 
+	const handleDeleteDishFromCategorySuccess = useCallback(
+		(updatedDish: IDish) => {
+			showSuccess('Dish removed from category successfully')
+
+			queryClient.setQueryData<IDish>(
+				[DISHES_QUERY_KEY.DETAIL, updatedDish.id],
+				updatedDish,
+			)
+
+			queryClient.setQueryData<InfiniteData<IDishListResponse>>(
+				[DISHES_QUERY_KEY.ALL],
+				oldData => {
+					if (!oldData) return oldData
+
+					return {
+						...oldData,
+						pages: oldData.pages.map((page: IDishListResponse) => ({
+							...page,
+							data: page.data.map((dish: IDish) =>
+								dish.id === updatedDish.id ? updatedDish : dish,
+							),
+						})),
+					}
+				},
+			)
+		},
+		[showSuccess, queryClient],
+	)
 	const handleDeleteDishFromCategoryError = useCallback(
 		(err: unknown) => showError(parseBackendError(err as IAxiosError).join('\n')),
 		[showError],
 	)
-	const handleDeleteDishFromCategorySuccess = useCallback(() => {
-		showSuccess('Dish removed from category successfully')
-		queryClient.invalidateQueries({
-			queryKey: [DISHES_QUERY_KEY.ALL, DISHES_QUERY_KEY.DETAIL],
-		})
-	}, [showSuccess, queryClient])
 
 	const deleteCategoryFromDishMutation = useMutation({
 		mutationFn: async (id: number) => {
