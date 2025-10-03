@@ -3,6 +3,7 @@
 import { ROUTES } from '@/constants/pages.constant'
 import { DISHES_QUERY_KEY } from '@/constants/query-keys.constant'
 import { useAlert } from '@/providers/AlertContext'
+import { deleteDishFromCategory } from '@/services/dish/delete-dish-category.service'
 import { deleteDish } from '@/services/dish/delete-dish.service'
 import { getDish } from '@/services/dish/get-dish.service'
 import { getAllDishes } from '@/services/dish/get-dishes.service'
@@ -49,13 +50,13 @@ export const useDishes = (dishId?: number) => {
 		enabled: !!dishId,
 	})
 
-	const handleDeleteSuccess = useCallback(() => {
+	const handleDeleteDishSuccess = useCallback(() => {
 		showSuccess('Dish deleted successfully')
 		queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
 		router.push(ROUTES.PRIVATE.ADMIN.DISH)
 	}, [showSuccess, queryClient, router])
 
-	const handleDeleteError = useCallback(
+	const handleDeleteDishError = useCallback(
 		(err: unknown) => showError(parseBackendError(err as IAxiosError).join('\n')),
 		[showError],
 	)
@@ -65,8 +66,28 @@ export const useDishes = (dishId?: number) => {
 			const response = await deleteDish(id)
 			return response.data
 		},
-		onSuccess: handleDeleteSuccess,
-		onError: handleDeleteError,
+		onSuccess: handleDeleteDishSuccess,
+		onError: handleDeleteDishError,
+	})
+
+	const handleDeleteDishFromCategoryError = useCallback(
+		(err: unknown) => showError(parseBackendError(err as IAxiosError).join('\n')),
+		[showError],
+	)
+	const handleDeleteDishFromCategorySuccess = useCallback(() => {
+		showSuccess('Dish removed from category successfully')
+		queryClient.invalidateQueries({
+			queryKey: [DISHES_QUERY_KEY.ALL, DISHES_QUERY_KEY.DETAIL],
+		})
+	}, [showSuccess, queryClient])
+
+	const deleteCategoryFromDishMutation = useMutation({
+		mutationFn: async (id: number) => {
+			const response = await deleteDishFromCategory(id)
+			return response.data
+		},
+		onSuccess: handleDeleteDishFromCategorySuccess,
+		onError: handleDeleteDishFromCategoryError,
 	})
 
 	const refetchDishes = useCallback(
@@ -85,5 +106,6 @@ export const useDishes = (dishId?: number) => {
 		refetchDishes,
 		dishQuery,
 		deleteDishMutation,
+		deleteCategoryFromDishMutation,
 	}
 }
