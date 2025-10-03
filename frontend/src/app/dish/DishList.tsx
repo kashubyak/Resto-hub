@@ -44,6 +44,15 @@ const DishListComponent = () => {
 			/>
 		)
 
+	if (!allDishes.length)
+		return (
+			<NotFound
+				icon='🍽️'
+				title='No Dishes Available'
+				message='Looks like there are no dishes yet.'
+			/>
+		)
+
 	return (
 		<div className='p-3 sm:p-6'>
 			<div className='flex justify-between items-center mb-6'>
