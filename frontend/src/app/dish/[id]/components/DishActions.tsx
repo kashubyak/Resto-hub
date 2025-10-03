@@ -34,7 +34,8 @@ export const DishActions = ({ id }: { id: number }) => {
 					</Button>
 					<Button
 						className='h-10 inline-flex items-center justify-center font-semibold'
-						onClick={() => console.log('Remove category')}
+						onClick={() => setOpenConfirm(prev => ({ ...prev, removeCategory: true }))}
+						disabled={deleteCategoryFromDishMutation.isPending}
 					>
 						<RemoveCircle className='w-4 h-4 mr-2' />
 						Remove Category
@@ -57,7 +58,7 @@ export const DishActions = ({ id }: { id: number }) => {
 				message='Are you sure you want to delete this dish?'
 				confirmText='Delete'
 				cancelText='Cancel'
-				danger
+				type='destructive'
 			/>
 
 			<ConfirmDialog
@@ -68,7 +69,7 @@ export const DishActions = ({ id }: { id: number }) => {
 				message='Do you really want to remove this category from the dish?'
 				confirmText='Remove'
 				cancelText='Cancel'
-				danger={false}
+				type='warning'
 			/>
 		</div>
 	)
