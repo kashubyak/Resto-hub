@@ -12,5 +12,7 @@ export const deleteDishFromCategory = async (
 		API_URL.DISH.REMOVE_CATEGORY(id),
 		config,
 	)
+	console.log(response)
+
 	return response
 }

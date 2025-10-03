@@ -7,8 +7,11 @@ import { Category, Delete, Edit, RemoveCircle } from '@mui/icons-material'
 import { useState } from 'react'
 
 export const DishActions = ({ id }: { id: number }) => {
-	const { deleteDishMutation } = useDishes()
-	const [openConfirm, setOpenConfirm] = useState(false)
+	const { deleteDishMutation, deleteCategoryFromDishMutation } = useDishes()
+	const [openConfirm, setOpenConfirm] = useState({
+		deleteDish: false,
+		removeCategory: false,
+	})
 
 	return (
 		<div className='px-4 lg:px-6 lg:pr-0 py-6 bg-muted/30'>
@@ -38,7 +41,7 @@ export const DishActions = ({ id }: { id: number }) => {
 					</Button>
 					<Button
 						className='h-10 inline-flex items-center justify-center font-semibold bg-destructive hover:bg-destructive'
-						onClick={() => setOpenConfirm(true)}
+						onClick={() => setOpenConfirm(prev => ({ ...prev, deleteDish: true }))}
 						disabled={deleteDishMutation.isPending}
 					>
 						<Delete className='w-4 h-4 mr-2' />
@@ -47,14 +50,25 @@ export const DishActions = ({ id }: { id: number }) => {
 				</div>
 			</div>
 			<ConfirmDialog
-				open={openConfirm}
-				onClose={() => setOpenConfirm(false)}
+				open={openConfirm.deleteDish}
+				onClose={() => setOpenConfirm(prev => ({ ...prev, deleteDish: false }))}
 				onConfirm={() => deleteDishMutation.mutate(id)}
 				title='⚠️ Delete Dish'
-				message='Are you sure you want to delete this dish? This action cannot be undone.'
+				message='Are you sure you want to delete this dish?'
 				confirmText='Delete'
 				cancelText='Cancel'
 				danger
+			/>
+
+			<ConfirmDialog
+				open={openConfirm.removeCategory}
+				onClose={() => setOpenConfirm(prev => ({ ...prev, removeCategory: false }))}
+				onConfirm={() => deleteCategoryFromDishMutation.mutate(id)}
+				title='⚠️ Remove Category'
+				message='Do you really want to remove this category from the dish?'
+				confirmText='Remove'
+				cancelText='Cancel'
+				danger={false}
 			/>
 		</div>
 	)
