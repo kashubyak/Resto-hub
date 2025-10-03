@@ -9,7 +9,7 @@ interface IAlertProps {
 	text: string
 }
 
-const CustomAlert = styled(Alert)(() => ({
+const CustomAlert = styled(Alert)(({ theme }) => ({
 	borderRadius: '10px',
 	fontSize: '14px',
 	padding: '5px 40px 5px 10px',
@@ -22,6 +22,7 @@ const CustomAlert = styled(Alert)(() => ({
 	},
 	'& .MuiAlert-message': {
 		flex: 1,
+		wordBreak: 'break-word',
 	},
 	'&.MuiAlert-standardSuccess': {
 		backgroundColor: 'var(--success)',
@@ -39,11 +40,29 @@ const CustomAlert = styled(Alert)(() => ({
 		backgroundColor: 'var(--info)',
 		color: 'var(--stable-light)',
 	},
+	// Мобільні пристрої (до 600px)
+	[theme.breakpoints.down('sm')]: {
+		fontSize: '13px',
+		padding: '6px 35px 6px 8px',
+		borderRadius: '8px',
+		'& .MuiAlert-icon': {
+			marginRight: '6px',
+			fontSize: '18px',
+		},
+	},
+	// Дуже малі екрани (до 400px)
+	'@media (max-width: 400px)': {
+		fontSize: '12px',
+		padding: '5px 30px 5px 6px',
+		'& .MuiAlert-icon': {
+			fontSize: '16px',
+			marginRight: '4px',
+		},
+	},
 }))
 
 export const AlertUI = memo<IAlertProps>(({ severity, text }) => {
 	const [expanded, setExpanded] = useState(false)
-
 	const isLong = useMemo(() => text.length > MAX_LENGTH_ALERT, [text.length])
 
 	const displayText = useMemo(() => {
@@ -58,7 +77,7 @@ export const AlertUI = memo<IAlertProps>(({ severity, text }) => {
 			<span>{displayText}</span>
 			{isLong && (
 				<span
-					className='ml-2 underline cursor-pointer text-xs opacity-80 text-nowrap'
+					className='ml-1 sm:ml-2 underline cursor-pointer text-[11px] sm:text-xs opacity-80 text-nowrap'
 					onClick={handleToggle}
 				>
 					{expanded ? 'Show less' : 'Show more'}
