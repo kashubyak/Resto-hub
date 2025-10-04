@@ -8,8 +8,8 @@ export const getAllDishes = async (
 	params?: IGetAllDishesParams,
 	config?: IServerSideRequestConfig,
 ): Promise<ApiResponse<IDishListResponse>> => {
-	const response = await api.get<IDishListResponse>(API_URL.DISH.ROOT, {
-		params: {
+	const cleanParams = Object.fromEntries(
+		Object.entries({
 			page: params?.page,
 			limit: params?.limit,
 			search: params?.search,
@@ -18,10 +18,13 @@ export const getAllDishes = async (
 			available: params?.available,
 			sortBy: params?.sortBy,
 			order: params?.order,
-		},
+		}).filter(([_, value]) => value !== undefined && value !== null && value !== ''),
+	)
+
+	const response = await api.get<IDishListResponse>(API_URL.DISH.ROOT, {
+		params: cleanParams,
 		...config,
 	})
-	console.log(response)
 
 	return response
 }

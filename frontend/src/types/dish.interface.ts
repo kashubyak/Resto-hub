@@ -1,4 +1,4 @@
-import type { IPaginatedResponse, IPaginationParams } from './api.interface'
+import type { IPaginatedResponse } from './api.interface'
 import type { ICategory } from './category.interface'
 
 export interface ICreateDishRequest {
@@ -62,11 +62,13 @@ export interface IDishFormValues {
 	available: boolean
 }
 
-export interface IGetAllDishesParams extends IPaginationParams {
+export interface IGetAllDishesParams {
+	page?: number
+	limit?: number
 	search?: string
 	minPrice?: number
 	maxPrice?: number
 	available?: boolean
-	sortBy?: string
+	sortBy?: 'name' | 'price' | 'createdAt' | 'updatedAt' | 'calories' | 'weightGr'
 	order?: 'asc' | 'desc'
 }
