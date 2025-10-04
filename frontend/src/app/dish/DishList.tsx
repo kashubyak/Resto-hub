@@ -78,9 +78,11 @@ const DishListComponent: React.FC<DishListProps> = ({ searchQuery = '' }) => {
 			</div>
 
 			{viewMode === 'grid' ? (
-				<div className='grid gap-3 grid-cols-[repeat(auto-fit,minmax(320px,1fr))]'>
+				<div className='grid gap-3 grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-center'>
 					{allDishes.map(dish => (
-						<DishCard key={dish.id} dish={dish} />
+						<div key={dish.id} className='max-w-[600px] w-full'>
+							<DishCard dish={dish} />
+						</div>
 					))}
 				</div>
 			) : (

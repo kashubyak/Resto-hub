@@ -26,15 +26,15 @@ export const useDishes = (dishId?: number, searchQuery?: string) => {
 	const queryClient = useQueryClient()
 	const router = useRouter()
 	const { showSuccess, showError } = useAlert()
-	const trimmedSearchQuery = searchQuery?.trim() || undefined
+	const normalizedSearchQuery = searchQuery?.trim().toLowerCase() || undefined
 
 	const dishesQuery = useInfiniteQuery<IDishListResponse, Error>({
-		queryKey: [DISHES_QUERY_KEY.ALL, trimmedSearchQuery],
-		queryFn: async ({ pageParam }) => {
+		queryKey: [DISHES_QUERY_KEY.ALL, normalizedSearchQuery],
+		queryFn: async ({ pageParam = 1 }) => {
 			const response = await getAllDishes({
 				page: pageParam as number,
 				limit: LIMIT,
-				...(trimmedSearchQuery && { search: trimmedSearchQuery }),
+				...(normalizedSearchQuery && { search: normalizedSearchQuery }),
 			})
 			return response.data
 		},
@@ -86,7 +86,7 @@ export const useDishes = (dishId?: number, searchQuery?: string) => {
 				updatedDish,
 			)
 			queryClient.setQueryData<InfiniteData<IDishListResponse>>(
-				[DISHES_QUERY_KEY.ALL, trimmedSearchQuery],
+				[DISHES_QUERY_KEY.ALL, normalizedSearchQuery],
 				oldData => {
 					if (!oldData) return oldData
 					return {
@@ -101,7 +101,7 @@ export const useDishes = (dishId?: number, searchQuery?: string) => {
 				},
 			)
 		},
-		[showSuccess, queryClient, trimmedSearchQuery],
+		[showSuccess, queryClient, normalizedSearchQuery],
 	)
 
 	const handleDeleteDishFromCategoryError = useCallback(
