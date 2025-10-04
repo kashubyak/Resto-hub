@@ -22,17 +22,18 @@ import { useCallback, useMemo } from 'react'
 
 const LIMIT = 10
 
-export const useDishes = (dishId?: number) => {
+export const useDishes = (dishId?: number, searchQuery?: string) => {
 	const queryClient = useQueryClient()
 	const router = useRouter()
 	const { showSuccess, showError } = useAlert()
 
 	const dishesQuery = useInfiniteQuery<IDishListResponse, Error>({
-		queryKey: [DISHES_QUERY_KEY.ALL],
+		queryKey: [DISHES_QUERY_KEY.ALL, searchQuery],
 		queryFn: async ({ pageParam }) => {
 			const response = await getAllDishes({
 				page: pageParam as number,
 				limit: LIMIT,
+				search: searchQuery,
 			})
 			return response.data
 		},
@@ -79,12 +80,10 @@ export const useDishes = (dishId?: number) => {
 				[DISHES_QUERY_KEY.DETAIL, updatedDish.id],
 				updatedDish,
 			)
-
 			queryClient.setQueryData<InfiniteData<IDishListResponse>>(
 				[DISHES_QUERY_KEY.ALL],
 				oldData => {
 					if (!oldData) return oldData
-
 					return {
 						...oldData,
 						pages: oldData.pages.map((page: IDishListResponse) => ({
@@ -99,6 +98,7 @@ export const useDishes = (dishId?: number) => {
 		},
 		[showSuccess, queryClient],
 	)
+
 	const handleDeleteDishFromCategoryError = useCallback(
 		(err: unknown) => showError(parseBackendError(err as IAxiosError).join('\n')),
 		[showError],

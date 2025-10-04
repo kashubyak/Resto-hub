@@ -8,7 +8,11 @@ import { DishCard } from './components/list/DishCard'
 import { DishListItem } from './components/list/DishListItem'
 import { ViewModeToggle, type ViewMode } from './components/list/ViewModeToggle'
 
-const DishListComponent = () => {
+interface DishListProps {
+	searchQuery?: string
+}
+
+const DishListComponent: React.FC<DishListProps> = ({ searchQuery = '' }) => {
 	const {
 		allDishes,
 		fetchNextPage,
@@ -16,7 +20,7 @@ const DishListComponent = () => {
 		isFetchingNextPage,
 		isLoading,
 		isError,
-	} = useDishes()
+	} = useDishes(undefined, searchQuery)
 
 	const [viewMode, setViewMode] = useState<ViewMode>('grid')
 	const loaderRef = useRef<HTMLDivElement | null>(null)
@@ -29,7 +33,9 @@ const DishListComponent = () => {
 	)
 
 	useEffect(() => {
-		const observer = new IntersectionObserver(handleIntersection, { threshold: 1.0 })
+		const observer = new IntersectionObserver(handleIntersection, {
+			threshold: 1.0,
+		})
 		if (loaderRef.current) observer.observe(loaderRef.current)
 		return () => observer.disconnect()
 	}, [handleIntersection])
@@ -49,14 +55,25 @@ const DishListComponent = () => {
 			<NotFound
 				icon='🍽️'
 				title='No Dishes Available'
-				message='Looks like there are no dishes yet.'
+				message={
+					searchQuery
+						? `No dishes found matching "${searchQuery}"`
+						: 'Looks like there are no dishes yet.'
+				}
 			/>
 		)
 
 	return (
 		<div className='p-3 sm:p-6'>
 			<div className='flex justify-between items-center mb-6'>
-				<h2 className='text-2xl font-bold'>Dish List</h2>
+				<h2 className='text-2xl font-bold'>
+					Dish List
+					{searchQuery && (
+						<span className='text-base font-normal text-secondary-foreground ml-2'>
+							({allDishes.length} {allDishes.length === 1 ? 'result' : 'results'})
+						</span>
+					)}
+				</h2>
 				<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 			</div>
 
