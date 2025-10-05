@@ -1,3 +1,4 @@
+// frontend/src/components/elements/Filters/dish.filters.ts
 import type { FilterConfig } from '@/types/filter.interface'
 
 export const dishFilters: FilterConfig[] = [
@@ -20,21 +21,14 @@ export const dishFilters: FilterConfig[] = [
 		type: 'select',
 		key: 'sortBy',
 		label: 'Sort By',
-		placeholder: 'Select sorting field',
+		placeholder: 'Select sorting',
 		options: [
-			{ value: 'name', label: 'Name' },
-			{ value: 'price', label: 'Price' },
-			{ value: 'createdAt', label: 'Date Created' },
-		],
-	},
-	{
-		type: 'select',
-		key: 'order',
-		label: 'Sort Order',
-		placeholder: 'Select order',
-		options: [
-			{ value: 'asc', label: 'Ascending' },
-			{ value: 'desc', label: 'Descending' },
+			{ value: 'name-asc', label: 'Name (A → Z)' },
+			{ value: 'name-desc', label: 'Name (Z → A)' },
+			{ value: 'price-asc', label: 'Price (Low → High)' },
+			{ value: 'price-desc', label: 'Price (High → Low)' },
+			{ value: 'createdAt-asc', label: 'Date Created (Oldest First)' },
+			{ value: 'createdAt-desc', label: 'Date Created (Newest First)' },
 		],
 	},
 ]

@@ -1,6 +1,6 @@
 'use client'
 
-import type { FilterConfig, FilterValues } from '@/types/filter.interface'
+import type { FilterConfig, FilterValue, FilterValues } from '@/types/filter.interface'
 import CloseIcon from '@mui/icons-material/Close'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
@@ -29,7 +29,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 	const handleOpen = () => setIsOpen(true)
 	const handleClose = () => setIsOpen(false)
 
-	const handleChange = (key: string, value: any) => {
+	const handleChange = (key: string, value: FilterValue) => {
 		setFilterValues(prev => ({
 			...prev,
 			[key]: value,
@@ -39,7 +39,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 	const handleApply = () => {
 		const cleanedValues = Object.fromEntries(
 			Object.entries(filterValues).filter(
-				([_, value]) => value !== undefined && value !== null && value !== '',
+				([, value]) => value !== undefined && value !== null && value !== '',
 			),
 		)
 		onApply(cleanedValues)
@@ -134,7 +134,6 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 				}}
 			>
 				<div className='flex flex-col h-full'>
-					{/* Header */}
 					<div className='flex items-center justify-between p-4 border-b border-border'>
 						<h2 className='text-xl font-bold flex items-center gap-2'>
 							<FilterListIcon />
@@ -161,12 +160,10 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 						</IconButton>
 					</div>
 
-					{/* Filters */}
 					<div className='flex-1 overflow-y-auto p-4'>
 						<div className='space-y-6'>{filters.map(filter => renderFilter(filter))}</div>
 					</div>
 
-					{/* Actions */}
 					<div className='p-4 border-t border-border space-y-2'>
 						<button
 							className='w-full py-3 px-4 bg-primary text-primary-foreground rounded-lg font-medium transition-all hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed'

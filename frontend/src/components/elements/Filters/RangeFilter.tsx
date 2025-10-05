@@ -5,8 +5,8 @@ import { TextField } from '@mui/material'
 
 interface RangeFilterProps {
 	config: RangeFilterConfig
-	values: Record<string, any>
-	onChange: (key: string, value: any) => void
+	values: Record<string, string | number | boolean | undefined | null>
+	onChange: (key: string, value: string | number | boolean | undefined | null) => void
 }
 
 export const RangeFilter: React.FC<RangeFilterProps> = ({ config, values, onChange }) => {

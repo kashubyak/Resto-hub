@@ -59,7 +59,9 @@ export type FilterConfig =
 	| DateRangeFilterConfig
 	| SearchFilterConfig
 
-export type FilterValues = Record<string, any>
+export type FilterValue = string | number | boolean | undefined | null
+
+export type FilterValues = Record<string, FilterValue>
 
 export interface FilterDrawerProps {
 	filters: FilterConfig[]

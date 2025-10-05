@@ -5,8 +5,8 @@ import { MenuItem, TextField } from '@mui/material'
 
 interface SelectFilterProps {
 	config: SelectFilterConfig
-	values: Record<string, any>
-	onChange: (key: string, value: any) => void
+	values: Record<string, string | number | boolean | undefined | null>
+	onChange: (key: string, value: string | number | boolean | undefined | null) => void
 }
 
 export const SelectFilter: React.FC<SelectFilterProps> = ({
@@ -53,6 +53,7 @@ export const SelectFilter: React.FC<SelectFilterProps> = ({
 					},
 				}}
 				SelectProps={{
+					displayEmpty: true,
 					MenuProps: {
 						PaperProps: {
 							sx: {
@@ -76,7 +77,7 @@ export const SelectFilter: React.FC<SelectFilterProps> = ({
 				}}
 			>
 				<MenuItem value=''>
-					<em>None</em>
+					<em>{config.placeholder || 'None'}</em>
 				</MenuItem>
 				{config.options.map(option => (
 					<MenuItem key={option.value} value={option.value}>

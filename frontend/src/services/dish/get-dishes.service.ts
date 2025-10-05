@@ -1,3 +1,4 @@
+// frontend/src/services/dish/get-dishes.service.ts
 import { API_URL } from '@/config/api'
 import type { ApiResponse } from '@/types/api.interface'
 import type { IServerSideRequestConfig } from '@/types/axios.interface'
@@ -8,6 +9,15 @@ export const getAllDishes = async (
 	params?: IGetAllDishesParams,
 	config?: IServerSideRequestConfig,
 ): Promise<ApiResponse<IDishListResponse>> => {
+	let sortBy = params?.sortBy
+	let order = params?.order
+
+	if (sortBy && typeof sortBy === 'string' && sortBy.includes('-')) {
+		const [field, direction] = sortBy.split('-')
+		sortBy = field
+		order = direction as 'asc' | 'desc'
+	}
+
 	const cleanParams = Object.fromEntries(
 		Object.entries({
 			page: params?.page,
@@ -16,9 +26,9 @@ export const getAllDishes = async (
 			minPrice: params?.minPrice,
 			maxPrice: params?.maxPrice,
 			available: params?.available,
-			sortBy: params?.sortBy,
-			order: params?.order,
-		}).filter(([_, value]) => value !== undefined && value !== null && value !== ''),
+			sortBy,
+			order,
+		}).filter(([, value]) => value !== undefined && value !== null && value !== ''),
 	)
 
 	const response = await api.get<IDishListResponse>(API_URL.DISH.ROOT, {

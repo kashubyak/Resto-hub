@@ -5,8 +5,8 @@ import { FormControlLabel, Switch } from '@mui/material'
 
 interface BooleanFilterProps {
 	config: BooleanFilterConfig
-	values: Record<string, any>
-	onChange: (key: string, value: any) => void
+	values: Record<string, string | number | boolean | undefined | null>
+	onChange: (key: string, value: string | number | boolean | undefined | null) => void
 }
 
 export const BooleanFilter: React.FC<BooleanFilterProps> = ({
@@ -21,7 +21,7 @@ export const BooleanFilter: React.FC<BooleanFilterProps> = ({
 			<FormControlLabel
 				control={
 					<Switch
-						checked={value}
+						checked={Boolean(value)}
 						onChange={e => onChange(config.key, e.target.checked)}
 						disabled={config.disabled}
 						sx={{

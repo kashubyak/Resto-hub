@@ -1,4 +1,3 @@
-import type { IFilterValues } from '@/components/ui/data.interface'
 import type { IPaginatedResponse } from './api.interface'
 import type { ICategory } from './category.interface'
 
@@ -63,8 +62,13 @@ export interface IDishFormValues {
 	available: boolean
 }
 
-export interface IGetAllDishesParams extends IFilterValues {
+export interface IGetAllDishesParams {
 	page?: number
 	limit?: number
 	search?: string
+	minPrice?: number
+	maxPrice?: number
+	available?: boolean
+	sortBy?: string
+	order?: 'asc' | 'desc'
 }
