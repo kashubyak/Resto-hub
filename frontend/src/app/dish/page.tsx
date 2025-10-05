@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/Button'
+import { FilterDrawer } from '@/components/ui/FilterDrawer'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { useState } from 'react'
 import { DishList } from './DishList'
@@ -19,14 +20,20 @@ export default function DishesPage() {
 					onClick={() => setIsModalOpen(true)}
 					className='w-full sm:w-auto px-6 py-2'
 				/>
-				<SearchInput
-					onSearch={setSearchQuery}
-					placeholder='Search dishes by name...'
-					debounceMs={500}
-					className='w-full sm:w-64'
-				/>
+
+				<div className='flex items-center gap-2 w-full sm:w-auto'>
+					<SearchInput
+						onSearch={setSearchQuery}
+						placeholder='Search dishes by name...'
+						debounceMs={500}
+						className='w-full sm:w-64'
+					/>
+					<FilterDrawer />
+				</div>
+
 				<DishModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
 			</div>
+
 			<DishList searchQuery={searchQuery} />
 		</div>
 	)
