@@ -1,8 +1,10 @@
 'use client'
 
+import { dishFilters } from '@/components/elements/Filters/dish.filters'
 import { Button } from '@/components/ui/Button'
 import { FilterDrawer } from '@/components/ui/FilterDrawer'
 import { SearchInput } from '@/components/ui/SearchInput'
+import type { FilterValues } from '@/types/filter.interface'
 import { useState } from 'react'
 import { DishList } from './DishList'
 import { DishModal } from './DishModal'
@@ -10,6 +12,15 @@ import { DishModal } from './DishModal'
 export default function DishesPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [searchQuery, setSearchQuery] = useState('')
+	const [filters, setFilters] = useState<FilterValues>({})
+
+	const handleFilterApply = (values: FilterValues) => {
+		setFilters(values)
+	}
+
+	const handleFilterReset = () => {
+		setFilters({})
+	}
 
 	return (
 		<div>
@@ -28,13 +39,18 @@ export default function DishesPage() {
 						debounceMs={500}
 						className='w-full sm:w-64'
 					/>
-					<FilterDrawer />
+					<FilterDrawer
+						filters={dishFilters}
+						initialValues={filters}
+						onApply={handleFilterApply}
+						onReset={handleFilterReset}
+					/>
 				</div>
 
 				<DishModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
 			</div>
 
-			<DishList searchQuery={searchQuery} />
+			<DishList searchQuery={searchQuery} filters={filters} />
 		</div>
 	)
 }
