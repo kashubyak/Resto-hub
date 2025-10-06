@@ -69,6 +69,6 @@ export interface IGetAllDishesParams {
 	minPrice?: number
 	maxPrice?: number
 	available?: boolean
-	sortBy?: 'name' | 'price' | 'createdAt' | 'updatedAt' | 'calories' | 'weightGr'
+	sortBy?: string
 	order?: 'asc' | 'desc'
 }

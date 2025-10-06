@@ -3,6 +3,7 @@
 import { Loading } from '@/components/ui/Loading'
 import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
+import type { FilterValues } from '@/types/filter.interface'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { DishCard } from './components/list/DishCard'
 import { DishListItem } from './components/list/DishListItem'
@@ -10,9 +11,13 @@ import { ViewModeToggle, type ViewMode } from './components/list/ViewModeToggle'
 
 interface DishListProps {
 	searchQuery?: string
+	filters?: FilterValues
 }
 
-const DishListComponent: React.FC<DishListProps> = ({ searchQuery = '' }) => {
+const DishListComponent: React.FC<DishListProps> = ({
+	searchQuery = '',
+	filters = {},
+}) => {
 	const {
 		allDishes,
 		fetchNextPage,
@@ -20,7 +25,7 @@ const DishListComponent: React.FC<DishListProps> = ({ searchQuery = '' }) => {
 		isFetchingNextPage,
 		isLoading,
 		isError,
-	} = useDishes(undefined, searchQuery)
+	} = useDishes(undefined, searchQuery, filters)
 
 	const [viewMode, setViewMode] = useState<ViewMode>('grid')
 	const loaderRef = useRef<HTMLDivElement | null>(null)
@@ -50,14 +55,16 @@ const DishListComponent: React.FC<DishListProps> = ({ searchQuery = '' }) => {
 			/>
 		)
 
+	const hasActiveFilters = Object.keys(filters).length > 0
+
 	if (!allDishes.length)
 		return (
 			<NotFound
 				icon='🍽️'
 				title='No Dishes Available'
 				message={
-					searchQuery
-						? `No dishes found matching "${searchQuery}"`
+					searchQuery || hasActiveFilters
+						? `No dishes found matching your ${searchQuery ? 'search' : 'filters'}`
 						: 'Looks like there are no dishes yet.'
 				}
 			/>
@@ -68,7 +75,7 @@ const DishListComponent: React.FC<DishListProps> = ({ searchQuery = '' }) => {
 			<div className='flex justify-between items-center mb-6'>
 				<h2 className='text-2xl font-bold'>
 					Dish List
-					{searchQuery && (
+					{(searchQuery || hasActiveFilters) && (
 						<span className='text-base font-normal text-secondary-foreground ml-2'>
 							({allDishes.length} {allDishes.length === 1 ? 'result' : 'results'})
 						</span>

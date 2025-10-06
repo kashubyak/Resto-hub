@@ -25,6 +25,7 @@
 	--input: #f5f6fa;
 	--stable-light: #fff;
 	--active-item: #e8eaf1;
+		--shadow: rgba(27, 27, 27, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -53,7 +54,7 @@
 		--input: #0e1217;
 		--stable-light: #fff;
 		--active-item: #202735;
-		--backdrop: #504f4f4d;
+		--shadow: rgba(27, 27, 27, 0.6);
 	}
 }
 
