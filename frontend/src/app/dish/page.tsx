@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { FilterDrawer } from '@/components/ui/FilterDrawer'
 import { SearchInput } from '@/components/ui/SearchInput'
 import type { FilterValues } from '@/types/filter.interface'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { DishList } from './DishList'
 import { DishModal } from './DishModal'
 
@@ -14,13 +14,12 @@ export default function DishesPage() {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [filters, setFilters] = useState<FilterValues>({})
 
-	const handleFilterApply = (values: FilterValues) => {
-		setFilters(values)
-	}
+	const handleModalOpen = useCallback(() => setIsModalOpen(true), [])
+	const handleModalClose = useCallback(() => setIsModalOpen(false), [])
 
-	const handleFilterReset = () => {
-		setFilters({})
-	}
+	const handleFilterApply = useCallback((values: FilterValues) => setFilters(values), [])
+	const handleFilterReset = useCallback(() => setFilters({}), [])
+	const handleSearch = useCallback((value: string) => setSearchQuery(value), [])
 
 	return (
 		<div>
@@ -31,7 +30,7 @@ export default function DishesPage() {
 							<Button
 								type='button'
 								text='Create new dish'
-								onClick={() => setIsModalOpen(true)}
+								onClick={handleModalOpen}
 								className='!mt-0 w-full sm:w-auto px-6 py-2.5 h-[42px] whitespace-nowrap rounded-lg shadow-sm hover:shadow-md transition-all duration-200'
 							/>
 						</div>
@@ -39,7 +38,7 @@ export default function DishesPage() {
 						<div className='flex-1 flex items-center gap-2 sm:gap-3 min-w-0'>
 							<div className='flex-1 min-w-0'>
 								<SearchInput
-									onSearch={setSearchQuery}
+									onSearch={handleSearch}
 									placeholder='Search dishes by name...'
 									debounceMs={500}
 									className='w-full'
@@ -57,7 +56,7 @@ export default function DishesPage() {
 					</div>
 				</div>
 
-				<DishModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+				<DishModal open={isModalOpen} onClose={handleModalClose} />
 			</div>
 
 			<DishList searchQuery={searchQuery} filters={filters} />

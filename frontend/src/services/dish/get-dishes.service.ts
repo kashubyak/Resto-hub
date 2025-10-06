@@ -1,4 +1,3 @@
-// frontend/src/services/dish/get-dishes.service.ts
 import { API_URL } from '@/config/api'
 import type { ApiResponse } from '@/types/api.interface'
 import type { IServerSideRequestConfig } from '@/types/axios.interface'
