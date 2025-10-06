@@ -30,4 +30,4 @@ export const dishFilters: FilterConfig[] = [
 			{ value: 'createdAt-desc', label: 'Date Created (Newest First)' },
 		],
 	},
-]
+] as const
