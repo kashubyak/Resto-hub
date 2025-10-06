@@ -127,10 +127,11 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 						backgroundColor: 'var(--background)',
 						color: 'var(--foreground)',
 						padding: 0,
-						boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.1)',
+						boxShadow: '-4px 0 20px var(--shadow)',
 					},
 					'& .MuiBackdrop-root': {
-						backgroundColor: 'rgba(0, 0, 0, 0.5)',
+						backgroundColor: 'rgba(var(--background-rgb), 0.3)',
+						backdropFilter: 'blur(8px)',
 					},
 				}}
 			>
