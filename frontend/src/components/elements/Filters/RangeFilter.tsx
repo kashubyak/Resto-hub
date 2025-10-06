@@ -45,7 +45,7 @@ export const RangeFilter: React.FC<RangeFilterProps> = ({ config, values, onChan
 							},
 							'&.Mui-focused fieldset': {
 								borderColor: 'var(--primary)',
-								borderWidth: '2px',
+								borderWidth: '1px',
 							},
 						},
 						'& .MuiInputBase-input': {
@@ -84,7 +84,7 @@ export const RangeFilter: React.FC<RangeFilterProps> = ({ config, values, onChan
 							},
 							'&.Mui-focused fieldset': {
 								borderColor: 'var(--primary)',
-								borderWidth: '2px',
+								borderWidth: '1px',
 							},
 						},
 						'& .MuiInputBase-input': {

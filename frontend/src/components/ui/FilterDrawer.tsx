@@ -50,7 +50,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 	const handleReset = () => {
 		setFilterValues({})
 		onReset?.()
-		handleClose()
+		// handleClose()
 	}
 
 	const renderFilter = (config: FilterConfig) => {

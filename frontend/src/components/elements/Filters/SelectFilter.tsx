@@ -74,6 +74,7 @@ export const SelectFilter: React.FC<SelectFilterProps> = ({
 									},
 									'&.Mui-selected': {
 										backgroundColor: 'var(--primary)',
+										color: 'var(--stable-light)',
 										'&:hover': {
 											backgroundColor: 'var(--primary-hover)',
 										},

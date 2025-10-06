@@ -25,11 +25,26 @@ export const BooleanFilter: React.FC<BooleanFilterProps> = ({
 						onChange={e => onChange(config.key, e.target.checked)}
 						disabled={config.disabled}
 						sx={{
+							'& .MuiSwitch-switchBase': {
+								color: 'var(--muted-foreground)',
+							},
 							'& .MuiSwitch-switchBase.Mui-checked': {
 								color: 'var(--primary)',
 							},
 							'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
 								backgroundColor: 'var(--primary)',
+								opacity: 1,
+							},
+							'& .MuiSwitch-track': {
+								backgroundColor: 'var(--muted)',
+								border: '1px solid var(--border)',
+								opacity: 1,
+							},
+							'& .MuiSwitch-thumb': {
+								backgroundColor: 'var(--stable-light)',
+							},
+							'&.Mui-disabled': {
+								opacity: 0.6,
 							},
 						}}
 					/>
