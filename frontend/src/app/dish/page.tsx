@@ -24,27 +24,37 @@ export default function DishesPage() {
 
 	return (
 		<div>
-			<div className='flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 border-b border-border'>
-				<Button
-					type='button'
-					text='Create new dish'
-					onClick={() => setIsModalOpen(true)}
-					className='w-full sm:w-auto px-6 py-2'
-				/>
+			<div className='p-4 sm:p-6 border-b border-border bg-background'>
+				<div className='max-w-7xl mx-auto'>
+					<div className='flex flex-col sm:flex-row gap-4 sm:gap-6 items-stretch sm:items-center'>
+						<div className='sm:flex-shrink-0'>
+							<Button
+								type='button'
+								text='Create new dish'
+								onClick={() => setIsModalOpen(true)}
+								className='!mt-0 w-full sm:w-auto px-6 py-2.5 h-[42px] whitespace-nowrap rounded-lg shadow-sm hover:shadow-md transition-all duration-200'
+							/>
+						</div>
 
-				<div className='flex items-center gap-2 w-full sm:w-auto'>
-					<SearchInput
-						onSearch={setSearchQuery}
-						placeholder='Search dishes by name...'
-						debounceMs={500}
-						className='w-full sm:w-64'
-					/>
-					<FilterDrawer
-						filters={dishFilters}
-						initialValues={filters}
-						onApply={handleFilterApply}
-						onReset={handleFilterReset}
-					/>
+						<div className='flex-1 flex items-center gap-2 sm:gap-3 min-w-0'>
+							<div className='flex-1 min-w-0'>
+								<SearchInput
+									onSearch={setSearchQuery}
+									placeholder='Search dishes by name...'
+									debounceMs={500}
+									className='w-full'
+								/>
+							</div>
+							<div className='flex-shrink-0'>
+								<FilterDrawer
+									filters={dishFilters}
+									initialValues={filters}
+									onApply={handleFilterApply}
+									onReset={handleFilterReset}
+								/>
+							</div>
+						</div>
+					</div>
 				</div>
 
 				<DishModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />

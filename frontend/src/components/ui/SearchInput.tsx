@@ -53,6 +53,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 					color: 'var(--foreground)',
 					borderRadius: '8px',
 					transition: 'all 0.2s ease',
+					height: '42px',
 					'& fieldset': {
 						borderColor: 'var(--border)',
 						borderWidth: '1px',
@@ -71,8 +72,9 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 				},
 				'& .MuiInputBase-input': {
 					color: 'var(--foreground)',
-					padding: '8px 12px',
+					padding: '10px 12px',
 					fontSize: '14px',
+					lineHeight: '1.5',
 					'&::placeholder': {
 						color: 'var(--muted-foreground)',
 						opacity: 0.7,
@@ -80,13 +82,17 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 				},
 				'& .MuiInputAdornment-root': {
 					color: 'var(--muted-foreground)',
+					marginLeft: '4px',
+					marginRight: '0',
 				},
 				'& .MuiIconButton-root': {
 					color: 'var(--muted-foreground)',
 					transition: 'all 0.2s ease',
+					padding: '6px',
+					marginRight: '-4px',
 					'&:hover': {
 						color: 'var(--foreground)',
-						backgroundColor: 'var(--muted-hover)',
+						backgroundColor: 'var(--accent)',
 					},
 				},
 				'& .MuiSvgIcon-root': {
@@ -106,9 +112,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 							edge='end'
 							size='small'
 							aria-label='clear search'
-							sx={{
-								padding: '4px',
-							}}
 						>
 							<ClearIcon fontSize='small' />
 						</IconButton>
