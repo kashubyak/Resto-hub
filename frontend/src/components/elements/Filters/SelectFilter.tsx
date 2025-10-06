@@ -29,7 +29,7 @@ export const SelectFilter: React.FC<SelectFilterProps> = ({
 				disabled={config.disabled}
 				sx={{
 					'& .MuiOutlinedInput-root': {
-						backgroundColor: 'var(--background)',
+						backgroundColor: 'var(--input)',
 						color: 'var(--foreground)',
 						borderRadius: '8px',
 						'& fieldset': {
@@ -40,7 +40,7 @@ export const SelectFilter: React.FC<SelectFilterProps> = ({
 						},
 						'&.Mui-focused fieldset': {
 							borderColor: 'var(--primary)',
-							borderWidth: '2px',
+							borderWidth: '1px',
 						},
 					},
 					'& .MuiInputBase-input': {
@@ -57,18 +57,35 @@ export const SelectFilter: React.FC<SelectFilterProps> = ({
 					MenuProps: {
 						PaperProps: {
 							sx: {
-								backgroundColor: 'var(--background)',
+								backgroundColor: 'var(--muted)',
 								color: 'var(--foreground)',
+								border: '0.3px solid var(--border)',
+								borderRadius: '8px',
+								marginTop: '2px',
+								'& .MuiList-root': {
+									paddingTop: 0,
+									paddingBottom: 0,
+								},
 								'& .MuiMenuItem-root': {
+									borderTop: '0.3px solid var(--border)',
+									padding: '8px 12px',
 									'&:hover': {
 										backgroundColor: 'var(--muted-hover)',
 									},
 									'&.Mui-selected': {
 										backgroundColor: 'var(--primary)',
-										color: 'var(--primary-foreground)',
 										'&:hover': {
 											backgroundColor: 'var(--primary-hover)',
 										},
+									},
+									'&:first-of-type': {
+										borderTopLeftRadius: '8px',
+										borderTopRightRadius: '8px',
+										borderTop: '0px',
+									},
+									'&:last-of-type': {
+										borderBottomLeftRadius: '8px',
+										borderBottomRightRadius: '8px',
 									},
 								},
 							},

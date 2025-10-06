@@ -1,4 +1,3 @@
-// frontend/src/components/elements/Filters/dish.filters.ts
 import type { FilterConfig } from '@/types/filter.interface'
 
 export const dishFilters: FilterConfig[] = [

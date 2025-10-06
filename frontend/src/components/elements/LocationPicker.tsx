@@ -65,7 +65,7 @@ const SearchResult = memo(
 		<button
 			type='button'
 			onClick={onClick}
-			className='w-full px-4 py-3 text-left hover:bg-hover border-b border-border last:border-b-0 first:rounded-t-md last:rounded-b-md transition-colors'
+			className='w-full px-4 py-3 text-left bg-muted hover:bg-hover border-b border-border last:border-b-0 first:rounded-t-md last:rounded-b-md transition-colors'
 		>
 			<div className='font-medium text-foreground mb-1'>{result.mainText}</div>
 			<div className='text-sm text-muted-foreground'>{result.secondaryText}</div>

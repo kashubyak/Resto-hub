@@ -34,7 +34,7 @@ export const RangeFilter: React.FC<RangeFilterProps> = ({ config, values, onChan
 					}}
 					sx={{
 						'& .MuiOutlinedInput-root': {
-							backgroundColor: 'var(--background)',
+							backgroundColor: 'var(--input)',
 							color: 'var(--foreground)',
 							borderRadius: '8px',
 							'& fieldset': {
@@ -73,7 +73,7 @@ export const RangeFilter: React.FC<RangeFilterProps> = ({ config, values, onChan
 					}}
 					sx={{
 						'& .MuiOutlinedInput-root': {
-							backgroundColor: 'var(--background)',
+							backgroundColor: 'var(--input)',
 							color: 'var(--foreground)',
 							borderRadius: '8px',
 							'& fieldset': {

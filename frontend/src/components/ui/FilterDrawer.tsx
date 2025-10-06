@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { BooleanFilter } from '../elements/Filters/BooleanFilter'
 import { RangeFilter } from '../elements/Filters/RangeFilter'
 import { SelectFilter } from '../elements/Filters/SelectFilter'
+import { Button } from './Button'
 
 interface FilterDrawerProps {
 	filters: FilterConfig[]
@@ -165,27 +166,16 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 					</div>
 
 					<div className='p-4 border-t border-border space-y-2'>
-						<button
-							className='w-full py-3 px-4 bg-primary text-primary-foreground rounded-lg font-medium transition-all hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed'
-							onClick={handleApply}
-						>
-							Apply Filters
-						</button>
+						<div className='flex justify-between gap-2'>
+							<Button onClick={handleClose} text='Cancel' />
+							<Button onClick={handleApply} text='Apply Filters' />
+						</div>
 						{hasActiveFilters && (
-							<button
-								className='w-full py-3 px-4 bg-secondary text-secondary-foreground rounded-lg font-medium transition-all hover:bg-secondary-hover flex items-center justify-center gap-2'
-								onClick={handleReset}
-							>
+							<Button onClick={handleReset}>
 								<RestartAltIcon fontSize='small' />
 								Reset Filters
-							</button>
+							</Button>
 						)}
-						<button
-							className='w-full py-3 px-4 bg-muted text-foreground rounded-lg font-medium transition-all hover:bg-muted-hover'
-							onClick={handleClose}
-						>
-							Cancel
-						</button>
 					</div>
 				</div>
 			</Drawer>
