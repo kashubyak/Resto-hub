@@ -9,6 +9,7 @@ import { getDish } from '@/services/dish/get-dish.service'
 import { getAllDishes } from '@/services/dish/get-dishes.service'
 import type { IDish, IDishListResponse } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
+import type { FilterValues } from '@/types/filter.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import {
 	useInfiniteQuery,
@@ -22,17 +23,28 @@ import { useCallback, useMemo } from 'react'
 
 const LIMIT = 10
 
-export const useDishes = (dishId?: number) => {
+export const useDishes = (
+	dishId?: number,
+	searchQuery?: string,
+	filters?: FilterValues,
+) => {
 	const queryClient = useQueryClient()
 	const router = useRouter()
 	const { showSuccess, showError } = useAlert()
+	const normalizedSearchQuery = searchQuery?.trim().toLowerCase() || undefined
+	const filterKey = useMemo(() => {
+		if (!filters || Object.keys(filters).length === 0) return 'no-filters'
+		return JSON.stringify(filters)
+	}, [filters])
 
 	const dishesQuery = useInfiniteQuery<IDishListResponse, Error>({
-		queryKey: [DISHES_QUERY_KEY.ALL],
-		queryFn: async ({ pageParam }) => {
+		queryKey: [DISHES_QUERY_KEY.ALL, normalizedSearchQuery, filterKey],
+		queryFn: async ({ pageParam = 1 }) => {
 			const response = await getAllDishes({
 				page: pageParam as number,
 				limit: LIMIT,
+				...(normalizedSearchQuery && { search: normalizedSearchQuery }),
+				...filters,
 			})
 			return response.data
 		},
@@ -40,6 +52,8 @@ export const useDishes = (dishId?: number) => {
 			lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
 		initialPageParam: 1,
 		enabled: !dishId,
+		staleTime: 30000,
+		refetchOnWindowFocus: false,
 	})
 
 	const dishQuery = useQuery<IDish, Error>({
@@ -49,6 +63,8 @@ export const useDishes = (dishId?: number) => {
 			return response.data
 		},
 		enabled: !!dishId,
+		staleTime: 30000,
+		refetchOnWindowFocus: false,
 	})
 
 	const handleDeleteDishSuccess = useCallback(() => {
@@ -79,12 +95,10 @@ export const useDishes = (dishId?: number) => {
 				[DISHES_QUERY_KEY.DETAIL, updatedDish.id],
 				updatedDish,
 			)
-
 			queryClient.setQueryData<InfiniteData<IDishListResponse>>(
-				[DISHES_QUERY_KEY.ALL],
+				[DISHES_QUERY_KEY.ALL, normalizedSearchQuery, filterKey],
 				oldData => {
 					if (!oldData) return oldData
-
 					return {
 						...oldData,
 						pages: oldData.pages.map((page: IDishListResponse) => ({
@@ -97,8 +111,9 @@ export const useDishes = (dishId?: number) => {
 				},
 			)
 		},
-		[showSuccess, queryClient],
+		[showSuccess, queryClient, normalizedSearchQuery, filterKey],
 	)
+
 	const handleDeleteDishFromCategoryError = useCallback(
 		(err: unknown) => showError(parseBackendError(err as IAxiosError).join('\n')),
 		[showError],

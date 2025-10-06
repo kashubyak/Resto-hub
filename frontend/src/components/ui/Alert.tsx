@@ -40,7 +40,6 @@ const CustomAlert = styled(Alert)(({ theme }) => ({
 		backgroundColor: 'var(--info)',
 		color: 'var(--stable-light)',
 	},
-	// Мобільні пристрої (до 600px)
 	[theme.breakpoints.down('sm')]: {
 		fontSize: '13px',
 		padding: '6px 35px 6px 8px',
@@ -50,7 +49,6 @@ const CustomAlert = styled(Alert)(({ theme }) => ({
 			fontSize: '18px',
 		},
 	},
-	// Дуже малі екрани (до 400px)
 	'@media (max-width: 400px)': {
 		fontSize: '12px',
 		padding: '5px 30px 5px 6px',

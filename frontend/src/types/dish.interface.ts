@@ -61,3 +61,14 @@ export interface IDishFormValues {
 	calories?: number | null
 	available: boolean
 }
+
+export interface IGetAllDishesParams {
+	page?: number
+	limit?: number
+	search?: string
+	minPrice?: number
+	maxPrice?: number
+	available?: boolean
+	sortBy?: string
+	order?: 'asc' | 'desc'
+}

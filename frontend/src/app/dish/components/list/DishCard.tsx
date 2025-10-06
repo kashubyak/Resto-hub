@@ -40,7 +40,7 @@ const DishCardComponent = ({ dish }: DishCardProps) => (
 					<span className='text-2xl font-bold text-primary'>${dish.price}</span>
 					<div className='flex flex-wrap gap-2'>
 						<span
-							className={`px-2 py-1 text-xs font-medium rounded-full ${
+							className={`px-2 py-1 stable-light text-xs font-medium rounded-full ${
 								dish.available ? 'bg-success' : 'bg-destructive'
 							}`}
 						>

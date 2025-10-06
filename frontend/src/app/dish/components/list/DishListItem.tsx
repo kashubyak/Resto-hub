@@ -43,7 +43,7 @@ const DishListItemComponent = ({ dish }: DishListItemProps) => (
 
 					<div className='flex flex-wrap gap-1.5 sm:gap-2'>
 						<span
-							className={`px-2 py-0.5 sm:py-1 text-xs font-medium rounded-full ${
+							className={`px-2 py-0.5 sm:py-1 stable-light  text-xs font-medium rounded-full ${
 								dish.available ? 'bg-success' : 'bg-destructive'
 							}`}
 						>
