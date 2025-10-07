@@ -6,10 +6,10 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import { Drawer, IconButton } from '@mui/material'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { BooleanFilter } from '../elements/Filters/BooleanFilter'
-import { RangeFilter } from '../elements/Filters/RangeFilter'
-import { SelectFilter } from '../elements/Filters/SelectFilter'
-import { Button } from './Button'
+import { Button } from '../../ui/Button'
+import { BooleanFilter } from './BooleanFilter'
+import { RangeFilter } from './RangeFilter'
+import { SelectFilter } from './SelectFilter'
 
 interface FilterDrawerProps {
 	filters: FilterConfig[]

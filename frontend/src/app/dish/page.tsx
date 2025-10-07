@@ -1,8 +1,8 @@
 'use client'
 
 import { dishFilters } from '@/components/elements/Filters/dish.filters'
+import { FilterDrawer } from '@/components/elements/Filters/FilterDrawer'
 import { Button } from '@/components/ui/Button'
-import { FilterDrawer } from '@/components/ui/FilterDrawer'
 import { SearchInput } from '@/components/ui/SearchInput'
 import type { FilterValues } from '@/types/filter.interface'
 import { useCallback, useState } from 'react'
