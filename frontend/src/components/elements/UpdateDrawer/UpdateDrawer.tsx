@@ -1,22 +1,17 @@
 'use client'
 
-import type {
-	UpdateFieldConfig,
-	UpdateFieldValue,
-	UpdateFormValues,
-} from '@/types/update-field.interface'
+import type { UpdateFormValues } from '@/types/update-field.interface'
 import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import { Drawer, IconButton } from '@mui/material'
-import { memo, useCallback, useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '../../ui/Button'
 
 interface UpdateDrawerProps {
 	open: boolean
 	onClose: () => void
 	title: string
-	fields: UpdateFieldConfig[]
 	initialValues?: UpdateFormValues
 	onSubmit: (values: UpdateFormValues) => Promise<void>
 	isLoading?: boolean
@@ -53,7 +48,6 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 	open,
 	onClose,
 	title,
-	fields,
 	initialValues = {},
 	onSubmit,
 	isLoading = false,
@@ -61,26 +55,23 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 	const [formValues, setFormValues] = useState<UpdateFormValues>(initialValues)
 
 	useEffect(() => {
-		if (open) {
-			setFormValues(initialValues)
-		}
+		if (open) setFormValues(initialValues)
 	}, [open, initialValues])
-
-	const handleChange = useCallback((key: string, value: UpdateFieldValue) => {
-		setFormValues(prev => ({
-			...prev,
-			[key]: value,
-		}))
-	}, [])
 
 	const handleSubmit = useCallback(async () => {
 		await onSubmit(formValues)
 		onClose()
 	}, [formValues, onSubmit, onClose])
 
-	const handleReset = useCallback(() => {
-		setFormValues(initialValues)
-	}, [initialValues])
+	const handleReset = useCallback(() => setFormValues(initialValues), [initialValues])
+
+	const hasActiveFilters = useMemo(
+		() =>
+			Object.values(formValues).some(
+				value => value !== undefined && value !== null && value !== '',
+			),
+		[formValues],
+	)
 
 	return (
 		<Drawer anchor='right' open={open} onClose={onClose} sx={drawerSx}>
@@ -101,12 +92,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 				</div>
 
 				<div className='flex-1 overflow-y-auto p-4'>
-					<div className='space-y-6'>
-						{/* TODO: Тут будуть поля */}
-						<div className='text-center text-muted-foreground py-8'>
-							Fields will be rendered here
-						</div>
-					</div>
+					<div className='space-y-6'>...</div>
 				</div>
 
 				<div className='p-4 border-t border-border space-y-2'>
@@ -114,10 +100,12 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 						<Button onClick={onClose} text='Cancel' disabled={isLoading} />
 						<Button onClick={handleSubmit} text='Save Changes' disabled={isLoading} />
 					</div>
-					<Button onClick={handleReset} disabled={isLoading}>
-						<RestartAltIcon fontSize='small' />
-						Reset to Initial
-					</Button>
+					{hasActiveFilters && (
+						<Button onClick={handleReset} disabled={isLoading}>
+							<RestartAltIcon fontSize='small' />
+							Reset to Initial
+						</Button>
+					)}
 				</div>
 			</div>
 		</Drawer>

@@ -20,11 +20,13 @@ export interface TextFieldConfig extends BaseUpdateFieldConfig {
 	type: 'text'
 	maxLength?: number
 }
+
 export interface TextAreaFieldConfig extends BaseUpdateFieldConfig {
 	type: 'textarea'
 	rows?: number
 	maxLength?: number
 }
+
 export interface NumberFieldConfig extends BaseUpdateFieldConfig {
 	type: 'number'
 	min?: number
@@ -47,13 +49,14 @@ export interface FileFieldConfig extends BaseUpdateFieldConfig {
 	type: 'file'
 	accept?: string
 	preview?: boolean
-	currentFileUrl: string
+	currentFileUrl?: string
 }
 
 export interface TagsFieldConfig extends BaseUpdateFieldConfig {
 	type: 'tags'
 	maxTags?: number
 }
+
 export type UpdateFieldConfig =
 	| TextFieldConfig
 	| TextAreaFieldConfig
@@ -71,4 +74,5 @@ export type UpdateFieldValue =
 	| string[]
 	| null
 	| undefined
+
 export type UpdateFormValues = Record<string, UpdateFieldValue>
