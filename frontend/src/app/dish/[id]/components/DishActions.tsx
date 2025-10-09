@@ -1,10 +1,12 @@
 'use client'
 
+import { UpdateDrawer } from '@/components/elements/UpdateDrawer/UpdateDrawer'
 import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useDishes } from '@/hooks/useDishes'
+import type { UpdateFormValues } from '@/types/update-field.interface'
 import { Category, Delete, Edit, RemoveCircle } from '@mui/icons-material'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 export const DishActions = ({ id }: { id: number }) => {
 	const { deleteDishMutation, deleteCategoryFromDishMutation } = useDishes()
@@ -12,6 +14,13 @@ export const DishActions = ({ id }: { id: number }) => {
 		deleteDish: false,
 		removeCategory: false,
 	})
+	const [updateDrawerOpen, setUpdateDrawerOpen] = useState(false)
+
+	const openUpdateDrawer = useCallback(() => setUpdateDrawerOpen(true), [])
+	const closeUpdateDrawer = useCallback(() => setUpdateDrawerOpen(false), [])
+	const handleUpdateSubmit = useCallback(async (value: UpdateFormValues) => {
+		console.log('Update dish', value)
+	}, [])
 
 	return (
 		<div className='px-4 lg:px-6 lg:pr-0 py-6 bg-muted/30'>
@@ -20,7 +29,7 @@ export const DishActions = ({ id }: { id: number }) => {
 				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2'>
 					<Button
 						className='h-10 inline-flex items-center justify-center font-semibold'
-						onClick={() => console.log('Update dish')}
+						onClick={openUpdateDrawer}
 					>
 						<Edit className='w-4 h-4 mr-2' />
 						Update Dish
@@ -50,6 +59,14 @@ export const DishActions = ({ id }: { id: number }) => {
 					</Button>
 				</div>
 			</div>
+			<UpdateDrawer
+				open={updateDrawerOpen}
+				onClose={closeUpdateDrawer}
+				title='Update Dish'
+				fields={[]}
+				onSubmit={handleUpdateSubmit}
+				isLoading={false}
+			/>
 			<ConfirmDialog
 				open={openConfirm.deleteDish}
 				onClose={() => setOpenConfirm(prev => ({ ...prev, deleteDish: false }))}
