@@ -1,70 +1,46 @@
-export type UpdateFieldType =
-	| 'text'
-	| 'textarea'
-	| 'number'
-	| 'switch'
-	| 'select'
-	| 'file'
-	| 'tags'
+export type UpdateSectionType =
+	| 'basic-info'
+	| 'pricing'
+	| 'ingredients'
+	| 'nutritional'
+	| 'image'
 
-export interface BaseUpdateFieldConfig {
-	key: string
-	label: string
-	type: UpdateFieldType
-	helperText?: string
-	disabled?: boolean
-	required?: boolean
+export interface BaseUpdateSectionConfig {
+	type: UpdateSectionType
+	component: string
 }
 
-export interface TextFieldConfig extends BaseUpdateFieldConfig {
-	type: 'text'
-	maxLength?: number
+export interface BasicInfoSectionConfig extends BaseUpdateSectionConfig {
+	type: 'basic-info'
+	component: 'BasicInformationSection'
 }
 
-export interface TextAreaFieldConfig extends BaseUpdateFieldConfig {
-	type: 'textarea'
-	rows?: number
-	maxLength?: number
+export interface PricingSectionConfig extends BaseUpdateSectionConfig {
+	type: 'pricing'
+	component: 'PricingCategorySection'
 }
 
-export interface NumberFieldConfig extends BaseUpdateFieldConfig {
-	type: 'number'
-	min?: number
-	max?: number
-	step?: number
-	suffix?: string
+export interface IngredientsSectionConfig extends BaseUpdateSectionConfig {
+	type: 'ingredients'
+	component: 'IngredientsSection'
 }
 
-export interface SwitchFieldConfig extends BaseUpdateFieldConfig {
-	type: 'switch'
+export interface NutritionalSectionConfig extends BaseUpdateSectionConfig {
+	type: 'nutritional'
+	component: 'NutritionalInfoSection'
 }
 
-export interface SelectFieldConfig extends BaseUpdateFieldConfig {
-	type: 'select'
-	options: Array<{ label: string; value: string | number }>
-	fetchOptions?: () => Promise<Array<{ label: string; value: string | number }>>
+export interface ImageSectionConfig extends BaseUpdateSectionConfig {
+	type: 'image'
+	component: 'ImageUploadSection'
 }
 
-export interface FileFieldConfig extends BaseUpdateFieldConfig {
-	type: 'file'
-	accept?: string
-	preview?: boolean
-	currentFileUrl?: string
-}
-
-export interface TagsFieldConfig extends BaseUpdateFieldConfig {
-	type: 'tags'
-	maxTags?: number
-}
-
-export type UpdateFieldConfig =
-	| TextFieldConfig
-	| TextAreaFieldConfig
-	| NumberFieldConfig
-	| SwitchFieldConfig
-	| SelectFieldConfig
-	| FileFieldConfig
-	| TagsFieldConfig
+export type UpdateSectionConfig =
+	| BasicInfoSectionConfig
+	| PricingSectionConfig
+	| IngredientsSectionConfig
+	| NutritionalSectionConfig
+	| ImageSectionConfig
 
 export type UpdateFieldValue =
 	| string
