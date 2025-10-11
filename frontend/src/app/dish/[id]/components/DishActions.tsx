@@ -1,12 +1,12 @@
 'use client'
 
+import { dishUpdateConfig } from '@/components/elements/UpdateDrawer/dish.update-config'
 import { UpdateDrawer } from '@/components/elements/UpdateDrawer/UpdateDrawer'
 import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useDishes } from '@/hooks/useDishes'
-import type { UpdateFormValues } from '@/types/update-field.interface'
 import { Category, Delete, Edit, RemoveCircle } from '@mui/icons-material'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 export const DishActions = ({ id }: { id: number }) => {
 	const { deleteDishMutation, deleteCategoryFromDishMutation, dishQuery } = useDishes(id)
@@ -18,26 +18,6 @@ export const DishActions = ({ id }: { id: number }) => {
 
 	const openUpdateDrawer = useCallback(() => setUpdateDrawerOpen(true), [])
 	const closeUpdateDrawer = useCallback(() => setUpdateDrawerOpen(false), [])
-
-	const initialValues = useMemo<UpdateFormValues>(() => {
-		if (!dishQuery.data) return {}
-
-		return {
-			name: dishQuery.data.name,
-			description: dishQuery.data.description,
-			price: dishQuery.data.price,
-			categoryId: dishQuery.data.categoryId,
-			ingredients: dishQuery.data.ingredients,
-			imageUrl: dishQuery.data.imageUrl,
-			weightGr: dishQuery.data.weightGr,
-			calories: dishQuery.data.calories,
-			available: dishQuery.data.available,
-		}
-	}, [dishQuery.data])
-
-	const handleUpdateSubmit = useCallback(async (values: UpdateFormValues) => {
-		console.log('Update dish with values:', values)
-	}, [])
 
 	return (
 		<>
@@ -83,8 +63,8 @@ export const DishActions = ({ id }: { id: number }) => {
 				open={updateDrawerOpen}
 				onClose={closeUpdateDrawer}
 				title='Update Dish'
-				initialValues={initialValues}
-				onSubmit={handleUpdateSubmit}
+				sections={dishUpdateConfig}
+				dishData={dishQuery.data}
 				isLoading={false}
 			/>
 
