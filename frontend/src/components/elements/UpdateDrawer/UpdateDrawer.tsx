@@ -1,19 +1,22 @@
 'use client'
 
-import type { UpdateFormValues } from '@/types/update-field.interface'
+import { BasicInformationSection } from '@/app/dish/components/modal/BasicInformationSection'
+import { useUpdateDish } from '@/hooks/useUpdateDish'
+import type { IDish } from '@/types/dish.interface'
+import type { UpdateSectionConfig } from '@/types/update-field.interface'
 import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import { Drawer, IconButton } from '@mui/material'
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback } from 'react'
 import { Button } from '../../ui/Button'
 
 interface UpdateDrawerProps {
 	open: boolean
 	onClose: () => void
 	title: string
-	initialValues?: UpdateFormValues
-	onSubmit: (values: UpdateFormValues) => Promise<void>
+	sections: UpdateSectionConfig[]
+	dishData?: IDish
 	isLoading?: boolean
 }
 
@@ -48,34 +51,51 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 	open,
 	onClose,
 	title,
-	initialValues = {},
-	onSubmit,
+	sections,
+	dishData,
 	isLoading = false,
 }) => {
-	const [formValues, setFormValues] = useState<UpdateFormValues>(initialValues)
+	const { onSubmit, handleSubmit, control, errors, watch, isDirty, reset } =
+		useUpdateDish(dishData, onClose)
 
-	useEffect(() => {
-		if (open) setFormValues(initialValues)
-	}, [open, initialValues])
+	const handleReset = useCallback(() => {
+		if (dishData) {
+			reset({
+				name: dishData.name,
+				description: dishData.description,
+				price: dishData.price,
+				categoryId: dishData.categoryId || undefined,
+				ingredients: dishData.ingredients,
+				weightGr: dishData.weightGr || undefined,
+				calories: dishData.calories || undefined,
+				available: dishData.available,
+			})
+		}
+	}, [dishData, reset])
 
-	const handleSubmit = useCallback(async () => {
-		await onSubmit(formValues)
-		onClose()
-	}, [formValues, onSubmit, onClose])
-
-	const handleReset = useCallback(() => setFormValues(initialValues), [initialValues])
-
-	const hasActiveFilters = useMemo(
-		() =>
-			Object.values(formValues).some(
-				value => value !== undefined && value !== null && value !== '',
-			),
-		[formValues],
+	const renderSection = useCallback(
+		(config: UpdateSectionConfig) => {
+			switch (config.type) {
+				case 'basic-info':
+					return (
+						<BasicInformationSection
+							key={config.type}
+							control={control}
+							errors={errors}
+							watch={watch}
+							mode='update'
+						/>
+					)
+				default:
+					return null
+			}
+		},
+		[control, errors, watch],
 	)
 
 	return (
 		<Drawer anchor='right' open={open} onClose={onClose} sx={drawerSx}>
-			<div className='flex flex-col h-full'>
+			<form onSubmit={handleSubmit(onSubmit)} className='flex flex-col h-full'>
 				<div className='flex items-center justify-between p-4 border-b border-border'>
 					<h2 className='text-xl font-bold flex items-center gap-2'>
 						<EditIcon />
@@ -92,22 +112,22 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 				</div>
 
 				<div className='flex-1 overflow-y-auto p-4'>
-					<div className='space-y-6'>...</div>
+					<div className='space-y-6'>{sections.map(renderSection)}</div>
 				</div>
 
 				<div className='p-4 border-t border-border space-y-2'>
 					<div className='flex justify-between gap-2'>
-						<Button onClick={onClose} text='Cancel' disabled={isLoading} />
-						<Button onClick={handleSubmit} text='Save Changes' disabled={isLoading} />
+						<Button type='button' onClick={onClose} text='Cancel' disabled={isLoading} />
+						<Button type='submit' text='Save Changes' disabled={isLoading} />
 					</div>
-					{hasActiveFilters && (
-						<Button onClick={handleReset} disabled={isLoading}>
+					{isDirty && (
+						<Button type='button' onClick={handleReset} disabled={isLoading}>
 							<RestartAltIcon fontSize='small' />
 							Reset to Initial
 						</Button>
 					)}
 				</div>
-			</div>
+			</form>
 		</Drawer>
 	)
 }
