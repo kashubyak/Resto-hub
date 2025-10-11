@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/Input'
 import type { IDishFormValues } from '@/types/dish.interface'
 import { dishNameValidation } from '@/validation/dish.validation'
 import { useMediaQuery, useTheme } from '@mui/material'
+import { useMemo } from 'react'
 import type { Control, FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 
@@ -27,8 +28,11 @@ export const BasicInformationSection = ({
 	const theme = useTheme()
 	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-	const descriptionValue =
-		(watch ? watch('description') : control?._formValues?.description) || ''
+	const descriptionValue = useMemo(() => {
+		if (watch) return watch('description') || ''
+		return ''
+	}, [watch])
+
 	const descriptionLength = descriptionValue.length
 
 	return (
