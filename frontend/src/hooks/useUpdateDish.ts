@@ -2,7 +2,7 @@ import { useAlert } from '@/providers/AlertContext'
 import type { IDish, IDishFormValues } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDishes } from './useDishes'
 
@@ -19,22 +19,32 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 		watch,
 	} = useForm<IDishFormValues>({
 		mode: 'onChange',
-		defaultValues: dishData
-			? {
-					name: dishData.name,
-					description: dishData.description,
-					price: dishData.price,
-					categoryId: dishData.categoryId || undefined,
-					ingredients: dishData.ingredients,
-					weightGr: dishData.weightGr || undefined,
-					calories: dishData.calories || undefined,
-					available: dishData.available,
-			  }
-			: {
-					ingredients: [],
-					available: true,
-			  },
+		defaultValues: {
+			name: '',
+			description: '',
+			price: 0,
+			categoryId: undefined,
+			ingredients: [],
+			weightGr: undefined,
+			calories: undefined,
+			available: true,
+		},
 	})
+
+	useEffect(() => {
+		if (dishData) {
+			reset({
+				name: dishData.name,
+				description: dishData.description,
+				price: dishData.price,
+				categoryId: dishData.categoryId || undefined,
+				ingredients: dishData.ingredients,
+				weightGr: dishData.weightGr || undefined,
+				calories: dishData.calories || undefined,
+				available: dishData.available,
+			})
+		}
+	}, [dishData, reset])
 
 	const onSubmit = useCallback(
 		async (data: IDishFormValues) => {
@@ -49,6 +59,7 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 		},
 		[showSuccess, showError, refetchDishes, onClose],
 	)
+
 	return {
 		onSubmit,
 		errors,
