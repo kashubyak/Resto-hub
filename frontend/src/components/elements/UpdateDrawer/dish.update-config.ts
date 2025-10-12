@@ -9,4 +9,8 @@ export const dishUpdateConfig: UpdateSectionConfig[] = [
 		type: 'pricing',
 		component: 'PricingCategorySection',
 	},
+	{
+		type: 'nutritional',
+		component: 'NutritionalInfoSection',
+	},
 ] as const

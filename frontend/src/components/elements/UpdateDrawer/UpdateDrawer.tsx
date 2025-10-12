@@ -1,6 +1,7 @@
 'use client'
 
 import { BasicInformationSection } from '@/app/dish/components/modal/BasicInformationSection'
+import { NutritionalInfoSection } from '@/app/dish/components/modal/NutritionalInfoSection'
 import { PricingCategorySection } from '@/app/dish/components/modal/PricingCategorySection'
 import { useUpdateDish } from '@/hooks/useUpdateDish'
 import type { IDish } from '@/types/dish.interface'
@@ -90,6 +91,15 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 				case 'pricing':
 					return (
 						<PricingCategorySection
+							key={config.type}
+							control={control}
+							errors={errors}
+							mode='update'
+						/>
+					)
+				case 'nutritional':
+					return (
+						<NutritionalInfoSection
 							key={config.type}
 							control={control}
 							errors={errors}
