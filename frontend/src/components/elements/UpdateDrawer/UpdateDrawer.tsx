@@ -1,6 +1,7 @@
 'use client'
 
 import { BasicInformationSection } from '@/app/dish/components/modal/BasicInformationSection'
+import { IngredientsSection } from '@/app/dish/components/modal/IngredientsSection'
 import { NutritionalInfoSection } from '@/app/dish/components/modal/NutritionalInfoSection'
 import { PricingCategorySection } from '@/app/dish/components/modal/PricingCategorySection'
 import { useUpdateDish } from '@/hooks/useUpdateDish'
@@ -57,8 +58,17 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 	dishData,
 	isLoading = false,
 }) => {
-	const { onSubmit, handleSubmit, control, errors, watch, isDirty, reset } =
-		useUpdateDish(dishData, onClose)
+	const {
+		onSubmit,
+		handleSubmit,
+		control,
+		errors,
+		watch,
+		isDirty,
+		reset,
+		setError,
+		clearErrors,
+	} = useUpdateDish(dishData, onClose)
 
 	const handleReset = useCallback(() => {
 		if (dishData) {
@@ -97,6 +107,16 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 							mode='update'
 						/>
 					)
+				case 'ingredients':
+					return (
+						<IngredientsSection
+							key={config.type}
+							control={control}
+							errors={errors}
+							setError={setError}
+							clearErrors={clearErrors}
+						/>
+					)
 				case 'nutritional':
 					return (
 						<NutritionalInfoSection
@@ -110,7 +130,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 					return null
 			}
 		},
-		[control, errors, watch],
+		[control, errors, watch, setError, clearErrors],
 	)
 
 	return (

@@ -16,7 +16,7 @@ type NutritionalInfoSectionProps = {
 	register?: UseFormRegister<IDishFormValues>
 	control?: Control<IDishFormValues>
 	errors: FieldErrors<IDishFormValues>
-	mode: 'create' | 'update'
+	mode?: 'create' | 'update'
 }
 
 const NutritionalInfoSectionFunction = ({

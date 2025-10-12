@@ -15,7 +15,7 @@ import {
 import { IngredientChip } from './IngredientChip'
 
 type IngredientsSectionProps = {
-	control: Control<IDishFormValues>
+	control?: Control<IDishFormValues>
 	errors: FieldErrors<IDishFormValues>
 	setError: UseFormSetError<IDishFormValues>
 	clearErrors: UseFormClearErrors<IDishFormValues>
@@ -147,6 +147,8 @@ export const IngredientsSection = ({
 		},
 		[draggedIndex],
 	)
+
+	if (!control) return null
 
 	return (
 		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
