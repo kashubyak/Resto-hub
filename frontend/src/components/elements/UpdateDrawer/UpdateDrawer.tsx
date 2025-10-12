@@ -1,6 +1,7 @@
 'use client'
 
 import { BasicInformationSection } from '@/app/dish/components/modal/BasicInformationSection'
+import { ImageUploadSection } from '@/app/dish/components/modal/ImageUploadSection'
 import { IngredientsSection } from '@/app/dish/components/modal/IngredientsSection'
 import { NutritionalInfoSection } from '@/app/dish/components/modal/NutritionalInfoSection'
 import { PricingCategorySection } from '@/app/dish/components/modal/PricingCategorySection'
@@ -126,11 +127,21 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 							mode='update'
 						/>
 					)
+				case 'image':
+					return (
+						<ImageUploadSection
+							key={config.type}
+							control={control}
+							errors={errors}
+							mode='update'
+							currentImageUrl={dishData?.imageUrl ?? null}
+						/>
+					)
 				default:
 					return null
 			}
 		},
-		[control, errors, watch, setError, clearErrors],
+		[control, errors, watch, setError, clearErrors, dishData?.imageUrl],
 	)
 
 	return (

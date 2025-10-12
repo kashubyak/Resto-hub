@@ -14,6 +14,10 @@ export const dishUpdateConfig: UpdateSectionConfig[] = [
 		component: 'IngredientsSection',
 	},
 	{
+		type: 'image',
+		component: 'ImageUploadSection',
+	},
+	{
 		type: 'nutritional',
 		component: 'NutritionalInfoSection',
 	},
