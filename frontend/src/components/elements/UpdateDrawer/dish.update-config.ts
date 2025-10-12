@@ -5,4 +5,8 @@ export const dishUpdateConfig: UpdateSectionConfig[] = [
 		type: 'basic-info',
 		component: 'BasicInformationSection',
 	},
+	{
+		type: 'pricing',
+		component: 'PricingCategorySection',
+	},
 ] as const

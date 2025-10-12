@@ -1,4 +1,5 @@
 'use client'
+
 import { Input } from '@/components/ui/Input'
 import type { IDishFormValues } from '@/types/dish.interface'
 import { categoryIdValidation, priceValidation } from '@/validation/dish.validation'
@@ -20,15 +21,17 @@ import {
 } from 'react-hook-form'
 
 type PricingCategorySectionProps = {
-	register: UseFormRegister<IDishFormValues>
-	errors: FieldErrors<IDishFormValues>
+	register?: UseFormRegister<IDishFormValues>
 	control: Control<IDishFormValues>
+	errors: FieldErrors<IDishFormValues>
+	mode?: 'create' | 'update'
 }
 
 const PricingCategorySectionFunction = ({
 	register,
-	errors,
 	control,
+	errors,
+	mode = 'create',
 }: PricingCategorySectionProps) => {
 	const theme = useTheme()
 	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -44,21 +47,56 @@ const PricingCategorySectionFunction = ({
 			</h3>
 			<div
 				className={`grid ${
-					isFullScreen ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-6'
+					isFullScreen || mode === 'update'
+						? 'grid-cols-1 gap-4'
+						: 'grid-cols-1 md:grid-cols-2 gap-6'
 				}`}
 			>
-				<Input
-					register={register('price', priceValidation)}
-					label='Price ($)'
-					type='number'
-					error={errors.price?.message}
-				/>
-				<Input
-					register={register('categoryId', categoryIdValidation)}
-					label='Category ID'
-					type='number'
-					error={errors.categoryId?.message}
-				/>
+				{mode === 'create' && register ? (
+					<>
+						<Input
+							register={register('price', priceValidation)}
+							label='Price ($)'
+							type='number'
+							error={errors.price?.message}
+						/>
+						<Input
+							register={register('categoryId', categoryIdValidation)}
+							label='Category ID'
+							type='number'
+							error={errors.categoryId?.message}
+						/>
+					</>
+				) : (
+					<>
+						<Controller
+							name='price'
+							control={control}
+							rules={priceValidation}
+							render={({ field }) => (
+								<Input
+									{...field}
+									label='Price ($)'
+									type='number'
+									error={errors.price?.message}
+								/>
+							)}
+						/>
+						<Controller
+							name='categoryId'
+							control={control}
+							rules={categoryIdValidation}
+							render={({ field }) => (
+								<Input
+									{...field}
+									label='Category ID'
+									type='number'
+									error={errors.categoryId?.message}
+								/>
+							)}
+						/>
+					</>
+				)}
 			</div>
 
 			<div className={isFullScreen ? 'mt-4' : 'mt-6'}>
@@ -152,4 +190,5 @@ const PricingCategorySectionFunction = ({
 		</div>
 	)
 }
+
 export const PricingCategorySection = memo(PricingCategorySectionFunction)
