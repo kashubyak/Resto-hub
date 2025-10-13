@@ -1,4 +1,5 @@
 import { useAlert } from '@/providers/AlertContext'
+import { updateDishService } from '@/services/dish/update-dish.service'
 import type { IDish, IDishFormValues } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
@@ -9,9 +10,10 @@ import { useDishes } from './useDishes'
 export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
 	const { refetchDishes } = useDishes()
+
 	const {
 		handleSubmit,
-		formState: { errors, isDirty },
+		formState: { errors, isDirty, dirtyFields },
 		reset,
 		control,
 		setError,
@@ -47,9 +49,23 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 	}, [dishData, reset])
 
 	const onSubmit = useCallback(
-		async (data: IDishFormValues) => {
+		async (formData: IDishFormValues) => {
 			try {
-				console.log(data)
+				if (!dishData) return
+
+				const changedData: Partial<IDishFormValues> & { id: number } = {
+					id: dishData.id,
+				}
+				if (dirtyFields.name) changedData.name = formData.name
+				if (dirtyFields.description) changedData.description = formData.description
+				if (dirtyFields.price) changedData.price = formData.price
+				if (dirtyFields.categoryId) changedData.categoryId = formData.categoryId
+				if (dirtyFields.ingredients) changedData.ingredients = formData.ingredients
+				if (dirtyFields.weightGr) changedData.weightGr = formData.weightGr
+				if (dirtyFields.calories) changedData.calories = formData.calories
+				if (dirtyFields.available) changedData.available = formData.available
+
+				await updateDishService(changedData)
 				showSuccess('Dish updated successfully')
 				refetchDishes()
 				onClose()
@@ -57,7 +73,7 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 				showError(parseBackendError(err as IAxiosError).join('\n'))
 			}
 		},
-		[showSuccess, showError, refetchDishes, onClose],
+		[showSuccess, showError, refetchDishes, onClose, dishData, dirtyFields],
 	)
 
 	return {

@@ -72,3 +72,16 @@ export interface IGetAllDishesParams {
 	sortBy?: string
 	order?: 'asc' | 'desc'
 }
+
+export interface IUpdateDishPayload {
+	id: number
+	name?: string
+	description?: string
+	price?: number
+	categoryId?: number | null
+	ingredients?: string[]
+	image?: File
+	weightGr?: number | null
+	calories?: number | null
+	available?: boolean
+}
