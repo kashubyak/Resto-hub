@@ -3,6 +3,7 @@ import { updateDishService } from '@/services/dish/update-dish.service'
 import type { IDish, IDishFormValues } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
+import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDishes } from './useDishes'
@@ -10,6 +11,8 @@ import { useDishes } from './useDishes'
 export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
 	const { refetchDishes } = useDishes()
+	const queryClient = useQueryClient()
+	const { updateDishCache } = useDishes()
 
 	const {
 		handleSubmit,
@@ -68,7 +71,8 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 					changedData.available = formData.available
 				if (dirtyFields.imageUrl) changedData.imageUrl = formData.imageUrl
 
-				await updateDishService(changedData)
+				const { data } = await updateDishService(changedData)
+				updateDishCache(queryClient, data)
 				showSuccess('Dish updated successfully')
 				refetchDishes()
 				onClose()
@@ -76,7 +80,16 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 				showError(parseBackendError(err as IAxiosError).join('\n'))
 			}
 		},
-		[showSuccess, showError, refetchDishes, onClose, dishData, dirtyFields],
+		[
+			showSuccess,
+			showError,
+			refetchDishes,
+			onClose,
+			dishData,
+			dirtyFields,
+			queryClient,
+			updateDishCache,
+		],
 	)
 
 	return {
