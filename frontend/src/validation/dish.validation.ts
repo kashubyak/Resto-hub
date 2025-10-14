@@ -41,12 +41,19 @@ export const caloriesValidation = {
 
 export const priceValidation = {
 	required: 'Dish price is required',
-	valueAsNumber: true,
-	validate: {
-		isPositive: (value: number | undefined) =>
-			(typeof value === 'number' && value > 0) || 'Price must be greater than 0',
-		isNumber: (value: number | undefined) =>
-			(typeof value === 'number' && !isNaN(value)) || 'Price must be a number',
+	validate: (value: string | number | undefined) => {
+		if (value === undefined || value === null || value === '')
+			return 'Dish price is required'
+		const valueStr = String(value).replace(',', '.')
+		if (!/^\d*\.?\d*$/.test(valueStr)) return 'Price must be a valid number'
+
+		const num = parseFloat(valueStr)
+		if (isNaN(num)) return 'Price must be a valid number'
+		if (num <= 0) return 'Price must be greater than 0'
+		if (!/^\d+(\.\d{1,2})?$/.test(valueStr))
+			return 'Price can have up to two decimal places'
+
+		return true
 	},
 }
 
