@@ -56,6 +56,7 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 				const changedData: Partial<IDishFormValues> & { id: number } = {
 					id: dishData.id,
 				}
+
 				if (dirtyFields.name) changedData.name = formData.name
 				if (dirtyFields.description) changedData.description = formData.description
 				if (dirtyFields.price) changedData.price = formData.price
@@ -63,7 +64,9 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 				if (dirtyFields.ingredients) changedData.ingredients = formData.ingredients
 				if (dirtyFields.weightGr) changedData.weightGr = formData.weightGr
 				if (dirtyFields.calories) changedData.calories = formData.calories
-				if (dirtyFields.available) changedData.available = formData.available
+				if (dirtyFields.available !== undefined)
+					changedData.available = formData.available
+				if (dirtyFields.imageUrl) changedData.imageUrl = formData.imageUrl
 
 				await updateDishService(changedData)
 				showSuccess('Dish updated successfully')

@@ -3,7 +3,7 @@
 import { UploadImage } from '@/components/elements/UploadImage'
 import type { IDishFormValues } from '@/types/dish.interface'
 import { imageValidation } from '@/validation/dish.validation'
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import {
 	Controller,
 	type ChangeHandler,
@@ -41,6 +41,11 @@ const ImageUploadSectionFunction = ({
 		[onChangeOutside],
 	)
 
+	const validationRules = useMemo(
+		() => (mode === 'update' ? {} : imageValidation),
+		[mode],
+	)
+
 	if (control) {
 		return (
 			<div className='mb-6'>
@@ -51,7 +56,7 @@ const ImageUploadSectionFunction = ({
 					<Controller
 						name='imageUrl'
 						control={control}
-						rules={imageValidation}
+						rules={validationRules}
 						render={({ field }) => {
 							const { onChange, onBlur, ref, name } = field
 
@@ -81,6 +86,11 @@ const ImageUploadSectionFunction = ({
 							)
 						}}
 					/>
+					{mode === 'update' && currentImageUrl && (
+						<p className='text-xs text-muted-foreground mt-2'>
+							💡 Leave empty to keep current image
+						</p>
+					)}
 				</div>
 			</div>
 		)

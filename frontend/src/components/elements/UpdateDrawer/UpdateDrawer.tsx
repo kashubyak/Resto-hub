@@ -86,6 +86,18 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 		}
 	}, [dishData, reset])
 
+	const handleFormSubmit = useCallback(
+		async (e: React.FormEvent) => {
+			e.preventDefault()
+			console.log('Form submit triggered')
+			console.log('Errors:', errors)
+			console.log('isDirty:', isDirty)
+
+			await handleSubmit(onSubmit)(e)
+		},
+		[handleSubmit, onSubmit, errors, isDirty],
+	)
+
 	const renderSection = useCallback(
 		(config: UpdateSectionConfig) => {
 			switch (config.type) {
@@ -146,7 +158,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 
 	return (
 		<Drawer anchor='right' open={open} onClose={onClose} sx={drawerSx}>
-			<form onSubmit={handleSubmit(onSubmit)} className='flex flex-col h-full'>
+			<form onSubmit={handleFormSubmit} className='flex flex-col h-full'>
 				<div className='flex items-center justify-between p-4 border-b border-border'>
 					<h2 className='text-xl font-bold flex items-center gap-2'>
 						<EditIcon />
@@ -169,7 +181,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 				<div className='p-4 border-t border-border space-y-2'>
 					<div className='flex justify-between gap-2'>
 						<Button type='button' onClick={onClose} text='Cancel' disabled={isLoading} />
-						<Button type='submit' text='Save Changes' disabled={isLoading} />
+						<Button type='submit' text='Update dish' disabled={isLoading || !isDirty} />
 					</div>
 					{isDirty && (
 						<Button type='button' onClick={handleReset} disabled={isLoading}>
