@@ -1,14 +1,7 @@
 'use client'
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
-import {
-	IconButton,
-	InputAdornment,
-	TextField,
-	useMediaQuery,
-	useTheme,
-	type TextFieldProps,
-} from '@mui/material'
+import { IconButton, InputAdornment, TextField, type TextFieldProps } from '@mui/material'
 import { memo, useCallback, useMemo, useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
@@ -24,8 +17,6 @@ type InputProps = {
 export const Input = memo<InputProps>(
 	({ register, error, type = 'text', multiline = false, rows = 4, size, ...rest }) => {
 		const [showPassword, setShowPassword] = useState(false)
-		const theme = useTheme()
-		const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
 		const finalSize = size || 'medium'
 		const isPasswordField = type === 'password' && !multiline
@@ -120,11 +111,10 @@ export const Input = memo<InputProps>(
 				'& .MuiFormHelperText-root': {
 					display: 'none',
 				},
-				minWidth: isMobile ? '100%' : '300px',
 				maxWidth: '100%',
 				...rest.sx,
 			}),
-			[error, isMobile, rest.sx],
+			[error, rest.sx],
 		)
 
 		return (

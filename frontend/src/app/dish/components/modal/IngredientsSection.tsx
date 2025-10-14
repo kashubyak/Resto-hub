@@ -190,6 +190,7 @@ export const IngredientsSection = ({
 							<IconButton
 								onClick={() => handleAdd(value, onChange)}
 								sx={{
+									flexShrink: 0,
 									mt: isFullScreen ? 0 : 1,
 									alignSelf: isFullScreen ? 'center' : 'flex-start',
 									borderRadius: '8px',
