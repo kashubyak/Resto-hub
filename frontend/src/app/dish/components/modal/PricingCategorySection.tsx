@@ -59,10 +59,6 @@ const PricingCategorySectionFunction = ({
 							label='Price ($)'
 							type='number'
 							error={errors.price?.message}
-							inputProps={{
-								step: '0.01',
-								inputMode: 'decimal',
-							}}
 						/>
 						<Input
 							register={register('categoryId', categoryIdValidation)}
@@ -83,10 +79,6 @@ const PricingCategorySectionFunction = ({
 									label='Price ($)'
 									type='number'
 									error={errors.price?.message}
-									inputProps={{
-										step: '0.01',
-										inputMode: 'decimal',
-									}}
 								/>
 							)}
 						/>
