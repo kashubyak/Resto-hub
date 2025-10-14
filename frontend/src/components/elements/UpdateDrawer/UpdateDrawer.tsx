@@ -89,13 +89,9 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 	const handleFormSubmit = useCallback(
 		async (e: React.FormEvent) => {
 			e.preventDefault()
-			console.log('Form submit triggered')
-			console.log('Errors:', errors)
-			console.log('isDirty:', isDirty)
-
 			await handleSubmit(onSubmit)(e)
 		},
-		[handleSubmit, onSubmit, errors, isDirty],
+		[handleSubmit, onSubmit],
 	)
 
 	const renderSection = useCallback(
