@@ -10,7 +10,7 @@ import { memo } from 'react'
 type DishCardProps = { dish: IDish }
 
 const DishCardComponent = ({ dish }: DishCardProps) => (
-	<div className='bg-background border border-border rounded-md shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group'>
+	<div className='bg-background border border-border rounded-md shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group h-full'>
 		<div className='w-full relative'>
 			<Image
 				src={dish.imageUrl}
