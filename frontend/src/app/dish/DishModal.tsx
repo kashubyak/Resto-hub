@@ -111,7 +111,6 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 						<BasicInformationSection register={register} errors={errors} watch={watch} />
 						<PricingCategorySection
 							register={register}
-							errors={errors}
 							control={control}
 						/>
 						<IngredientsSection
