@@ -100,7 +100,10 @@ const DishListComponent: React.FC<DishListProps> = ({
 				</div>
 			)}
 
-			<div ref={loaderRef} className='h-12 flex items-center justify-center'>
+			<div
+				ref={loaderRef}
+				className={isFetchingNextPage ? 'h-12 flex items-center justify-center' : 'h-1'}
+			>
 				{isFetchingNextPage && (
 					<div className='animate-spin rounded-full h-8 w-8 border-4 border-[var(--primary)] border-t-transparent' />
 				)}
