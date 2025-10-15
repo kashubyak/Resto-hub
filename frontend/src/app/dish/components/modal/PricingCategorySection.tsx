@@ -25,6 +25,7 @@ type PricingCategorySectionProps = {
 	control: Control<IDishFormValues>
 	errors: FieldErrors<IDishFormValues>
 	mode?: 'create' | 'update'
+	trigger: (field: keyof IDishFormValues) => Promise<boolean>
 }
 
 const PricingCategorySectionFunction = ({
@@ -32,6 +33,7 @@ const PricingCategorySectionFunction = ({
 	control,
 	errors,
 	mode = 'create',
+	trigger,
 }: PricingCategorySectionProps) => {
 	const theme = useTheme()
 	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -73,15 +75,21 @@ const PricingCategorySectionFunction = ({
 							name='price'
 							control={control}
 							rules={priceValidation}
-							render={({ field }) => (
+							render={({ field, fieldState }) => (
 								<Input
-									{...field}
 									label='Price ($)'
-									type='number'
-									error={errors.price?.message}
+									type='text'
+									value={field.value ?? ''}
+									error={fieldState.error?.message}
+									onChange={e => {
+										const v = e.target.value.replace(',', '.')
+										field.onChange(v)
+									}}
+									onBlur={() => trigger('price')}
 								/>
 							)}
 						/>
+
 						<Controller
 							name='categoryId'
 							control={control}

@@ -69,6 +69,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 		reset,
 		setError,
 		clearErrors,
+		trigger,
 	} = useUpdateDish(dishData, onClose)
 
 	const handleReset = useCallback(() => {
@@ -114,6 +115,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 							control={control}
 							errors={errors}
 							mode='update'
+							trigger={trigger}
 						/>
 					)
 				case 'ingredients':
@@ -149,7 +151,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 					return null
 			}
 		},
-		[control, errors, watch, setError, clearErrors, dishData?.imageUrl],
+		[control, errors, watch, setError, clearErrors, dishData?.imageUrl, trigger],
 	)
 
 	return (

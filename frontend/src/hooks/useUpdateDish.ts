@@ -22,12 +22,13 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 		setError,
 		clearErrors,
 		watch,
+		trigger,
 	} = useForm<IDishFormValues>({
 		mode: 'onChange',
 		defaultValues: {
 			name: '',
 			description: '',
-			price: 0,
+			price: '',
 			categoryId: undefined,
 			ingredients: [],
 			weightGr: undefined,
@@ -102,5 +103,6 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 		watch,
 		isDirty,
 		reset,
+		trigger,
 	}
 }

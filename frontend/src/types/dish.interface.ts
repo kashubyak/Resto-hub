@@ -53,7 +53,7 @@ export type IDishListResponse = IPaginatedResponse<IDish>
 export interface IDishFormValues {
 	name: string
 	description: string
-	price: number
+	price: number | string
 	categoryId?: number | null
 	ingredients: string[]
 	imageUrl: FileList
