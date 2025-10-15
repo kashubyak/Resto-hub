@@ -113,7 +113,6 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 						<PricingCategorySection
 							key={config.type}
 							control={control}
-							errors={errors}
 							mode='update'
 							trigger={trigger}
 						/>

@@ -13,25 +13,18 @@ import {
 	useTheme,
 } from '@mui/material'
 import { memo } from 'react'
-import {
-	Controller,
-	type Control,
-	type FieldErrors,
-	type UseFormRegister,
-} from 'react-hook-form'
+import { Controller, type Control, type UseFormRegister } from 'react-hook-form'
 
 type PricingCategorySectionProps = {
 	register?: UseFormRegister<IDishFormValues>
 	control: Control<IDishFormValues>
-	errors: FieldErrors<IDishFormValues>
 	mode?: 'create' | 'update'
-	trigger: (field: keyof IDishFormValues) => Promise<boolean>
+	trigger?: (field: keyof IDishFormValues) => Promise<boolean>
 }
 
 const PricingCategorySectionFunction = ({
 	register,
 	control,
-	errors,
 	mode = 'create',
 	trigger,
 }: PricingCategorySectionProps) => {
@@ -56,17 +49,42 @@ const PricingCategorySectionFunction = ({
 			>
 				{mode === 'create' && register ? (
 					<>
-						<Input
-							register={register('price', priceValidation)}
-							label='Price ($)'
-							type='number'
-							error={errors.price?.message}
+						<Controller
+							name='price'
+							control={control}
+							rules={priceValidation}
+							render={({ field, fieldState }) => (
+								<Input
+									{...field}
+									label='Price ($)'
+									type='text'
+									value={field.value ?? ''}
+									error={fieldState.error?.message}
+									onChange={e => {
+										const v = e.target.value.replace(',', '.')
+										field.onChange(v)
+									}}
+								/>
+							)}
 						/>
-						<Input
-							register={register('categoryId', categoryIdValidation)}
-							label='Category ID'
-							type='number'
-							error={errors.categoryId?.message}
+
+						<Controller
+							name='categoryId'
+							control={control}
+							rules={categoryIdValidation}
+							render={({ field, fieldState }) => (
+								<Input
+									{...field}
+									label='Category ID'
+									type='number'
+									value={field.value ?? ''}
+									error={fieldState.error?.message}
+									onChange={e => {
+										const val = e.target.value === '' ? undefined : Number(e.target.value)
+										field.onChange(val)
+									}}
+								/>
+							)}
 						/>
 					</>
 				) : (
@@ -85,7 +103,7 @@ const PricingCategorySectionFunction = ({
 										const v = e.target.value.replace(',', '.')
 										field.onChange(v)
 									}}
-									onBlur={() => trigger('price')}
+									onBlur={() => trigger?.('price')}
 								/>
 							)}
 						/>
@@ -94,12 +112,13 @@ const PricingCategorySectionFunction = ({
 							name='categoryId'
 							control={control}
 							rules={categoryIdValidation}
-							render={({ field }) => (
+							render={({ field, fieldState }) => (
 								<Input
 									{...field}
 									label='Category ID'
 									type='number'
-									error={errors.categoryId?.message}
+									value={field.value ?? ''}
+									error={fieldState.error?.message}
 								/>
 							)}
 						/>
@@ -139,7 +158,7 @@ const PricingCategorySectionFunction = ({
 								}}
 							>
 								<FormControlLabel
-									value={true}
+									value='true'
 									control={
 										<Radio
 											sx={{
@@ -165,7 +184,7 @@ const PricingCategorySectionFunction = ({
 									}}
 								/>
 								<FormControlLabel
-									value={false}
+									value='false'
 									control={
 										<Radio
 											sx={{
