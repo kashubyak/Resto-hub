@@ -4,15 +4,37 @@ import type { IDish, IDishFormValues } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDishes } from './useDishes'
 
+const toNumber = (value: string | number | undefined): number | undefined => {
+	if (typeof value === 'number') return value
+	if (typeof value === 'string') {
+		const num = parseFloat(value)
+		return isNaN(num) ? undefined : num
+	}
+	return undefined
+}
+
 export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
-	const { refetchDishes } = useDishes()
+	const { refetchDishes, updateDishCache } = useDishes()
 	const queryClient = useQueryClient()
-	const { updateDishCache } = useDishes()
+
+	const defaultValues = useMemo(
+		() => ({
+			name: '',
+			description: '',
+			price: '',
+			categoryId: undefined,
+			ingredients: [],
+			weightGr: undefined,
+			calories: undefined,
+			available: true,
+		}),
+		[],
+	)
 
 	const {
 		handleSubmit,
@@ -25,16 +47,7 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 		trigger,
 	} = useForm<IDishFormValues>({
 		mode: 'onChange',
-		defaultValues: {
-			name: '',
-			description: '',
-			price: '',
-			categoryId: undefined,
-			ingredients: [],
-			weightGr: undefined,
-			calories: undefined,
-			available: true,
-		},
+		defaultValues,
 	})
 
 	useEffect(() => {
@@ -61,16 +74,26 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 					id: dishData.id,
 				}
 
-				if (dirtyFields.name) changedData.name = formData.name
-				if (dirtyFields.description) changedData.description = formData.description
-				if (dirtyFields.price) changedData.price = formData.price
-				if (dirtyFields.categoryId) changedData.categoryId = formData.categoryId
-				if (dirtyFields.ingredients) changedData.ingredients = formData.ingredients
-				if (dirtyFields.weightGr) changedData.weightGr = formData.weightGr
-				if (dirtyFields.calories) changedData.calories = formData.calories
-				if (dirtyFields.available !== undefined)
-					changedData.available = formData.available
-				if (dirtyFields.imageUrl) changedData.imageUrl = formData.imageUrl
+				// delete any types later
+				const fieldMapping: Array<{
+					key: keyof typeof dirtyFields
+					value: any
+					converter?: (val: any) => any
+				}> = [
+					{ key: 'name', value: formData.name },
+					{ key: 'description', value: formData.description },
+					{ key: 'price', value: formData.price, converter: toNumber },
+					{ key: 'categoryId', value: formData.categoryId },
+					{ key: 'ingredients', value: formData.ingredients },
+					{ key: 'weightGr', value: formData.weightGr, converter: toNumber },
+					{ key: 'calories', value: formData.calories, converter: toNumber },
+					{ key: 'available', value: formData.available },
+					{ key: 'imageUrl', value: formData.imageUrl },
+				]
+
+				fieldMapping.forEach(({ key, value, converter }) => {
+					if (dirtyFields[key]) changedData[key] = converter ? converter(value) : value
+				})
 
 				const { data } = await updateDishService(changedData)
 				updateDishCache(queryClient, data)
@@ -82,14 +105,14 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 			}
 		},
 		[
-			showSuccess,
-			showError,
-			refetchDishes,
-			onClose,
 			dishData,
 			dirtyFields,
 			queryClient,
 			updateDishCache,
+			showSuccess,
+			refetchDishes,
+			onClose,
+			showError,
 		],
 	)
 
