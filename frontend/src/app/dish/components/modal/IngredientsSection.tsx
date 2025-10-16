@@ -15,7 +15,7 @@ import {
 import { IngredientChip } from './IngredientChip'
 
 type IngredientsSectionProps = {
-	control: Control<IDishFormValues>
+	control?: Control<IDishFormValues>
 	errors: FieldErrors<IDishFormValues>
 	setError: UseFormSetError<IDishFormValues>
 	clearErrors: UseFormClearErrors<IDishFormValues>
@@ -148,6 +148,8 @@ export const IngredientsSection = ({
 		[draggedIndex],
 	)
 
+	if (!control) return null
+
 	return (
 		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
 			<h3
@@ -188,6 +190,7 @@ export const IngredientsSection = ({
 							<IconButton
 								onClick={() => handleAdd(value, onChange)}
 								sx={{
+									flexShrink: 0,
 									mt: isFullScreen ? 0 : 1,
 									alignSelf: isFullScreen ? 'center' : 'flex-start',
 									borderRadius: '8px',

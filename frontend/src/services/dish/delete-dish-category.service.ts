@@ -9,7 +9,5 @@ export const deleteDishFromCategory = async (
 	config?: CustomAxiosRequestConfig,
 ): Promise<ApiResponse<IDish>> => {
 	const response = await api.patch<IDish>(API_URL.DISH.REMOVE_CATEGORY(id), {}, config)
-	console.log(response)
-
 	return response
 }

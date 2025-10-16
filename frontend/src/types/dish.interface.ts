@@ -53,7 +53,7 @@ export type IDishListResponse = IPaginatedResponse<IDish>
 export interface IDishFormValues {
 	name: string
 	description: string
-	price: number
+	price: number | string
 	categoryId?: number | null
 	ingredients: string[]
 	imageUrl: FileList
@@ -71,4 +71,17 @@ export interface IGetAllDishesParams {
 	available?: boolean
 	sortBy?: string
 	order?: 'asc' | 'desc'
+}
+
+export interface IUpdateDishPayload {
+	id: number
+	name?: string
+	description?: string
+	price?: number
+	categoryId?: number | null
+	ingredients?: string[]
+	image?: File
+	weightGr?: number | null
+	calories?: number | null
+	available?: boolean
 }

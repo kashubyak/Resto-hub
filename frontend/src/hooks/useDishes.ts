@@ -12,6 +12,7 @@ import type { IAxiosError } from '@/types/error.interface'
 import type { FilterValues } from '@/types/filter.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import {
+	QueryClient,
 	useInfiniteQuery,
 	useMutation,
 	useQuery,
@@ -31,11 +32,41 @@ export const useDishes = (
 	const queryClient = useQueryClient()
 	const router = useRouter()
 	const { showSuccess, showError } = useAlert()
-	const normalizedSearchQuery = searchQuery?.trim().toLowerCase() || undefined
+	const normalizedSearchQuery = searchQuery?.trim() || undefined
 	const filterKey = useMemo(() => {
 		if (!filters || Object.keys(filters).length === 0) return 'no-filters'
 		return JSON.stringify(filters)
 	}, [filters])
+
+	const updateDishCache = useCallback(
+		(
+			queryClient: QueryClient,
+			updatedDish: IDish,
+			searchKey?: string,
+			filterKey?: string,
+		) => {
+			queryClient.setQueryData<IDish>(
+				[DISHES_QUERY_KEY.DETAIL, updatedDish.id],
+				updatedDish,
+			)
+			queryClient.setQueryData<InfiniteData<IDishListResponse>>(
+				[DISHES_QUERY_KEY.ALL, searchKey, filterKey],
+				oldData => {
+					if (!oldData) return oldData
+					return {
+						...oldData,
+						pages: oldData.pages.map(page => ({
+							...page,
+							data: page.data.map(dish =>
+								dish.id === updatedDish.id ? updatedDish : dish,
+							),
+						})),
+					}
+				},
+			)
+		},
+		[],
+	)
 
 	const dishesQuery = useInfiniteQuery<IDishListResponse, Error>({
 		queryKey: [DISHES_QUERY_KEY.ALL, normalizedSearchQuery, filterKey],
@@ -90,28 +121,9 @@ export const useDishes = (
 	const handleDeleteDishFromCategorySuccess = useCallback(
 		(updatedDish: IDish) => {
 			showSuccess('Dish removed from category successfully')
-
-			queryClient.setQueryData<IDish>(
-				[DISHES_QUERY_KEY.DETAIL, updatedDish.id],
-				updatedDish,
-			)
-			queryClient.setQueryData<InfiniteData<IDishListResponse>>(
-				[DISHES_QUERY_KEY.ALL, normalizedSearchQuery, filterKey],
-				oldData => {
-					if (!oldData) return oldData
-					return {
-						...oldData,
-						pages: oldData.pages.map((page: IDishListResponse) => ({
-							...page,
-							data: page.data.map((dish: IDish) =>
-								dish.id === updatedDish.id ? updatedDish : dish,
-							),
-						})),
-					}
-				},
-			)
+			updateDishCache(queryClient, updatedDish, normalizedSearchQuery, filterKey)
 		},
-		[showSuccess, queryClient, normalizedSearchQuery, filterKey],
+		[showSuccess, updateDishCache, queryClient, normalizedSearchQuery, filterKey],
 	)
 
 	const handleDeleteDishFromCategoryError = useCallback(
@@ -142,6 +154,7 @@ export const useDishes = (
 		...dishesQuery,
 		allDishes,
 		refetchDishes,
+		updateDishCache,
 		dishQuery,
 		deleteDishMutation,
 		deleteCategoryFromDishMutation,

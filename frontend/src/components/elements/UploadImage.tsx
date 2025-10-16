@@ -9,7 +9,7 @@ import { ViewableImage } from './ImageViewer/ViewableImage'
 type UploadImageProps = {
 	label?: string
 	error?: string
-	register: UseFormRegisterReturn
+	register?: UseFormRegisterReturn
 	savedPreview?: string | null
 	onDataChange?: (preview: string | null, file: File | null) => void
 }
@@ -62,7 +62,7 @@ const ImagePreview = memo(({ src, onClick }: { src: string; onClick: () => void 
 ImagePreview.displayName = 'ImagePreview'
 
 export const UploadImage = memo(
-	({ label, error, savedPreview, onDataChange, ...register }: UploadImageProps) => {
+	({ label, error, savedPreview, onDataChange, register }: UploadImageProps) => {
 		const {
 			preview,
 			isDragging,
@@ -71,9 +71,17 @@ export const UploadImage = memo(
 			preventDefaults,
 			ref,
 			...restRegister
-		} = useUploadImage({ ...register, savedPreview, onDataChange })
+		} = useUploadImage({
+			register: register!,
+			savedPreview,
+			onDataChange,
+		})
 
-		const currentPreview = useMemo(() => preview || savedPreview, [preview, savedPreview])
+		const currentPreview = useMemo(
+			() => preview || savedPreview || null,
+			[preview, savedPreview],
+		)
+
 		const handleImageClick = useCallback(() => inputRef.current?.click(), [inputRef])
 
 		const inputRefCallback = useCallback(

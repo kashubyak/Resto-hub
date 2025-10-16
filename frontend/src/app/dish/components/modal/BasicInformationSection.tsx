@@ -4,24 +4,35 @@ import { Input } from '@/components/ui/Input'
 import type { IDishFormValues } from '@/types/dish.interface'
 import { dishNameValidation } from '@/validation/dish.validation'
 import { useMediaQuery, useTheme } from '@mui/material'
-import type { FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form'
+import { useMemo } from 'react'
+import type { Control, FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 
 type BasicInformationSectionProps = {
-	register: UseFormRegister<IDishFormValues>
+	register?: UseFormRegister<IDishFormValues>
+	control?: Control<IDishFormValues>
 	errors: FieldErrors<IDishFormValues>
-	watch: UseFormWatch<IDishFormValues>
+	watch?: UseFormWatch<IDishFormValues>
+	mode?: 'create' | 'update'
 }
 
 const maxDescriptionLength = 1500
+
 export const BasicInformationSection = ({
 	register,
+	control,
 	errors,
 	watch,
+	mode = 'create',
 }: BasicInformationSectionProps) => {
 	const theme = useTheme()
 	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-	const descriptionValue = watch('description') || ''
+	const descriptionValue = useMemo(() => {
+		if (watch) return watch('description') || ''
+		return ''
+	}, [watch])
+
 	const descriptionLength = descriptionValue.length
 
 	return (
@@ -34,31 +45,74 @@ export const BasicInformationSection = ({
 				📝 Basic Information
 			</h3>
 			<div className='grid grid-cols-1 gap-4'>
-				<Input
-					register={register('name', dishNameValidation)}
-					label='Dish Name'
-					error={errors.name?.message}
-				/>
+				{mode === 'create' && register ? (
+					<Input
+						register={register('name', dishNameValidation)}
+						label='Dish Name'
+						error={errors.name?.message}
+					/>
+				) : (
+					control && (
+						<Controller
+							name='name'
+							control={control}
+							rules={dishNameValidation}
+							render={({ field }) => (
+								<Input {...field} label='Dish Name' error={errors.name?.message} />
+							)}
+						/>
+					)
+				)}
 
 				<div className='relative'>
-					<Input
-						register={register('description', {
-							required: 'Dish description is required',
-							validate: {
-								minLength: v =>
-									v.trim().length >= 5 || 'Description must be at least 5 characters',
-								maxLength: v =>
-									v.trim().length <= maxDescriptionLength ||
-									`Description can be at most ${maxDescriptionLength} characters`,
-								noOnlySpaces: v =>
-									v.trim().length > 0 || 'Description cannot be only spaces',
-							},
-						})}
-						label='Dish Description'
-						error={errors.description?.message}
-						multiline
-						rows={isFullScreen ? 3 : 4}
-					/>
+					{mode === 'create' && register ? (
+						<Input
+							register={register('description', {
+								required: 'Dish description is required',
+								validate: {
+									minLength: v =>
+										v.trim().length >= 5 || 'Description must be at least 5 characters',
+									maxLength: v =>
+										v.trim().length <= maxDescriptionLength ||
+										`Description can be at most ${maxDescriptionLength} characters`,
+									noOnlySpaces: v =>
+										v.trim().length > 0 || 'Description cannot be only spaces',
+								},
+							})}
+							label='Dish Description'
+							error={errors.description?.message}
+							multiline
+							rows={isFullScreen ? 3 : 4}
+						/>
+					) : (
+						control && (
+							<Controller
+								name='description'
+								control={control}
+								rules={{
+									required: 'Dish description is required',
+									validate: {
+										minLength: v =>
+											v.trim().length >= 5 || 'Description must be at least 5 characters',
+										maxLength: v =>
+											v.trim().length <= maxDescriptionLength ||
+											`Description can be at most ${maxDescriptionLength} characters`,
+										noOnlySpaces: v =>
+											v.trim().length > 0 || 'Description cannot be only spaces',
+									},
+								}}
+								render={({ field }) => (
+									<Input
+										{...field}
+										label='Dish Description'
+										error={errors.description?.message}
+										multiline
+										rows={isFullScreen ? 3 : 4}
+									/>
+								)}
+							/>
+						)
+					)}
 
 					<p className='text-xs text-secondary-foreground mt-1 text-right'>
 						{descriptionLength} / {maxDescriptionLength}
