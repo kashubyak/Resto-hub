@@ -32,7 +32,7 @@ export const useDishes = (
 	const queryClient = useQueryClient()
 	const router = useRouter()
 	const { showSuccess, showError } = useAlert()
-	const normalizedSearchQuery = searchQuery?.trim().toLowerCase() || undefined
+	const normalizedSearchQuery = searchQuery?.trim() || undefined
 	const filterKey = useMemo(() => {
 		if (!filters || Object.keys(filters).length === 0) return 'no-filters'
 		return JSON.stringify(filters)
