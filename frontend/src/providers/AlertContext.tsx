@@ -4,9 +4,11 @@ import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import {
 	createContext,
+	memo,
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from 'react'
@@ -44,11 +46,13 @@ const AlertContext = createContext<IAlertContext>({
 	showBackendError: () => {},
 })
 
-export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
+const generateId = () => `alert-${Date.now()}-${Math.random()}`
+const formatText = (text: string | string[]): string =>
+	Array.isArray(text) ? text.join('\n') : text
+
+export const AlertProvider = memo<{ children: React.ReactNode }>(({ children }) => {
 	const [alerts, setAlerts] = useState<IAlert[]>([])
 	const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
-
-	const generateId = () => `alert-${Date.now()}-${Math.random()}`
 
 	const clearTimer = useCallback((id: string) => {
 		const t = timers.current[id]
@@ -78,21 +82,28 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 		[clearTimer, removeAlert],
 	)
 
-	const pauseAlertTimer = (id: string) => {
-		clearTimer(id)
-	}
+	const pauseAlertTimer = useCallback(
+		(id: string) => {
+			clearTimer(id)
+		},
+		[clearTimer],
+	)
 
-	const resumeAlertTimer = (id: string) => {
-		const alert = alerts.find(a => a.id === id)
-		if (!alert) return
-		const duration = alert.duration ?? DEFAULT_DURATION_ALERT
-		startTimer(id, duration)
-	}
+	const resumeAlertTimer = useCallback(
+		(id: string) => {
+			const alert = alerts.find(a => a.id === id)
+			if (!alert) return
+			const duration = alert.duration ?? DEFAULT_DURATION_ALERT
+			startTimer(id, duration)
+		},
+		[alerts, startTimer],
+	)
 
 	const showAlert = useCallback(
 		(alert: Omit<IAlert, 'id'>) => {
 			setAlerts(prev => {
 				const existing = prev.find(a => a.severity === alert.severity)
+
 				if (existing) {
 					const merged: IAlert = {
 						...existing,
@@ -116,36 +127,45 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 		[startTimer],
 	)
 
-	const showSuccess = (text: string | string[], duration?: number) =>
-		showAlert({
-			severity: 'success',
-			text: Array.isArray(text) ? text.join('\n') : text,
-			duration,
-		})
-
-	const showError = useCallback(
+	const showSuccess = useCallback(
 		(text: string | string[], duration?: number) =>
 			showAlert({
-				severity: 'error',
-				text: Array.isArray(text) ? text.join('\n') : text,
+				severity: 'success',
+				text: formatText(text),
 				duration,
 			}),
 		[showAlert],
 	)
 
-	const showWarning = (text: string | string[], duration?: number) =>
-		showAlert({
-			severity: 'warning',
-			text: Array.isArray(text) ? text.join('\n') : text,
-			duration,
-		})
+	const showError = useCallback(
+		(text: string | string[], duration?: number) =>
+			showAlert({
+				severity: 'error',
+				text: formatText(text),
+				duration,
+			}),
+		[showAlert],
+	)
 
-	const showInfo = (text: string | string[], duration?: number) =>
-		showAlert({
-			severity: 'info',
-			text: Array.isArray(text) ? text.join('\n') : text,
-			duration,
-		})
+	const showWarning = useCallback(
+		(text: string | string[], duration?: number) =>
+			showAlert({
+				severity: 'warning',
+				text: formatText(text),
+				duration,
+			}),
+		[showAlert],
+	)
+
+	const showInfo = useCallback(
+		(text: string | string[], duration?: number) =>
+			showAlert({
+				severity: 'info',
+				text: formatText(text),
+				duration,
+			}),
+		[showAlert],
+	)
 
 	const showBackendError = useCallback(
 		(error: IAxiosError, duration?: number) => {
@@ -156,30 +176,55 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
 	)
 
 	useEffect(() => {
-		const timersSnapshot = { ...timers.current }
+		const currentTimers = timers.current
+
 		return () => {
-			Object.keys(timersSnapshot).forEach(clearTimer)
+			Object.keys(currentTimers).forEach(id => {
+				const timer = currentTimers[id]
+				if (timer) {
+					clearTimeout(timer)
+					delete currentTimers[id]
+				}
+			})
 		}
-	}, [clearTimer])
+	}, [])
 
-	return (
-		<AlertContext.Provider
-			value={{
-				alerts,
-				showAlert,
-				removeAlert,
-				pauseAlertTimer,
-				resumeAlertTimer,
-				showSuccess,
-				showError,
-				showWarning,
-				showInfo,
-				showBackendError,
-			}}
-		>
-			{children}
-		</AlertContext.Provider>
+	const contextValue = useMemo(
+		() => ({
+			alerts,
+			showAlert,
+			removeAlert,
+			pauseAlertTimer,
+			resumeAlertTimer,
+			showSuccess,
+			showError,
+			showWarning,
+			showInfo,
+			showBackendError,
+		}),
+		[
+			alerts,
+			showAlert,
+			removeAlert,
+			pauseAlertTimer,
+			resumeAlertTimer,
+			showSuccess,
+			showError,
+			showWarning,
+			showInfo,
+			showBackendError,
+		],
 	)
-}
 
-export const useAlert = () => useContext(AlertContext)
+	return <AlertContext.Provider value={contextValue}>{children}</AlertContext.Provider>
+})
+
+AlertProvider.displayName = 'AlertProvider'
+
+export const useAlert = () => {
+	const context = useContext(AlertContext)
+	if (!context) {
+		throw new Error('useAlert must be used within AlertProvider')
+	}
+	return context
+}

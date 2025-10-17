@@ -2,14 +2,14 @@ import { MAX_LENGTH_ALERT } from '@/constants/alert.constant'
 import type { AlertSeverity } from '@/types/alert.interface'
 import Alert from '@mui/material/Alert'
 import { styled } from '@mui/material/styles'
-import { useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 
 interface IAlertProps {
 	severity: AlertSeverity
 	text: string
 }
 
-const CustomAlert = styled(Alert)(() => ({
+const CustomAlert = styled(Alert)(({ theme }) => ({
 	borderRadius: '10px',
 	fontSize: '14px',
 	padding: '5px 40px 5px 10px',
@@ -22,6 +22,7 @@ const CustomAlert = styled(Alert)(() => ({
 	},
 	'& .MuiAlert-message': {
 		flex: 1,
+		wordBreak: 'break-word',
 	},
 	'&.MuiAlert-standardSuccess': {
 		backgroundColor: 'var(--success)',
@@ -39,25 +40,49 @@ const CustomAlert = styled(Alert)(() => ({
 		backgroundColor: 'var(--info)',
 		color: 'var(--stable-light)',
 	},
+	[theme.breakpoints.down('sm')]: {
+		fontSize: '13px',
+		padding: '6px 35px 6px 8px',
+		borderRadius: '8px',
+		'& .MuiAlert-icon': {
+			marginRight: '6px',
+			fontSize: '18px',
+		},
+	},
+	'@media (max-width: 400px)': {
+		fontSize: '12px',
+		padding: '5px 30px 5px 6px',
+		'& .MuiAlert-icon': {
+			fontSize: '16px',
+			marginRight: '4px',
+		},
+	},
 }))
 
-export const AlertUI = ({ severity, text }: IAlertProps) => {
+export const AlertUI = memo<IAlertProps>(({ severity, text }) => {
 	const [expanded, setExpanded] = useState(false)
+	const isLong = useMemo(() => text.length > MAX_LENGTH_ALERT, [text.length])
 
-	const isLong = text.length > MAX_LENGTH_ALERT
-	const displayText = expanded || !isLong ? text : text.slice(0, MAX_LENGTH_ALERT) + '...'
+	const displayText = useMemo(() => {
+		if (!isLong || expanded) return text
+		return text.slice(0, MAX_LENGTH_ALERT) + '...'
+	}, [text, isLong, expanded])
+
+	const handleToggle = useCallback(() => setExpanded(prev => !prev), [])
 
 	return (
 		<CustomAlert severity={severity}>
 			<span>{displayText}</span>
 			{isLong && (
 				<span
-					className='ml-2 underline cursor-pointer text-xs opacity-80 text-nowrap'
-					onClick={() => setExpanded(!expanded)}
+					className='ml-1 sm:ml-2 underline cursor-pointer text-[11px] sm:text-xs opacity-80 text-nowrap'
+					onClick={handleToggle}
 				>
 					{expanded ? 'Show less' : 'Show more'}
 				</span>
 			)}
 		</CustomAlert>
 	)
-}
+})
+
+AlertUI.displayName = 'AlertUI'

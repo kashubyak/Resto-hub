@@ -69,7 +69,7 @@ export class DishService {
     if (dish.imageUrl) {
       try {
         await this.s3Service.deleteFile(dish.imageUrl);
-      } catch (error) {
+      } catch {
         throw new BadRequestException('Failed to delete dish image');
       }
     }

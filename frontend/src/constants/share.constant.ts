@@ -1,1 +1,1 @@
-export const size_of_image = 3
+export const size_of_image = 10

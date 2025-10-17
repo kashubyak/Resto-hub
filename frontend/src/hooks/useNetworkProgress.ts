@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 interface INetworkRequest {
 	url: string
@@ -10,7 +10,7 @@ interface INetworkRequest {
 const networkRequests = new Map<string, INetworkRequest>()
 const progressListeners = new Set<(progress: number) => void>()
 
-function notifyListeners() {
+function notifyListeners(): void {
 	const requests = Array.from(networkRequests.values())
 	const avgProgress =
 		requests.length > 0
@@ -20,7 +20,7 @@ function notifyListeners() {
 	progressListeners.forEach(listener => listener(avgProgress))
 }
 
-export function useNetworkProgress() {
+export const useNetworkProgress = () => {
 	const [totalProgress, setTotalProgress] = useState(0)
 	const [activeRequests, setActiveRequests] = useState(0)
 
@@ -31,16 +31,20 @@ export function useNetworkProgress() {
 		}
 
 		progressListeners.add(updateProgress)
+
 		return () => {
 			progressListeners.delete(updateProgress)
 		}
 	}, [])
 
-	return {
-		totalProgress,
-		activeRequests,
-		isLoading: activeRequests > 0,
-	}
+	return useMemo(
+		() => ({
+			totalProgress,
+			activeRequests,
+			isLoading: activeRequests > 0,
+		}),
+		[totalProgress, activeRequests],
+	)
 }
 
 export function startNetworkRequest(url: string): string {
@@ -55,7 +59,11 @@ export function startNetworkRequest(url: string): string {
 	return requestId
 }
 
-export function updateNetworkProgress(requestId: string, loaded: number, total?: number) {
+export function updateNetworkProgress(
+	requestId: string,
+	loaded: number,
+	total?: number,
+): void {
 	const request = networkRequests.get(requestId)
 	if (!request) return
 
@@ -64,14 +72,14 @@ export function updateNetworkProgress(requestId: string, loaded: number, total?:
 	notifyListeners()
 }
 
-export function completeNetworkRequest(requestId: string) {
+export function completeNetworkRequest(requestId: string): void {
 	if (networkRequests.has(requestId)) {
 		networkRequests.delete(requestId)
 		notifyListeners()
 	}
 }
 
-export function failNetworkRequest(requestId: string) {
+export function failNetworkRequest(requestId: string): void {
 	networkRequests.delete(requestId)
 	notifyListeners()
 }

@@ -2,22 +2,23 @@
 
 import { ROUTES } from '@/constants/pages.constant'
 import Link from 'next/link'
+import { type FormEvent, type JSX, type ReactNode } from 'react'
 
 interface IAuthContainerProps {
 	title: string
-	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
-	children: React.ReactNode
+	onSubmit: (e: FormEvent<HTMLFormElement>) => void
+	children: ReactNode
 	encType?: string
 	isLogin?: boolean
 }
 
-export const AuthContainer = ({
+export function AuthContainer({
 	title,
 	onSubmit,
 	children,
 	encType,
 	isLogin = false,
-}: IAuthContainerProps) => {
+}: IAuthContainerProps): JSX.Element {
 	return (
 		<div className='w-screen h-screen bg-background text-foreground flex items-center justify-center p-4'>
 			<div className='w-full max-w-xl border border-border text-muted-foreground rounded-xl shadow-xl max-h-10/12 overflow-y-auto p-6'>

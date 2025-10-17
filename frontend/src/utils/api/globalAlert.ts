@@ -1,12 +1,14 @@
 import type { AlertSeverity } from '@/types/alert.interface'
 
-let globalShowAlert: ((severity: AlertSeverity, text: string | string[]) => void) | null =
-	null
+type ShowAlertFunction = (severity: AlertSeverity, text: string | string[]) => void
+let globalShowAlert: ShowAlertFunction | null = null
 
-export function setGlobalAlertFunction(
-	showAlert: (severity: AlertSeverity, text: string | string[]) => void,
-) {
+export function setGlobalAlertFunction(showAlert: ShowAlertFunction): void {
 	globalShowAlert = showAlert
 }
 
-export const getGlobalShowAlert = () => globalShowAlert
+export const getGlobalShowAlert = (): ShowAlertFunction | null => globalShowAlert
+
+export const clearGlobalAlertFunction = (): void => {
+	globalShowAlert = null
+}

@@ -5,10 +5,10 @@ type Props = { children: React.ReactNode }
 export async function generateMetadata({
 	params,
 }: {
-	params: { mode?: string }
+	params: Promise<{ mode?: string }>
 }): Promise<Metadata> {
-	const mode = params?.mode === 'login' ? 'Login' : 'Register'
-	return { title: mode }
+	const { mode } = await params
+	return { title: mode === 'login' ? 'Login' : 'Register' }
 }
 
 export default function AuthLayout({ children }: Props) {
