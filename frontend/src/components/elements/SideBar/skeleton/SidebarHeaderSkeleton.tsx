@@ -11,13 +11,13 @@ const ExpandedHeaderSkeleton = memo(() => (
 			variant='rounded'
 			width={40}
 			height={40}
-			sx={{ bgcolor: 'var(--muted)', borderRadius: '6px' }}
+			sx={{ bgcolor: 'var(--active-item)', borderRadius: '6px' }}
 		/>
 		<Skeleton
 			variant='rounded'
 			width={40}
 			height={40}
-			sx={{ bgcolor: 'var(--muted)', borderRadius: '8px' }}
+			sx={{ bgcolor: 'var(--active-item)', borderRadius: '8px' }}
 		/>
 	</>
 ))
@@ -28,7 +28,7 @@ const CollapsedHeaderSkeleton = memo(() => (
 		variant='rounded'
 		width={48}
 		height={40}
-		sx={{ bgcolor: 'var(--muted)', borderRadius: '8px' }}
+		sx={{ bgcolor: 'var(--active-item)', borderRadius: '8px' }}
 	/>
 ))
 CollapsedHeaderSkeleton.displayName = 'CollapsedHeaderSkeleton'

@@ -8,21 +8,18 @@ interface SidebarNavSkeletonProps {
 
 const NavItemSkeleton = memo(({ collapsed }: { collapsed: boolean }) => (
 	<div className='flex items-center rounded-lg px-3 py-2'>
-		{/* Icon skeleton */}
 		<Skeleton
 			variant='rounded'
 			width={24}
 			height={24}
-			sx={{ bgcolor: 'var(--muted)', borderRadius: '4px' }}
+			sx={{ bgcolor: 'var(--active-item)', borderRadius: '4px' }}
 		/>
-
-		{/* Text skeleton - only visible when not collapsed */}
 		<Skeleton
 			variant='text'
 			width={120}
 			height={20}
 			sx={{
-				bgcolor: 'var(--muted)',
+				bgcolor: 'var(--active-item)',
 				ml: 1.5,
 				transition: 'all 0.3s',
 				opacity: collapsed ? 0 : 1,
