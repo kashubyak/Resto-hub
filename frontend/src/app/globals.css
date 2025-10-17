@@ -2,6 +2,7 @@
 
 :root {
 	--background: #fcfcfc;
+	--background-rgb: 252, 252, 252;
 	--foreground: #0a0e13;
 	--muted: #f5f6fa;
 	--muted-hover: #f1f2f8;
@@ -12,8 +13,8 @@
 	--secondary: #f5f6fa;
 	--secondary-foreground: #8c8e92;
 	--secondary-hover: #eceef5;
-	--success: #16a34a;
-	--success-hover: #15803d;
+	--success: #06923e;
+	--success-hover: #06aa48;
 	--destructive: #c20b0a;
 	--destructive-hover: #dc2626;
 	--warning: #eab308;
@@ -24,23 +25,25 @@
 	--input: #f5f6fa;
 	--stable-light: #fff;
 	--active-item: #e8eaf1;
+	--shadow: rgba(27, 27, 27, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
 		--background: #05070a;
+		--background-rgb: 5, 7, 10;
 		--foreground: #fff;
 		--muted: #0a0e13;
 		--muted-hover: #151a24;
 		--muted-foreground: #949fb7;
 		--primary: #3187f3;
 		--primary-foreground: #e0e6f2;
-		--primary-hover: #3b82f6;
+		--primary-hover: #4c8aef;
 		--secondary: #0c1018;
 		--secondary-foreground: #b7b8ba;
 		--secondary-hover: #151a24;
-		--success: #16a34a;
-		--success-hover: #15803d;
+		--success: #07b201;
+		--success-hover: #08c102;
 		--destructive: #c20b0a;
 		--destructive-hover: #dc2626;
 		--warning: #eab308;
@@ -51,6 +54,7 @@
 		--input: #0e1217;
 		--stable-light: #fff;
 		--active-item: #202735;
+		--shadow: rgba(27, 27, 27, 0.6);
 	}
 }
 
@@ -76,6 +80,9 @@ body {
 	.text-primary {
 		color: var(--primary);
 	}
+	.stable-light {
+		color: var(--stable-light);
+	}
 	.bg-primary {
 		background-color: var(--primary);
 	}
@@ -88,11 +95,11 @@ body {
 	.text-secondary-foreground {
 		color: var(--secondary-foreground);
 	}
+	.bg-success {
+		background-color: var(--success);
+	}
 	.bg-destructive {
 		background-color: var(--destructive);
-	}
-	.text-destructive-foreground {
-		color: var(--destructive-foreground);
 	}
 	.bg-warning {
 		background-color: var(--warning);
@@ -126,6 +133,9 @@ body {
 	}
 	.hover\:bg-secondary:hover {
 		background-color: var(--secondary-hover);
+	}
+	.hover\:bg-success:hover {
+		background-color: var(--success-hover);
 	}
 	.hover\:bg-destructive:hover {
 		background-color: var(--destructive-hover);

@@ -6,20 +6,37 @@ export interface IJwtPayload {
 	iat: number
 	sub: string
 }
+
+const BASE64_REPLACEMENTS = [
+	[/-/g, '+'],
+	[/_/g, '/'],
+] as const
+
 export const decodeJWT = (token: string): IJwtPayload | null => {
 	try {
 		const parts = token.split('.')
+		if (parts.length !== 3) return null
+
 		const payload = parts[1]
 
-		const paddedPayload = payload + '='.repeat((4 - (payload.length % 4)) % 4)
-		const decodedPayload = atob(paddedPayload.replace(/-/g, '+').replace(/_/g, '/'))
+		let paddedPayload = payload
+		for (const [pattern, replacement] of BASE64_REPLACEMENTS)
+			paddedPayload = paddedPayload.replace(pattern, replacement)
+
+		const paddingLength = (4 - (paddedPayload.length % 4)) % 4
+		if (paddingLength) paddedPayload += '='.repeat(paddingLength)
+
+		const decodedPayload = atob(paddedPayload)
 		const tokenData = JSON.parse(decodedPayload) as IJwtPayload
 
-		const currentTime = Math.floor(Date.now() / 1000)
-		if (tokenData.exp && tokenData.exp < currentTime) return null
+		if (tokenData.exp) {
+			const currentTime = Math.floor(Date.now() / 1000)
+			if (tokenData.exp < currentTime) return null
+		}
+
 		return tokenData
 	} catch (error) {
-		console.error('Error decoding JWT:', error)
+		if (process.env.NODE_ENV !== 'production') console.error('Error decoding JWT:', error)
 		return null
 	}
 }

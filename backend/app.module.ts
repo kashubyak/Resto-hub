@@ -21,7 +21,7 @@ import { AuthModule } from './src/api/auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env', `./configs/.env.${process.env.NODE_ENV}`],
+      envFilePath: ['.env'],
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'frontend', 'build'),

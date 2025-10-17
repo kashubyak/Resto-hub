@@ -7,11 +7,13 @@ import {
 	startNetworkRequest,
 	updateNetworkProgress,
 } from '@/hooks/useNetworkProgress'
-import { refreshToken } from '@/services/auth.service'
+import { refreshToken } from '@/services/auth/auth.service'
 import { useAlertStore } from '@/store/alert.store'
+import type { CustomAxiosRequestConfig } from '@/types/axios.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import type { AxiosProgressEvent } from 'axios'
 import Cookies from 'js-cookie'
+import { clearAuth } from '../auth-helpers'
 import { convertToDays } from '../convertToDays'
 import { parseBackendError } from '../errorHandler'
 import { getIsRefreshing, processQueue, pushToQueue, setIsRefreshing } from './authQueue'
@@ -49,12 +51,15 @@ api.interceptors.response.use(
 		const requestId = error.config?.headers?.['X-Request-ID'] as string
 		if (requestId) failNetworkRequest(requestId)
 
-		const originalRequest = error.config
+		const originalRequest = error.config as CustomAxiosRequestConfig
+		const shouldHideGlobalError = originalRequest?._hideGlobalError === true
+
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
 					Cookies.remove(AUTH.SUBDOMAIN)
+					clearAuth()
 					useAlertStore.getState().setPendingAlert({
 						severity: 'warning',
 						text: 'Your session has expired. Please log in again.',
@@ -70,6 +75,7 @@ api.interceptors.response.use(
 				})
 					.then(token => {
 						if (token) {
+							originalRequest.headers = originalRequest.headers || {}
 							originalRequest.headers['Authorization'] = `Bearer ${token}`
 							originalRequest.headers['X-Request-ID'] = startNetworkRequest(
 								originalRequest.url || 'retry',
@@ -84,7 +90,9 @@ api.interceptors.response.use(
 			setIsRefreshing(true)
 
 			try {
-				const { token: newToken } = await refreshToken()
+				const {
+					data: { token: newToken },
+				} = await refreshToken()
 				if (newToken) {
 					const tokenExpiresInDays = convertToDays(
 						process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d',
@@ -97,6 +105,8 @@ api.interceptors.response.use(
 
 					api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 					processQueue(null, newToken)
+
+					originalRequest.headers = originalRequest.headers || {}
 					originalRequest.headers['Authorization'] = `Bearer ${newToken}`
 					originalRequest.headers['X-Request-ID'] = startNetworkRequest(
 						originalRequest.url || 'refresh-retry',
@@ -110,6 +120,7 @@ api.interceptors.response.use(
 				if (typeof window !== 'undefined') {
 					Cookies.remove(AUTH.TOKEN)
 					Cookies.remove(AUTH.SUBDOMAIN)
+					clearAuth()
 					const currentPath = window.location.pathname
 					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(
 						currentPath,
@@ -120,6 +131,7 @@ api.interceptors.response.use(
 							text: parseBackendError(err as IAxiosError).join('\n'),
 						})
 					} catch {
+						clearAuth()
 						useAlertStore.getState().setPendingAlert({
 							severity: 'warning',
 							text: 'Your session has expired. Redirecting to login page.',
@@ -139,18 +151,23 @@ api.interceptors.response.use(
 				status !== 401 &&
 				!originalRequest.url?.includes(API_URL.AUTH.LOGIN) &&
 				!originalRequest.url?.includes(API_URL.AUTH.REGISTER) &&
-				!originalRequest._hideGlobalError
-			if (shouldShowAlert)
+				!shouldHideGlobalError
+
+			if (shouldShowAlert) {
 				useAlertStore.getState().setPendingAlert({
 					severity: 'error',
 					text: parseBackendError(error as IAxiosError).join('\n'),
 				})
+			}
 		}
-		if (!error.response)
+
+		if (!error.response && !shouldHideGlobalError) {
 			useAlertStore.getState().setPendingAlert({
 				severity: 'error',
 				text: parseBackendError(error as IAxiosError).join('\n'),
 			})
+		}
+
 		return Promise.reject(error)
 	},
 )

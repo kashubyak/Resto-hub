@@ -10,16 +10,20 @@ interface IPosition {
 export const useDropdownMenu = (offset = 8, margin = 8) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [position, setPosition] = useState<IPosition>({ top: 0, left: 0 })
+
 	const menuRef = useRef<HTMLDivElement | null>(null)
 	const buttonRef = useRef<HTMLButtonElement | null>(null)
 	const anchorRectRef = useRef<DOMRect | null>(null)
 
 	const closeMenu = useCallback(() => setIsOpen(false), [])
+
 	const openMenu = useCallback(() => {
 		const btn = buttonRef.current
 		if (!btn) return
+
 		const rect = btn.getBoundingClientRect()
 		anchorRectRef.current = rect
+
 		setPosition({
 			top: Math.round(rect.bottom + offset),
 			left: Math.round(rect.left),
@@ -35,7 +39,7 @@ export const useDropdownMenu = (offset = 8, margin = 8) => {
 	useEffect(() => {
 		if (!isOpen) return
 
-		const adjust = () => {
+		const adjustPosition = () => {
 			const anchor = anchorRectRef.current
 			const menu = menuRef.current
 			if (!anchor || !menu) return
@@ -59,41 +63,41 @@ export const useDropdownMenu = (offset = 8, margin = 8) => {
 			setPosition({ top: Math.round(top), left: Math.round(left) })
 		}
 
-		const raf = requestAnimationFrame(adjust)
+		const raf = requestAnimationFrame(adjustPosition)
 
-		const onResize = () => adjust()
-		window.addEventListener('resize', onResize)
-		window.addEventListener('scroll', onResize, true)
+		const handleResize = () => adjustPosition()
+		window.addEventListener('resize', handleResize)
+		window.addEventListener('scroll', handleResize, true)
 
 		return () => {
 			cancelAnimationFrame(raf)
-			window.removeEventListener('resize', onResize)
-			window.removeEventListener('scroll', onResize, true)
+			window.removeEventListener('resize', handleResize)
+			window.removeEventListener('scroll', handleResize, true)
 		}
 	}, [isOpen, offset, margin])
 
 	useEffect(() => {
 		if (!isOpen) return
 
-		const onDocClick = (e: Event) => {
+		const handleDocumentClick = (e: Event) => {
 			const target = e.target as Node | null
 			if (!menuRef.current || !buttonRef.current) return
 			if (!menuRef.current.contains(target) && !buttonRef.current.contains(target))
 				closeMenu()
 		}
 
-		const onKey = (e: KeyboardEvent) => {
+		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') closeMenu()
 		}
 
-		document.addEventListener('mousedown', onDocClick)
-		document.addEventListener('touchstart', onDocClick)
-		document.addEventListener('keydown', onKey)
+		document.addEventListener('mousedown', handleDocumentClick)
+		document.addEventListener('touchstart', handleDocumentClick)
+		document.addEventListener('keydown', handleKeyDown)
 
 		return () => {
-			document.removeEventListener('mousedown', onDocClick)
-			document.removeEventListener('touchstart', onDocClick)
-			document.removeEventListener('keydown', onKey)
+			document.removeEventListener('mousedown', handleDocumentClick)
+			document.removeEventListener('touchstart', handleDocumentClick)
+			document.removeEventListener('keydown', handleKeyDown)
 		}
 	}, [isOpen, closeMenu])
 

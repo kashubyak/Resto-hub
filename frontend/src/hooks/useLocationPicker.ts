@@ -7,9 +7,12 @@ import type {
 	ISuggestion,
 } from '@/types/locationPicker.interface'
 import { useJsApiLoader } from '@react-google-maps/api'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-const libraries: ('geometry' | 'places')[] = ['geometry', 'places']
+const LIBRARIES: ('geometry' | 'places')[] = ['geometry', 'places']
+const SEARCH_DEBOUNCE_MS = 400
+const MIN_SEARCH_LENGTH = 2
+
 const getReadableAddress = (results: google.maps.GeocoderResult[]): string => {
 	if (!results || results.length === 0) return ''
 
@@ -52,41 +55,59 @@ export const useLocationPicker = ({
 	onSelectLocation,
 	initialLocation,
 }: IExtendedLocationPickerProps) => {
-	const [position, setPosition] = useState<{ lat: number; lng: number } | null>(
-		initialLocation ? { lat: initialLocation.lat, lng: initialLocation.lng } : null,
-	)
-	const { showError, showWarning } = useAlert()
-	const [searchValue, setSearchValue] = useState(initialLocation?.address || '')
+	const [locationState, setLocationState] = useState<{
+		position: { lat: number; lng: number } | null
+		searchValue: string
+	}>({
+		position: initialLocation
+			? { lat: initialLocation.lat, lng: initialLocation.lng }
+			: null,
+		searchValue: initialLocation?.address || '',
+	})
+
 	const [searchResults, setSearchResults] = useState<ISearchResult[]>([])
 	const [showResults, setShowResults] = useState(false)
 	const [isSearching, setIsSearching] = useState(false)
 
+	const { showError, showWarning } = useAlert()
+
 	const mapRef = useRef<google.maps.Map | null>(null)
 	const geocoder = useRef<google.maps.Geocoder | null>(null)
 	const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+	const isInitializedRef = useRef(false)
 
-	const { isLoaded } = useJsApiLoader({
-		googleMapsApiKey: API_URL.GOOGLE_MAPS!,
-		libraries,
-		language: 'en',
-		region: 'UA',
-	})
+	const loaderConfig = useMemo(
+		() => ({
+			googleMapsApiKey: API_URL.GOOGLE_MAPS!,
+			libraries: LIBRARIES,
+			language: 'en',
+			region: 'UA',
+		}),
+		[],
+	)
+
+	const { isLoaded } = useJsApiLoader(loaderConfig)
 
 	useEffect(() => {
-		if (!isLoaded || !window.google) return
+		if (!isLoaded || !window.google || geocoder.current) return
 		geocoder.current = new window.google.maps.Geocoder()
 	}, [isLoaded])
 
 	useEffect(() => {
-		if (initialLocation && initialLocation.address && !position) {
-			setPosition({ lat: initialLocation.lat, lng: initialLocation.lng })
-			setSearchValue(initialLocation.address)
+		if (isInitializedRef.current || !initialLocation) return
+
+		if (initialLocation.address && !locationState.position) {
+			setLocationState({
+				position: { lat: initialLocation.lat, lng: initialLocation.lng },
+				searchValue: initialLocation.address,
+			})
+			isInitializedRef.current = true
 		}
-	}, [initialLocation, position])
+	}, [initialLocation, locationState.position])
 
 	const searchPlaces = useCallback(
 		async (query: string) => {
-			if (!window.google?.maps?.importLibrary || query.length < 2) {
+			if (!window.google?.maps?.importLibrary || query.length < MIN_SEARCH_LENGTH) {
 				setSearchResults([])
 				setShowResults(false)
 				setIsSearching(false)
@@ -98,6 +119,7 @@ export const useLocationPicker = ({
 				const lib = (await window.google.maps.importLibrary('places')) as {
 					AutocompleteSuggestion: IAutocompleteSuggestionStatic
 				}
+
 				const { suggestions } =
 					await lib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
 						input: query,
@@ -116,6 +138,7 @@ export const useLocationPicker = ({
 
 				setSearchResults(formatted)
 				setShowResults(formatted.length > 0)
+
 				if (formatted.length === 0) showWarning(`No results found for "${query}"`)
 			} catch {
 				setSearchResults([])
@@ -130,11 +153,9 @@ export const useLocationPicker = ({
 
 	const handleSearch = useCallback(
 		(value: string) => {
-			setSearchValue(value)
+			setLocationState(prev => ({ ...prev, searchValue: value }))
 			if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
-			searchTimeoutRef.current = setTimeout(() => {
-				searchPlaces(value)
-			}, 400)
+			searchTimeoutRef.current = setTimeout(() => searchPlaces(value), SEARCH_DEBOUNCE_MS)
 		},
 		[searchPlaces],
 	)
@@ -142,14 +163,11 @@ export const useLocationPicker = ({
 	const handleClear = useCallback(() => {
 		if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
 
-		setTimeout(() => {
-			setSearchValue('')
-			setSearchResults([])
-			setShowResults(false)
-			setPosition(null)
-			setIsSearching(false)
-			onSelectLocation({ lat: 0, lng: 0, address: '' })
-		}, 0)
+		setLocationState({ position: null, searchValue: '' })
+		setSearchResults([])
+		setShowResults(false)
+		setIsSearching(false)
+		onSelectLocation({ lat: 0, lng: 0, address: '' })
 	}, [onSelectLocation])
 
 	const handleResultSelect = useCallback(
@@ -157,29 +175,28 @@ export const useLocationPicker = ({
 			if (!geocoder.current) return
 
 			geocoder.current.geocode({ placeId: result.placeId }, (results, status) => {
-				if (status === 'OK' && results?.[0]) {
-					const location = results[0].geometry.location
-					const lat = location.lat()
-					const lng = location.lng()
-					const address = result.fullAddress
+				if (status !== 'OK' || !results?.[0]) return
 
-					const coords = { lat, lng, address }
-					setPosition({ lat, lng })
-					setSearchValue(address)
-					setShowResults(false)
-					onSelectLocation(coords)
+				const location = results[0].geometry.location
+				const lat = location.lat()
+				const lng = location.lng()
+				const address = result.fullAddress
 
-					if (mapRef.current) {
-						mapRef.current.panTo({ lat, lng })
-						const types = results[0].types
-						let zoom = 12
-						if (types.includes('country')) zoom = 6
-						else if (types.includes('administrative_area_level_1')) zoom = 8
-						else if (types.includes('locality')) zoom = 12
-						else if (types.includes('establishment')) zoom = 16
+				setLocationState({ position: { lat, lng }, searchValue: address })
+				setShowResults(false)
+				onSelectLocation({ lat, lng, address })
 
-						mapRef.current.setZoom(zoom)
-					}
+				if (mapRef.current) {
+					mapRef.current.panTo({ lat, lng })
+
+					const types = results[0].types
+					let zoom = 12
+					if (types.includes('country')) zoom = 6
+					else if (types.includes('administrative_area_level_1')) zoom = 8
+					else if (types.includes('locality')) zoom = 12
+					else if (types.includes('establishment')) zoom = 16
+
+					mapRef.current.setZoom(zoom)
 				}
 			})
 		},
@@ -189,34 +206,27 @@ export const useLocationPicker = ({
 	const handleMapClick = useCallback(
 		(event: google.maps.MapMouseEvent) => {
 			if (!event.latLng || !geocoder.current) return
+
 			const lat = event.latLng.lat()
 			const lng = event.latLng.lng()
 
-			setPosition({ lat, lng })
+			setLocationState(prev => ({ ...prev, position: { lat, lng } }))
 
 			geocoder.current.geocode({ location: { lat, lng } }, (results, status) => {
-				if (status === 'OK' && results) {
-					const address = getReadableAddress(results)
-					setSearchValue(address)
-					onSelectLocation({ lat, lng, address })
-				} else {
-					const address = `${lat.toFixed(6)}, ${lng.toFixed(6)}`
-					setSearchValue(address)
-					onSelectLocation({ lat, lng, address })
-				}
+				const address =
+					status === 'OK' && results
+						? getReadableAddress(results)
+						: `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+
+				setLocationState(prev => ({ ...prev, searchValue: address }))
+				onSelectLocation({ lat, lng, address })
 			})
 		},
 		[onSelectLocation],
 	)
 
-	const onMapLoad = useCallback((map: google.maps.Map) => {
+	const onMapLoad = useCallback((map: google.maps.Map): void => {
 		mapRef.current = map
-	}, [])
-
-	useEffect(() => {
-		return () => {
-			if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
-		}
 	}, [])
 
 	const handleKeyDown = useCallback(
@@ -224,15 +234,20 @@ export const useLocationPicker = ({
 			if (e.key === 'Enter' && searchResults.length > 0) {
 				e.preventDefault()
 				handleResultSelect(searchResults[0])
-			}
-			if (e.key === 'Escape') setShowResults(false)
+			} else if (e.key === 'Escape') setShowResults(false)
 		},
 		[searchResults, handleResultSelect],
 	)
 
+	useEffect(() => {
+		return () => {
+			if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+		}
+	}, [])
+
 	return {
-		position,
-		searchValue,
+		position: locationState.position,
+		searchValue: locationState.searchValue,
 		isSearching,
 		searchResults,
 		showResults,
@@ -242,9 +257,6 @@ export const useLocationPicker = ({
 		handleResultSelect,
 		handleClear,
 		setShowResults,
-		setSearchValue,
-		setSearchResults,
-		setPosition,
 		onMapLoad,
 		handleMapClick,
 	}

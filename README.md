@@ -45,6 +45,10 @@ ALLOWED_ORIGINS=http://localhost:3001
 
 JWT_TOKEN_SECRET=your_jwt_access_secret
 JWT_REFRESH_TOKEN_SECRET=your_jwt_refresh_secret
+JWT_EXPIRES_IN=1d
+JWT_REFRESH_EXPIRES_IN=30d
+
+DOMAIN=localhost
 
 AWS_ACCESS_KEY_ID=your_aws_access_key_id
 AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key

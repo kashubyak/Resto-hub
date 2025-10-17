@@ -1,6 +1,10 @@
-import AuthPageClient from '../AuthPageClient'
+import { AuthPageClient } from '../AuthPageClient'
 
-export default function AuthPage({ params }: { params: { mode: string } }) {
-	const mode = params.mode === 'login' ? 'login' : 'register'
+export default async function AuthPage({
+	params,
+}: {
+	params: Promise<{ mode: 'login' | 'register' }>
+}) {
+	const { mode } = await params
 	return <AuthPageClient mode={mode} />
 }

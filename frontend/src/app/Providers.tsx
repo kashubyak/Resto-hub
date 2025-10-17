@@ -5,11 +5,11 @@ import { AlertProvider, useAlert } from '@/providers/AlertContext'
 import { AuthProvider } from '@/providers/AuthContext'
 import { useAlertStore } from '@/store/alert.store'
 import { setGlobalAlertFunction } from '@/utils/api'
-import { useEffect } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useEffect, useRef } from 'react'
 
 const AlertInitializer = () => {
 	const { showAlert } = useAlert()
-
 	useEffect(() => {
 		setGlobalAlertFunction((severity, text) =>
 			showAlert({
@@ -21,25 +21,30 @@ const AlertInitializer = () => {
 
 	useEffect(() => {
 		const pending = useAlertStore.getState().consumePendingAlert()
-		if (pending) {
+		if (pending)
 			showAlert({
 				severity: pending.severity,
 				text: pending.text,
 				duration: pending.duration,
 			})
-		}
 	}, [showAlert])
+
 	return null
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
+	const queryClientRef = useRef<QueryClient>(null)
+	if (!queryClientRef.current) queryClientRef.current = new QueryClient()
+
 	return (
-		<AlertProvider>
-			<AuthProvider>
-				<AlertInitializer />
-				{children}
-				<AlertDisplay />
-			</AuthProvider>
-		</AlertProvider>
+		<QueryClientProvider client={queryClientRef.current}>
+			<AlertProvider>
+				<AuthProvider>
+					<AlertInitializer />
+					{children}
+					<AlertDisplay />
+				</AuthProvider>
+			</AlertProvider>
+		</QueryClientProvider>
 	)
 }

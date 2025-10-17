@@ -6,6 +6,7 @@ import { Providers } from './Providers'
 const geistSans = Geist({
 	variable: '--font-geist-sans',
 	subsets: ['latin'],
+	display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -23,11 +24,7 @@ export const metadata: Metadata = {
 	manifest: '/site.webmanifest',
 }
 
-export default function RootLayout({
-	children,
-}: Readonly<{
-	children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang='en'>
 			<body className={`${geistSans.variable} antialiased`}>

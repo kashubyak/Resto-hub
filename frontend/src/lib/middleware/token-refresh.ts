@@ -7,28 +7,37 @@ interface IRefreshResult {
 	error?: string
 }
 
+const REFRESH_URL = `${process.env.NEXT_PUBLIC_API_URL}${API_URL.AUTH.REFRESH}`
+
+const FETCH_OPTIONS_BASE = {
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/json',
+	},
+	credentials: 'include' as RequestCredentials,
+}
+
 export async function refreshAccessToken(request: NextRequest): Promise<IRefreshResult> {
 	try {
-		const refreshUrl = buildRefreshUrl()
-		const response = await fetch(refreshUrl, {
-			method: 'POST',
+		const cookie = request.headers.get('cookie')
+
+		const response = await fetch(REFRESH_URL, {
+			...FETCH_OPTIONS_BASE,
 			headers: {
-				'Content-Type': 'application/json',
-				Cookie: request.headers.get('cookie') || '',
+				...FETCH_OPTIONS_BASE.headers,
+				...(cookie && { Cookie: cookie }),
 			},
-			credentials: 'include',
 		})
 
 		if (!response.ok) return { success: false, error: `HTTP ${response.status}` }
-
 		const data = await response.json()
-		if (data.token) return { success: true, token: data.token }
-		return { success: false, error: 'No token in response' }
-	} catch {
+
+		return data.token
+			? { success: true, token: data.token }
+			: { success: false, error: 'No token in response' }
+	} catch (error) {
+		if (process.env.NODE_ENV !== 'production')
+			console.error('Token refresh error:', error)
 		return { success: false, error: 'Network error' }
 	}
-}
-
-function buildRefreshUrl(): string {
-	return `${process.env.NEXT_PUBLIC_API_URL}${API_URL.AUTH.REFRESH}`
 }
