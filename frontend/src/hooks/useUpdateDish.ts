@@ -8,7 +8,10 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDishes } from './useDishes'
 
-const toNumber = (value: string | number | undefined): number | undefined => {
+const toNumber = (
+	value: string | number | null | undefined,
+): number | null | undefined => {
+	if (value === null || value === undefined) return value
 	if (typeof value === 'number') return value
 	if (typeof value === 'string') {
 		const num = parseFloat(value)
@@ -70,30 +73,20 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 			try {
 				if (!dishData) return
 
-				const changedData: Partial<IDishFormValues> & { id: number } = {
+				const changedData: Record<string, unknown> & { id: number } = {
 					id: dishData.id,
 				}
 
-				// delete any types later
-				const fieldMapping: Array<{
-					key: keyof typeof dirtyFields
-					value: any
-					converter?: (val: any) => any
-				}> = [
-					{ key: 'name', value: formData.name },
-					{ key: 'description', value: formData.description },
-					{ key: 'price', value: formData.price, converter: toNumber },
-					{ key: 'categoryId', value: formData.categoryId },
-					{ key: 'ingredients', value: formData.ingredients },
-					{ key: 'weightGr', value: formData.weightGr, converter: toNumber },
-					{ key: 'calories', value: formData.calories, converter: toNumber },
-					{ key: 'available', value: formData.available },
-					{ key: 'imageUrl', value: formData.imageUrl },
-				]
-
-				fieldMapping.forEach(({ key, value, converter }) => {
-					if (dirtyFields[key]) changedData[key] = converter ? converter(value) : value
-				})
+				if (dirtyFields.name) changedData.name = formData.name
+				if (dirtyFields.description) changedData.description = formData.description
+				if (dirtyFields.price) changedData.price = toNumber(formData.price)
+				if (dirtyFields.categoryId) changedData.categoryId = formData.categoryId
+				if (dirtyFields.ingredients) changedData.ingredients = formData.ingredients
+				if (dirtyFields.weightGr) changedData.weightGr = toNumber(formData.weightGr)
+				if (dirtyFields.calories) changedData.calories = toNumber(formData.calories)
+				if (dirtyFields.available !== undefined)
+					changedData.available = formData.available
+				if (dirtyFields.imageUrl) changedData.imageUrl = formData.imageUrl
 
 				const { data } = await updateDishService(changedData)
 				updateDishCache(queryClient, data)
