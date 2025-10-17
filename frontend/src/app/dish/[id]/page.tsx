@@ -1,6 +1,5 @@
 'use client'
 
-import { Loading } from '@/components/ui/Loading'
 import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
 import { use } from 'react'
@@ -9,12 +8,13 @@ import { DishDetails } from './components/DishDetails'
 import { DishDownInfo } from './components/DishDownInfo'
 import { DishImage } from './components/DishImage'
 import { DishTopInfo } from './components/DishTopInfo'
+import { DishPageSkeleton } from './components/skeleton/DishPageSkeleton'
 
 export default function DishPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = use(params)
 	const { dishQuery } = useDishes(Number(id))
 
-	if (dishQuery.isLoading) return <Loading title='Loading dish details...' />
+	if (dishQuery.isLoading) return <DishPageSkeleton />
 	if (dishQuery.isError || !dishQuery.data)
 		return (
 			<NotFound
