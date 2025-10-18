@@ -71,7 +71,11 @@ export const AUTH_ROUTES_LIST: string[] = [
 const SHARED_ROUTES: string[] = [ROUTES.PRIVATE.SHARED.DASHBOARD]
 
 export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
-	[UserRole.ADMIN]: [...SHARED_ROUTES, ROUTES.PRIVATE.ADMIN.DISH],
+	[UserRole.ADMIN]: [
+		...SHARED_ROUTES,
+		ROUTES.PRIVATE.ADMIN.DISH,
+		ROUTES.PRIVATE.ADMIN.CATEGORY,
+	],
 	[UserRole.COOK]: [...SHARED_ROUTES],
 	[UserRole.WAITER]: [...SHARED_ROUTES],
 }
