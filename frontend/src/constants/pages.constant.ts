@@ -1,3 +1,4 @@
+import CategoryIcon from '@mui/icons-material/Category'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
 import type { ComponentType } from 'react'
@@ -43,6 +44,7 @@ export const ROUTES = {
 		ADMIN: {
 			DISH: '/dish',
 			DISH_ID: (id: number | string) => `/dish/${id}`,
+			CATEGORY: '/category',
 		},
 		COOK: {},
 		WAITER: {},
@@ -93,6 +95,12 @@ export const ALL_ROUTES: IRouteConfig[] = [
 		path: ROUTES.PRIVATE.ADMIN.DISH,
 		name: 'Dishes',
 		icon: RestaurantMenuIcon,
+		roles: ADMIN_ROLES,
+	},
+	{
+		path: ROUTES.PRIVATE.ADMIN.CATEGORY,
+		name: 'Categories',
+		icon: CategoryIcon,
 		roles: ADMIN_ROLES,
 	},
 ]
