@@ -1,7 +1,7 @@
 'use client'
 
 import { ROUTES } from '@/constants/pages.constant'
-import { DISHES_QUERY_KEY } from '@/constants/query-keys.constant'
+import { DISHES_QUERY_KEY, LIMIT } from '@/constants/query-keys.constant'
 import { useAlert } from '@/providers/AlertContext'
 import { deleteDishFromCategory } from '@/services/dish/delete-dish-category.service'
 import { deleteDish } from '@/services/dish/delete-dish.service'
@@ -21,8 +21,6 @@ import {
 } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
-
-const LIMIT = 10
 
 export const useDishes = (
 	dishId?: number,
