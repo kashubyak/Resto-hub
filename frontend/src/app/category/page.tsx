@@ -1,3 +1,5 @@
+import { CategoryListItem } from './CategoryListItem'
+
 export default function CategoryPage() {
-	return <div>Category Page</div>
+	return <CategoryListItem />
 }
