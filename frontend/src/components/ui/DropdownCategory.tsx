@@ -1,6 +1,12 @@
 import { useCategories } from '@/hooks/useCategories'
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
-import { memo } from 'react'
+import {
+	FormControl,
+	InputLabel,
+	MenuItem,
+	Select,
+	type SelectChangeEvent,
+} from '@mui/material'
+import { memo, useCallback, useState } from 'react'
 
 const MENU_PROPS_SX = {
 	'& .MuiPaper-root': {
@@ -71,6 +77,12 @@ const SELECT_SX = {
 
 export const DropdownCategory = memo(() => {
 	const { allCategories } = useCategories()
+	const [selectedCategory, setSelectedCategory] = useState<string | number>('')
+
+	const handleChange = useCallback((event: SelectChangeEvent<string | number>) => {
+		setSelectedCategory(event.target.value)
+	}, [])
+
 	return (
 		<FormControl fullWidth>
 			<InputLabel id='dropdown-category-label' sx={INPUT_LABEL_SX}>
@@ -79,14 +91,17 @@ export const DropdownCategory = memo(() => {
 			<Select
 				labelId='dropdown-category-label'
 				id='dropdown-category-select'
+				value={selectedCategory}
 				label='Category'
-				onChange={() => {}}
+				onChange={handleChange}
 				variant='outlined'
 				sx={SELECT_SX}
 				MenuProps={{
 					sx: MENU_PROPS_SX,
 				}}
 			>
+				<MenuItem value=''>None</MenuItem>
+
 				{allCategories.map(category => (
 					<MenuItem key={category.id} value={category.id} sx={MENU_ITEM_SX}>
 						{category.name}
