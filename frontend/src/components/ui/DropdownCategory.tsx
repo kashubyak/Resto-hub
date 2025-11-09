@@ -1,3 +1,4 @@
+import { useCategories } from '@/hooks/useCategories'
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
 import { memo } from 'react'
 
@@ -69,6 +70,7 @@ const SELECT_SX = {
 }
 
 export const DropdownCategory = memo(() => {
+	const { allCategories } = useCategories()
 	return (
 		<FormControl fullWidth>
 			<InputLabel id='dropdown-category-label' sx={INPUT_LABEL_SX}>
@@ -85,15 +87,11 @@ export const DropdownCategory = memo(() => {
 					sx: MENU_PROPS_SX,
 				}}
 			>
-				<MenuItem value={10} sx={MENU_ITEM_SX}>
-					Ten
-				</MenuItem>
-				<MenuItem value={20} sx={MENU_ITEM_SX}>
-					Twenty
-				</MenuItem>
-				<MenuItem value={30} sx={MENU_ITEM_SX}>
-					Thirty
-				</MenuItem>
+				{allCategories.map(category => (
+					<MenuItem key={category.id} value={category.id} sx={MENU_ITEM_SX}>
+						{category.name}
+					</MenuItem>
+				))}
 			</Select>
 		</FormControl>
 	)
