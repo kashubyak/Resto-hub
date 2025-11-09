@@ -6,7 +6,7 @@ import type { IUser } from '@/types/user.interface'
 import LogoutIcon from '@mui/icons-material/Logout'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { memo, useMemo } from 'react'
-import { DropdownMenu, type IMenuItem } from '../../ui/DropdownMenu'
+import { KebabMenu, type IMenuItem } from '../../ui/KebabMenu'
 import { ViewableImage } from '../ImageViewer/ViewableImage'
 
 const ExpandedUserView = memo(
@@ -126,7 +126,7 @@ export const SideBarUser = memo(({ collapsed }: { collapsed: boolean }) => {
 				/>
 			)}
 
-			<DropdownMenu
+			<KebabMenu
 				isOpen={isOpen}
 				position={position}
 				menuRef={menuRef}
