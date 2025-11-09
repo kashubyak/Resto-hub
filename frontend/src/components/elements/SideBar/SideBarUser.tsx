@@ -1,6 +1,6 @@
 'use client'
 
-import { useDropdownMenu } from '@/hooks/useDropdownMenu'
+import { useKebabMenu } from '@/hooks/useDropdownMenu'
 import { useAuth } from '@/providers/AuthContext'
 import type { IUser } from '@/types/user.interface'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -93,8 +93,7 @@ CollapsedUserView.displayName = 'CollapsedUserView'
 
 export const SideBarUser = memo(({ collapsed }: { collapsed: boolean }) => {
 	const { user, logout } = useAuth()
-	const { isOpen, position, toggleMenu, closeMenu, menuRef, buttonRef } =
-		useDropdownMenu()
+	const { isOpen, position, toggleMenu, closeMenu, menuRef, buttonRef } = useKebabMenu()
 
 	const menuItems: IMenuItem[] = useMemo(
 		() => [
