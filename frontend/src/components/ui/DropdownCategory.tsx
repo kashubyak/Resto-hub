@@ -6,7 +6,21 @@ import {
 	Select,
 	type SelectChangeEvent,
 } from '@mui/material'
-import { memo, useCallback, useState } from 'react'
+import { memo } from 'react'
+import type { ControllerFieldState, ControllerRenderProps } from 'react-hook-form'
+
+type ValueType = string | number | null | undefined
+type FormValues = {
+	[key: string]: ValueType
+}
+
+type FieldProps = ControllerRenderProps<FormValues, string> & {
+	value: ValueType
+	onChange: (value: ValueType) => void
+}
+type DropdownCategoryProps = FieldProps & {
+	fieldState: ControllerFieldState
+}
 
 const MENU_PROPS_SX = {
 	'& .MuiPaper-root': {
@@ -36,30 +50,39 @@ const MENU_ITEM_SX = {
 	'&.Mui-selected': {
 		backgroundColor: 'var(--active-item) !important',
 	},
+	'&.Mui-focusVisible': {
+		backgroundColor: 'var(--muted-hover)',
+	},
 }
 
-const INPUT_LABEL_SX = {
-	color: 'color-mix(in oklab, var(--foreground) 70%, transparent)',
+const INPUT_LABEL_SX = (isError: boolean) => ({
+	color: isError
+		? 'var(--destructive)'
+		: 'color-mix(in oklab, var(--foreground) 70%, transparent)',
 	'&.Mui-focused': {
-		color: 'var(--primary)',
+		color: isError ? 'var(--destructive)' : 'var(--primary)',
 	},
 	'&.MuiInputLabel-shrink': {
 		transform: 'translate(14px, -9px) scale(0.75)',
 	},
 	transform: 'translate(14px, 16px) scale(1)',
-}
+})
 
-const SELECT_SX = {
+const SELECT_SX = (isError: boolean) => ({
 	backgroundColor: 'var(--input)',
 	color: 'var(--foreground)',
 
 	'& .MuiOutlinedInput-notchedOutline': {
-		borderColor: 'var(--border)',
+		borderColor: isError ? 'var(--destructive)' : 'var(--border)',
 		borderWidth: '1px',
 		borderRadius: '6px',
 	},
+	'&:hover .MuiOutlinedInput-notchedOutline': {
+		borderColor: isError ? 'var(--destructive)' : 'var(--border)',
+		borderWidth: '1px',
+	},
 	'&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-		borderColor: 'var(--primary)',
+		borderColor: isError ? 'var(--destructive)' : 'var(--primary)',
 		borderWidth: '2px',
 	},
 	'& .MuiSelect-select': {
@@ -73,34 +96,43 @@ const SELECT_SX = {
 		color: 'var(--muted-foreground)',
 		right: '0.75rem',
 	},
-}
+})
 
-export const DropdownCategory = memo(() => {
+export const DropdownCategory = memo((props: DropdownCategoryProps) => {
 	const { allCategories } = useCategories()
-	const [selectedCategory, setSelectedCategory] = useState<string | number>('')
+	const { fieldState, value, onChange, ...restFieldProps } = props
 
-	const handleChange = useCallback((event: SelectChangeEvent<string | number>) => {
-		setSelectedCategory(event.target.value)
-	}, [])
+	const isError = !!fieldState.error
+	const selectedValue = value ?? ''
+
+	const handleChange = (event: SelectChangeEvent<ValueType>) => {
+		const newValue = event.target.value
+
+		if (newValue === '') onChange(null)
+		else onChange(newValue)
+	}
 
 	return (
-		<FormControl fullWidth>
-			<InputLabel id='dropdown-category-label' sx={INPUT_LABEL_SX}>
+		<FormControl fullWidth error={isError}>
+			<InputLabel id='dropdown-category-label' sx={INPUT_LABEL_SX(isError)}>
 				Category
 			</InputLabel>
 			<Select
 				labelId='dropdown-category-label'
 				id='dropdown-category-select'
-				value={selectedCategory}
-				label='Category'
+				{...restFieldProps}
+				value={selectedValue}
 				onChange={handleChange}
+				label='Category'
 				variant='outlined'
-				sx={SELECT_SX}
+				sx={SELECT_SX(isError)}
 				MenuProps={{
 					sx: MENU_PROPS_SX,
 				}}
 			>
-				<MenuItem value=''>None</MenuItem>
+				<MenuItem value='' sx={MENU_ITEM_SX}>
+					None
+				</MenuItem>
 
 				{allCategories.map(category => (
 					<MenuItem key={category.id} value={category.id} sx={MENU_ITEM_SX}>
@@ -108,6 +140,11 @@ export const DropdownCategory = memo(() => {
 					</MenuItem>
 				))}
 			</Select>
+			{isError && (
+				<span className='text-[var(--destructive)] text-sm mt-1'>
+					{fieldState.error?.message}
+				</span>
+			)}
 		</FormControl>
 	)
 })

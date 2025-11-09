@@ -16,7 +16,9 @@ const CategoryInputFunction = ({ control }: CategoryInputProps) => {
 			name='categoryId'
 			control={control}
 			rules={categoryIdValidation}
-			render={({ field, fieldState }) => <DropdownCategory />}
+			render={({ field, fieldState }) => (
+				<DropdownCategory {...field} fieldState={fieldState} />
+			)}
 		/>
 	)
 }
