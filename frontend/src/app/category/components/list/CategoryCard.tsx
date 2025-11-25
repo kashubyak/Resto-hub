@@ -43,10 +43,7 @@ const CategoryCardComponent = ({ category }: CategoryCardProps) => {
 
 			<div className='mt-auto'>
 				<Link href={`/category/${category.id}`} className='w-full block'>
-					<Button
-						text='View Details'
-						className='w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground border-0'
-					/>
+					<Button text='View Details' />
 				</Link>
 			</div>
 		</div>
