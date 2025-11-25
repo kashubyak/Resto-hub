@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/Button'
+import { ROUTES } from '@/constants/pages.constant'
 import type { ICategoryWithDishes } from '@/types/category.interface'
 import Link from 'next/link'
 import { memo } from 'react'
@@ -38,12 +39,15 @@ const CategoryCardComponent = ({ category }: CategoryCardProps) => {
 			</h3>
 
 			<p className='text-sm text-muted-foreground mb-6'>
-				{dishCount} {dishCount === 1 ? 'dish' : 'dishes'} available
+				{dishCount} {dishCount === 1 ? 'dish' : 'dishes'}
 			</p>
 
 			<div className='mt-auto'>
-				<Link href={`/category/${category.id}`} className='w-full block'>
-					<Button text='View Details' />
+				<Link
+					href={ROUTES.PRIVATE.ADMIN.CATEGORY_ID(category.id)}
+					className='w-full block'
+				>
+					<Button text='View Details' className='w-full' />
 				</Link>
 			</div>
 		</div>
