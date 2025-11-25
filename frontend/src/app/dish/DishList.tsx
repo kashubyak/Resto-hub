@@ -4,11 +4,11 @@ import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
 import type { FilterValues } from '@/types/filter.interface'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { ViewModeToggle, type ViewMode } from '../../components/ui/ViewModeToggle'
 import { DishCard } from './components/list/DishCard'
 import { DishListItem } from './components/list/DishListItem'
 import { DishCardSkeleton } from './components/list/skeleton/DishCardSkeleton'
 import { DishListItemSkeleton } from './components/list/skeleton/DishListItemSkeleton'
-import { ViewModeToggle, type ViewMode } from './components/list/ViewModeToggle'
 
 interface DishListProps {
 	searchQuery?: string
