@@ -102,11 +102,9 @@ const DishListComponent: React.FC<DishListProps> = ({
 			<div className='flex justify-between items-center mb-6'>
 				<h2 className='text-2xl font-bold'>
 					Dish List
-					{(searchQuery || hasActiveFilters) && (
-						<span className='text-base font-normal text-secondary-foreground ml-2'>
-							({allDishes.length} {allDishes.length === 1 ? 'result' : 'results'})
-						</span>
-					)}
+					<span className='text-base font-normal text-muted-foreground ml-2'>
+						({allDishes.length} {allDishes.length === 1 ? 'item' : 'items'})
+					</span>
 				</h2>
 				<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 			</div>
