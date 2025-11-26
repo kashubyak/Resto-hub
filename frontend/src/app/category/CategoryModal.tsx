@@ -142,10 +142,9 @@ export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
 					<Button
 						type='submit'
 						text={isSubmitting ? 'Creating...' : 'Create'}
-						disabled={isSubmitting}
-						className={`bg-success text-white hover:bg-success/90 ${
-							isMobile ? 'w-full' : 'px-8'
-						}`}
+						className={`${
+							isMobile ? 'w-full' : 'w-auto px-4 py-2'
+						} bg-success text-foreground hover:bg-success`}
 					/>
 				</DialogActions>
 			</form>
