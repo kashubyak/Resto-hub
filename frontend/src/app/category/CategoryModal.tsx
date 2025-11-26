@@ -107,7 +107,6 @@ export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
 						<TextField
 							fullWidth
 							label='Category Name'
-							placeholder='e.g. Pizza, Drinks, Desserts'
 							error={!!errors.name}
 							helperText={errors.name?.message}
 							variant='outlined'
@@ -115,8 +114,12 @@ export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
 							{...register('name', {
 								required: 'Name is required',
 								minLength: {
-									value: 2,
-									message: 'Name must be at least 2 characters',
+									value: 3,
+									message: 'Name must be at least 3 characters',
+								},
+								maxLength: {
+									value: 50,
+									message: 'Name cannot exceed 50 characters',
 								},
 							})}
 						/>
