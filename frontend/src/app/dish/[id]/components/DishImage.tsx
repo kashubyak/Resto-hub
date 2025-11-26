@@ -3,8 +3,8 @@ import { ViewableImage } from '@/components/elements/ImageViewer/ViewableImage'
 export const DishImage = ({ imageUrl, name }: { imageUrl: string; name: string }) => {
 	return (
 		<div className='lg:col-span-2 relative flex items-center justify-center lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:self-start'>
-			<div className='relative w-full max-w-7xl'>
-				<div className='relative w-full aspect-[4/3] lg:h-[70vh]'>
+			<div className='relative w-full max-w-7xl h-full'>
+				<div className='relative w-full h-full min-h-[40vh]'>
 					<ViewableImage
 						src={imageUrl}
 						alt={name}

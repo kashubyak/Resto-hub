@@ -4,11 +4,11 @@ import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
 import type { FilterValues } from '@/types/filter.interface'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { ViewModeToggle, type ViewMode } from '../../components/ui/ViewModeToggle'
 import { DishCard } from './components/list/DishCard'
 import { DishListItem } from './components/list/DishListItem'
 import { DishCardSkeleton } from './components/list/skeleton/DishCardSkeleton'
 import { DishListItemSkeleton } from './components/list/skeleton/DishListItemSkeleton'
-import { ViewModeToggle, type ViewMode } from './components/list/ViewModeToggle'
 
 interface DishListProps {
 	searchQuery?: string
@@ -102,11 +102,9 @@ const DishListComponent: React.FC<DishListProps> = ({
 			<div className='flex justify-between items-center mb-6'>
 				<h2 className='text-2xl font-bold'>
 					Dish List
-					{(searchQuery || hasActiveFilters) && (
-						<span className='text-base font-normal text-secondary-foreground ml-2'>
-							({allDishes.length} {allDishes.length === 1 ? 'result' : 'results'})
-						</span>
-					)}
+					<span className='text-base font-normal text-muted-foreground ml-2'>
+						({allDishes.length} {allDishes.length === 1 ? 'item' : 'items'})
+					</span>
 				</h2>
 				<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 			</div>

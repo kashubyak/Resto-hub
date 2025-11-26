@@ -18,7 +18,7 @@ interface IPosition {
 	left: number
 }
 
-interface IDropdownMenuProps {
+interface IKebabMenuProps {
 	isOpen: boolean
 	position: IPosition
 	menuRef: React.RefObject<HTMLDivElement | null>
@@ -55,7 +55,7 @@ const MenuItem = memo<{
 
 MenuItem.displayName = 'MenuItem'
 
-export const DropdownMenu = memo<IDropdownMenuProps>(
+export const KebabMenu = memo<IKebabMenuProps>(
 	({ isOpen, position, menuRef, items, onClose, className = '' }) => {
 		const handleItemClick = useCallback(
 			(item: IMenuItem) => {
@@ -90,4 +90,4 @@ export const DropdownMenu = memo<IDropdownMenuProps>(
 	},
 )
 
-DropdownMenu.displayName = 'DropdownMenu'
+KebabMenu.displayName = 'KebabMenu'
