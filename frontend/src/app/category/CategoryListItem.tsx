@@ -3,6 +3,7 @@
 import { NotFound } from '@/components/ui/NotFound'
 import { ViewModeToggle, type ViewMode } from '@/components/ui/ViewModeToggle'
 import { useCategories } from '@/hooks/useCategories'
+import type { FilterValues } from '@/types/filter.interface'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { CategoryCard } from './components/list/CategoryCard'
 import { CategoryRowItem } from './components/list/CategoryRowItem'
@@ -14,7 +15,15 @@ const RowSkeleton = () => (
 	<div className='h-[80px] bg-muted/50 border border-border rounded-lg animate-pulse' />
 )
 
-const CategoryListItemComponent = () => {
+interface CategoryListItemProps {
+	searchQuery?: string
+	filters?: FilterValues
+}
+
+const CategoryListItemComponent = ({
+	searchQuery = '',
+	filters = {},
+}: CategoryListItemProps) => {
 	const {
 		allCategories,
 		fetchNextPage,
