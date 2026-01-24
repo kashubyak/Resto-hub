@@ -6,7 +6,10 @@ import {
 	type ICategoryWhereInput,
 } from './prisma.interface'
 
-export type { IDeleteResult, IFindManyResult } from 'src/common/interface/repository.interface'
+export type {
+	IDeleteResult,
+	IFindManyResult,
+} from 'src/common/interface/repository.interface'
 
 export type IFindCategoriesArgs = IFindManyArgs<
 	ICategoryWhereInput,

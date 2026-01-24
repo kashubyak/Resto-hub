@@ -18,7 +18,7 @@ import { CategoryRepository } from './repository/category.repository'
 
 @Injectable()
 export class CategoryService {
-	constructor(private readonly categoryRep: CategoryRepository) { }
+	constructor(private readonly categoryRep: CategoryRepository) {}
 
 	async createCategory(
 		dto: CreateCategoryDto,

@@ -20,5 +20,10 @@ export class OrderItemSummaryDto {
 	dish!: DishBasicDto
 }
 
-export { BaseTableDto, BaseUserDto, DishBasicDto, ExtendedTableDto, ExtendedUserDto }
-
+export {
+	BaseTableDto,
+	BaseUserDto,
+	DishBasicDto,
+	ExtendedTableDto,
+	ExtendedUserDto,
+}

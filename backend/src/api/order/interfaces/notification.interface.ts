@@ -10,4 +10,6 @@ export interface IOrderCompletedNotification {
 	table: number | null
 }
 
-export type INotificationData = INewOrderNotification | IOrderCompletedNotification
+export type INotificationData =
+	| INewOrderNotification
+	| IOrderCompletedNotification

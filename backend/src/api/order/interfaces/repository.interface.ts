@@ -14,7 +14,10 @@ import {
 	type IOrderWhereInput,
 } from './prisma.interface'
 
-export type IFindOrdersArgs = IFindManyArgs<IOrderWhereInput, IOrderOrderByInput>
+export type IFindOrdersArgs = IFindManyArgs<
+	IOrderWhereInput,
+	IOrderOrderByInput
+>
 
 export type IFindOrdersResult = IFindManyResult<IOrderWithRelations>
 

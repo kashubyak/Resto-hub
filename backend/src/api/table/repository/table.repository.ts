@@ -42,9 +42,7 @@ export class TableRepository {
 		})
 	}
 
-	async getAllTables(
-		companyId: number,
-	): Promise<ITableRepositoryResultArray> {
+	async getAllTables(companyId: number): Promise<ITableRepositoryResultArray> {
 		return this.prisma.table.findMany({ where: { companyId } })
 	}
 

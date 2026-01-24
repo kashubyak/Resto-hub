@@ -1,5 +1,8 @@
 import { type Role } from '@prisma/client'
-import { type IBaseUser, type IExtendedUser } from 'src/common/interface/user.interface'
+import {
+	type IBaseUser,
+	type IExtendedUser,
+} from 'src/common/interface/user.interface'
 
 export interface IUserRecord {
 	id: number

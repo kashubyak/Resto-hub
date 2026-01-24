@@ -23,7 +23,10 @@ import {
 	type IGroupInfo,
 	type IOrderAnalyticsResult,
 } from './interfaces/analytics.interface'
-import { type INewOrderNotification, type IOrderCompletedNotification } from './interfaces/notification.interface'
+import {
+	type INewOrderNotification,
+	type IOrderCompletedNotification,
+} from './interfaces/notification.interface'
 import {
 	type IOrderItemSummary,
 	type IOrderSummary,
@@ -150,7 +153,11 @@ export class OrderService {
 		if (groupBy === OrderGroupBy.COOK && firstOrder.cookId)
 			return { id: firstOrder.cook!.id, name: firstOrder.cook!.name }
 
-		if (groupBy === OrderGroupBy.TABLE && firstOrder.tableId && firstOrder.table)
+		if (
+			groupBy === OrderGroupBy.TABLE &&
+			firstOrder.tableId &&
+			firstOrder.table
+		)
 			return {
 				id: firstOrder.table.id,
 				name: `Table ${firstOrder.table.number ?? firstOrder.table.id}`,
@@ -210,7 +217,10 @@ export class OrderService {
 			itemsCount: order.items.length,
 			createdAt: createdOrder.createdAt,
 		}
-		this.notificationsGateway.notifyKitchen(socket_events.NEW_ORDER, notification)
+		this.notificationsGateway.notifyKitchen(
+			socket_events.NEW_ORDER,
+			notification,
+		)
 
 		return createdOrder
 	}
@@ -280,12 +290,7 @@ export class OrderService {
 		if (role === Role.WAITER) where.waiterId = userId
 		if (role === Role.COOK) where.cookId = userId
 
-		const {
-			page = 1,
-			limit = 10,
-			sortBy = 'createdAt',
-			order = 'desc',
-		} = query
+		const { page = 1, limit = 10, sortBy = 'createdAt', order = 'desc' } = query
 		const skip = (page - 1) * limit
 
 		const [orders, total] = await Promise.all([
@@ -312,12 +317,7 @@ export class OrderService {
 		query: OrdersQueryDto,
 		companyId: number,
 	): Promise<IPaginatedResponse<IOrderSummary>> {
-		const {
-			page = 1,
-			limit = 10,
-			sortBy = 'createdAt',
-			order = 'desc',
-		} = query
+		const { page = 1, limit = 10, sortBy = 'createdAt', order = 'desc' } = query
 
 		const where: IOrderWhereInput = {
 			cookId: null,

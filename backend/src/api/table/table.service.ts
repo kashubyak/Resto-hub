@@ -13,10 +13,7 @@ import { TableRepository } from './repository/table.repository'
 export class TableService {
 	constructor(private readonly tableRepo: TableRepository) {}
 
-	async createTable(
-		dto: CreateTableDto,
-		companyId: number,
-	): Promise<Table> {
+	async createTable(dto: CreateTableDto, companyId: number): Promise<Table> {
 		const existing = await this.tableRepo.findByNumber(dto.number, companyId)
 		if (existing)
 			throw new ConflictException('Table with this number already exists')
@@ -53,10 +50,7 @@ export class TableService {
 		return this.tableRepo.updateTable(id, companyId, dto)
 	}
 
-	async deleteTable(
-		id: number,
-		companyId: number,
-	): Promise<IDeleteResult> {
+	async deleteTable(id: number, companyId: number): Promise<IDeleteResult> {
 		const table = await this.tableRepo.findById(id, companyId)
 		if (!table) throw new NotFoundException('Table not found')
 		if (table.active === false)

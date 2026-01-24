@@ -69,11 +69,7 @@ export class NotificationsGateway
 	notifyKitchen(event: string, data: INotificationData): void {
 		this.server.to(socket_rooms.KITCHEN).emit(event, data)
 	}
-	notifyWaiter(
-		event: string,
-		data: INotificationData,
-		waiterId: number,
-	): void {
+	notifyWaiter(event: string, data: INotificationData, waiterId: number): void {
 		this.server.to(socket_rooms.WAITER(waiterId)).emit(event, data)
 	}
 }

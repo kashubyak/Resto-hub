@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'prisma/prisma.service'
-import { type IUserCreateInput, type IUserUpdateInput } from '../interfaces/prisma.interface'
+import {
+	type IUserCreateInput,
+	type IUserUpdateInput,
+} from '../interfaces/prisma.interface'
 import {
 	type IFindUsersArgs,
 	type IFindUsersResult,

@@ -16,53 +16,53 @@ export class CreateDishDto {
 	@ApiPropertyOptional()
 	@IsString()
 	@IsNotEmpty()
-	name: string
+	name!: string
 
 	@ApiPropertyOptional()
 	@IsString()
 	@IsNotEmpty()
-	description: string
+	description!: string
 
 	@ApiPropertyOptional()
-	@Transform(({ value }) => parseFloat(value))
+	@Transform(({ value }: { value: unknown }) => parseFloat(String(value)))
 	@IsNumber()
 	@IsPositive()
-	price: number
+	price!: number
 
 	@ApiPropertyOptional()
 	@IsOptional()
-	@Transform(({ value }) => parseInt(value))
+	@Transform(({ value }: { value: unknown }) => parseInt(String(value), 10))
 	@IsInt()
 	categoryId?: number
 
 	@ApiPropertyOptional()
-	@Transform(({ value }) => {
-		if (Array.isArray(value)) return value
+	@Transform(({ value }: { value: unknown }): string[] => {
+		if (Array.isArray(value)) return value as string[]
 		if (typeof value === 'string') return value.split(',').map((v) => v.trim())
 		return []
 	})
 	@IsArray()
 	@ArrayMinSize(1)
 	@IsString({ each: true })
-	ingredients: string[]
+	ingredients!: string[]
 
 	@ApiPropertyOptional()
 	@IsOptional()
-	@Transform(({ value }) => parseFloat(value))
+	@Transform(({ value }: { value: unknown }) => parseFloat(String(value)))
 	@IsNumber()
 	@IsPositive()
-	weightGr: number
+	weightGr?: number
 
 	@ApiPropertyOptional()
 	@IsOptional()
-	@Transform(({ value }) => parseFloat(value))
+	@Transform(({ value }: { value: unknown }) => parseFloat(String(value)))
 	@IsNumber()
 	@IsPositive()
-	calories: number
+	calories?: number
 
 	@ApiPropertyOptional()
 	@IsOptional()
-	@Transform(({ value }) => value === 'true')
+	@Transform(({ value }: { value: unknown }) => value === 'true')
 	@IsBoolean()
 	available?: boolean
 }

@@ -1,7 +1,23 @@
-import { type Order, type OrderItem, type OrderStatus, type Table, type User } from '@prisma/client'
-import { type IDishBasic, type IDishFull, type IDishWithCategory } from 'src/api/dish/interfaces/dish.interface'
-import { type IBaseTable, type IExtendedTable } from 'src/common/interface/table.interface'
-import { type IBaseUser, type IExtendedUser } from 'src/common/interface/user.interface'
+import {
+	type Order,
+	type OrderItem,
+	type OrderStatus,
+	type Table,
+	type User,
+} from '@prisma/client'
+import {
+	type IDishBasic,
+	type IDishFull,
+	type IDishWithCategory,
+} from 'src/api/dish/interfaces/dish.interface'
+import {
+	type IBaseTable,
+	type IExtendedTable,
+} from 'src/common/interface/table.interface'
+import {
+	type IBaseUser,
+	type IExtendedUser,
+} from 'src/common/interface/user.interface'
 
 export interface IOrderItemWithBasicDish {
 	quantity: number

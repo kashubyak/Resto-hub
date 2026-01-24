@@ -2,19 +2,15 @@ import { Injectable } from '@nestjs/common'
 import { OrderStatus } from '@prisma/client'
 import { PrismaService } from 'prisma/prisma.service'
 import { OrderEntity } from '../entities/order.entity'
-import {
-	type IOrderWithRelations
-} from '../interfaces/order.interface'
-import {
-	type IOrderWhereInput
-} from '../interfaces/prisma.interface'
+import { type IOrderWithRelations } from '../interfaces/order.interface'
+import { type IOrderWhereInput } from '../interfaces/prisma.interface'
 import {
 	type IFindOrdersOptions,
 	type IOrderBaseResult,
 	type IOrderWithCookResult,
 	type IOrderWithFullDetailsResult,
 	type IOrderWithItemsForAnalyticsResult,
-	type IOrderWithWaiterResult
+	type IOrderWithWaiterResult,
 } from '../interfaces/repository.interface'
 
 const ORDER_WITH_RELATIONS_INCLUDE = {
@@ -93,7 +89,18 @@ const ORDER_WITH_FULL_DISH_INCLUDE = {
 export class OrderRepository {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async createOrder(order: OrderEntity): Promise<IOrderBaseResult & { orderItems: Array<{ id: number; orderId: number; dishId: number; quantity: number; price: number; notes: string | null }> }> {
+	async createOrder(order: OrderEntity): Promise<
+		IOrderBaseResult & {
+			orderItems: Array<{
+				id: number
+				orderId: number
+				dishId: number
+				quantity: number
+				price: number
+				notes: string | null
+			}>
+		}
+	> {
 		return this.prisma.order.create({
 			data: {
 				waiterId: order.waiterId,
