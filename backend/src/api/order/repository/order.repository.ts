@@ -1,13 +1,99 @@
 import { Injectable } from '@nestjs/common'
-import { OrderStatus, Prisma } from '@prisma/client'
+import { OrderStatus } from '@prisma/client'
 import { PrismaService } from 'prisma/prisma.service'
 import { OrderEntity } from '../entities/order.entity'
+import {
+	type IOrderWithRelations
+} from '../interfaces/order.interface'
+import {
+	type IOrderWhereInput
+} from '../interfaces/prisma.interface'
+import {
+	type IFindOrdersOptions,
+	type IOrderBaseResult,
+	type IOrderWithCookResult,
+	type IOrderWithFullDetailsResult,
+	type IOrderWithItemsForAnalyticsResult,
+	type IOrderWithWaiterResult
+} from '../interfaces/repository.interface'
+
+const ORDER_WITH_RELATIONS_INCLUDE = {
+	waiter: { select: { id: true, name: true } },
+	cook: { select: { id: true, name: true } },
+	table: { select: { id: true, number: true } },
+	orderItems: {
+		select: {
+			dish: { select: { id: true, name: true, price: true } },
+			quantity: true,
+			price: true,
+			notes: true,
+		},
+	},
+} as const
+
+const ORDER_WITH_FULL_DETAILS_SELECT = {
+	id: true,
+	status: true,
+	createdAt: true,
+	updatedAt: true,
+	waiter: { select: { id: true, name: true, email: true, role: true } },
+	cook: { select: { id: true, name: true, email: true, role: true } },
+	table: {
+		select: { id: true, number: true, seats: true, active: true },
+	},
+	orderItems: {
+		select: {
+			quantity: true,
+			price: true,
+			notes: true,
+			dish: {
+				select: {
+					id: true,
+					name: true,
+					description: true,
+					price: true,
+					imageUrl: true,
+					ingredients: true,
+					weightGr: true,
+					calories: true,
+					available: true,
+				},
+			},
+		},
+	},
+} as const
+
+const ORDER_WITH_FULL_DISH_INCLUDE = {
+	waiter: { select: { id: true, name: true } },
+	cook: { select: { id: true, name: true } },
+	table: { select: { id: true, number: true } },
+	orderItems: {
+		select: {
+			dish: {
+				select: {
+					id: true,
+					name: true,
+					description: true,
+					price: true,
+					imageUrl: true,
+					ingredients: true,
+					weightGr: true,
+					calories: true,
+					available: true,
+				},
+			},
+			quantity: true,
+			price: true,
+			notes: true,
+		},
+	},
+} as const
 
 @Injectable()
 export class OrderRepository {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async createOrder(order: OrderEntity) {
+	async createOrder(order: OrderEntity): Promise<IOrderBaseResult & { orderItems: Array<{ id: number; orderId: number; dishId: number; quantity: number; price: number; notes: string | null }> }> {
 		return this.prisma.order.create({
 			data: {
 				waiterId: order.waiterId,
@@ -39,119 +125,69 @@ export class OrderRepository {
 	}
 
 	async findAll(
-		where: Prisma.OrderWhereInput,
-		options: { skip: number; take: number; orderBy: any },
-	) {
+		where: IOrderWhereInput,
+		options: IFindOrdersOptions,
+	): Promise<IOrderWithRelations[]> {
 		return this.prisma.order.findMany({
 			where,
 			skip: options.skip,
 			take: options.take,
 			orderBy: options.orderBy,
-			include: {
-				waiter: { select: { id: true, name: true } },
-				cook: { select: { id: true, name: true } },
-				table: { select: { id: true, number: true } },
-				orderItems: {
-					select: {
-						dish: { select: { id: true, name: true, price: true } },
-						quantity: true,
-						notes: true,
-					},
-				},
-			},
-		})
+			include: ORDER_WITH_RELATIONS_INCLUDE,
+		}) as Promise<IOrderWithRelations[]>
 	}
 
-	async count(where: Prisma.OrderWhereInput) {
+	async count(where: IOrderWhereInput): Promise<number> {
 		return this.prisma.order.count({ where })
 	}
 
-	async findById(id: number, companyId: number) {
+	async findById(
+		id: number,
+		companyId: number,
+	): Promise<IOrderWithFullDetailsResult> {
 		return this.prisma.order.findFirst({
 			where: { id, companyId },
-			select: {
-				id: true,
-				status: true,
-				createdAt: true,
-				updatedAt: true,
-				waiter: { select: { id: true, name: true, email: true, role: true } },
-				cook: { select: { id: true, name: true, email: true, role: true } },
-				table: {
-					select: { id: true, number: true, seats: true, active: true },
-				},
-				orderItems: {
-					select: {
-						quantity: true,
-						notes: true,
-						dish: {
-							select: {
-								id: true,
-								name: true,
-								description: true,
-								price: true,
-								imageUrl: true,
-								ingredients: true,
-								weightGr: true,
-								calories: true,
-								available: true,
-							},
-						},
-					},
-				},
-			},
-		})
+			select: ORDER_WITH_FULL_DETAILS_SELECT,
+		}) as Promise<IOrderWithFullDetailsResult>
 	}
 
 	async findWithFullDish(
-		where: Prisma.OrderWhereInput,
-		options: { skip: number; take: number; orderBy: any },
-	) {
+		where: IOrderWhereInput,
+		options: IFindOrdersOptions,
+	): Promise<IOrderWithRelations[]> {
 		return this.prisma.order.findMany({
 			where,
 			skip: options.skip,
 			take: options.take,
 			orderBy: options.orderBy,
-			include: {
-				waiter: { select: { id: true, name: true } },
-				cook: { select: { id: true, name: true } },
-				table: { select: { id: true, number: true } },
-				orderItems: {
-					select: {
-						dish: {
-							select: {
-								id: true,
-								name: true,
-								description: true,
-								price: true,
-								imageUrl: true,
-								ingredients: true,
-								weightGr: true,
-								calories: true,
-								available: true,
-							},
-						},
-						quantity: true,
-						notes: true,
-					},
-				},
-			},
-		})
+			include: ORDER_WITH_FULL_DISH_INCLUDE,
+		}) as Promise<IOrderWithRelations[]>
 	}
-	async findPendingOrderWithCookById(id: number, companyId: number) {
+	async findPendingOrderWithCookById(
+		id: number,
+		companyId: number,
+	): Promise<IOrderWithCookResult | null> {
 		return this.prisma.order.findFirst({
 			where: { id, status: OrderStatus.PENDING, companyId },
 			include: { cook: true },
-		})
+		}) as Promise<IOrderWithCookResult | null>
 	}
 
-	async findPendingOrderWithWaiterById(id: number, companyId: number) {
+	async findPendingOrderWithWaiterById(
+		id: number,
+		companyId: number,
+	): Promise<IOrderWithWaiterResult | null> {
 		return this.prisma.order.findFirst({
 			where: { id, companyId },
 			include: { waiter: true },
-		})
+		}) as Promise<IOrderWithWaiterResult | null>
 	}
 
-	async assignCook(orderId: number, cookId: number, companyId: number) {
+	async assignCook(
+		orderId: number,
+		cookId: number,
+		companyId: number,
+	): Promise<IOrderBaseResult> {
 		return this.prisma.order.update({
 			where: { id: orderId, companyId },
 			data: {
@@ -162,7 +198,10 @@ export class OrderRepository {
 		})
 	}
 
-	async cancelOrder(orderId: number, companyId: number) {
+	async cancelOrder(
+		orderId: number,
+		companyId: number,
+	): Promise<IOrderBaseResult> {
 		return this.prisma.order.update({
 			where: { id: orderId, companyId },
 			data: {
@@ -172,14 +211,20 @@ export class OrderRepository {
 		})
 	}
 
-	async updateStatus(orderId: number, status: OrderStatus, companyId: number) {
+	async updateStatus(
+		orderId: number,
+		status: OrderStatus,
+		companyId: number,
+	): Promise<IOrderBaseResult> {
 		return this.prisma.order.update({
 			where: { id: orderId, companyId },
 			data: { status },
 		})
 	}
 
-	async findOrdersWithItems(where: Prisma.OrderWhereInput) {
+	async findOrdersWithItems(
+		where: IOrderWhereInput,
+	): Promise<IOrderWithItemsForAnalyticsResult> {
 		return this.prisma.order.findMany({
 			where,
 			include: {
@@ -196,6 +241,6 @@ export class OrderRepository {
 					},
 				},
 			},
-		})
+		}) as Promise<IOrderWithItemsForAnalyticsResult>
 	}
 }

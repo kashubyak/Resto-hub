@@ -4,9 +4,10 @@ import {
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common'
-import { OrderStatus, Prisma, Role } from '@prisma/client'
+import { OrderStatus, Role } from '@prisma/client'
 import { endOfDay } from 'date-fns'
 import { socket_events } from 'src/common/constants'
+import { type IPaginatedResponse } from 'src/common/interface/pagination.interface'
 import { TableService } from '../table/table.service'
 import { CreateOrderDto } from './dto/request/create-order.dto'
 import {
@@ -17,6 +18,20 @@ import {
 import { OrdersQueryDto } from './dto/request/orders-query.dto'
 import { OrderEntity } from './entities/order.entity'
 import { NotificationsGateway } from './gateway/notification.gateway'
+import {
+	type IGroupedOrders,
+	type IGroupInfo,
+	type IOrderAnalyticsResult,
+} from './interfaces/analytics.interface'
+import { type INewOrderNotification, type IOrderCompletedNotification } from './interfaces/notification.interface'
+import {
+	type IOrderItemSummary,
+	type IOrderSummary,
+	type IOrderWithFullDetails,
+	type IOrderWithItemsForAnalytics,
+	type IOrderWithRelations,
+} from './interfaces/order.interface'
+import { type IOrderWhereInput } from './interfaces/prisma.interface'
 import { OrderRepository } from './repository/order.repository'
 
 @Injectable()
@@ -26,14 +41,22 @@ export class OrderService {
 		private readonly notificationsGateway: NotificationsGateway,
 		private readonly tableService: TableService,
 	) {}
-	private mapSummary = (order: any) => {
-		const summarizedItems = order.orderItems.map((item) => ({
-			price: item.price,
-			quantity: item.quantity,
-			total: item.dish.price * item.quantity,
-			notes: item.notes,
-			dish: item.dish,
-		}))
+	private mapSummary = (
+		order: IOrderWithRelations | IOrderWithFullDetails,
+	): IOrderSummary => {
+		const summarizedItems: IOrderItemSummary[] = order.orderItems.map(
+			(item) => ({
+				price: item.price,
+				quantity: item.quantity,
+				total: item.price * item.quantity,
+				notes: item.notes,
+				dish: {
+					id: item.dish.id,
+					name: item.dish.name,
+					price: item.dish.price,
+				},
+			}),
+		)
 
 		const total = summarizedItems.reduce((sum, item) => sum + item.total, 0)
 
@@ -43,15 +66,15 @@ export class OrderService {
 			createdAt: order.createdAt,
 			updatedAt: order.updatedAt,
 			total,
-			waiter: order.waiter,
-			cook: order.cook,
-			table: order.table,
+			waiter: order.waiter ?? null,
+			cook: order.cook ?? null,
+			table: order.table ?? null,
 			orderItems: summarizedItems,
 		}
 	}
 
-	private buildFilters(query: OrderAnalyticsQueryDto): Prisma.OrderWhereInput {
-		const where: Prisma.OrderWhereInput = {}
+	private buildFilters(query: OrderAnalyticsQueryDto): IOrderWhereInput {
+		const where: IOrderWhereInput = {}
 		if (query.from || query.to) {
 			where.createdAt = {}
 			if (query.from) where.createdAt.gte = new Date(query.from)
@@ -72,8 +95,11 @@ export class OrderService {
 		return where
 	}
 
-	private groupOrders(orders: any[], groupBy?: OrderGroupBy) {
-		const grouped: Record<string, any[]> = {}
+	private groupOrders(
+		orders: IOrderWithItemsForAnalytics[],
+		groupBy?: OrderGroupBy,
+	): IGroupedOrders {
+		const grouped: IGroupedOrders = {}
 		if (groupBy === OrderGroupBy.CATEGORY) {
 			for (const order of orders) {
 				for (const item of order.orderItems || []) {
@@ -113,18 +139,21 @@ export class OrderService {
 		return grouped
 	}
 
-	private extractGroupInfo(orders: any[], groupBy?: OrderGroupBy) {
+	private extractGroupInfo(
+		orders: IOrderWithItemsForAnalytics[],
+		groupBy?: OrderGroupBy,
+	): IGroupInfo {
 		if (!orders?.length) return {}
 		const firstOrder = orders[0]
 		if (groupBy === OrderGroupBy.WAITER && firstOrder.waiterId)
 			return { id: firstOrder.waiter.id, name: firstOrder.waiter.name }
 		if (groupBy === OrderGroupBy.COOK && firstOrder.cookId)
-			return { id: firstOrder.cook.id, name: firstOrder.cook.name }
+			return { id: firstOrder.cook!.id, name: firstOrder.cook!.name }
 
-		if (groupBy === OrderGroupBy.TABLE && firstOrder.tableId)
+		if (groupBy === OrderGroupBy.TABLE && firstOrder.tableId && firstOrder.table)
 			return {
 				id: firstOrder.table.id,
-				name: `Table ${firstOrder.table?.number ?? firstOrder.table?.id}`,
+				name: `Table ${firstOrder.table.number ?? firstOrder.table.id}`,
 			}
 
 		if (groupBy === OrderGroupBy.DISH) {
@@ -176,16 +205,20 @@ export class OrderService {
 			{ active: false },
 			companyId,
 		)
-		this.notificationsGateway.notifyKitchen(socket_events.NEW_ORDER, {
+		const notification: INewOrderNotification = {
 			id: createdOrder.id,
 			itemsCount: order.items.length,
 			createdAt: createdOrder.createdAt,
-		})
+		}
+		this.notificationsGateway.notifyKitchen(socket_events.NEW_ORDER, notification)
 
 		return createdOrder
 	}
 
-	async getAllOrders(query: OrdersQueryDto, companyId: number) {
+	async getAllOrders(
+		query: OrdersQueryDto,
+		companyId: number,
+	): Promise<IPaginatedResponse<IOrderSummary>> {
 		const {
 			status,
 			from,
@@ -199,7 +232,7 @@ export class OrderService {
 			order = 'desc',
 		} = query
 
-		const where: Prisma.OrderWhereInput = { companyId }
+		const where: IOrderWhereInput = { companyId }
 		if (status) where.status = status
 		if (waiterId) where.waiterId = waiterId
 		if (cookId) where.cookId = cookId
@@ -237,8 +270,8 @@ export class OrderService {
 		role: Role,
 		query: OrdersQueryDto,
 		companyId: number,
-	) {
-		const where: Prisma.OrderWhereInput = {
+	): Promise<IPaginatedResponse<IOrderSummary>> {
+		const where: IOrderWhereInput = {
 			companyId,
 			status: {
 				in: [OrderStatus.COMPLETE, OrderStatus.DELIVERED, OrderStatus.CANCELED],
@@ -275,7 +308,10 @@ export class OrderService {
 		}
 	}
 
-	async getFreeOrders(query: OrdersQueryDto, companyId: number) {
+	async getFreeOrders(
+		query: OrdersQueryDto,
+		companyId: number,
+	): Promise<IPaginatedResponse<IOrderSummary>> {
 		const {
 			page = 1,
 			limit = 10,
@@ -283,7 +319,11 @@ export class OrderService {
 			order = 'desc',
 		} = query
 
-		const where = { cookId: null, status: OrderStatus.PENDING, companyId }
+		const where: IOrderWhereInput = {
+			cookId: null,
+			status: OrderStatus.PENDING,
+			companyId,
+		}
 		const skip = (page - 1) * limit
 
 		const [orders, total] = await Promise.all([
@@ -364,14 +404,15 @@ export class OrderService {
 				throw new BadRequestException('Order must be IN_PROGRESS to complete')
 			const update = this.orderRepo.updateStatus(orderId, newStatus, companyId)
 
+			const notification: IOrderCompletedNotification = {
+				orderId,
+				status: newStatus,
+				table: order.table?.number ?? null,
+			}
 			this.notificationsGateway.notifyWaiter(
 				socket_events.ORDER_COMPLETED,
-				{
-					orderId,
-					status: newStatus,
-					table: order.table?.number,
-				},
-				order.waiter.id,
+				notification,
+				order.waiter!.id,
 			)
 			return update
 		}
@@ -409,7 +450,9 @@ export class OrderService {
 		}
 	}
 
-	async getOrderAnalytics(query: OrderAnalyticsQueryDto) {
+	async getOrderAnalytics(
+		query: OrderAnalyticsQueryDto,
+	): Promise<IOrderAnalyticsResult[]> {
 		const { groupBy, metric = OrderMetric.REVENUE, from, to } = query
 		const filters = this.buildFilters(query)
 		const orders = await this.orderRepo.findOrdersWithItems(filters)
@@ -450,7 +493,7 @@ export class OrderService {
 
 			const trendMap: Record<string, number> = {}
 			for (const order of group) {
-				const createdAt = new Date(order.createdAt as string | number | Date)
+				const createdAt = new Date(order.createdAt)
 				const dateKey = createdAt.toISOString().split('T')[0]
 				if (!trendMap[dateKey]) trendMap[dateKey] = 0
 
@@ -463,7 +506,7 @@ export class OrderService {
 				}
 			}
 
-			let trend: { date: string; value: number }[] = []
+			let trend: Array<{ date: string; value: number }> = []
 			if (from && to) {
 				const dateRange = getDateRange(from, to)
 				trend = dateRange.map((date) => ({ date, value: trendMap[date] || 0 }))
@@ -475,8 +518,8 @@ export class OrderService {
 			}
 
 			const values = trend.map((t) => t.value)
-			const maxRevenueInDay = Math.max(...values)
-			const minRevenueInDay = Math.min(...values)
+			const maxRevenueInDay = values.length > 0 ? Math.max(...values) : 0
+			const minRevenueInDay = values.length > 0 ? Math.min(...values) : 0
 			const peakDay =
 				trend.find((t) => t.value === maxRevenueInDay)?.date || null
 			const troughDay =

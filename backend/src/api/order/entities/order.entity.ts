@@ -1,15 +1,15 @@
 export class OrderItemEntity {
-	dishId: number
-	quantity: number
-	price: number
-	notes?: string
+	readonly dishId: number
+	readonly quantity: number
+	readonly price: number
+	readonly notes?: string
 }
 
 export class OrderEntity {
-	waiterId: number
-	tableId: number
-	items: OrderItemEntity[]
-	companyId: number
+	readonly waiterId: number
+	readonly tableId: number
+	readonly items: readonly OrderItemEntity[]
+	readonly companyId: number
 	constructor(
 		waiterId: number,
 		tableId: number,

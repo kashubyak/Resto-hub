@@ -9,6 +9,7 @@ import { Role } from '@prisma/client'
 import * as jwt from 'jsonwebtoken'
 import { Server, Socket } from 'socket.io'
 import { socket_rooms } from 'src/common/constants'
+import { type INotificationData } from '../interfaces/notification.interface'
 
 interface ICustomJwtPayload {
 	sub: number
@@ -16,13 +17,6 @@ interface ICustomJwtPayload {
 	iat?: number
 	exp?: number
 }
-
-type NotificationData =
-	| Record<string, unknown>
-	| string
-	| number
-	| boolean
-	| null
 
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
 @Injectable()
@@ -72,10 +66,14 @@ export class NotificationsGateway
 	handleDisconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`)
 	}
-	notifyKitchen(event: string, data: NotificationData) {
+	notifyKitchen(event: string, data: INotificationData): void {
 		this.server.to(socket_rooms.KITCHEN).emit(event, data)
 	}
-	notifyWaiter(event: string, data: NotificationData, waiterId: number) {
+	notifyWaiter(
+		event: string,
+		data: INotificationData,
+		waiterId: number,
+	): void {
 		this.server.to(socket_rooms.WAITER(waiterId)).emit(event, data)
 	}
 }

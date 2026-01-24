@@ -4,3 +4,13 @@ export interface ISubUserDto {
 	password: string
 	role: 'WAITER' | 'COOK'
 }
+
+export interface IBaseUser {
+	id: number
+	name: string
+}
+
+export interface IExtendedUser extends IBaseUser {
+	email: string
+	role: string
+}

@@ -14,6 +14,9 @@ export class DishInOrderDto {
 
 export class OrderItemSummaryDto {
 	@ApiProperty()
+	price: number
+
+	@ApiProperty()
 	quantity: number
 
 	@ApiProperty()

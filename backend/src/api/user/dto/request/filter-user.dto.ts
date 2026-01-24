@@ -2,6 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Role } from '@prisma/client'
 import { IsIn, IsOptional } from 'class-validator'
 import { BasePaginationQueryDto } from 'src/common/dto/pagination-query.dto'
+import { type ICommonSortFields } from 'src/common/interface/prisma.interface'
 
 export class FilterUserDto extends BasePaginationQueryDto {
 	@ApiPropertyOptional({
@@ -18,5 +19,5 @@ export class FilterUserDto extends BasePaginationQueryDto {
 	})
 	@IsOptional()
 	@IsIn(['name', 'email', 'createdAt', 'updatedAt'])
-	sortBy?: 'name' | 'email' | 'createdAt' | 'updatedAt'
+	sortBy?: 'name' | 'email' | ICommonSortFields
 }
