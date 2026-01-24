@@ -52,44 +52,46 @@ export class AuthService {
     if (!logo || !avatar)
       throw new BadRequestException('Logo and avatar are required');
 
-    const existing = await this.prisma.user.findFirst({
-      where: { email: dto.adminEmail },
-    });
-    if (existing) throw new ConflictException('Email already in use');
-
-    const existingCompany = await this.prisma.company.findFirst({
-      where: {
-        OR: [{ name: dto.name }, { subdomain: dto.subdomain }],
-      },
-    });
-    if (existingCompany)
-      throw new ConflictException('Company name or subdomain already exists');
-
     const logoUrl = await this.S3Service.uploadFile(logo, company_avatar);
     const avatarUrl = await this.S3Service.uploadFile(avatar, folder_avatar);
     const hashedPassword = await bcrypt.hash(dto.adminPassword, 10);
 
-    const company = await this.prisma.company.create({
-      data: {
-        name: dto.name,
-        subdomain: dto.subdomain,
-        address: dto.address,
-        latitude: dto.latitude,
-        longitude: dto.longitude,
-        logoUrl,
-        users: {
-          create: {
-            name: dto.adminName,
-            email: dto.adminEmail,
-            password: hashedPassword,
-            role: Role.ADMIN,
-            avatarUrl,
+    const company = await this.prisma.$transaction(async (tx) => {
+      const existing = await tx.user.findFirst({
+        where: { email: dto.adminEmail },
+      });
+      if (existing) throw new ConflictException('Email already in use');
+
+      const existingCompany = await tx.company.findFirst({
+        where: {
+          OR: [{ name: dto.name }, { subdomain: dto.subdomain }],
+        },
+      });
+      if (existingCompany)
+        throw new ConflictException('Company name or subdomain already exists');
+
+      return tx.company.create({
+        data: {
+          name: dto.name,
+          subdomain: dto.subdomain,
+          address: dto.address,
+          latitude: dto.latitude,
+          longitude: dto.longitude,
+          logoUrl,
+          users: {
+            create: {
+              name: dto.adminName,
+              email: dto.adminEmail,
+              password: hashedPassword,
+              role: Role.ADMIN,
+              avatarUrl,
+            },
           },
         },
-      },
-      include: {
-        users: true,
-      },
+        include: {
+          users: true,
+        },
+      });
     });
 
     const admin = company.users[0];
