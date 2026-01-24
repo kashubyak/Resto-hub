@@ -3,15 +3,20 @@ import {
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common'
+import { Table } from '@prisma/client'
 import { CreateTableDto } from './dto/request/create-table.dto'
 import { UpdateTableDto } from './dto/request/update-table.dto'
+import { type IDeleteResult } from './interfaces/repository.interface'
 import { TableRepository } from './repository/table.repository'
 
 @Injectable()
 export class TableService {
 	constructor(private readonly tableRepo: TableRepository) {}
 
-	async createTable(dto: CreateTableDto, companyId: number) {
+	async createTable(
+		dto: CreateTableDto,
+		companyId: number,
+	): Promise<Table> {
 		const existing = await this.tableRepo.findByNumber(dto.number, companyId)
 		if (existing)
 			throw new ConflictException('Table with this number already exists')
@@ -19,17 +24,21 @@ export class TableService {
 		return this.tableRepo.createTable({ ...dto, companyId })
 	}
 
-	async getAllTables(companyId: number) {
+	async getAllTables(companyId: number): Promise<Table[]> {
 		return this.tableRepo.getAllTables(companyId)
 	}
 
-	async getTableById(id: number, companyId: number) {
+	async getTableById(id: number, companyId: number): Promise<Table> {
 		const table = await this.tableRepo.findById(id, companyId)
 		if (!table) throw new NotFoundException(`Table with id ${id} not found`)
 		return table
 	}
 
-	async updateTable(id: number, dto: UpdateTableDto, companyId: number) {
+	async updateTable(
+		id: number,
+		dto: UpdateTableDto,
+		companyId: number,
+	): Promise<Table> {
 		const table = await this.tableRepo.findById(id, companyId)
 		if (!table) throw new NotFoundException('Table not found')
 		if (dto.number !== undefined) {
@@ -44,7 +53,10 @@ export class TableService {
 		return this.tableRepo.updateTable(id, companyId, dto)
 	}
 
-	async deleteTable(id: number, companyId: number) {
+	async deleteTable(
+		id: number,
+		companyId: number,
+	): Promise<IDeleteResult> {
 		const table = await this.tableRepo.findById(id, companyId)
 		if (!table) throw new NotFoundException('Table not found')
 		if (table.active === false)
