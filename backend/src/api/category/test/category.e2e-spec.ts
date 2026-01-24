@@ -1,6 +1,7 @@
 import { type INestApplication, ValidationPipe } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { AppModule } from 'app.module'
+import { type Server } from 'http'
 import { PrismaService } from 'prisma/prisma.service'
 import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware'
 import * as request from 'supertest'
@@ -9,6 +10,18 @@ import { BASE_URL, HOST } from 'test/utils/constants'
 import { cleanTestDb } from 'test/utils/db-utils'
 import { FakeDTO } from 'test/utils/faker'
 import { createCategory, makeRequest } from 'test/utils/form-utils'
+
+interface CategoryResponse {
+	id: number
+	name: string
+}
+
+interface PaginatedResponse<T> {
+	data: T[]
+	total: number
+	page?: number
+	limit?: number
+}
 
 describe('Category (e2e)', () => {
 	let app: INestApplication
@@ -41,7 +54,7 @@ describe('Category (e2e)', () => {
 
 	beforeEach(async () => {
 		await prisma.category.deleteMany({ where: { companyId } })
-		const category = await createCategory(app, token)
+		const category = (await createCategory(app, token)) as CategoryResponse
 		categoryId = category.id
 	})
 
@@ -59,13 +72,14 @@ describe('Category (e2e)', () => {
 		)
 			.send(dto)
 			.expect(201)
-		expect(res.body.name).toBe(dto.name)
+		expect((res.body as CategoryResponse).name).toBe(dto.name)
 	})
 
 	it('should not allow duplicate category names', async () => {
 		const existing = await prisma.category.findFirst({ where: { companyId } })
+		if (!existing) throw new Error('Category not found')
 		await makeRequest(app, token, 'post', `${BASE_URL.CATEGORY}/create`)
-			.send({ name: existing!.name })
+			.send({ name: existing.name })
 			.expect(409)
 	})
 
@@ -77,8 +91,9 @@ describe('Category (e2e)', () => {
 			'get',
 			`${BASE_URL.CATEGORY}?page=1&limit=10`,
 		).expect(200)
-		expect(Array.isArray(res.body.data)).toBe(true)
-		expect(res.body.total).toBeGreaterThanOrEqual(1)
+		const body = res.body as PaginatedResponse<CategoryResponse>
+		expect(Array.isArray(body.data)).toBe(true)
+		expect(body.total).toBeGreaterThanOrEqual(1)
 	})
 
 	it('should filter by search', async () => {
@@ -91,9 +106,10 @@ describe('Category (e2e)', () => {
 			`${BASE_URL.CATEGORY}?search=UniqueCategoryName`,
 		).expect(200)
 
-		expect(Array.isArray(res.body.data)).toBe(true)
-		expect(res.body.data.length).toBeGreaterThan(0)
-		expect(res.body.data[0].name).toBe(dto.name)
+		const body = res.body as PaginatedResponse<CategoryResponse>
+		expect(Array.isArray(body.data)).toBe(true)
+		expect(body.data.length).toBeGreaterThan(0)
+		expect(body.data[0]?.name).toBe(dto.name)
 	})
 
 	it('should sort categories by name ascending', async () => {
@@ -105,7 +121,8 @@ describe('Category (e2e)', () => {
 			'get',
 			`${BASE_URL.CATEGORY}?sortBy=name&order=asc`,
 		).expect(200)
-		const names = res.body.data.map((c: any) => c.name)
+		const body = res.body as PaginatedResponse<CategoryResponse>
+		const names = body.data.map((c) => c.name)
 		expect(names).toEqual([...names].sort())
 	})
 
@@ -117,8 +134,9 @@ describe('Category (e2e)', () => {
 			'get',
 			`${BASE_URL.CATEGORY}`,
 		).expect(200)
-		expect(res.body.page).toBe(1)
-		expect(res.body.limit).toBe(10)
+		const body = res.body as PaginatedResponse<CategoryResponse>
+		expect(body.page).toBe(1)
+		expect(body.limit).toBe(10)
 	})
 
 	it('should return 404 when updating non-existent category', async () => {
@@ -128,15 +146,18 @@ describe('Category (e2e)', () => {
 	})
 
 	it('should return deleted category in response', async () => {
-		const cat = await createCategory(app, token, { name: 'ToBeDeleted' })
+		const cat = (await createCategory(app, token, {
+			name: 'ToBeDeleted',
+		})) as CategoryResponse
 		const res = await makeRequest(
 			app,
 			token,
 			'delete',
 			`${BASE_URL.CATEGORY}/${cat.id}`,
 		).expect(200)
-		expect(res.body.id).toBe(cat.id)
-		expect(res.body.name).toBe(cat.name)
+		const body = res.body as CategoryResponse
+		expect(body.id).toBe(cat.id)
+		expect(body.name).toBe(cat.name)
 	})
 
 	it('should get category by id', async () => {
@@ -146,7 +167,8 @@ describe('Category (e2e)', () => {
 			'get',
 			`${BASE_URL.CATEGORY}/${categoryId}`,
 		).expect(200)
-		expect(res.body.id).toBe(categoryId)
+		const body = res.body as CategoryResponse
+		expect(body.id).toBe(categoryId)
 	})
 
 	it('should return 404 if category not found by id', async () => {
@@ -165,19 +187,24 @@ describe('Category (e2e)', () => {
 		)
 			.send(dto)
 			.expect(200)
-		expect(res.body.name).toBe(dto.name)
+		const body = res.body as CategoryResponse
+		expect(body.name).toBe(dto.name)
 	})
 
 	it('should not allow updating to duplicate name', async () => {
-		const cat1 = await createCategory(app, token, { name: 'Cat1' })
-		const cat2 = await createCategory(app, token, { name: 'Cat2' })
+		const cat1 = (await createCategory(app, token, {
+			name: 'Cat1',
+		})) as CategoryResponse
+		const cat2 = (await createCategory(app, token, {
+			name: 'Cat2',
+		})) as CategoryResponse
 		await makeRequest(app, token, 'patch', `${BASE_URL.CATEGORY}/${cat1.id}`)
 			.send({ name: cat2.name })
 			.expect(409)
 	})
 
 	it('should delete category', async () => {
-		const cat = await createCategory(app, token)
+		const cat = (await createCategory(app, token)) as CategoryResponse
 		await makeRequest(
 			app,
 			token,
@@ -199,24 +226,24 @@ describe('Category (e2e)', () => {
 	})
 
 	it('should block access without token', async () => {
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.get(BASE_URL.CATEGORY)
 			.set('Host', HOST)
 			.expect(401)
 
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.post(`${BASE_URL.CATEGORY}/create`)
 			.set('Host', HOST)
 			.send(FakeDTO.category.create())
 			.expect(401)
 
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.patch(`${BASE_URL.CATEGORY}/1`)
 			.set('Host', HOST)
 			.send({ name: 'New' })
 			.expect(401)
 
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.delete(`${BASE_URL.CATEGORY}/1`)
 			.set('Host', HOST)
 			.expect(401)

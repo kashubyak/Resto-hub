@@ -1,6 +1,7 @@
 import { type INestApplication, ValidationPipe } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { AppModule } from 'app.module'
+import { type Server } from 'http'
 import { PrismaService } from 'prisma/prisma.service'
 import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware'
 import * as request from 'supertest'
@@ -8,6 +9,13 @@ import { getAuthToken } from 'test/utils/auth-test'
 import { BASE_URL, localhost, logoPath } from 'test/utils/constants'
 import { cleanTestDb } from 'test/utils/db-utils'
 import { makeRequest } from 'test/utils/form-utils'
+
+interface CompanyResponse {
+	id: number
+	name: string
+	address?: string
+	logoUrl?: string
+}
 
 describe('Company (e2e)', () => {
 	let app: INestApplication
@@ -44,8 +52,9 @@ describe('Company (e2e)', () => {
 		const res = await makeRequest(app, token, 'get', BASE_URL.COMPANY).expect(
 			200,
 		)
-		expect(res.body.id).toBe(companyId)
-		expect(res.body.name).toBeDefined()
+		const body = res.body as CompanyResponse
+		expect(body.id).toBe(companyId)
+		expect(body.name).toBeDefined()
 	})
 
 	it('should update company info without file', async () => {
@@ -63,8 +72,9 @@ describe('Company (e2e)', () => {
 			.field('longitude', updateDto.longitude.toString())
 			.expect(200)
 
-		expect(res.body.name).toBe(updateDto.name)
-		expect(res.body.address).toBe(updateDto.address)
+		const body = res.body as CompanyResponse
+		expect(body.name).toBe(updateDto.name)
+		expect(body.address).toBe(updateDto.address)
 	})
 
 	it('should update company info with file', async () => {
@@ -74,8 +84,9 @@ describe('Company (e2e)', () => {
 
 			.expect(200)
 
-		expect(res.body.name).toBe('Company With Logo')
-		expect(res.body.logoUrl).toBeDefined()
+		const body = res.body as CompanyResponse
+		expect(body.name).toBe('Company With Logo')
+		expect(body.logoUrl).toBeDefined()
 	})
 
 	it('should not update with duplicate name', async () => {
@@ -102,7 +113,8 @@ describe('Company (e2e)', () => {
 			'delete',
 			BASE_URL.COMPANY,
 		).expect(200)
-		expect(res.body.id).toBe(companyId)
+		const body = res.body as CompanyResponse
+		expect(body.id).toBe(companyId)
 
 		const check = await prisma.company.findUnique({ where: { id: companyId } })
 		expect(check).toBeNull()
@@ -117,17 +129,17 @@ describe('Company (e2e)', () => {
 	})
 
 	it('should deny access without token', async () => {
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.get(BASE_URL.COMPANY)
 			.set('Host', localhost)
 			.expect(401)
 
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.patch(BASE_URL.COMPANY)
 			.set('Host', localhost)
 			.expect(401)
 
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.delete(BASE_URL.COMPANY)
 			.set('Host', localhost)
 			.expect(401)

@@ -2,6 +2,7 @@ import { type INestApplication, ValidationPipe } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
 import { AppModule } from 'app.module'
 import * as cookieParser from 'cookie-parser'
+import { type Server } from 'http'
 import { PrismaService } from 'prisma/prisma.service'
 import { company_avatar, folder_avatar } from 'src/common/constants'
 import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware'
@@ -17,7 +18,7 @@ import {
 describe('Auth (e2e)', () => {
 	let app: INestApplication
 	let prisma: PrismaService
-	let server: any
+	let server: Server
 	let s3Service: S3Service
 	const loginDto = {
 		email: companyData.adminEmail,
@@ -43,7 +44,7 @@ describe('Auth (e2e)', () => {
 		app.use(middleware.use.bind(middleware))
 
 		await app.init()
-		server = app.getHttpServer()
+		server = app.getHttpServer() as Server
 
 		await attachCompanyFormFields(
 			request(server)
@@ -125,12 +126,15 @@ describe('Auth (e2e)', () => {
 				.send(loginDto)
 				.expect(200)
 
-			const cookies = loginRes.headers['set-cookie']
+			const cookies = loginRes.headers['set-cookie'] as
+				| string
+				| string[]
+				| undefined
 
 			const refreshRes = await request(server)
 				.post(`${BASE_URL.AUTH}/refresh`)
 				.set('Host', HOST)
-				.set('Cookie', cookies)
+				.set('Cookie', cookies as string)
 				.expect(200)
 
 			expect(refreshRes.body).toHaveProperty('token')
@@ -160,14 +164,16 @@ describe('Auth (e2e)', () => {
 				.send(loginDto)
 				.expect(200)
 
-			const token = loginRes.body.token
+			const token = (loginRes.body as { token: string }).token
 			const resLogout = await request(server)
 				.post(`${BASE_URL.AUTH}/logout`)
 				.set('Host', HOST)
 				.set('Authorization', `Bearer ${token}`)
 				.expect(200)
 
-			expect(resLogout.body.message).toBe('Logged out successfully')
+			expect((resLogout.body as { message: string }).message).toBe(
+				'Logged out successfully',
+			)
 			expect(resLogout.headers['set-cookie']).toBeDefined()
 		})
 	})
