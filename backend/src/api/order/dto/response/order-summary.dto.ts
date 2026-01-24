@@ -1,12 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { OrderStatus } from '@prisma/client'
-import {
-	BaseTable,
-	BaseUser,
-	ExtendedTable,
-	ExtendedUser,
-	OrderItemSummaryDto,
-} from './order-item-summary.dto'
+import { BaseTableDto, ExtendedTableDto } from 'src/common/dto/base-table.dto'
+import { BaseUserDto, ExtendedUserDto } from 'src/common/dto/base-user.dto'
+import { OrderItemSummaryDto } from './order-item-summary.dto'
 
 export class OrderSummaryDto {
 	@ApiProperty()
@@ -24,14 +20,14 @@ export class OrderSummaryDto {
 	@ApiProperty()
 	total: number
 
-	@ApiPropertyOptional({ type: BaseUser })
-	waiter?: BaseUser
+	@ApiPropertyOptional({ type: BaseUserDto })
+	waiter?: BaseUserDto
 
-	@ApiPropertyOptional({ type: BaseUser })
-	cook?: BaseUser
+	@ApiPropertyOptional({ type: BaseUserDto })
+	cook?: BaseUserDto
 
-	@ApiProperty({ type: BaseTable })
-	table: BaseTable
+	@ApiProperty({ type: BaseTableDto })
+	table: BaseTableDto
 
 	@ApiProperty({ type: [OrderItemSummaryDto] })
 	orderItems: OrderItemSummaryDto[]
@@ -53,14 +49,14 @@ export class OrderSummaryFullPersonalDto {
 	@ApiProperty()
 	total: number
 
-	@ApiPropertyOptional({ type: ExtendedUser })
-	waiter?: ExtendedUser
+	@ApiPropertyOptional({ type: ExtendedUserDto })
+	waiter?: ExtendedUserDto
 
-	@ApiPropertyOptional({ type: ExtendedUser })
-	cook?: ExtendedUser
+	@ApiPropertyOptional({ type: ExtendedUserDto })
+	cook?: ExtendedUserDto
 
-	@ApiProperty({ type: ExtendedTable })
-	table: ExtendedTable
+	@ApiProperty({ type: ExtendedTableDto })
+	table: ExtendedTableDto
 
 	@ApiProperty({ type: [OrderItemSummaryDto] })
 	orderItems: OrderItemSummaryDto[]

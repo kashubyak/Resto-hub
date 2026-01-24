@@ -10,7 +10,7 @@ import {
 	type IOrderDirection,
 } from '../interfaces/prisma.interface'
 import {
-	type ICategoryRepositoryResult,
+	type ICategoryResult,
 	type IDishRepositoryResult,
 	type IFindDishesResult,
 } from '../interfaces/repository.interface'
@@ -128,7 +128,7 @@ export class DishRepository {
 	async findCategoryById(
 		id: number,
 		companyId: number,
-	): Promise<ICategoryRepositoryResult> {
+	): Promise<ICategoryResult> {
 		return this.prisma.category.findFirst({
 			where: { id, companyId },
 		})

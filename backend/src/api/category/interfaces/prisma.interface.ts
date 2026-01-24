@@ -1,4 +1,5 @@
 import { type Prisma } from '@prisma/client'
+import { type ICommonSortFields } from 'src/common/interface/prisma.interface'
 
 export type { IOrderDirection, ICommonSortFields } from 'src/common/interface/prisma.interface'
 

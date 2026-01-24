@@ -1,7 +1,7 @@
 import { type Role } from '@prisma/client'
 import { type IBaseUser, type IExtendedUser } from 'src/common/interface/user.interface'
 
-export interface IUserBase {
+export interface IUserRecord {
 	id: number
 	name: string
 	email: string
@@ -11,7 +11,7 @@ export interface IUserBase {
 	updatedAt: Date
 }
 
-export interface IUserWithCompanyId extends IUserBase {
+export interface IUserWithCompanyId extends IUserRecord {
 	companyId: number
 }
 

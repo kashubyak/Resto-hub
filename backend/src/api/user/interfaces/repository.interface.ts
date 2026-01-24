@@ -8,7 +8,7 @@ import {
 	type IUserWhereInput,
 } from './prisma.interface'
 import {
-	type IUserBase,
+	type IUserRecord,
 	type IUserWithCompanyId,
 	type IUserWithPassword,
 } from './user.interface'
@@ -17,13 +17,13 @@ export type IFindUsersArgs = IFindManyArgs<IUserWhereInput, IUserOrderByInput>
 
 export type IFindUsersResult<T> = IFindManyResult<T>
 
-export type IUserRepositoryResult = IUserBase
+export type IUserRepositoryResult = IUserRecord
 
 export type IUserWithCompanyIdResult = IUserWithCompanyId
 
 export type IUserWithPasswordResult = IUserWithPassword
 
-export type IUserRepositoryResultOrNull = IUserBase | null
+export type IUserRepositoryResultOrNull = IUserRecord | null
 
 export type IUserFullResult = User
 

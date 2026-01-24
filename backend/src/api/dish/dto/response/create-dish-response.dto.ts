@@ -24,7 +24,7 @@ export class CreateDishResponseDto {
 	ingredients: string[]
 
 	@ApiProperty()
-	weight: number
+	weightGr: number
 
 	@ApiProperty()
 	calories: number
@@ -39,7 +39,7 @@ export class CreateDishResponseDto {
 	updatedAt: Date
 }
 
-export class CrateDishWithCategoryResponseDto extends CreateDishResponseDto {
+export class CreateDishWithCategoryResponseDto extends CreateDishResponseDto {
 	@ApiProperty()
 	category: CreateCategoryResponseDto
 }

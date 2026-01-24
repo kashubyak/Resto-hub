@@ -7,7 +7,7 @@ import { companyIdFromSubdomain } from '../constants'
 export class CompanyContextMiddleware implements NestMiddleware {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async use(req: Request, res: Response, next: NextFunction) {
+	async use(req: Request, _res: Response, next: NextFunction) {
 		const host = req.hostname
 		const subdomain = host.split('.')[0]
 

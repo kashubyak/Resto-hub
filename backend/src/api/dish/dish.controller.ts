@@ -32,8 +32,8 @@ import { CreateDishDto } from './dto/request/create-dish.dto'
 import { FilterDishDto } from './dto/request/filter-dish.dto'
 import { UpdateDishDto } from './dto/request/update-dish.dto'
 import {
-	CrateDishWithCategoryResponseDto,
 	CreateDishResponseDto,
+	CreateDishWithCategoryResponseDto,
 } from './dto/response/create-dish-response.dto'
 import { PaginatedDishesWithCategoryResponseDto } from './dto/response/paginated-dishes-response.dto'
 
@@ -83,7 +83,7 @@ export class DishController {
 	@ApiOperation({ description: 'Get a dish by its ID' })
 	@ApiOkResponse({
 		description: 'Returns the dish with the specified ID.',
-		type: CrateDishWithCategoryResponseDto,
+		type: CreateDishWithCategoryResponseDto,
 	})
 	getDishById(
 		@Param('id', ParseIntPipe) id: number,

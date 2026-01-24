@@ -6,8 +6,8 @@ import { UpdateCategoryDto } from '../dto/request/update-category.dto'
 import { type ICategoryWithDishes } from '../interfaces/category.interface'
 import {
 	type IDeleteResult,
-	type IFindManyWithCountArgs,
-	type IFindManyWithCountResult,
+	type IFindCategoriesArgs,
+	type IFindManyResult,
 } from '../interfaces/repository.interface'
 
 @Injectable()
@@ -35,8 +35,8 @@ export class CategoryRepository {
 	}
 
 	async findManyWithCount(
-		args: IFindManyWithCountArgs,
-	): Promise<IFindManyWithCountResult<ICategoryWithDishes>> {
+		args: IFindCategoriesArgs,
+	): Promise<IFindManyResult<ICategoryWithDishes>> {
 		const { where, orderBy, skip, take } = args
 		const [data, total] = await Promise.all([
 			this.prisma.category.findMany({

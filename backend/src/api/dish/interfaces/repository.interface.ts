@@ -15,4 +15,4 @@ export type IFindDishesResult = IFindManyResult<IDishWithCategory>
 
 export type IDishRepositoryResult = IDishWithCategory | null
 
-export type ICategoryRepositoryResult = Category | null
+export type ICategoryResult = Category | null
