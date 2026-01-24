@@ -7,7 +7,6 @@ export interface IRefreshTokenCookieOptions {
 	maxAge: number
 }
 
-
 export interface IEnvironmentConfig {
 	nodeEnv: string
 	domain?: string

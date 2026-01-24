@@ -1,15 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 
 export class CreateCategoryResponseDto {
-  @ApiProperty()
-  id: number;
+	@ApiProperty()
+	id: number
 
-  @ApiProperty()
-  name: string;
+	@ApiProperty()
+	name: string
 
-  @ApiProperty()
-  createdAt: Date;
+	@ApiProperty()
+	createdAt: Date
 
-  @ApiProperty()
-  updatedAt: Date;
+	@ApiProperty()
+	updatedAt: Date
 }
