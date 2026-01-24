@@ -1,18 +1,35 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Dish } from '@prisma/client'
 import { PrismaService } from 'prisma/prisma.service'
 import { CreateDishDto } from '../dto/request/create-dish.dto'
 import { FilterDishDto } from '../dto/request/filter-dish.dto'
+import {
+	type IDishSortBy,
+	type IDishUpdateInput,
+	type IDishWhereInput,
+	type IOrderDirection
+} from '../interfaces/prisma.interface'
+import {
+	type ICategoryRepositoryResult,
+	type IDishRepositoryResult,
+	type IFindDishesResult,
+} from '../interfaces/repository.interface'
 
 @Injectable()
 export class DishRepository {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService) { }
 
-	createDish(data: CreateDishDto & { imageUrl: string }, companyId: number) {
+	async createDish(
+		data: CreateDishDto & { imageUrl: string },
+		companyId: number,
+	): Promise<Dish> {
 		return this.prisma.dish.create({ data: { ...data, companyId } })
 	}
 
-	findDishes(query: FilterDishDto, companyId: number) {
+	async findDishes(
+		query: FilterDishDto,
+		companyId: number,
+	): Promise<IFindDishesResult> {
 		const {
 			search,
 			minPrice,
@@ -24,7 +41,7 @@ export class DishRepository {
 			limit = 10,
 		} = query
 
-		const where: Prisma.DishWhereInput = { companyId }
+		const where: IDishWhereInput = { companyId }
 		if (search) where.name = { contains: search, mode: 'insensitive' }
 		if (available !== undefined) where.available = available
 		if (minPrice !== undefined || maxPrice !== undefined) {
@@ -35,33 +52,54 @@ export class DishRepository {
 
 		const skip = (page - 1) * limit
 
-		return Promise.all([
+		const typedSortBy = sortBy as IDishSortBy
+		const typedOrder = order as IOrderDirection
+
+		let orderBy:
+			| { name: IOrderDirection }
+			| { price: IOrderDirection }
+			| { createdAt: IOrderDirection }
+
+		if (typedSortBy === 'name') orderBy = { name: typedOrder }
+		else if (typedSortBy === 'price') orderBy = { price: typedOrder }
+		else orderBy = { createdAt: typedOrder }
+
+		const [data, total] = await Promise.all([
 			this.prisma.dish.findMany({
 				where,
 				include: { category: true },
 				skip,
 				take: limit,
-				orderBy: { [sortBy]: order },
+				orderBy,
 			}),
 			this.prisma.dish.count({ where }),
 		])
+
+		return { data, total }
 	}
 
-	findById(id: number, companyId: number) {
+	async findById(
+		id: number,
+		companyId: number,
+	): Promise<IDishRepositoryResult> {
 		return this.prisma.dish.findUnique({
 			where: { id, companyId },
 			include: { category: true },
 		})
 	}
 
-	async updateDish(id: number, dto: Prisma.DishUpdateInput, companyId: number) {
+	async updateDish(
+		id: number,
+		dto: IDishUpdateInput,
+		companyId: number,
+	): Promise<Dish> {
 		return this.prisma.dish.update({
 			where: { id, companyId },
 			data: dto,
 		})
 	}
 
-	async deleteDish(id: number, companyId: number) {
+	async deleteDish(id: number, companyId: number): Promise<Dish> {
 		const dish = await this.findById(id, companyId)
 		if (!dish) throw new NotFoundException('Dish not found')
 		return this.prisma.dish.delete({
@@ -69,21 +107,28 @@ export class DishRepository {
 		})
 	}
 
-	async removeCategory(id: number, companyId: number) {
+	async removeCategory(id: number, companyId: number): Promise<Dish> {
 		return this.prisma.dish.update({
 			where: { id, companyId },
 			data: { categoryId: null },
 		})
 	}
 
-	async assignCategory(id: number, categoryId: number, companyId: number) {
+	async assignCategory(
+		id: number,
+		categoryId: number,
+		companyId: number,
+	): Promise<Dish> {
 		return this.prisma.dish.update({
 			where: { id, companyId },
 			data: { categoryId },
 		})
 	}
 
-	findCategoryById(id: number, companyId: number) {
+	async findCategoryById(
+		id: number,
+		companyId: number,
+	): Promise<ICategoryRepositoryResult> {
 		return this.prisma.category.findFirst({
 			where: { id, companyId },
 		})

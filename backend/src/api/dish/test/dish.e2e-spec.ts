@@ -10,6 +10,34 @@ import { cleanTestDb } from 'test/utils/db-utils'
 import { FakeDTO } from 'test/utils/faker'
 import { createCategory, createDish, makeRequest } from 'test/utils/form-utils'
 
+interface DishResponse {
+	id: number
+	name: string
+	description: string
+	price: number
+	imageUrl: string
+	categoryId: number | null
+	ingredients: string[]
+	weightGr: number | null
+	calories: number | null
+	available: boolean
+	companyId: number
+	createdAt: string
+	updatedAt: string
+	category?: {
+		id: number
+		name: string
+	} | null
+}
+
+interface PaginatedDishResponse {
+	data: DishResponse[]
+	total: number
+	page: number
+	limit: number
+	totalPages: number
+}
+
 describe('Dish (e2e)', () => {
 	let app: INestApplication
 	let prisma: PrismaService
@@ -175,7 +203,8 @@ describe('Dish (e2e)', () => {
 				'get',
 				`${BASE_URL.DISH}?sortBy=name&order=asc`,
 			).expect(200)
-			const names = res.body.data.map((d: any) => d.name)
+			const body = res.body as PaginatedDishResponse
+			const names = body.data.map((d) => d.name)
 			expect(names).toEqual(['Borsch Soup', 'Pizza Carbonara', 'Sushi Set'])
 		})
 
@@ -186,7 +215,8 @@ describe('Dish (e2e)', () => {
 				'get',
 				`${BASE_URL.DISH}?sortBy=price&order=desc`,
 			).expect(200)
-			const prices = res.body.data.map((d: any) => d.price)
+			const body = res.body as PaginatedDishResponse
+			const prices = body.data.map((d) => d.price)
 			expect(prices).toEqual([350, 150, 80])
 		})
 	})

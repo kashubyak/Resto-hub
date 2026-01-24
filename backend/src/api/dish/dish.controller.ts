@@ -35,6 +35,7 @@ import {
 	CreateDishResponseDto,
 } from './dto/response/create-dish-response.dto'
 import { PaginatedDishesWithCategoryResponseDto } from './dto/response/paginated-dishes-response.dto'
+import { type IDishImageFile } from './interfaces/file-upload.interface'
 
 @ApiTags('Dishes')
 @ApiBearerAuth()
@@ -47,7 +48,10 @@ export class DishController {
 	@HttpCode(HttpStatus.CREATED)
 	@UseInterceptors(
 		MulterErrorInterceptor,
-		FileInterceptor('imageUrl', multerOptions),
+		FileInterceptor(
+			'imageUrl',
+			multerOptions as unknown as Parameters<typeof FileInterceptor>[1],
+		),
 	)
 	@ApiOperation({ description: 'Create a new dish (admin only)' })
 	@ApiCreatedResponse({
@@ -56,7 +60,7 @@ export class DishController {
 	})
 	createDish(
 		@Body() dto: CreateDishDto,
-		@UploadedFile() file: Express.Multer.File,
+		@UploadedFile() file: IDishImageFile,
 		@CurrentUser('companyId') companyId: number,
 	) {
 		return this.dishService.createDish(dto, file, companyId)
@@ -93,7 +97,10 @@ export class DishController {
 	@HttpCode(HttpStatus.OK)
 	@UseInterceptors(
 		MulterErrorInterceptor,
-		FileInterceptor('imageUrl', multerOptions),
+		FileInterceptor(
+			'imageUrl',
+			multerOptions as unknown as Parameters<typeof FileInterceptor>[1],
+		),
 	)
 	@ApiOperation({ description: 'Update a dish by its ID (admin only)' })
 	@ApiOkResponse({
@@ -102,7 +109,7 @@ export class DishController {
 	})
 	updateDish(
 		@Param('id', ParseIntPipe) id: number,
-		@UploadedFile() file: Express.Multer.File,
+		@UploadedFile() file: IDishImageFile,
 		@Body() dto: UpdateDishDto,
 		@CurrentUser('companyId') companyId: number,
 	) {

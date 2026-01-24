@@ -3,11 +3,16 @@ import {
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common'
+import { Dish } from '@prisma/client'
 import { folder_dish } from 'src/common/constants'
 import { S3Service } from 'src/common/s3/s3.service'
+import { type IPaginatedResponse } from '../category/interfaces/pagination.interface'
 import { CreateDishDto } from './dto/request/create-dish.dto'
 import { FilterDishDto } from './dto/request/filter-dish.dto'
 import { UpdateDishDto } from './dto/request/update-dish.dto'
+import { type IDishWithCategory } from './interfaces/dish.interface'
+import { type IDishImageFile } from './interfaces/file-upload.interface'
+import { type IDishUpdateInput } from './interfaces/prisma.interface'
 import { DishRepository } from './repository/dish.repository'
 
 @Injectable()
@@ -19,18 +24,21 @@ export class DishService {
 
 	async createDish(
 		dto: CreateDishDto,
-		file: Express.Multer.File,
+		file: IDishImageFile,
 		companyId: number,
-	) {
+	): Promise<Dish> {
 		if (!file) throw new BadRequestException('Dish image is required')
 		const imageUrl = await this.s3Service.uploadFile(file, folder_dish)
 
 		return this.dishRepo.createDish({ ...dto, imageUrl }, companyId)
 	}
-	async filterDishes(query: FilterDishDto, companyId: number) {
-		const [data, total] = await this.dishRepo.findDishes(query, companyId)
-		const page = query.page || 1
-		const limit = query.limit || 10
+	async filterDishes(
+		query: FilterDishDto,
+		companyId: number,
+	): Promise<IPaginatedResponse<IDishWithCategory>> {
+		const { data, total } = await this.dishRepo.findDishes(query, companyId)
+		const page = query.page ?? 1
+		const limit = query.limit ?? 10
 
 		return {
 			data,
@@ -41,7 +49,10 @@ export class DishService {
 		}
 	}
 
-	async getDishById(id: number, companyId: number) {
+	async getDishById(
+		id: number,
+		companyId: number,
+	): Promise<IDishWithCategory> {
 		const dish = await this.dishRepo.findById(id, companyId)
 		if (!dish) throw new NotFoundException('Dish not found')
 		return dish
@@ -50,9 +61,9 @@ export class DishService {
 	async updateDish(
 		id: number,
 		dto: UpdateDishDto,
-		file: Express.Multer.File,
+		file: IDishImageFile,
 		companyId: number,
-	) {
+	): Promise<Dish> {
 		const dish = await this.dishRepo.findById(id, companyId)
 		if (!dish) throw new NotFoundException('Dish not found')
 		let imageUrl = dish.imageUrl
@@ -60,10 +71,24 @@ export class DishService {
 			if (imageUrl) await this.s3Service.deleteFile(imageUrl)
 			imageUrl = await this.s3Service.uploadFile(file, folder_dish)
 		}
-		return this.dishRepo.updateDish(id, { ...dto, imageUrl }, companyId)
+
+		const updateData: IDishUpdateInput & { categoryId?: number | null } = {
+			imageUrl,
+		}
+
+		if (dto.name !== undefined) updateData.name = dto.name
+		if (dto.description !== undefined) updateData.description = dto.description
+		if (dto.price !== undefined) updateData.price = dto.price
+		if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId
+		if (dto.ingredients !== undefined) updateData.ingredients = dto.ingredients
+		if (dto.weightGr !== undefined) updateData.weightGr = dto.weightGr
+		if (dto.calories !== undefined) updateData.calories = dto.calories
+		if (dto.available !== undefined) updateData.available = dto.available
+
+		return this.dishRepo.updateDish(id, updateData as IDishUpdateInput, companyId)
 	}
 
-	async removeDish(id: number, companyId: number) {
+	async removeDish(id: number, companyId: number): Promise<Dish> {
 		const dish = await this.dishRepo.findById(id, companyId)
 		if (!dish) throw new NotFoundException('Dish not found')
 		if (dish.imageUrl) {
@@ -76,7 +101,7 @@ export class DishService {
 		return this.dishRepo.deleteDish(id, companyId)
 	}
 
-	async removeDishFromCategory(id: number, companyId: number) {
+	async removeDishFromCategory(id: number, companyId: number): Promise<Dish> {
 		const dish = await this.dishRepo.findById(id, companyId)
 		if (!dish) throw new NotFoundException('Dish not found')
 		return this.dishRepo.removeCategory(id, companyId)
@@ -86,7 +111,7 @@ export class DishService {
 		id: number,
 		categoryId: number,
 		companyId: number,
-	) {
+	): Promise<Dish> {
 		const dish = await this.dishRepo.findById(id, companyId)
 		if (!dish) throw new NotFoundException('Dish not found')
 		const category = await this.dishRepo.findCategoryById(categoryId, companyId)
