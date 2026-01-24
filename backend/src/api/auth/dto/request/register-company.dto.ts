@@ -23,14 +23,14 @@ export class RegisterCompanyDto {
 	address: string
 
 	@ApiProperty({ description: 'Latitude', example: 50.4501 })
-	@Transform(({ value }) => parseFloat(value))
+	@Transform(({ value }) => parseFloat(value as string))
 	@IsNumber()
 	@Min(-90)
 	@Max(90)
 	latitude: number
 
 	@ApiProperty({ description: 'Longitude', example: 30.5234 })
-	@Transform(({ value }) => parseFloat(value))
+	@Transform(({ value }) => parseFloat(value as string))
 	@IsNumber()
 	@Min(-180)
 	@Max(180)

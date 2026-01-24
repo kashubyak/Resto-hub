@@ -1,6 +1,7 @@
 // eslint.config.mjs
 import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import prettierConfig from 'eslint-config-prettier';
+import prettierPlugin from 'eslint-plugin-prettier';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -10,7 +11,6 @@ export default tseslint.config(
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
   {
     languageOptions: {
       globals: {
@@ -54,6 +54,26 @@ export default tseslint.config(
         'error',
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
+      'prettier/prettier': [
+        'error',
+        {
+          singleQuote: true,
+          trailingComma: 'all',
+          tabWidth: 2,
+          useTabs: true,
+          semi: false,
+          bracketSpacing: true,
+        },
+      ],
+      'object-curly-spacing': 'off',
+      '@typescript-eslint/object-curly-spacing': 'off',
+      '@stylistic/object-curly-spacing': 'off',
+      'bracket-spacing': 'off',
+      '@typescript-eslint/bracket-spacing': 'off',
+    },
+    plugins: {
+      prettier: prettierPlugin,
     },
   },
+  prettierConfig,
 );

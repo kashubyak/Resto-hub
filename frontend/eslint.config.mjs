@@ -1,6 +1,8 @@
+import { FlatCompat } from "@eslint/eslintrc";
+import prettierConfig from "eslint-config-prettier";
+import prettierPlugin from "eslint-plugin-prettier";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,8 +36,28 @@ const eslintConfig = [
       "react-hooks/exhaustive-deps": "error",
       "react/no-unescaped-entities": "error",
       "react/jsx-key": "error",
+      "prettier/prettier": [
+        "error",
+        {
+          singleQuote: true,
+          trailingComma: "all",
+          tabWidth: 2,
+          useTabs: true,
+          semi: false,
+          bracketSpacing: true,
+        },
+      ],
+      "object-curly-spacing": "off",
+      "@typescript-eslint/object-curly-spacing": "off",
+      "@stylistic/object-curly-spacing": "off",
+      "bracket-spacing": "off",
+      "@typescript-eslint/bracket-spacing": "off",
+    },
+    plugins: {
+      prettier: prettierPlugin,
     },
   },
+  prettierConfig,
 ];
 
 export default eslintConfig;

@@ -12,7 +12,7 @@ import { JwtStrategy } from './strategies/jwt.strategy'
 	imports: [
 		PassportModule,
 		JwtModule.register({
-			secret: process.env.JWT_TOKEN_SECRET || 'default_secret',
+			secret: process.env.JWT_TOKEN_SECRET ?? 'default_secret',
 			signOptions: { expiresIn: '1d' },
 		}),
 		ThrottlerModule.forRoot([{ limit: 10, ttl: 60 }]),
@@ -20,4 +20,4 @@ import { JwtStrategy } from './strategies/jwt.strategy'
 	controllers: [AuthController],
 	providers: [AuthService, JwtStrategy, PrismaService, S3Service],
 })
-export class AuthModule { }
+export class AuthModule {}
