@@ -5,13 +5,13 @@ import {
 } from '@nestjs/common'
 import { Dish } from '@prisma/client'
 import { folder_dish } from 'src/common/constants'
+import { type IOptionalFile } from 'src/common/interface/file-upload.interface'
+import { type IPaginatedResponse } from 'src/common/interface/pagination.interface'
 import { S3Service } from 'src/common/s3/s3.service'
-import { type IPaginatedResponse } from '../category/interfaces/pagination.interface'
 import { CreateDishDto } from './dto/request/create-dish.dto'
 import { FilterDishDto } from './dto/request/filter-dish.dto'
 import { UpdateDishDto } from './dto/request/update-dish.dto'
 import { type IDishWithCategory } from './interfaces/dish.interface'
-import { type IDishImageFile } from './interfaces/file-upload.interface'
 import { type IDishUpdateInput } from './interfaces/prisma.interface'
 import { DishRepository } from './repository/dish.repository'
 
@@ -24,7 +24,7 @@ export class DishService {
 
 	async createDish(
 		dto: CreateDishDto,
-		file: IDishImageFile,
+		file: IOptionalFile,
 		companyId: number,
 	): Promise<Dish> {
 		if (!file) throw new BadRequestException('Dish image is required')
@@ -49,10 +49,7 @@ export class DishService {
 		}
 	}
 
-	async getDishById(
-		id: number,
-		companyId: number,
-	): Promise<IDishWithCategory> {
+	async getDishById(id: number, companyId: number): Promise<IDishWithCategory> {
 		const dish = await this.dishRepo.findById(id, companyId)
 		if (!dish) throw new NotFoundException('Dish not found')
 		return dish
@@ -61,7 +58,7 @@ export class DishService {
 	async updateDish(
 		id: number,
 		dto: UpdateDishDto,
-		file: IDishImageFile,
+		file: IOptionalFile,
 		companyId: number,
 	): Promise<Dish> {
 		const dish = await this.dishRepo.findById(id, companyId)
@@ -85,7 +82,11 @@ export class DishService {
 		if (dto.calories !== undefined) updateData.calories = dto.calories
 		if (dto.available !== undefined) updateData.available = dto.available
 
-		return this.dishRepo.updateDish(id, updateData as IDishUpdateInput, companyId)
+		return this.dishRepo.updateDish(
+			id,
+			updateData as IDishUpdateInput,
+			companyId,
+		)
 	}
 
 	async removeDish(id: number, companyId: number): Promise<Dish> {

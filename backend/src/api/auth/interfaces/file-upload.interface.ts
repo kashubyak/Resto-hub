@@ -1,4 +1,6 @@
+import { type IOptionalFileArray } from 'src/common/interface/file-upload.interface'
+
 export interface ICompanyRegistrationFiles {
-	logoUrl?: Express.Multer.File[]
-	avatarUrl?: Express.Multer.File[]
+	logoUrl?: IOptionalFileArray
+	avatarUrl?: IOptionalFileArray
 }

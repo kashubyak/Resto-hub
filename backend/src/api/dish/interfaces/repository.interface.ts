@@ -1,18 +1,17 @@
 import { type Category } from '@prisma/client'
+import {
+	type IFindManyArgs,
+	type IFindManyResult,
+} from 'src/common/interface/repository.interface'
 import { type IDishWithCategory } from './dish.interface'
-import { type IDishOrderByInput, type IDishWhereInput } from './prisma.interface'
+import {
+	type IDishOrderByInput,
+	type IDishWhereInput,
+} from './prisma.interface'
 
-export interface IFindDishesArgs {
-	where: IDishWhereInput
-	orderBy: IDishOrderByInput
-	skip: number
-	take: number
-}
+export type IFindDishesArgs = IFindManyArgs<IDishWhereInput, IDishOrderByInput>
 
-export interface IFindDishesResult {
-	data: IDishWithCategory[]
-	total: number
-}
+export type IFindDishesResult = IFindManyResult<IDishWithCategory>
 
 export type IDishRepositoryResult = IDishWithCategory | null
 

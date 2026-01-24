@@ -7,7 +7,7 @@ import {
 	type IDishSortBy,
 	type IDishUpdateInput,
 	type IDishWhereInput,
-	type IOrderDirection
+	type IOrderDirection,
 } from '../interfaces/prisma.interface'
 import {
 	type ICategoryRepositoryResult,
@@ -17,7 +17,7 @@ import {
 
 @Injectable()
 export class DishRepository {
-	constructor(private readonly prisma: PrismaService) { }
+	constructor(private readonly prisma: PrismaService) {}
 
 	async createDish(
 		data: CreateDishDto & { imageUrl: string },

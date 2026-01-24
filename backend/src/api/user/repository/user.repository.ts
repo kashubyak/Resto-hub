@@ -2,9 +2,19 @@ import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from 'prisma/prisma.service'
 
+const USER_BASE_SELECT = {
+	id: true,
+	name: true,
+	email: true,
+	role: true,
+	avatarUrl: true,
+	createdAt: true,
+	updatedAt: true,
+} as const
+
 @Injectable()
 export class UserRepository {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService) { }
 
 	createUser(data: Prisma.UserUncheckedCreateInput, companyId: number) {
 		return this.prisma.user.create({
@@ -13,14 +23,8 @@ export class UserRepository {
 				companyId,
 			},
 			select: {
-				id: true,
-				name: true,
-				email: true,
-				role: true,
-				avatarUrl: true,
+				...USER_BASE_SELECT,
 				companyId: true,
-				createdAt: true,
-				updatedAt: true,
 			},
 		})
 	}
@@ -39,13 +43,7 @@ export class UserRepository {
 				take,
 				orderBy,
 				select: {
-					id: true,
-					name: true,
-					email: true,
-					role: true,
-					avatarUrl: true,
-					createdAt: true,
-					updatedAt: true,
+					...USER_BASE_SELECT,
 					companyId: true,
 				},
 			}),
@@ -57,15 +55,7 @@ export class UserRepository {
 	findUser(id: number, companyId: number) {
 		return this.prisma.user.findFirst({
 			where: { id, companyId },
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				role: true,
-				avatarUrl: true,
-				createdAt: true,
-				updatedAt: true,
-			},
+			select: USER_BASE_SELECT,
 		})
 	}
 
@@ -77,15 +67,7 @@ export class UserRepository {
 		return this.prisma.user.update({
 			where: { id, companyId },
 			data,
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				role: true,
-				avatarUrl: true,
-				createdAt: true,
-				updatedAt: true,
-			},
+			select: USER_BASE_SELECT,
 		})
 	}
 

@@ -1,22 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import {
-	IsBoolean,
-	IsIn,
-	IsNumber,
-	IsOptional,
-	IsPositive,
-	IsString,
-} from 'class-validator'
+import { IsBoolean, IsIn, IsNumber, IsOptional } from 'class-validator'
+import { BasePaginationQueryDto } from 'src/common/dto/pagination-query.dto'
 
-export class FilterDishDto {
-	@ApiPropertyOptional({
-		description: 'Search term to filter dishes by name',
-	})
-	@IsOptional()
-	@IsString()
-	search?: string
-
+export class FilterDishDto extends BasePaginationQueryDto {
 	@ApiPropertyOptional({
 		description: 'Minimum price to filter dishes',
 		example: 10,
@@ -51,30 +38,4 @@ export class FilterDishDto {
 	@IsOptional()
 	@IsIn(['name', 'price', 'createdAt'])
 	sortBy?: 'name' | 'price' | 'createdAt'
-
-	@ApiPropertyOptional({
-		description: 'Order of the sorting',
-		example: 'asc',
-	})
-	@IsOptional()
-	@IsIn(['asc', 'desc'])
-	order?: 'asc' | 'desc'
-
-	@ApiPropertyOptional({
-		description: 'Page number for pagination',
-		example: 1,
-	})
-	@IsOptional()
-	@Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-	@IsPositive()
-	page?: number
-
-	@ApiPropertyOptional({
-		description: 'Number of items per page for pagination',
-		example: 10,
-	})
-	@IsOptional()
-	@Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-	@IsPositive()
-	limit?: number
 }

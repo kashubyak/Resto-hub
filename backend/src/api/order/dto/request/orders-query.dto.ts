@@ -1,9 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { OrderStatus } from '@prisma/client'
 import { Type } from 'class-transformer'
-import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator'
+import { IsEnum, IsIn, IsNumber, IsOptional, IsString } from 'class-validator'
+import { BasePaginationQueryDto } from 'src/common/dto/pagination-query.dto'
 
-export class OrdersQueryDto {
+export class OrdersQueryDto extends BasePaginationQueryDto {
 	@ApiPropertyOptional({
 		description: 'Filter orders by status',
 		enum: OrderStatus,
@@ -57,38 +58,11 @@ export class OrdersQueryDto {
 	tableId?: number
 
 	@ApiPropertyOptional({
-		description: 'Page number for pagination',
-		example: 1,
-	})
-	@IsOptional()
-	@IsNumber()
-	@Type(() => Number)
-	@Min(1)
-	page?: number
-
-	@ApiPropertyOptional({
-		description: 'Number of items per page for pagination',
-		example: 10,
-	})
-	@IsOptional()
-	@IsNumber()
-	@Type(() => Number)
-	@Min(1)
-	limit: number
-
-	@ApiPropertyOptional({
 		description: 'Sort orders by a specific field',
 		example: 'createdAt',
 	})
 	@IsOptional()
 	@IsString()
+	@IsIn(['createdAt'])
 	sortBy?: 'createdAt'
-
-	@ApiPropertyOptional({
-		description: 'Order of the sorting',
-		example: 'asc',
-	})
-	@IsOptional()
-	@IsString()
-	sortOrder?: 'asc' | 'desc'
 }

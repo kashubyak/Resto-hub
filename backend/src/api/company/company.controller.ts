@@ -17,17 +17,17 @@ import {
 import { Role } from '@prisma/client'
 import { CurrentUser } from 'src/common/decorators/current-user.decorator'
 import { Roles } from 'src/common/decorators/roles.decorator'
+import { type IOptionalFile } from 'src/common/interface/file-upload.interface'
 import { multerOptions } from 'src/common/s3/file-upload.util'
 import { CompanyService } from './company.service'
 import { UpdateCompanyDto } from './dto/request/update-company.dto'
 import { CompanyItemDto } from './dto/response/company-item-dto'
-import { type ICompanyLogoFile } from './interfaces/file-upload.interface'
 
 @ApiTags('Company')
 @ApiBearerAuth()
 @Controller('company')
 export class CompanyController {
-	constructor(private readonly companyService: CompanyService) {}
+	constructor(private readonly companyService: CompanyService) { }
 
 	@Get()
 	@Roles(Role.ADMIN)
@@ -49,7 +49,7 @@ export class CompanyController {
 	@ApiOkResponse({ type: UpdateCompanyDto })
 	updateCompany(
 		@Body() dto: UpdateCompanyDto,
-		@UploadedFile() file: ICompanyLogoFile,
+		@UploadedFile() file: IOptionalFile,
 		@CurrentUser('companyId') companyId: number,
 	) {
 		return this.companyService.updateCompany(companyId, dto, file)

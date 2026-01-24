@@ -6,9 +6,9 @@ import {
 import { Company } from '@prisma/client'
 import { PrismaService } from 'prisma/prisma.service'
 import { company_avatar } from 'src/common/constants'
+import { type IOptionalFile } from 'src/common/interface/file-upload.interface'
 import { S3Service } from 'src/common/s3/s3.service'
 import { UpdateCompanyDto } from './dto/request/update-company.dto'
-import { type ICompanyLogoFile } from './interfaces/file-upload.interface'
 import { type ICompanyUpdateInput } from './interfaces/prisma.interface'
 import { CompanyRepository } from './repository/company.repository'
 
@@ -30,7 +30,7 @@ export class CompanyService {
 	async updateCompany(
 		companyId: number,
 		dto: UpdateCompanyDto,
-		file?: ICompanyLogoFile,
+		file?: IOptionalFile,
 	): Promise<Company> {
 		const company = await this.companyRepository.findById(companyId)
 		if (!company)

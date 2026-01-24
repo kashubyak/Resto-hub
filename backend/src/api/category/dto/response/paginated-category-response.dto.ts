@@ -1,19 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { BasePaginationDto } from 'src/common/dto/pagination-response.dto'
 import { CategorySummaryDto } from './category-summary.dto'
 
-export class PaginatedCategoryResponseDto {
+export class PaginatedCategoryResponseDto extends BasePaginationDto {
 	@ApiProperty({ type: [CategorySummaryDto] })
 	data: CategorySummaryDto[]
-
-	@ApiProperty({ example: 1 })
-	total: number
-
-	@ApiProperty({ example: 1 })
-	page: number
-
-	@ApiProperty({ example: 10 })
-	limit: number
-
-	@ApiProperty({ example: 1 })
-	totalPages: number
 }

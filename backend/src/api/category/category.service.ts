@@ -4,17 +4,21 @@ import {
 	NotFoundException,
 } from '@nestjs/common'
 import { Category } from '@prisma/client'
+import { type IPaginatedResponse } from 'src/common/interface/pagination.interface'
+import { type IOrderDirection } from 'src/common/interface/prisma.interface'
 import { CreateCategoryDto } from './dto/request/create-category.dto'
 import { FilterCategoryDto } from './dto/request/filter-category.dto'
 import { UpdateCategoryDto } from './dto/request/update-category.dto'
 import { type ICategoryWithDishes } from './interfaces/category.interface'
-import { type IPaginatedResponse } from './interfaces/pagination.interface'
-import { type ICategorySortBy, type ICategoryWhereInput, type IOrderDirection } from './interfaces/prisma.interface'
+import {
+	type ICategorySortBy,
+	type ICategoryWhereInput,
+} from './interfaces/prisma.interface'
 import { CategoryRepository } from './repository/category.repository'
 
 @Injectable()
 export class CategoryService {
-	constructor(private readonly categoryRep: CategoryRepository) {}
+	constructor(private readonly categoryRep: CategoryRepository) { }
 
 	async createCategory(
 		dto: CreateCategoryDto,
@@ -30,12 +34,7 @@ export class CategoryService {
 		query: FilterCategoryDto,
 		companyId: number,
 	): Promise<IPaginatedResponse<ICategoryWithDishes>> {
-		const {
-			search,
-			hasDishes,
-			sortBy = 'createdAt',
-			order = 'desc',
-		} = query
+		const { search, hasDishes, sortBy = 'createdAt', order = 'desc' } = query
 		const page = query.page ?? 1
 		const limit = query.limit ?? 10
 		const where: ICategoryWhereInput = { companyId }

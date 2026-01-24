@@ -19,10 +19,7 @@ export class CompanyRepository {
 		})
 	}
 
-	async update(
-		companyId: number,
-		data: ICompanyUpdateInput,
-	): Promise<Company> {
+	async update(companyId: number, data: ICompanyUpdateInput): Promise<Company> {
 		return this.prisma.company.update({
 			where: { id: companyId },
 			data,

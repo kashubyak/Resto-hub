@@ -24,6 +24,7 @@ import {
 import { Role } from '@prisma/client'
 import { CurrentUser } from 'src/common/decorators/current-user.decorator'
 import { Roles } from 'src/common/decorators/roles.decorator'
+import { type IOptionalFile } from 'src/common/interface/file-upload.interface'
 import { multerOptions } from 'src/common/s3/file-upload.util'
 import { MulterErrorInterceptor } from 'src/common/s3/multer-error.interceptor'
 import { DishService } from './dish.service'
@@ -35,7 +36,6 @@ import {
 	CreateDishResponseDto,
 } from './dto/response/create-dish-response.dto'
 import { PaginatedDishesWithCategoryResponseDto } from './dto/response/paginated-dishes-response.dto'
-import { type IDishImageFile } from './interfaces/file-upload.interface'
 
 @ApiTags('Dishes')
 @ApiBearerAuth()
@@ -60,7 +60,7 @@ export class DishController {
 	})
 	createDish(
 		@Body() dto: CreateDishDto,
-		@UploadedFile() file: IDishImageFile,
+		@UploadedFile() file: IOptionalFile,
 		@CurrentUser('companyId') companyId: number,
 	) {
 		return this.dishService.createDish(dto, file, companyId)
@@ -109,7 +109,7 @@ export class DishController {
 	})
 	updateDish(
 		@Param('id', ParseIntPipe) id: number,
-		@UploadedFile() file: IDishImageFile,
+		@UploadedFile() file: IOptionalFile,
 		@Body() dto: UpdateDishDto,
 		@CurrentUser('companyId') companyId: number,
 	) {

@@ -196,7 +196,7 @@ export class OrderService {
 			page = 1,
 			limit = 10,
 			sortBy = 'createdAt',
-			sortOrder = 'desc',
+			order = 'desc',
 		} = query
 
 		const where: Prisma.OrderWhereInput = { companyId }
@@ -216,7 +216,7 @@ export class OrderService {
 			this.orderRepo.findAll(where, {
 				skip,
 				take: limit,
-				orderBy: { [sortBy]: sortOrder },
+				orderBy: { [sortBy]: order },
 			}),
 			this.orderRepo.count(where),
 		])
@@ -251,7 +251,7 @@ export class OrderService {
 			page = 1,
 			limit = 10,
 			sortBy = 'createdAt',
-			sortOrder = 'desc',
+			order = 'desc',
 		} = query
 		const skip = (page - 1) * limit
 
@@ -259,7 +259,7 @@ export class OrderService {
 			this.orderRepo.findAll(where, {
 				skip,
 				take: limit,
-				orderBy: { [sortBy]: sortOrder },
+				orderBy: { [sortBy]: order },
 			}),
 			this.orderRepo.count(where),
 		])
@@ -280,7 +280,7 @@ export class OrderService {
 			page = 1,
 			limit = 10,
 			sortBy = 'createdAt',
-			sortOrder = 'desc',
+			order = 'desc',
 		} = query
 
 		const where = { cookId: null, status: OrderStatus.PENDING, companyId }
@@ -290,7 +290,7 @@ export class OrderService {
 			this.orderRepo.findWithFullDish(where, {
 				skip,
 				take: limit,
-				orderBy: { [sortBy]: sortOrder },
+				orderBy: { [sortBy]: order },
 			}),
 			this.orderRepo.count(where),
 		])

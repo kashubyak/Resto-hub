@@ -1,21 +1,21 @@
-import { Category } from '@prisma/client'
+import { type Category } from '@prisma/client'
+import {
+	type IFindManyArgs,
+	type IFindManyResult,
+} from 'src/common/interface/repository.interface'
 import { type ICategoryWithDishes } from './category.interface'
-import { type ICategoryOrderByInput, type ICategoryWhereInput } from './prisma.interface'
+import {
+	type ICategoryOrderByInput,
+	type ICategoryWhereInput,
+} from './prisma.interface'
 
-export interface IFindManyWithCountArgs {
-	where: ICategoryWhereInput
-	orderBy: ICategoryOrderByInput
-	skip: number
-	take: number
-}
+export type { IDeleteResult } from 'src/common/interface/repository.interface'
 
-export interface IFindManyWithCountResult<T> {
-	data: T[]
-	total: number
-}
+export type IFindManyWithCountArgs = IFindManyArgs<
+	ICategoryWhereInput,
+	ICategoryOrderByInput
+>
 
-export interface IDeleteResult {
-	id: number
-}
+export type IFindManyWithCountResult<T> = IFindManyResult<T>
 
 export type ICategoryRepositoryResult = Category | ICategoryWithDishes | null
