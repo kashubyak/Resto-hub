@@ -1,5 +1,5 @@
-import { INestApplication } from '@nestjs/common'
-import { Order } from '@prisma/client'
+import { type INestApplication } from '@nestjs/common'
+import { type Order } from '@prisma/client'
 import * as request from 'supertest'
 import { BASE_URL, HOST, logoPath } from './constants'
 import { FakeDTO } from './faker'

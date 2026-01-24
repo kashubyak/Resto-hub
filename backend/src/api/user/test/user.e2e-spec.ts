@@ -1,5 +1,5 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common'
-import { Test, TestingModule } from '@nestjs/testing'
+import { type INestApplication, ValidationPipe } from '@nestjs/common'
+import { Test, type TestingModule } from '@nestjs/testing'
 import { AppModule } from 'app.module'
 import * as cookieParser from 'cookie-parser'
 import { PrismaService } from 'prisma/prisma.service'

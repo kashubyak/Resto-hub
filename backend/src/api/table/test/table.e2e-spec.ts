@@ -1,4 +1,4 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { type INestApplication, ValidationPipe } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { AppModule } from 'app.module'
 import { PrismaService } from 'prisma/prisma.service'

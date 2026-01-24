@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common'
-import { Request } from 'express'
-import { Options as MulterOptions } from 'multer'
+import { type Request } from 'express'
+import { type Options as MulterOptions } from 'multer'
 import { size_of_image } from '../constants'
 
 export const imageFileFilter = (

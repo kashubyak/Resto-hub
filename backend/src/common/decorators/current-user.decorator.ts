@@ -1,4 +1,4 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common'
+import { createParamDecorator, type ExecutionContext } from '@nestjs/common'
 import { companyIdFromSubdomain } from '../constants'
 
 export const CurrentUser = createParamDecorator(

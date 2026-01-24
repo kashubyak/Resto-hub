@@ -1,6 +1,6 @@
-import { INestApplication } from '@nestjs/common'
+import { type INestApplication } from '@nestjs/common'
 import { PrismaService } from 'prisma/prisma.service'
-import { ISubUserDto } from 'src/common/interface/user.interface'
+import { type ISubUserDto } from 'src/common/interface/user.interface'
 import * as request from 'supertest'
 import { BASE_URL, companyData, HOST, localhost, logoPath } from './constants'
 import { attachCompanyFormFields, makeRequest } from './form-utils'
