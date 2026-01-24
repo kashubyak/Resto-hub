@@ -8,8 +8,8 @@ import {
   Res,
   UploadedFiles,
   UseInterceptors,
-} from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express/multer/interceptors';
+} from '@nestjs/common'
+import { FileFieldsInterceptor } from '@nestjs/platform-express/multer/interceptors'
 import {
   ApiBearerAuth,
   ApiBody,
@@ -17,20 +17,22 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
-} from '@nestjs/swagger';
-import { Request, Response } from 'express';
-import { Public } from 'src/common/decorators/public.decorator';
-import { multerOptions } from 'src/common/s3/file-upload.util';
-import { AuthService } from './auth.service';
-import { LoginDto } from './dto/request/login.dto';
-import { RegisterCompanyDto } from './dto/request/register-company.dto';
-import { RegisterCompanyResponseDto } from './dto/response/register-company-response.dto';
-import { TokenResponseDto } from './dto/response/token-response.dto';
+} from '@nestjs/swagger'
+import { Response } from 'express'
+import { Public } from 'src/common/decorators/public.decorator'
+import { IRequestWithCompanyId } from 'src/common/interface/request.interface'
+import { multerOptions } from 'src/common/s3/file-upload.util'
+import { AuthService } from './auth.service'
+import { LoginDto } from './dto/request/login.dto'
+import { RegisterCompanyDto } from './dto/request/register-company.dto'
+import { RegisterCompanyResponseDto } from './dto/response/register-company-response.dto'
+import { ICompanyRegistrationFiles } from './interfaces/file-upload.interface'
+import { ITokenResponse } from './interfaces/jwt.interface'
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register-company')
   @Public()
@@ -52,13 +54,10 @@ export class AuthController {
   registerCompany(
     @Body() dto: RegisterCompanyDto,
     @UploadedFiles()
-    files: {
-      logoUrl: Express.Multer.File[];
-      avatarUrl: Express.Multer.File[];
-    },
+    files: ICompanyRegistrationFiles,
     @Res({ passthrough: true }) res: Response,
   ): Promise<Omit<RegisterCompanyResponseDto, 'refresh_token'>> {
-    return this.authService.registerCompany(dto, files, res);
+    return this.authService.registerCompany(dto, files, res)
   }
 
   @Post('login')
@@ -78,10 +77,10 @@ export class AuthController {
   })
   async login(
     @Body() dto: LoginDto,
-    @Req() req: Request,
+    @Req() req: IRequestWithCompanyId,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ token: string }> {
-    return this.authService.processLogin(dto, req, res);
+  ): Promise<ITokenResponse> {
+    return this.authService.processLogin(dto, req, res)
   }
 
   @Post('refresh')
@@ -92,13 +91,17 @@ export class AuthController {
   })
   @ApiOkResponse({
     description: 'Token refreshed successfully.',
-    type: TokenResponseDto,
+    schema: {
+      example: {
+        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+      },
+    },
   })
   async refresh(
-    @Req() req: Request,
+    @Req() req: IRequestWithCompanyId,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ token: string }> {
-    return this.authService.processRefresh(req, res);
+  ): Promise<ITokenResponse> {
+    return this.authService.processRefresh(req, res)
   }
 
   @Post('logout')
@@ -109,6 +112,6 @@ export class AuthController {
     description: 'Logged out successfully.',
   })
   logout(@Res({ passthrough: true }) res: Response) {
-    return this.authService.logoutUser(res);
+    return this.authService.logoutUser(res)
   }
 }
