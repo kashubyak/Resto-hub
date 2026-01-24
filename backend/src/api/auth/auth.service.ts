@@ -95,6 +95,7 @@ export class AuthService {
 		})
 
 		const admin = company.users[0]
+		if (!admin) throw new Error('Admin not found')
 		return {
 			user: {
 				id: admin.id,
@@ -136,8 +137,8 @@ export class AuthService {
 		req: IRequestWithCompanyId,
 		res: Response,
 	): Promise<ITokenResponse> {
-		const refreshToken = req.cookies['jid']
-		if (!refreshToken)
+		const refreshToken = req.cookies['jid'] as string | undefined
+		if (!refreshToken || typeof refreshToken !== 'string')
 			throw new UnauthorizedException('No refresh token provided')
 
 		let payload: IJwtPayload
