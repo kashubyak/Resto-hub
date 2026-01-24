@@ -3,13 +3,19 @@ import {
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common'
-import { Prisma, Role } from '@prisma/client'
+import { Role } from '@prisma/client'
 import * as bcrypt from 'bcryptjs'
 import { folder_avatar } from 'src/common/constants'
+import { type IPaginatedResponse } from 'src/common/interface/pagination.interface'
 import { S3Service } from 'src/common/s3/s3.service'
 import { RegisterDto } from '../auth/dto/request/register.dto'
 import { FilterUserDto } from './dto/request/filter-user.dto'
 import { UpdateUserDto } from './dto/request/update-user.dto'
+import { type IUserWhereInput } from './interfaces/prisma.interface'
+import {
+	type IUserRepositoryResult,
+	type IUserWithCompanyIdResult,
+} from './interfaces/repository.interface'
 import { UserRepository } from './repository/user.repository'
 
 @Injectable()
@@ -23,7 +29,7 @@ export class UserService {
 		dto: RegisterDto,
 		file: Express.Multer.File,
 		companyId: number,
-	) {
+	): Promise<IUserRepositoryResult> {
 		if (!file) throw new BadRequestException('Avatar image is required')
 		const existingUser = await this.userRepository.findByEmail(
 			dto.email,
@@ -57,7 +63,10 @@ export class UserService {
 		}
 	}
 
-	async findAll(query: FilterUserDto, companyId: number) {
+	async findAll(
+		query: FilterUserDto,
+		companyId: number,
+	): Promise<IPaginatedResponse<IUserWithCompanyIdResult>> {
 		const {
 			search,
 			role,
@@ -72,7 +81,7 @@ export class UserService {
 		const skip = (page - 1) * limit
 
 		const allowedRoles: Role[] = ['COOK', 'WAITER']
-		const where: Prisma.UserWhereInput = {
+		const where: IUserWhereInput = {
 			companyId,
 			role: role ? role : { in: allowedRoles },
 			OR: search
@@ -98,7 +107,10 @@ export class UserService {
 		}
 	}
 
-	async findById(id: number, companyId: number) {
+	async findById(
+		id: number,
+		companyId: number,
+	): Promise<IUserRepositoryResult> {
 		const user = await this.userRepository.findUser(id, companyId)
 		if (!user) throw new NotFoundException(`User with ID ${id} not found`)
 		return user
@@ -109,7 +121,7 @@ export class UserService {
 		dto: UpdateUserDto,
 		file: Express.Multer.File,
 		companyId: number,
-	) {
+	): Promise<IUserRepositoryResult> {
 		const user = await this.userRepository.findUserWithPassword(id, companyId)
 		if (!user) throw new NotFoundException(`User with ID ${id} not found`)
 
@@ -154,7 +166,10 @@ export class UserService {
 		)
 	}
 
-	async deleteUser(id: number, companyId: number) {
+	async deleteUser(
+		id: number,
+		companyId: number,
+	): Promise<IUserRepositoryResult> {
 		const user = await this.userRepository.findUser(id, companyId)
 		if (!user) throw new NotFoundException(`User with ID ${id} not found`)
 		if (user.avatarUrl) {
@@ -164,6 +179,9 @@ export class UserService {
 				throw new BadRequestException('Failed to delete avatar image')
 			}
 		}
-		return this.userRepository.deleteUser(id, companyId)
+		const deletedUser = await this.userRepository.deleteUser(id, companyId)
+		if (!deletedUser)
+			throw new NotFoundException(`User with ID ${id} not found`)
+		return deletedUser
 	}
 }
