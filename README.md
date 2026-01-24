@@ -12,7 +12,7 @@ This repository contains both parts of the application:
 
 * Node.js v18+
 * Yarn
-* PostgreSQL
+* Supabase account and project (for PostgreSQL database)
 * AWS S3 bucket for file uploads
 
 ## Getting Started
@@ -31,14 +31,27 @@ cd backend
 yarn install
 ```
 
-### 3. Configure environment variables
+### 3. Set up Supabase
+
+1. Create a new project at [Supabase](https://supabase.com/)
+2. Go to Project Settings → Database
+3. Copy the connection strings:
+   - **Connection pooling** (for application): Use this for `DATABASE_URL`
+   - **Direct connection** (for migrations): Use this for `DATABASE_DIRECT_URL`
+
+### 4. Configure environment variables
 
 Create the following environment files inside the `backend/` directory.
 
 #### `.env`
 
 ```env
-DATABASE_URL="postgresql://<db_user>:<db_password>@localhost:5432/resto_hub?schema=public"
+# Supabase Database URLs
+# Connection pooling URL (for application queries)
+DATABASE_URL="postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
+# Direct connection URL (for migrations)
+DATABASE_DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres"
+
 PORT=3000
 NODE_ENV=development
 ALLOWED_ORIGINS=http://localhost:3001
@@ -59,25 +72,34 @@ AWS_S3_BUCKET_NAME=your_s3_bucket_name
 #### `.env.test`
 
 ```env
-DATABASE_URL="postgresql://<db_user>:<db_password>@localhost:5432/resto_hub_test?schema=public"
+# Use a separate Supabase project for tests OR a test database
+DATABASE_URL="postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
+DATABASE_DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres"
 NODE_ENV=test
 ```
 
-> ⚠️ Replace placeholder values (`<...>`) with your actual credentials or use environment-specific secrets in development.
+> ⚠️ **Important:** 
+> - Replace `[PROJECT_REF]`, `[PASSWORD]`, `[REGION]` with your actual Supabase project credentials
+> - Get connection strings from Supabase Dashboard → Project Settings → Database
+> - Never commit `.env` files to version control
 
-### 4. Generate Prisma client
+### 5. Generate Prisma client
 
 ```bash
 yarn prisma generate
 ```
 
-### 5. Run database migrations
+### 6. Run database migrations
 
 ```bash
+# For development (creates migration files)
 yarn prisma migrate dev
+
+# For production (applies existing migrations)
+yarn prisma migrate deploy
 ```
 
-### 6. Start the development server
+### 7. Start the development server
 
 ```bash
 yarn start:dev
