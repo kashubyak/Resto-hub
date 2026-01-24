@@ -21,6 +21,7 @@ import { multerOptions } from 'src/common/s3/file-upload.util'
 import { CompanyService } from './company.service'
 import { UpdateCompanyDto } from './dto/request/update-company.dto'
 import { CompanyItemDto } from './dto/response/company-item-dto'
+import { type ICompanyLogoFile } from './interfaces/file-upload.interface'
 
 @ApiTags('Company')
 @ApiBearerAuth()
@@ -38,12 +39,17 @@ export class CompanyController {
 
 	@Patch()
 	@Roles(Role.ADMIN)
-	@UseInterceptors(FileInterceptor('logoUrl', multerOptions))
+	@UseInterceptors(
+		FileInterceptor(
+			'logoUrl',
+			multerOptions as unknown as Parameters<typeof FileInterceptor>[1],
+		),
+	)
 	@ApiOperation({ description: 'Update current company info (ADMIN only)' })
 	@ApiOkResponse({ type: UpdateCompanyDto })
 	updateCompany(
 		@Body() dto: UpdateCompanyDto,
-		@UploadedFile() file: Express.Multer.File,
+		@UploadedFile() file: ICompanyLogoFile,
 		@CurrentUser('companyId') companyId: number,
 	) {
 		return this.companyService.updateCompany(companyId, dto, file)

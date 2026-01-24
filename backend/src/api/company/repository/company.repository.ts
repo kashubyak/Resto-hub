@@ -1,28 +1,35 @@
 import { Injectable } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Company } from '@prisma/client'
 import { PrismaService } from 'prisma/prisma.service'
+import { type ICompanyUpdateInput } from '../interfaces/prisma.interface'
 
 @Injectable()
 export class CompanyRepository {
 	constructor(private readonly prisma: PrismaService) {}
 
-	findById(companyId: number) {
+	async findById(companyId: number): Promise<Company | null> {
 		return this.prisma.company.findUnique({
 			where: { id: companyId },
 		})
 	}
-	findByName(name: string) {
+
+	async findByName(name: string): Promise<Company | null> {
 		return this.prisma.company.findFirst({
 			where: { name },
 		})
 	}
-	update(companyId: number, data: Prisma.CompanyUpdateInput) {
+
+	async update(
+		companyId: number,
+		data: ICompanyUpdateInput,
+	): Promise<Company> {
 		return this.prisma.company.update({
 			where: { id: companyId },
 			data,
 		})
 	}
-	deleteCompany(companyId: number) {
+
+	async deleteCompany(companyId: number): Promise<Company> {
 		return this.prisma.company.delete({
 			where: { id: companyId },
 		})

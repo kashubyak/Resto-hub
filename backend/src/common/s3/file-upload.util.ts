@@ -4,7 +4,7 @@ import { type Options as MulterOptions } from 'multer'
 import { size_of_image } from '../constants'
 
 export const imageFileFilter = (
-	req: Request,
+	_req: Request,
 	file: Express.Multer.File,
 	callback: (error: Error | null, acceptFile: boolean) => void,
 ) => {
@@ -17,9 +17,9 @@ export const imageFileFilter = (
 	callback(null, true)
 }
 
-export const multerOptions: MulterOptions = {
+export const multerOptions = {
 	fileFilter: imageFileFilter,
 	limits: {
 		fileSize: size_of_image * 1024 * 1024,
 	},
-}
+} as MulterOptions

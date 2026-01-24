@@ -3,11 +3,13 @@ import {
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Company } from '@prisma/client'
 import { PrismaService } from 'prisma/prisma.service'
 import { company_avatar } from 'src/common/constants'
 import { S3Service } from 'src/common/s3/s3.service'
 import { UpdateCompanyDto } from './dto/request/update-company.dto'
+import { type ICompanyLogoFile } from './interfaces/file-upload.interface'
+import { type ICompanyUpdateInput } from './interfaces/prisma.interface'
 import { CompanyRepository } from './repository/company.repository'
 
 @Injectable()
@@ -18,7 +20,7 @@ export class CompanyService {
 		private readonly prisma: PrismaService,
 	) {}
 
-	async getCompanyById(companyId: number) {
+	async getCompanyById(companyId: number): Promise<Company> {
 		const company = await this.companyRepository.findById(companyId)
 		if (!company)
 			throw new NotFoundException(`Company with ID ${companyId} not found`)
@@ -28,8 +30,8 @@ export class CompanyService {
 	async updateCompany(
 		companyId: number,
 		dto: UpdateCompanyDto,
-		file?: Express.Multer.File,
-	) {
+		file?: ICompanyLogoFile,
+	): Promise<Company> {
 		const company = await this.companyRepository.findById(companyId)
 		if (!company)
 			throw new NotFoundException(`Company with ID ${companyId} not found`)
@@ -55,21 +57,25 @@ export class CompanyService {
 				'Both latitude and longitude must be provided together',
 			)
 
-		const updateData: Prisma.CompanyUpdateInput = {
-			name: dto.name ?? undefined,
-			address: dto.address ?? undefined,
+		const updateData: ICompanyUpdateInput = {
 			logoUrl,
 		}
+		if (dto.name !== undefined) updateData.name = dto.name
+		if (dto.address !== undefined) updateData.address = dto.address
 
 		if (latitudeDefined && longitudeDefined) {
-			updateData.latitude = dto.latitude
-			updateData.longitude = dto.longitude
+			const latitude = dto.latitude
+			const longitude = dto.longitude
+			if (latitude !== undefined && longitude !== undefined) {
+				updateData.latitude = latitude
+				updateData.longitude = longitude
+			}
 		}
 
 		return this.companyRepository.update(companyId, updateData)
 	}
 
-	async deleteCompany(companyId: number) {
+	async deleteCompany(companyId: number): Promise<Company> {
 		const company = await this.companyRepository.findById(companyId)
 		if (!company)
 			throw new NotFoundException(`Company with ID ${companyId} not found`)
