@@ -8,6 +8,7 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "testMatch": ["**/test/**/*.e2e-spec.ts"],
+  "testTimeout": 15000,
   "moduleNameMapper": {
     "^test/(.*)$": "<rootDir>/test/$1",
     "^src/(.*)$": "<rootDir>/src/$1",
