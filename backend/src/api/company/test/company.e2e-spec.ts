@@ -9,6 +9,7 @@ import { getAuthToken } from 'test/utils/auth-test'
 import { BASE_URL, localhost, logoPath } from 'test/utils/constants'
 import { cleanTestDb } from 'test/utils/db-utils'
 import { makeRequest } from 'test/utils/form-utils'
+import { closeTestApp } from 'test/utils/test-cleanup'
 
 interface CompanyResponse {
 	id: number
@@ -45,7 +46,7 @@ describe('Company (e2e)', () => {
 	})
 
 	afterAll(async () => {
-		await app.close()
+		await closeTestApp(app, prisma)
 	})
 
 	it('should get current company info', async () => {

@@ -12,6 +12,7 @@ import { getAuthToken } from 'test/utils/auth-test'
 import { BASE_URL, companyData, HOST, logoPath } from 'test/utils/constants'
 import { cleanTestDb } from 'test/utils/db-utils'
 import { makeRequest } from 'test/utils/form-utils'
+import { closeTestApp } from 'test/utils/test-cleanup'
 
 interface UserItemResponse {
 	id: number
@@ -65,8 +66,9 @@ describe('User (e2e)', () => {
 	})
 
 	afterAll(async () => {
-		await s3Service.deleteFolder('avatars')
-		await app.close()
+		await closeTestApp(app, prisma, async () => {
+			await s3Service.deleteFolder('avatars')
+		})
 	})
 
 	describe(`${BASE_URL.USER}/register (POST)`, () => {

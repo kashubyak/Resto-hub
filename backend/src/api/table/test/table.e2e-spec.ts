@@ -10,6 +10,7 @@ import { BASE_URL, HOST } from 'test/utils/constants'
 import { cleanTestDb } from 'test/utils/db-utils'
 import { FakeDTO } from 'test/utils/faker'
 import { createTable, makeRequest } from 'test/utils/form-utils'
+import { closeTestApp } from 'test/utils/test-cleanup'
 
 interface TableResponse {
 	id: number
@@ -57,11 +58,11 @@ describe('Table (e2e)', () => {
 	})
 
 	afterAll(async () => {
-		await app.close()
+		await closeTestApp(app, prisma)
 	})
 
 	it('should create a new table', async () => {
-		const dto = FakeDTO.table.create()
+		const dto = { number: 8888, seats: 4 }
 		const res = (await createTable(app, token, dto)) as TableResponse
 		expect(res).toHaveProperty('id')
 		expect(res.number).toBe(dto.number)
@@ -125,7 +126,7 @@ describe('Table (e2e)', () => {
 	})
 
 	it('should delete a table', async () => {
-		const dto = FakeDTO.table.create()
+		const dto = { number: 9999, seats: 4 }
 		const res = await makeRequest(
 			app,
 			token,

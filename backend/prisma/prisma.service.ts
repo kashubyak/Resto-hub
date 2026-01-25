@@ -2,7 +2,7 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ override: false });
 
 @Injectable()
 export class PrismaService
@@ -23,12 +23,27 @@ export class PrismaService
       log:
         process.env.NODE_ENV === 'development'
           ? ['query', 'error', 'warn']
+          : process.env.NODE_ENV === 'test'
+          ? []
           : ['error'],
     });
   }
 
   async onModuleInit(): Promise<void> {
-    await this.$connect();
+    if (process.env.NODE_ENV === 'test') {
+      const TEST_CONNECTION_MAX_RETRIES = 5;
+      const TEST_CONNECTION_RETRY_DELAY = 500;
+
+      for (let attempt = 1; attempt <= TEST_CONNECTION_MAX_RETRIES; attempt++) {
+        try {
+          await this.$connect();
+          return;
+        } catch (error) {
+          if (attempt === TEST_CONNECTION_MAX_RETRIES) throw error;
+          await new Promise(resolve => setTimeout(resolve, TEST_CONNECTION_RETRY_DELAY));
+        }
+      }
+    } else await this.$connect();
   }
 
   async onModuleDestroy(): Promise<void> {

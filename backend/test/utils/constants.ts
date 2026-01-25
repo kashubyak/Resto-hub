@@ -23,3 +23,5 @@ export const companyData = {
 	adminEmail: 'admin@example.com',
 	adminPassword: 'password123',
 }
+
+export const CONNECTION_POOL_RELEASE_DELAY = 500

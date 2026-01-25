@@ -14,6 +14,7 @@ import {
 	createTable,
 	makeRequest,
 } from 'test/utils/form-utils'
+import { closeTestApp } from 'test/utils/test-cleanup'
 
 interface CategoryResponse {
 	id: number
@@ -190,7 +191,7 @@ describe('Order (e2e)', () => {
 	})
 
 	afterAll(async () => {
-		await app.close()
+		await closeTestApp(app, prisma)
 	})
 
 	describe('POST /create', () => {

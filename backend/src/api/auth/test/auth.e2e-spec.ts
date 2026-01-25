@@ -14,6 +14,7 @@ import {
 	attachCompanyFormFields,
 	baseCompanyFormFields,
 } from 'test/utils/form-utils'
+import { closeTestApp } from 'test/utils/test-cleanup'
 
 describe('Auth (e2e)', () => {
 	let app: INestApplication
@@ -55,9 +56,10 @@ describe('Auth (e2e)', () => {
 	})
 
 	afterAll(async () => {
-		await s3Service.deleteFolder(folder_avatar)
-		await s3Service.deleteFolder(company_avatar)
-		await app.close()
+		await closeTestApp(app, prisma, async () => {
+			await s3Service.deleteFolder(folder_avatar)
+			await s3Service.deleteFolder(company_avatar)
+		})
 	})
 
 	describe('${BASE_URL.AUTH}/register-company (POST)', () => {

@@ -10,6 +10,7 @@ import { BASE_URL, HOST, logoPath } from 'test/utils/constants'
 import { cleanTestDb } from 'test/utils/db-utils'
 import { FakeDTO } from 'test/utils/faker'
 import { createCategory, createDish, makeRequest } from 'test/utils/form-utils'
+import { closeTestApp } from 'test/utils/test-cleanup'
 
 interface CategoryResponse {
 	id: number
@@ -81,7 +82,7 @@ describe('Dish (e2e)', () => {
 	})
 
 	afterAll(async () => {
-		await app.close()
+		await closeTestApp(app, prisma)
 	})
 
 	describe('/create (POST)', () => {

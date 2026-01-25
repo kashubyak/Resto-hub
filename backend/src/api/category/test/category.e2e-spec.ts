@@ -10,6 +10,7 @@ import { BASE_URL, HOST } from 'test/utils/constants'
 import { cleanTestDb } from 'test/utils/db-utils'
 import { FakeDTO } from 'test/utils/faker'
 import { createCategory, makeRequest } from 'test/utils/form-utils'
+import { closeTestApp } from 'test/utils/test-cleanup'
 
 interface CategoryResponse {
 	id: number
@@ -59,7 +60,7 @@ describe('Category (e2e)', () => {
 	})
 
 	afterAll(async () => {
-		await app.close()
+		await closeTestApp(app, prisma)
 	})
 
 	it('should create a category', async () => {
