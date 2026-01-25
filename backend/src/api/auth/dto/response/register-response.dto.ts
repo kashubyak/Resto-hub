@@ -1,27 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
-
-class UserResponse {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  email: string;
-
-  @ApiProperty({ enum: Role, example: Role.WAITER })
-  role: Role;
-
-  @ApiProperty()
-  avatarUrl: string;
-}
+import { ApiProperty } from '@nestjs/swagger'
+import { UserProfileDto } from 'src/common/dto/base-user.dto'
 
 export class RegisterResponseDto {
-  @ApiProperty({ description: 'JWT access token' })
-  access_token: string;
+	@ApiProperty({ description: 'JWT access token' })
+	access_token!: string
 
-  @ApiProperty({ type: () => UserResponse })
-  user: UserResponse;
+	@ApiProperty({ type: () => UserProfileDto })
+	user!: UserProfileDto
 }

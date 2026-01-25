@@ -1,59 +1,29 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
-
-export class DishInOrderDto {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  price: number;
-}
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { DishBasicDto } from 'src/api/dish/dto/response/dish-basic.dto'
+import { BaseTableDto, ExtendedTableDto } from 'src/common/dto/base-table.dto'
+import { BaseUserDto, ExtendedUserDto } from 'src/common/dto/base-user.dto'
 
 export class OrderItemSummaryDto {
-  @ApiProperty()
-  quantity: number;
+	@ApiProperty()
+	price!: number
 
-  @ApiProperty()
-  total: number;
+	@ApiProperty()
+	quantity!: number
 
-  @ApiPropertyOptional()
-  notes?: string;
+	@ApiProperty()
+	total!: number
 
-  @ApiProperty({ type: DishInOrderDto })
-  dish: DishInOrderDto;
+	@ApiPropertyOptional()
+	notes?: string
+
+	@ApiProperty({ type: DishBasicDto })
+	dish!: DishBasicDto
 }
 
-export class BaseUser {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  name: string;
-}
-
-export class ExtendedUser extends BaseUser {
-  @ApiProperty()
-  email: string;
-
-  @ApiProperty({ example: Role.WAITER })
-  role: string;
-}
-
-export class BaseTable {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  number: number;
-}
-
-export class ExtendedTable extends BaseTable {
-  @ApiProperty()
-  seats: number;
-
-  @ApiProperty()
-  active: boolean;
+export {
+	BaseTableDto,
+	BaseUserDto,
+	DishBasicDto,
+	ExtendedTableDto,
+	ExtendedUserDto,
 }
