@@ -1,13 +1,17 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { companyIdFromSubdomain } from '../constants';
+import { createParamDecorator, type ExecutionContext } from '@nestjs/common'
+import { type IAuthenticatedUser } from 'src/api/auth/interfaces/user.interface'
+import { companyIdFromSubdomain } from '../constants'
+import { type IRequestWithUser } from '../interface/request.interface'
 
 export const CurrentUser = createParamDecorator(
-  (field: string | undefined, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    const user = request.user;
-    if (user && !user.companyId && request[companyIdFromSubdomain])
-      user.companyId = request[companyIdFromSubdomain];
+	(field: string | undefined, ctx: ExecutionContext): unknown => {
+		const request = ctx.switchToHttp().getRequest<IRequestWithUser>()
+		const user: IAuthenticatedUser | undefined = request.user
+		if (user && !user.companyId && request[companyIdFromSubdomain])
+			user.companyId = request[companyIdFromSubdomain]
 
-    return field ? user?.[field] : user;
-  },
-);
+		if (!field) return user
+		if (!user) return undefined
+		return (user as unknown as Record<string, unknown>)[field]
+	},
+)
