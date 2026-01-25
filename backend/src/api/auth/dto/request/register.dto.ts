@@ -5,11 +5,11 @@ import { Role } from '@prisma/client'
 export class RegisterDto {
 	@ApiProperty({ description: 'Full name of the user' })
 	@IsString()
-	name: string
+	name!: string
 
 	@ApiProperty({ description: 'Email address' })
 	@IsEmail()
-	email: string
+	email!: string
 
 	@ApiProperty({
 		description: 'Password with minimum 6 characters',
@@ -19,9 +19,9 @@ export class RegisterDto {
 	@MinLength(6, {
 		message: 'Password should be at least 6 characters long',
 	})
-	password: string
+	password!: string
 
 	@ApiProperty({ enum: Role, description: 'Role of the user' })
 	@IsEnum(Role)
-	role: Role
+	role!: Role
 }

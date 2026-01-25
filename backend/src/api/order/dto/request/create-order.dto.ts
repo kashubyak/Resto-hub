@@ -13,12 +13,12 @@ import {
 export class CreateOrderItemDto {
 	@ApiProperty()
 	@IsInt()
-	dishId: number
+	dishId!: number
 
 	@ApiProperty()
 	@IsInt()
 	@Min(1)
-	quantity: number
+	quantity!: number
 
 	@ApiProperty({ required: false })
 	@IsOptional()
@@ -28,12 +28,12 @@ export class CreateOrderItemDto {
 export class CreateOrderDto {
 	@ApiProperty()
 	@IsInt()
-	tableId: number
+	tableId!: number
 
 	@ApiProperty({ type: [CreateOrderItemDto] })
 	@IsArray()
 	@ArrayMinSize(1)
 	@ValidateNested({ each: true })
 	@Type(() => CreateOrderItemDto)
-	items: CreateOrderItemDto[]
+	items!: CreateOrderItemDto[]
 }

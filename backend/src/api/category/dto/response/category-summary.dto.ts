@@ -3,19 +3,19 @@ import { CreateDishResponseDto } from 'src/api/dish/dto/response/create-dish-res
 
 export class BaseCategoryDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty()
-	name: string
+	name!: string
 
 	@ApiProperty()
-	createdAt: Date
+	createdAt!: Date
 
 	@ApiProperty()
-	updatedAt: Date
+	updatedAt!: Date
 }
 
 export class CategorySummaryDto extends BaseCategoryDto {
 	@ApiProperty({ type: [CreateDishResponseDto] })
-	dishes: CreateDishResponseDto[]
+	dishes!: CreateDishResponseDto[]
 }

@@ -9,5 +9,5 @@ export class CreateCategoryDto {
 	@MinLength(3, {
 		message: 'name must be longer than or equal to 3 characters',
 	})
-	name: string
+	name!: string
 }

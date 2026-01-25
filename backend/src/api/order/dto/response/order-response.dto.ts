@@ -3,78 +3,78 @@ import { OrderStatus } from '@prisma/client'
 
 export class AssignOrderResponseDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty()
-	waiterId: number
+	waiterId!: number
 
 	@ApiProperty()
-	cookId: number
+	cookId!: number
 
 	@ApiProperty({
 		example: OrderStatus.IN_PROGRESS,
 		enum: ['PENDING', 'IN_PROGRESS', 'COMPLETE'],
 	})
-	status: OrderStatus
+	status!: OrderStatus
 
 	@ApiProperty()
-	tableId: number
+	tableId!: number
 
 	@ApiProperty({ example: '2025-06-16T08:59:04.292Z' })
-	createdAt: string
+	createdAt!: string
 
 	@ApiProperty({ example: '2025-06-16T13:44:13.152Z' })
-	updatedAt: string
+	updatedAt!: string
 }
 
 export class CancelOrderResponseDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty()
-	waiterId: number
+	waiterId!: number
 
 	@ApiProperty({ nullable: true })
-	cookId: number | null
+	cookId!: number | null
 
 	@ApiProperty({
 		example: OrderStatus.CANCELED,
 		enum: ['PENDING', 'IN_PROGRESS', 'COMPLETE', 'CANCELED'],
 	})
-	status: OrderStatus
+	status!: OrderStatus
 
 	@ApiProperty()
-	tableId: number
+	tableId!: number
 
 	@ApiProperty({ example: '2025-06-16T08:32:24.116Z' })
-	createdAt: string
+	createdAt!: string
 
 	@ApiProperty({ example: '2025-06-16T15:28:35.005Z' })
-	updatedAt: string
+	updatedAt!: string
 }
 
 export class UpdateOrderStatusResponseDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty()
-	waiterId: number
+	waiterId!: number
 
 	@ApiProperty({ nullable: true })
-	cookId: number | null
+	cookId!: number | null
 
 	@ApiProperty({
 		example: OrderStatus.COMPLETE,
 		enum: ['PENDING', 'IN_PROGRESS', 'COMPLETE', 'CANCELED'],
 	})
-	status: OrderStatus
+	status!: OrderStatus
 
 	@ApiProperty()
-	tableId: number
+	tableId!: number
 
 	@ApiProperty({ example: '2025-06-16T08:59:04.292Z' })
-	createdAt: string
+	createdAt!: string
 
 	@ApiProperty({ example: '2025-06-16T15:30:41.448Z' })
-	updatedAt: string
+	updatedAt!: string
 }

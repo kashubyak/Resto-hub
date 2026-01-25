@@ -4,26 +4,26 @@ import { OrderItemResponseDto } from './order-item-response.dto'
 
 export class CreateOrderResponseDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty()
-	waiterId: number
+	waiterId!: number
 
 	@ApiProperty({ nullable: true })
-	cookId: number | null
+	cookId!: number | null
 
 	@ApiProperty({ enum: OrderStatus })
-	status: OrderStatus
+	status!: OrderStatus
 
 	@ApiProperty()
-	tableId: number
+	tableId!: number
 
 	@ApiProperty({ type: [OrderItemResponseDto] })
-	orderItems: OrderItemResponseDto[]
+	orderItems!: OrderItemResponseDto[]
 
 	@ApiProperty()
-	createdAt: string
+	createdAt!: string
 
 	@ApiProperty()
-	updatedAt: string
+	updatedAt!: string
 }

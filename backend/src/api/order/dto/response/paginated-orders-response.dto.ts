@@ -4,5 +4,5 @@ import { OrderSummaryDto } from './order-summary.dto'
 
 export class PaginatedOrdersResponseDto extends BasePaginationDto {
 	@ApiProperty({ type: [OrderSummaryDto] })
-	data: OrderSummaryDto[]
+	data!: OrderSummaryDto[]
 }

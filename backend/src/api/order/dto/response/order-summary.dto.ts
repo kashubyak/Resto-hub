@@ -6,19 +6,19 @@ import { OrderItemSummaryDto } from './order-item-summary.dto'
 
 export class OrderSummaryDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty({ enum: OrderStatus, example: OrderStatus.PENDING })
-	status: OrderStatus
+	status!: OrderStatus
 
 	@ApiProperty({ example: '2025-06-24T12:00:00.000Z' })
-	createdAt: string
+	createdAt!: string
 
 	@ApiProperty({ example: '2025-06-24T13:00:00.000Z' })
-	updatedAt: string
+	updatedAt!: string
 
 	@ApiProperty()
-	total: number
+	total!: number
 
 	@ApiPropertyOptional({ type: BaseUserDto })
 	waiter?: BaseUserDto
@@ -27,27 +27,27 @@ export class OrderSummaryDto {
 	cook?: BaseUserDto
 
 	@ApiProperty({ type: BaseTableDto })
-	table: BaseTableDto
+	table!: BaseTableDto
 
 	@ApiProperty({ type: [OrderItemSummaryDto] })
-	orderItems: OrderItemSummaryDto[]
+	orderItems!: OrderItemSummaryDto[]
 }
 
 export class OrderSummaryFullPersonalDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty({ enum: OrderStatus, example: OrderStatus.PENDING })
-	status: OrderStatus
+	status!: OrderStatus
 
 	@ApiProperty({ example: '2025-06-24T12:00:00.000Z' })
-	createdAt: string
+	createdAt!: string
 
 	@ApiProperty({ example: '2025-06-24T13:00:00.000Z' })
-	updatedAt: string
+	updatedAt!: string
 
 	@ApiProperty()
-	total: number
+	total!: number
 
 	@ApiPropertyOptional({ type: ExtendedUserDto })
 	waiter?: ExtendedUserDto
@@ -56,8 +56,8 @@ export class OrderSummaryFullPersonalDto {
 	cook?: ExtendedUserDto
 
 	@ApiProperty({ type: ExtendedTableDto })
-	table: ExtendedTableDto
+	table!: ExtendedTableDto
 
 	@ApiProperty({ type: [OrderItemSummaryDto] })
-	orderItems: OrderItemSummaryDto[]
+	orderItems!: OrderItemSummaryDto[]
 }

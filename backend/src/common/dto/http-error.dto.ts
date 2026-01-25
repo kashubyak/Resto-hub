@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger'
 
 export class BadRequestResponseDto {
 	@ApiProperty({ example: HttpStatus.BAD_REQUEST })
-	statusCode: number
+	statusCode!: number
 
 	@ApiProperty({
 		example: [
@@ -11,30 +11,30 @@ export class BadRequestResponseDto {
 			'seats must be an integer number',
 		],
 	})
-	message: string[] | string
+	message!: string[] | string
 
 	@ApiProperty({ example: 'Bad Request' })
-	error: string
+	error!: string
 }
 
 export class HttpErrorResponseDto {
 	@ApiProperty({ example: HttpStatus.NOT_FOUND })
-	statusCode: number
+	statusCode!: number
 
 	@ApiProperty({ example: 'Table not found' })
-	message: string | string[]
+	message!: string | string[]
 
 	@ApiProperty({ example: 'Not Found' })
-	error: string
+	error!: string
 }
 
 export class ConflictResponseDto {
 	@ApiProperty({ example: HttpStatus.CONFLICT })
-	statusCode: number
+	statusCode!: number
 
 	@ApiProperty({ example: 'Table number already exists' })
-	message: string | string[]
+	message!: string | string[]
 
 	@ApiProperty({ example: 'Conflict' })
-	error: string
+	error!: string
 }

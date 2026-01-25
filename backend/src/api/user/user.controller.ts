@@ -38,7 +38,10 @@ export class UserController {
 	@Roles(Role.ADMIN)
 	@UseInterceptors(
 		MulterErrorInterceptor,
-		FileInterceptor('avatarUrl', multerOptions),
+		FileInterceptor(
+			'avatarUrl',
+			multerOptions as unknown as Parameters<typeof FileInterceptor>[1],
+		),
 	)
 	@ApiOperation({ description: 'Create a new user (ADMIN only)' })
 	@ApiCreatedResponse({
@@ -95,7 +98,10 @@ export class UserController {
 	@Roles(Role.ADMIN)
 	@UseInterceptors(
 		MulterErrorInterceptor,
-		FileInterceptor('avatarUrl', multerOptions),
+		FileInterceptor(
+			'avatarUrl',
+			multerOptions as unknown as Parameters<typeof FileInterceptor>[1],
+		),
 	)
 	@ApiOperation({ description: 'Update current user (ADMIN only)' })
 	@ApiOkResponse({
@@ -114,7 +120,10 @@ export class UserController {
 	@Roles(Role.ADMIN)
 	@UseInterceptors(
 		MulterErrorInterceptor,
-		FileInterceptor('avatarUrl', multerOptions),
+		FileInterceptor(
+			'avatarUrl',
+			multerOptions as unknown as Parameters<typeof FileInterceptor>[1],
+		),
 	)
 	@ApiOperation({ description: 'Update user by ID (ADMIN only)' })
 	@ApiOkResponse({

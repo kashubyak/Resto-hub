@@ -2,26 +2,26 @@ import { ApiProperty } from '@nestjs/swagger'
 
 export class CompanyItemDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty()
-	name: string
+	name!: string
 
 	@ApiProperty()
-	address: string
+	address!: string
 
 	@ApiProperty()
-	latitude: number
+	latitude!: number
 
 	@ApiProperty()
-	longitude: number
+	longitude!: number
 
 	@ApiProperty()
-	logoUrl: string
+	logoUrl!: string
 
 	@ApiProperty()
-	createdAt: Date
+	createdAt!: Date
 
 	@ApiProperty()
-	updatedAt: Date
+	updatedAt!: Date
 }

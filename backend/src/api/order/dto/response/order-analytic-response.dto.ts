@@ -2,10 +2,10 @@ import { ApiProperty } from '@nestjs/swagger'
 
 class TrendPointDto {
 	@ApiProperty()
-	date: string
+	date!: string
 
 	@ApiProperty()
-	value: number
+	value!: number
 }
 
 class GroupInfoDto {
@@ -24,44 +24,44 @@ class GroupInfoDto {
 
 export class OrderAnalyticsResponseDto {
 	@ApiProperty()
-	group: string
+	group!: string
 
 	@ApiProperty({ type: GroupInfoDto })
-	groupInfo: GroupInfoDto
+	groupInfo!: GroupInfoDto
 
 	@ApiProperty()
-	value: number
+	value!: number
 
 	@ApiProperty()
-	count: number
+	count!: number
 
 	@ApiProperty()
-	quantity: number
+	quantity!: number
 
 	@ApiProperty()
-	revenue: number
+	revenue!: number
 
 	@ApiProperty()
-	avgRevenuePerOrder: number
+	avgRevenuePerOrder!: number
 
 	@ApiProperty()
-	avgItemsPerOrder: number
+	avgItemsPerOrder!: number
 
 	@ApiProperty()
-	percentageOfTotalRevenue: number
+	percentageOfTotalRevenue!: number
 
 	@ApiProperty()
-	maxRevenueInDay: number
+	maxRevenueInDay!: number
 
 	@ApiProperty()
-	minRevenueInDay: number
+	minRevenueInDay!: number
 
 	@ApiProperty()
-	peakDay: string
+	peakDay!: string
 
 	@ApiProperty()
-	troughDay: string
+	troughDay!: string
 
 	@ApiProperty({ type: [TrendPointDto] })
-	trend: TrendPointDto[]
+	trend!: TrendPointDto[]
 }

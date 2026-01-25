@@ -5,10 +5,10 @@ export class CreateTableDto {
 	@ApiProperty({ example: 5, description: 'Unique number for the table' })
 	@IsInt()
 	@IsPositive()
-	number: number
+	number!: number
 
 	@ApiProperty({ example: 4, description: 'How many seats the table has' })
 	@IsInt()
 	@IsPositive()
-	seats: number
+	seats!: number
 }

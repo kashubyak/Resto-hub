@@ -2,20 +2,20 @@ import { ApiProperty } from '@nestjs/swagger'
 
 export class CreateTableResponseDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty()
-	number: number
+	number!: number
 
 	@ApiProperty()
-	seats: number
+	seats!: number
 
 	@ApiProperty()
-	active: boolean
+	active!: boolean
 
 	@ApiProperty()
-	createdAt: Date
+	createdAt!: Date
 
 	@ApiProperty()
-	updatedAt: Date
+	updatedAt!: Date
 }

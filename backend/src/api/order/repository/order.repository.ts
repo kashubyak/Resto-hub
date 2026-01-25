@@ -10,6 +10,7 @@ import {
 	type IOrderWithCookResult,
 	type IOrderWithFullDetailsResult,
 	type IOrderWithItemsForAnalyticsResult,
+	type IOrderWithItemsResult,
 	type IOrderWithWaiterResult,
 } from '../interfaces/repository.interface'
 
@@ -89,18 +90,7 @@ const ORDER_WITH_FULL_DISH_INCLUDE = {
 export class OrderRepository {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async createOrder(order: OrderEntity): Promise<
-		IOrderBaseResult & {
-			orderItems: Array<{
-				id: number
-				orderId: number
-				dishId: number
-				quantity: number
-				price: number
-				notes: string | null
-			}>
-		}
-	> {
+	async createOrder(order: OrderEntity): Promise<IOrderWithItemsResult> {
 		return this.prisma.order.create({
 			data: {
 				waiterId: order.waiterId,
@@ -111,14 +101,14 @@ export class OrderRepository {
 						dishId: item.dishId,
 						quantity: item.quantity,
 						price: item.price,
-						notes: item.notes,
+						notes: item.notes ?? null,
 					})),
 				},
 			},
 			include: {
 				orderItems: true,
 			},
-		})
+		}) as unknown as Promise<IOrderWithItemsResult>
 	}
 
 	async getDishPrices(dishIds: number[], companyId: number) {

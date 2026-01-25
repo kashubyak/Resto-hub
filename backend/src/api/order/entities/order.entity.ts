@@ -1,7 +1,7 @@
 export class OrderItemEntity {
-	readonly dishId: number
-	readonly quantity: number
-	readonly price: number
+	readonly dishId!: number
+	readonly quantity!: number
+	readonly price!: number
 	readonly notes?: string
 }
 

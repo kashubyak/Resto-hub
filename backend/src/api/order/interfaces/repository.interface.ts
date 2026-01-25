@@ -1,4 +1,4 @@
-import { type Order, type User } from '@prisma/client'
+import { type Order, type OrderItem, type User } from '@prisma/client'
 import {
 	type IFindManyArgs,
 	type IFindManyResult,
@@ -37,6 +37,10 @@ export type IOrderWithCookResult = Order & {
 
 export type IOrderWithWaiterResult = Order & {
 	waiter: User
+}
+
+export type IOrderWithItemsResult = IOrderBaseResult & {
+	orderItems: OrderItem[]
 }
 
 export type IFindOrdersOptions = Omit<

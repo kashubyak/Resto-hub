@@ -42,7 +42,7 @@ export class AuthController {
 				{ name: 'logoUrl', maxCount: 1 },
 				{ name: 'avatarUrl', maxCount: 1 },
 			],
-			multerOptions,
+			multerOptions as unknown as Parameters<typeof FileFieldsInterceptor>[1],
 		),
 	)
 	@ApiOperation({ description: 'Register a new company' })

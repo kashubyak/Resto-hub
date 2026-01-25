@@ -3,43 +3,43 @@ import { CreateCategoryResponseDto } from 'src/api/category/dto/response/create-
 
 export class CreateDishResponseDto {
 	@ApiProperty()
-	id: number
+	id!: number
 
 	@ApiProperty()
-	name: string
+	name!: string
 
 	@ApiProperty()
-	description: string
+	description!: string
 
 	@ApiProperty()
-	price: number
+	price!: number
 
 	@ApiProperty()
-	imageUrl: string
+	imageUrl!: string
 
 	@ApiProperty()
-	categoryId: number
+	categoryId!: number
 
 	@ApiProperty({ type: [String] })
-	ingredients: string[]
+	ingredients!: string[]
 
 	@ApiProperty()
-	weightGr: number
+	weightGr!: number
 
 	@ApiProperty()
-	calories: number
+	calories!: number
 
 	@ApiProperty()
-	available: boolean
+	available!: boolean
 
 	@ApiProperty()
-	createdAt: Date
+	createdAt!: Date
 
 	@ApiProperty()
-	updatedAt: Date
+	updatedAt!: Date
 }
 
 export class CreateDishWithCategoryResponseDto extends CreateDishResponseDto {
 	@ApiProperty()
-	category: CreateCategoryResponseDto
+	category!: CreateCategoryResponseDto
 }

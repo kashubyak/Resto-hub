@@ -4,5 +4,5 @@ import { CategorySummaryDto } from './category-summary.dto'
 
 export class PaginatedCategoryResponseDto extends BasePaginationDto {
 	@ApiProperty({ type: [CategorySummaryDto] })
-	data: CategorySummaryDto[]
+	data!: CategorySummaryDto[]
 }
