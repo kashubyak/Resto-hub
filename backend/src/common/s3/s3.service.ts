@@ -77,7 +77,9 @@ export class S3Service {
 		const deleteCommand = {
 			Bucket: this.bucket,
 			Delete: {
-				Objects: listResponse.Contents.map((obj) => ({ Key: obj.Key! })),
+				Objects: listResponse.Contents.filter((obj) => obj.Key).map((obj) => ({
+					Key: obj.Key as string,
+				})),
 				Quiet: true,
 			},
 		}

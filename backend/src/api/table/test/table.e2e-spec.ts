@@ -1,6 +1,7 @@
 import { type INestApplication, ValidationPipe } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { AppModule } from 'app.module'
+import { type Server } from 'http'
 import { PrismaService } from 'prisma/prisma.service'
 import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware'
 import * as request from 'supertest'
@@ -9,6 +10,16 @@ import { BASE_URL, HOST } from 'test/utils/constants'
 import { cleanTestDb } from 'test/utils/db-utils'
 import { FakeDTO } from 'test/utils/faker'
 import { createTable, makeRequest } from 'test/utils/form-utils'
+
+interface TableResponse {
+	id: number
+	number: number
+	seats: number
+	active: boolean
+	createdAt: string
+	updatedAt: string
+	companyId?: number
+}
 
 describe('Table (e2e)', () => {
 	let app: INestApplication
@@ -41,7 +52,7 @@ describe('Table (e2e)', () => {
 
 	beforeEach(async () => {
 		await prisma.table.deleteMany({ where: { companyId } })
-		const res = await createTable(app, token)
+		const res = (await createTable(app, token)) as TableResponse
 		tableId = res.id
 	})
 
@@ -51,7 +62,7 @@ describe('Table (e2e)', () => {
 
 	it('should create a new table', async () => {
 		const dto = FakeDTO.table.create()
-		const res = await createTable(app, token, dto)
+		const res = (await createTable(app, token, dto)) as TableResponse
 		expect(res).toHaveProperty('id')
 		expect(res.number).toBe(dto.number)
 		expect(res.seats).toBe(dto.seats)
@@ -72,8 +83,9 @@ describe('Table (e2e)', () => {
 			'get',
 			`${BASE_URL.TABLE}`,
 		).expect(200)
-		expect(Array.isArray(res.body)).toBe(true)
-		expect(res.body.length).toBeGreaterThanOrEqual(1)
+		const body = res.body as TableResponse[]
+		expect(Array.isArray(body)).toBe(true)
+		expect(body.length).toBeGreaterThanOrEqual(1)
 	})
 
 	it('should get table by id', async () => {
@@ -83,7 +95,8 @@ describe('Table (e2e)', () => {
 			'get',
 			`${BASE_URL.TABLE}/${tableId}`,
 		).expect(200)
-		expect(res.body.id).toBe(tableId)
+		const body = res.body as TableResponse
+		expect(body.id).toBe(tableId)
 	})
 
 	it('should return 404 for non-existing id', async () => {
@@ -106,8 +119,9 @@ describe('Table (e2e)', () => {
 		)
 			.send(dto)
 			.expect(200)
-		expect(res.body.number).toBe(dto.number)
-		expect(res.body.seats).toBe(dto.seats)
+		const body = res.body as TableResponse
+		expect(body.number).toBe(dto.number)
+		expect(body.seats).toBe(dto.seats)
 	})
 
 	it('should delete a table', async () => {
@@ -120,7 +134,7 @@ describe('Table (e2e)', () => {
 		)
 			.send(dto)
 			.expect(201)
-		const id = res.body.id
+		const id = (res.body as TableResponse).id
 
 		await makeRequest(app, token, 'delete', `${BASE_URL.TABLE}/${id}`).expect(
 			200,
@@ -142,21 +156,21 @@ describe('Table (e2e)', () => {
 	})
 
 	it('should deny access without token', async () => {
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.get(`${BASE_URL.TABLE}`)
 			.expect(401)
 			.set('Host', HOST)
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.post(`${BASE_URL.TABLE}/create`)
 			.set('Host', HOST)
 			.send(FakeDTO.table.create())
 			.expect(401)
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.patch(`${BASE_URL.TABLE}/${tableId}`)
 			.set('Host', HOST)
 			.send({ number: 7 })
 			.expect(401)
-		await request(app.getHttpServer())
+		await request(app.getHttpServer() as Server)
 			.delete(`${BASE_URL.TABLE}/${tableId}`)
 			.set('Host', HOST)
 			.expect(401)

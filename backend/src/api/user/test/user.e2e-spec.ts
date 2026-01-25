@@ -1,7 +1,9 @@
 import { type INestApplication, ValidationPipe } from '@nestjs/common'
 import { Test, type TestingModule } from '@nestjs/testing'
+import { type Role } from '@prisma/client'
 import { AppModule } from 'app.module'
 import * as cookieParser from 'cookie-parser'
+import type { Server } from 'http'
 import { PrismaService } from 'prisma/prisma.service'
 import { CompanyContextMiddleware } from 'src/common/middleware/company-context.middleware'
 import { S3Service } from 'src/common/s3/s3.service'
@@ -11,9 +13,28 @@ import { BASE_URL, companyData, HOST, logoPath } from 'test/utils/constants'
 import { cleanTestDb } from 'test/utils/db-utils'
 import { makeRequest } from 'test/utils/form-utils'
 
+interface UserItemResponse {
+	id: number
+	name: string
+	email: string
+	role: Role
+	avatarUrl: string
+	createdAt: string
+	updatedAt: string
+	companyId?: number
+}
+
+interface PaginatedUserResponse {
+	data: UserItemResponse[]
+	total: number
+	page: number
+	limit: number
+	totalPages: number
+}
+
 describe('User (e2e)', () => {
 	let app: INestApplication
-	let server: any
+	let server: Server
 	let prisma: PrismaService
 	let s3Service: S3Service
 	let token: string
@@ -35,7 +56,7 @@ describe('User (e2e)', () => {
 		const middleware = new CompanyContextMiddleware(prisma)
 		app.use(middleware.use.bind(middleware))
 		await app.init()
-		server = app.getHttpServer()
+		server = app.getHttpServer() as Server
 
 		await cleanTestDb(prisma)
 		const auth = await getAuthToken(app)
@@ -70,8 +91,9 @@ describe('User (e2e)', () => {
 				.attach('avatarUrl', logoPath)
 				.expect(201)
 
-			expect(res.body).toHaveProperty('id')
-			expect(res.body.email).toBe(dto.email)
+			const body = res.body as UserItemResponse
+			expect(body).toHaveProperty('id')
+			expect(body.email).toBe(dto.email)
 
 			const userInDb = await prisma.user.findFirst({
 				where: { email: dto.email, companyId },
@@ -107,11 +129,12 @@ describe('User (e2e)', () => {
 				'get',
 				`${BASE_URL.USER}`,
 			).expect(200)
-			expect(res.body.data).toBeInstanceOf(Array)
-			expect(res.body).toHaveProperty('total')
-			expect(res.body.data.every((u: any) => u.companyId === companyId)).toBe(
-				true,
-			)
+			const body = res.body as PaginatedUserResponse
+			expect(body.data).toBeInstanceOf(Array)
+			expect(body).toHaveProperty('total')
+			expect(
+				body.data.every((u: UserItemResponse) => u.companyId === companyId),
+			).toBe(true)
 		})
 
 		it('should filter users by role', async () => {
@@ -121,7 +144,10 @@ describe('User (e2e)', () => {
 				'get',
 				`${BASE_URL.USER}?role=COOK`,
 			).expect(200)
-			expect(res.body.data.every((u: any) => u.role === 'COOK')).toBe(true)
+			const body = res.body as PaginatedUserResponse
+			expect(body.data.every((u: UserItemResponse) => u.role === 'COOK')).toBe(
+				true,
+			)
 		})
 	})
 
@@ -133,7 +159,8 @@ describe('User (e2e)', () => {
 				'get',
 				`${BASE_URL.USER}/me`,
 			).expect(200)
-			expect(res.body.email).toBe(companyData.adminEmail)
+			const body = res.body as UserItemResponse
+			expect(body.email).toBe(companyData.adminEmail)
 		})
 
 		it('should update current user profile (name + avatar)', async () => {
@@ -141,7 +168,8 @@ describe('User (e2e)', () => {
 				.field('name', 'Updated Name')
 				.attach('avatarUrl', logoPath)
 				.expect(200)
-			expect(res.body.name).toBe('Updated Name')
+			const body = res.body as UserItemResponse
+			expect(body.name).toBe('Updated Name')
 		})
 
 		it('should change password with oldPassword', async () => {
@@ -176,7 +204,8 @@ describe('User (e2e)', () => {
 				.attach('avatarUrl', logoPath)
 				.expect(201)
 
-			userId = res.body.id
+			const body = res.body as UserItemResponse
+			userId = body.id
 		})
 
 		it('should get user by id', async () => {
@@ -186,7 +215,8 @@ describe('User (e2e)', () => {
 				'get',
 				`${BASE_URL.USER}/${userId}`,
 			).expect(200)
-			expect(res.body.id).toBe(userId)
+			const body = res.body as UserItemResponse
+			expect(body.id).toBe(userId)
 		})
 
 		it('should update user by id', async () => {
@@ -200,7 +230,8 @@ describe('User (e2e)', () => {
 				.attach('avatarUrl', logoPath)
 				.expect(200)
 
-			expect(res.body.name).toBe('New Name')
+			const body = res.body as UserItemResponse
+			expect(body.name).toBe('New Name')
 		})
 
 		it('should delete user', async () => {

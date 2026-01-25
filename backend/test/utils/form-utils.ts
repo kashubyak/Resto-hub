@@ -1,12 +1,59 @@
 import { type INestApplication } from '@nestjs/common'
 import { type Order } from '@prisma/client'
+import type { Server } from 'http'
 import * as request from 'supertest'
-import { BASE_URL, HOST, logoPath } from './constants'
+import { BASE_URL, type companyData, HOST, logoPath } from './constants'
 import { FakeDTO } from './faker'
+
+interface TableResponse {
+	id: number
+	number: number
+	seats: number
+	active: boolean
+	createdAt: string
+	updatedAt: string
+	companyId?: number
+}
+
+interface CategoryResponse {
+	id: number
+	name: string
+}
+
+interface DishResponse {
+	id: number
+	name: string
+	description: string
+	price: number
+	imageUrl: string
+	categoryId: number | null
+	ingredients: string[]
+	weightGr: number | null
+	calories: number | null
+	available: boolean
+	companyId: number
+	createdAt: string
+	updatedAt: string
+	category?: {
+		id: number
+		name: string
+	} | null
+}
+
+interface UserInfoResponse {
+	id: number
+	name: string
+	email: string
+	role: string
+	avatarUrl: string | null
+	createdAt: string
+	updatedAt: string
+	companyId?: number
+}
 
 export const baseCompanyFormFields = (
 	req: request.Test,
-	data: typeof import('./constants').companyData,
+	data: typeof companyData,
 ) => {
 	return req
 		.field('name', data.name)
@@ -20,7 +67,7 @@ export const baseCompanyFormFields = (
 }
 export const attachCompanyFormFields = (
 	req: request.Test,
-	data: typeof import('./constants').companyData,
+	data: typeof companyData,
 ) => {
 	return req
 		.field('name', data.name)
@@ -41,7 +88,7 @@ export const makeRequest = (
 	method: 'get' | 'post' | 'patch' | 'delete',
 	url: string,
 ) => {
-	return request(app.getHttpServer())
+	return request(app.getHttpServer() as Server)
 		[method](url)
 		.set('Authorization', `Bearer ${token}`)
 		.set('Host', HOST)
@@ -51,18 +98,18 @@ export const createTable = async (
 	app: INestApplication,
 	token: string,
 	dto = FakeDTO.table.create(),
-) => {
+): Promise<TableResponse> => {
 	const res = await makeRequest(app, token, 'post', `${BASE_URL.TABLE}/create`)
 		.send(dto)
 		.expect(201)
-	return res.body
+	return res.body as TableResponse
 }
 
 export const createCategory = async (
 	app: INestApplication,
 	token: string,
 	dto = FakeDTO.category.create(),
-) => {
+): Promise<CategoryResponse> => {
 	const res = await makeRequest(
 		app,
 		token,
@@ -71,7 +118,7 @@ export const createCategory = async (
 	)
 		.send(dto)
 		.expect(201)
-	return res.body
+	return res.body as CategoryResponse
 }
 
 export const createDish = async (
@@ -79,7 +126,7 @@ export const createDish = async (
 	token: string,
 	categoryId: number,
 	overrideDto: Partial<ReturnType<typeof FakeDTO.dish.create>> = {},
-) => {
+): Promise<DishResponse> => {
 	const dto = {
 		...FakeDTO.dish.create(),
 		categoryId,
@@ -98,17 +145,20 @@ export const createDish = async (
 		.attach('imageUrl', logoPath)
 		.expect(201)
 
-	return res.body
+	return res.body as DishResponse
 }
 
-export const getUserInfo = async (app: INestApplication, token: string) => {
+export const getUserInfo = async (
+	app: INestApplication,
+	token: string,
+): Promise<UserInfoResponse> => {
 	const res = await makeRequest(
 		app,
 		token,
 		'get',
 		`${BASE_URL.USER}/me`,
 	).expect(200)
-	return res.body
+	return res.body as UserInfoResponse
 }
 
 export const createOrder = async (

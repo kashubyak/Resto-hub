@@ -20,13 +20,13 @@ export class PrismaExceptionFilter implements ExceptionFilter {
 			case 'P2002':
 				statusCode = HttpStatus.CONFLICT
 				message = `Record with this unique constraint already exists. Details: ${
-					(exception.meta?.target as string) ?? 'unknown'
+					(exception.meta?.target as string | undefined) ?? 'unknown'
 				}`
 				break
 			case 'P2003':
 				statusCode = HttpStatus.BAD_REQUEST
 				message = `Foreign key constraint failed. Ensure the related record exists. Details: ${
-					(exception.meta?.field_name as string) ?? 'unknown'
+					(exception.meta?.field_name as string | undefined) ?? 'unknown'
 				}`
 				break
 			case 'P2025':

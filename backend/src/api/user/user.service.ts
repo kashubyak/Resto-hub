@@ -27,7 +27,7 @@ export class UserService {
 
 	async registerUser(
 		dto: RegisterDto,
-		file: Express.Multer.File,
+		file: Express.Multer.File | undefined,
 		companyId: number,
 	): Promise<IUserRepositoryResult> {
 		if (!file) throw new BadRequestException('Avatar image is required')
@@ -76,20 +76,20 @@ export class UserService {
 			limit: rawLimit,
 		} = query
 
-		const page = rawPage || 1
-		const limit = rawLimit || 10
+		const page = rawPage ?? 1
+		const limit = rawLimit ?? 10
 		const skip = (page - 1) * limit
 
 		const allowedRoles: Role[] = ['COOK', 'WAITER']
 		const where: IUserWhereInput = {
 			companyId,
-			role: role ? role : { in: allowedRoles },
-			OR: search
-				? [
-						{ name: { contains: search, mode: 'insensitive' } },
-						{ email: { contains: search, mode: 'insensitive' } },
-					]
-				: undefined,
+			role: role ?? { in: allowedRoles },
+			...(search && {
+				OR: [
+					{ name: { contains: search, mode: 'insensitive' } },
+					{ email: { contains: search, mode: 'insensitive' } },
+				],
+			}),
 		}
 		const { data, total } = await this.userRepository.findManyWithCount({
 			where,
@@ -119,7 +119,7 @@ export class UserService {
 	async updateUser(
 		id: number,
 		dto: UpdateUserDto,
-		file: Express.Multer.File,
+		file: Express.Multer.File | undefined,
 		companyId: number,
 	): Promise<IUserRepositoryResult> {
 		const user = await this.userRepository.findUserWithPassword(id, companyId)
@@ -155,7 +155,7 @@ export class UserService {
 			avatarUrl = await this.s3Service.uploadFile(file, folder_avatar)
 		}
 
-		const { oldPassword, ...safeData } = dto
+		const { oldPassword: _oldPassword, ...safeData } = dto
 		return this.userRepository.updateUser(
 			id,
 			{
@@ -175,7 +175,7 @@ export class UserService {
 		if (user.avatarUrl) {
 			try {
 				await this.s3Service.deleteFile(user.avatarUrl)
-			} catch (error) {
+			} catch {
 				throw new BadRequestException('Failed to delete avatar image')
 			}
 		}

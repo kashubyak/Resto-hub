@@ -12,7 +12,10 @@ import { size_of_image } from '../constants'
 
 @Injectable()
 export class MulterErrorInterceptor implements NestInterceptor {
-	intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+	intercept(
+		_context: ExecutionContext,
+		next: CallHandler,
+	): Observable<unknown> {
 		return next.handle().pipe(
 			catchError((err: unknown) => {
 				if (err instanceof MulterError) {
@@ -21,7 +24,7 @@ export class MulterErrorInterceptor implements NestInterceptor {
 						LIMIT_FILE_COUNT: 'Too many files uploaded.',
 						LIMIT_UNEXPECTED_FILE: 'Unexpected file field.',
 					}
-					throw new BadRequestException(messageMap[err.code] || err.message)
+					throw new BadRequestException(messageMap[err.code] ?? err.message)
 				}
 				throw err
 			}),

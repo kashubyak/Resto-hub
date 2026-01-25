@@ -18,23 +18,36 @@ interface ICustomJwtPayload {
 	exp?: number
 }
 
+interface ISocketData {
+	userId: number
+	role: Role
+}
+
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
 @Injectable()
 export class NotificationsGateway
 	implements OnGatewayConnection, OnGatewayDisconnect
 {
 	@WebSocketServer()
-	server: Server
+	server!: Server
 	private logger = new Logger(NotificationsGateway.name)
 
 	async handleConnection(client: Socket) {
 		try {
-			const token: string | undefined =
-				client.handshake.auth?.token ||
-				client.handshake.query?.token ||
-				(typeof client.handshake.headers?.authorization === 'string'
+			const authToken =
+				typeof client.handshake.auth.token === 'string'
+					? client.handshake.auth.token
+					: undefined
+			const queryToken =
+				typeof client.handshake.query.token === 'string'
+					? client.handshake.query.token
+					: undefined
+			const headerToken =
+				typeof client.handshake.headers.authorization === 'string'
 					? client.handshake.headers.authorization.split(' ')[1]
-					: undefined)
+					: undefined
+
+			const token: string | undefined = authToken ?? queryToken ?? headerToken
 
 			if (!token) throw new Error('Token is missing')
 			const secret = process.env.JWT_TOKEN_SECRET
@@ -43,14 +56,14 @@ export class NotificationsGateway
 
 			if (typeof decoded === 'string') throw new Error('Invalid token format')
 			const payload = decoded as unknown as ICustomJwtPayload
-			if (typeof payload.sub !== 'number' || !payload.role)
+			if (typeof payload.sub !== 'number' || typeof payload.role !== 'string')
 				throw new Error('Invalid token payload')
 
 			const userId: number = payload.sub
 			const role: Role = payload.role
 
-			client.data.userId = userId
-			client.data.role = role
+			;(client.data as ISocketData).userId = userId
+			;(client.data as ISocketData).role = role
 
 			if (role === Role.COOK) await client.join(socket_rooms.KITCHEN)
 			else if (role === Role.WAITER)
