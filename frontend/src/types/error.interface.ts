@@ -9,6 +9,7 @@ export interface IAxiosError {
 		data: IApiErrorResponse
 		status: number
 		statusText: string
+		headers?: Record<string, string>
 	}
 	request?: unknown
 	message: string

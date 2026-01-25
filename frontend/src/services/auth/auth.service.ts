@@ -8,36 +8,40 @@ import type {
 	IRefreshTokenResponse,
 } from '@/types/auth.interface'
 import api, { refreshApi, setApiSubdomain } from '@/utils/api'
-import { convertToDays } from '@/utils/convertToDays'
 import Cookies from 'js-cookie'
 
+/**
+ * Login user and receive JWT tokens via httpOnly cookies.
+ * Access token (15 min) and refresh token (7 days) are set automatically by the backend.
+ */
 export const login = async (
 	data: ILoginRequest,
 ): Promise<ApiResponse<ILoginResponse>> => {
+	// Store subdomain for future API calls
 	Cookies.set(AUTH.SUBDOMAIN, data.subdomain, {
 		expires: 365,
-		secure: true,
+		secure: process.env.NODE_ENV === 'production',
 		sameSite: 'strict',
 	})
 	setApiSubdomain(data.subdomain)
 
-	const response = await api.post<ILoginResponse>(API_URL.AUTH.LOGIN, {
-		email: data.email,
-		password: data.password,
-	})
-
-	if (response.data?.token) {
-		const TOKEN_EXPIRES_IN = process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d'
-		Cookies.set(AUTH.TOKEN, response.data.token, {
-			expires: convertToDays(TOKEN_EXPIRES_IN),
-			secure: true,
-			sameSite: 'strict',
-		})
-	}
+	// Login - tokens are set via httpOnly cookies by backend
+	const response = await api.post<ILoginResponse>(
+		API_URL.AUTH.LOGIN,
+		{
+			email: data.email,
+			password: data.password,
+		},
+		{ withCredentials: true }, // Required for httpOnly cookies
+	)
 
 	return response
 }
 
+/**
+ * Refresh access token using httpOnly refresh token cookie.
+ * New tokens are set automatically by the backend.
+ */
 export const refreshToken = async (): Promise<ApiResponse<IRefreshTokenResponse>> => {
 	const response = await refreshApi.post<IRefreshTokenResponse>(
 		API_URL.AUTH.REFRESH,
@@ -47,11 +51,18 @@ export const refreshToken = async (): Promise<ApiResponse<IRefreshTokenResponse>
 	return response
 }
 
+/**
+ * Logout user and clear all auth cookies on the server.
+ */
 export const logout = async (): Promise<ApiResponse<ILogoutResponse>> => {
 	const response = await api.post<ILogoutResponse>(
 		API_URL.AUTH.LOGOUT,
 		{},
 		{ withCredentials: true },
 	)
+
+	// Clear local subdomain cookie (not managed by backend)
+	Cookies.remove(AUTH.SUBDOMAIN)
+
 	return response
 }

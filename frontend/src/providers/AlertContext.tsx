@@ -1,7 +1,7 @@
 import { DEFAULT_DURATION_ALERT } from '@/constants/alert.constant'
 import type { AlertSeverity } from '@/types/alert.interface'
 import type { IAxiosError } from '@/types/error.interface'
-import { parseBackendError } from '@/utils/errorHandler'
+import { getRetryAfter, parseBackendError } from '@/utils/errorHandler'
 import {
 	createContext,
 	memo,
@@ -18,6 +18,7 @@ interface IAlert {
 	severity: AlertSeverity
 	text: string
 	duration?: number
+	retryAfter?: number
 }
 
 interface IAlertContext {
@@ -31,6 +32,7 @@ interface IAlertContext {
 	showWarning: (text: string | string[], duration?: number) => void
 	showInfo: (text: string | string[], duration?: number) => void
 	showBackendError: (error: IAxiosError, duration?: number) => void
+	showRateLimitError: (retryAfter: number, message?: string) => void
 }
 
 const AlertContext = createContext<IAlertContext>({
@@ -44,6 +46,7 @@ const AlertContext = createContext<IAlertContext>({
 	showWarning: () => {},
 	showInfo: () => {},
 	showBackendError: () => {},
+	showRateLimitError: () => {},
 })
 
 const generateId = () => `alert-${Date.now()}-${Math.random()}`
@@ -102,7 +105,32 @@ export const AlertProvider = memo<{ children: React.ReactNode }>(({ children }) 
 	const showAlert = useCallback(
 		(alert: Omit<IAlert, 'id'>) => {
 			setAlerts(prev => {
-				const existing = prev.find(a => a.severity === alert.severity)
+				if (alert.retryAfter !== undefined) {
+					const existingRateLimit = prev.find(a => a.retryAfter !== undefined)
+					if (existingRateLimit) {
+						const updatedAlert: IAlert = {
+							...existingRateLimit,
+							...alert,
+							id: existingRateLimit.id,
+						}
+						const d = (alert.retryAfter + 1) * 1000
+						startTimer(existingRateLimit.id, d)
+						return prev.map(a => (a.id === existingRateLimit.id ? updatedAlert : a))
+					}
+
+					const id = generateId()
+					const newAlert: IAlert = {
+						...alert,
+						id,
+						duration: (alert.retryAfter + 1) * 1000,
+					}
+					startTimer(id, newAlert.duration!)
+					return [...prev, newAlert]
+				}
+
+				const existing = prev.find(
+					a => a.severity === alert.severity && a.retryAfter === undefined,
+				)
 
 				if (existing) {
 					const merged: IAlert = {
@@ -167,12 +195,30 @@ export const AlertProvider = memo<{ children: React.ReactNode }>(({ children }) 
 		[showAlert],
 	)
 
+	const showRateLimitError = useCallback(
+		(retryAfter: number, message?: string) => {
+			showAlert({
+				severity: 'error',
+				text: message || 'Too many requests',
+				retryAfter,
+			})
+		},
+		[showAlert],
+	)
+
 	const showBackendError = useCallback(
 		(error: IAxiosError, duration?: number) => {
 			const errorMessages = parseBackendError(error)
+			const retryAfter = getRetryAfter(error)
+
+			if (retryAfter !== null) {
+				showRateLimitError(retryAfter, errorMessages.join('\n'))
+				return
+			}
+
 			showError(errorMessages, duration)
 		},
-		[showError],
+		[showError, showRateLimitError],
 	)
 
 	useEffect(() => {
@@ -201,6 +247,7 @@ export const AlertProvider = memo<{ children: React.ReactNode }>(({ children }) 
 			showWarning,
 			showInfo,
 			showBackendError,
+			showRateLimitError,
 		}),
 		[
 			alerts,
@@ -213,6 +260,7 @@ export const AlertProvider = memo<{ children: React.ReactNode }>(({ children }) 
 			showWarning,
 			showInfo,
 			showBackendError,
+			showRateLimitError,
 		],
 	)
 

@@ -2,7 +2,6 @@ import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
 import { registerCompany } from '@/services/auth/company.service'
 import type { IAxiosError } from '@/types/error.interface'
-import { parseBackendError } from '@/utils/errorHandler'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -24,7 +23,7 @@ interface IFormValues {
 export const useRegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
 	const { login } = useAuth()
-	const { showError } = useAlert()
+	const { showBackendError } = useAlert()
 	const searchParams = useSearchParams()
 	const router = useRouter()
 	const [hasMounted, setHasMounted] = useState(false)
@@ -128,10 +127,10 @@ export const useRegisterCompany = () => {
 				if (redirectTo && !redirectTo.startsWith('/auth')) router.push(redirectTo)
 				else router.push('/')
 			} catch (err) {
-				showError(parseBackendError(err as IAxiosError).join('\n'))
+				showBackendError(err as IAxiosError)
 			}
 		},
-		[step, location, setValue, savedFiles, login, searchParams, router, showError],
+		[step, location, setValue, savedFiles, login, searchParams, router, showBackendError],
 	)
 
 	const validateLogo = useCallback(() => {

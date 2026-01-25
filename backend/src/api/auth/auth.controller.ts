@@ -17,7 +17,9 @@ import {
 	ApiOkResponse,
 	ApiOperation,
 	ApiTags,
+	ApiTooManyRequestsResponse,
 } from '@nestjs/swagger'
+import { Throttle } from '@nestjs/throttler'
 import { Response } from 'express'
 import { Public } from 'src/common/decorators/public.decorator'
 import { IRequestWithCompanyId } from 'src/common/interface/request.interface'
@@ -27,7 +29,7 @@ import { LoginDto } from './dto/request/login.dto'
 import { RegisterCompanyDto } from './dto/request/register-company.dto'
 import { RegisterCompanyResponseDto } from './dto/response/register-company-response.dto'
 import { ICompanyRegistrationFiles } from './interfaces/file-upload.interface'
-import { ITokenResponse } from './interfaces/jwt.interface'
+import { IAuthResponse } from './interfaces/jwt.interface'
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -36,6 +38,7 @@ export class AuthController {
 
 	@Post('register-company')
 	@Public()
+	@Throttle({ default: { limit: 3, ttl: 60000 } })
 	@UseInterceptors(
 		FileFieldsInterceptor(
 			[
@@ -51,6 +54,7 @@ export class AuthController {
 		description: 'Company registered successfully.',
 		type: RegisterCompanyResponseDto,
 	})
+	@ApiTooManyRequestsResponse({ description: 'Too many registration attempts.' })
 	registerCompany(
 		@Body() dto: RegisterCompanyDto,
 		@UploadedFiles()
@@ -61,25 +65,30 @@ export class AuthController {
 	}
 
 	@Post('login')
+
 	@Public()
+	@Throttle({ default: { limit: 5, ttl: 60000 } })
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
-		description: 'Log in and get JWT token which expires in 1 day.',
+		description:
+			'Log in and receive JWT tokens via httpOnly cookies. Access token expires in 15 minutes.',
 	})
 	@ApiBody({ type: LoginDto })
 	@ApiOkResponse({
-		description: 'Signed in successfully.',
+		description: 'Signed in successfully. Tokens set via httpOnly cookies.',
 		schema: {
 			example: {
-				token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+				success: true,
+				user: { id: 1, role: 'ADMIN' },
 			},
 		},
 	})
+	@ApiTooManyRequestsResponse({ description: 'Too many login attempts. Try again later.' })
 	async login(
 		@Body() dto: LoginDto,
 		@Req() req: IRequestWithCompanyId,
 		@Res({ passthrough: true }) res: Response,
-	): Promise<ITokenResponse> {
+	): Promise<IAuthResponse> {
 		return this.authService.processLogin(dto, req, res)
 	}
 
@@ -87,20 +96,22 @@ export class AuthController {
 	@Public()
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
-		description: 'Refresh access token using cookie-based refresh token.',
+		description:
+			'Refresh access token using cookie-based refresh token. New tokens set via httpOnly cookies.',
 	})
 	@ApiOkResponse({
-		description: 'Token refreshed successfully.',
+		description: 'Token refreshed successfully. New tokens set via httpOnly cookies.',
 		schema: {
 			example: {
-				token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+				success: true,
+				user: { id: 1, role: 'ADMIN' },
 			},
 		},
 	})
 	async refresh(
 		@Req() req: IRequestWithCompanyId,
 		@Res({ passthrough: true }) res: Response,
-	): Promise<ITokenResponse> {
+	): Promise<IAuthResponse> {
 		return this.authService.processRefresh(req, res)
 	}
 

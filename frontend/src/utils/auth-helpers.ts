@@ -1,17 +1,32 @@
+import { AUTH } from '@/constants/auth.constant'
+import { UserRole } from '@/constants/pages.constant'
 import { useAuthStore } from '@/store/auth.store'
 import type { IUser } from '@/types/user.interface'
+import Cookies from 'js-cookie'
 
-export function initializeAuth(user: IUser): void {
-	const { setUser, setIsAuth, updateUserRoleFromToken } = useAuthStore.getState()
+/**
+ * Initialize auth state after successful login.
+ * Called when we have user data from the API.
+ */
+export function initializeAuth(user: IUser, role?: UserRole): void {
+	const { setUser, setIsAuth, setUserRole } = useAuthStore.getState()
 	setUser(user)
 	setIsAuth(true)
-	updateUserRoleFromToken()
+	if (role) {
+		setUserRole(role)
+	}
 }
 
+/**
+ * Clear all auth state.
+ * Called on logout or when auth fails.
+ */
 export function clearAuth(): void {
-	const { setUser, setIsAuth, setUserRole, setTokenValidUntil } = useAuthStore.getState()
+	const { setUser, setIsAuth, setUserRole } = useAuthStore.getState()
 	setUser(null)
 	setIsAuth(false)
 	setUserRole(null)
-	setTokenValidUntil(null)
+
+	// Clear the subdomain cookie (not managed by backend)
+	Cookies.remove(AUTH.SUBDOMAIN)
 }

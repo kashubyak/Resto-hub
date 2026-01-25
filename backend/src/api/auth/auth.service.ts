@@ -17,7 +17,13 @@ import { LoginDto } from './dto/request/login.dto'
 import { RegisterCompanyDto } from './dto/request/register-company.dto'
 import { RegisterCompanyResponseDto } from './dto/response/register-company-response.dto'
 import { ICompanyRegistrationFiles } from './interfaces/file-upload.interface'
-import { IJwtPayload, ITokenResponse } from './interfaces/jwt.interface'
+import { IAuthResponse, IJwtPayload } from './interfaces/jwt.interface'
+
+const ACCESS_TOKEN_COOKIE = 'access_token'
+const REFRESH_TOKEN_COOKIE = 'jid'
+const AUTH_STATUS_COOKIE = 'is_authenticated'
+const ACCESS_TOKEN_MAX_AGE = 15 * 60 * 1000
+const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000
 
 @Injectable()
 export class AuthService {
@@ -110,7 +116,7 @@ export class AuthService {
 		dto: LoginDto,
 		req: IRequestWithCompanyId,
 		res: Response,
-	): Promise<ITokenResponse> {
+	): Promise<IAuthResponse> {
 		const companyId = req.companyIdFromSubdomain
 		if (!companyId)
 			throw new UnauthorizedException('Company subdomain not found')
@@ -127,17 +133,24 @@ export class AuthService {
 		if (!user || !(await bcrypt.compare(dto.password, user.password)))
 			throw new UnauthorizedException('Invalid credentials')
 
-		const token = await this.getAccessToken(user.id, user.role)
+		const accessToken = await this.getAccessToken(user.id, user.role)
 		const refreshToken = await this.getRefreshToken(user.id, user.role)
+
+		this.setAccessTokenCookie(res, accessToken)
 		this.setRefreshTokenCookie(res, refreshToken)
-		return { token }
+		this.setAuthStatusCookie(res)
+
+		return {
+			success: true,
+			user: { id: user.id, role: user.role },
+		}
 	}
 
 	async processRefresh(
 		req: IRequestWithCompanyId,
 		res: Response,
-	): Promise<ITokenResponse> {
-		const refreshToken = req.cookies['jid'] as string | undefined
+	): Promise<IAuthResponse> {
+		const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE] as string | undefined
 		if (!refreshToken || typeof refreshToken !== 'string')
 			throw new UnauthorizedException('No refresh token provided')
 
@@ -150,18 +163,30 @@ export class AuthService {
 			throw new UnauthorizedException('Invalid refresh token')
 		}
 
-		const token = await this.getAccessToken(payload.sub, payload.role)
-		const newRefreshToken = await this.getRefreshToken(
-			payload.sub,
-			payload.role,
-		)
-		this.setRefreshTokenCookie(res, newRefreshToken)
+		const user = await this.prisma.user.findUnique({
+			where: { id: payload.sub },
+			select: { id: true, role: true },
+		})
+		if (!user) {
+			this.clearAllAuthCookies(res)
+			throw new UnauthorizedException('User not found')
+		}
 
-		return { token }
+		const accessToken = await this.getAccessToken(user.id, user.role)
+		const newRefreshToken = await this.getRefreshToken(user.id, user.role)
+
+		this.setAccessTokenCookie(res, accessToken)
+		this.setRefreshTokenCookie(res, newRefreshToken)
+		this.setAuthStatusCookie(res)
+
+		return {
+			success: true,
+			user: { id: user.id, role: user.role },
+		}
 	}
 
 	logoutUser(res: Response): { message: string } {
-		res.clearCookie('jid', { path: '/', httpOnly: true })
+		this.clearAllAuthCookies(res)
 		return { message: 'Logged out successfully' }
 	}
 
@@ -181,15 +206,46 @@ export class AuthService {
 		})
 	}
 
-	private setRefreshTokenCookie(res: Response, refreshToken: string): void {
+	private getCookieOptions(httpOnly: boolean, maxAge: number) {
 		const isProd = process.env.NODE_ENV === 'production'
-		res.cookie('jid', refreshToken, {
-			httpOnly: true,
+		return {
+			httpOnly,
 			secure: isProd,
-			sameSite: isProd ? 'strict' : 'lax',
+			sameSite: (isProd ? 'strict' : 'lax') as 'strict' | 'lax',
 			...(isProd ? { domain: `.${process.env.DOMAIN}` } : {}),
 			path: '/',
-			maxAge: 30 * 24 * 60 * 60 * 1000,
-		})
+			maxAge,
+		}
+	}
+
+	private setAccessTokenCookie(res: Response, accessToken: string): void {
+		res.cookie(
+			ACCESS_TOKEN_COOKIE,
+			accessToken,
+			this.getCookieOptions(true, ACCESS_TOKEN_MAX_AGE),
+		)
+	}
+
+	private setRefreshTokenCookie(res: Response, refreshToken: string): void {
+		res.cookie(
+			REFRESH_TOKEN_COOKIE,
+			refreshToken,
+			this.getCookieOptions(true, REFRESH_TOKEN_MAX_AGE),
+		)
+	}
+
+	private setAuthStatusCookie(res: Response): void {
+		res.cookie(
+			AUTH_STATUS_COOKIE,
+			'true',
+			this.getCookieOptions(false, ACCESS_TOKEN_MAX_AGE),
+		)
+	}
+
+	private clearAllAuthCookies(res: Response): void {
+		const clearOptions = this.getCookieOptions(true, 0)
+		res.clearCookie(ACCESS_TOKEN_COOKIE, clearOptions)
+		res.clearCookie(REFRESH_TOKEN_COOKIE, clearOptions)
+		res.clearCookie(AUTH_STATUS_COOKIE, { ...clearOptions, httpOnly: false })
 	}
 }

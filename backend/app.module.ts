@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { join } from 'path';
 import { PrismaService } from 'prisma/prisma.service';
 import { JwtAuthGuard } from 'src/api/auth/guards/jwt.guard';
@@ -26,6 +27,12 @@ import { AuthModule } from './src/api/auth/auth.module';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'frontend', 'build'),
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
 
     AuthModule,
     CategoryModule,
@@ -37,6 +44,10 @@ import { AuthModule } from './src/api/auth/auth.module';
   ],
   providers: [
     PrismaService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: SubdomainGuard,

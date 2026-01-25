@@ -1,6 +1,6 @@
 'use client'
 import { AUTH } from '@/constants/auth.constant'
-import { ROUTES } from '@/constants/pages.constant'
+import { ROUTES, UserRole } from '@/constants/pages.constant'
 import {
 	login as loginRequest,
 	logout as logoutRequest,
@@ -30,23 +30,27 @@ const AuthContext = createContext<IAuthContext>({
 })
 
 export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
-	const { user, isAuth, hydrated, clearAuth } = useAuthStore()
+	const { user, isAuth, hydrated, clearAuth, setUserRole } = useAuthStore()
 	const { setPendingAlert } = useAlertStore()
 
-	const login = useCallback(async (data: ILoginRequest) => {
-		const response = await loginRequest(data)
-		if (response.status === 200) {
-			initApiFromCookies()
-			const currentUser = await getCurrentUser()
-			initializeAuth(currentUser.data)
-		}
-	}, [])
+	const login = useCallback(
+		async (data: ILoginRequest) => {
+			const response = await loginRequest(data)
+			if (response.status === 200 && response.data.success) {
+				initApiFromCookies()
+
+				if (response.data.user?.role) setUserRole(response.data.user.role as UserRole)
+
+				const currentUser = await getCurrentUser()
+				initializeAuth(currentUser.data, currentUser.data.role as UserRole)
+			}
+		},
+		[setUserRole],
+	)
 
 	const logout = useCallback(async () => {
 		try {
 			const response = await logoutRequest()
-			Cookies.remove(AUTH.TOKEN)
-			Cookies.remove(AUTH.SUBDOMAIN)
 			clearAuth()
 
 			setPendingAlert({
@@ -55,6 +59,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 			})
 			window.location.href = ROUTES.PUBLIC.AUTH.LOGIN
 		} catch {
+			clearAuth()
 			setPendingAlert({
 				severity: 'error',
 				text: 'Logout failed. Please try again later.',
@@ -75,10 +80,12 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 			}
 		}
 
-		if (!user && Cookies.get(AUTH.TOKEN)) {
+		const isAuthenticated = Cookies.get(AUTH.AUTH_STATUS) === 'true'
+
+		if (!user && isAuthenticated) {
 			initApiFromCookies()
 			getCurrentUser()
-				.then(current => initializeAuth(current.data))
+				.then(current => initializeAuth(current.data, current.data.role as UserRole))
 				.catch(() => clearAuth())
 		}
 	}, [hydrated, user, clearAuth, setPendingAlert])

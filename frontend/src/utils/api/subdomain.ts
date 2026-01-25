@@ -30,7 +30,5 @@ export function setApiSubdomain(subdomain?: string): void {
 export function initApiFromCookies(): void {
 	const subdomain = Cookies.get(AUTH.SUBDOMAIN)
 	if (subdomain) setApiSubdomain(subdomain)
-
-	const token = Cookies.get(AUTH.TOKEN)
-	if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+	api.defaults.withCredentials = true
 }

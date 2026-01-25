@@ -14,8 +14,7 @@ import type { IAxiosError } from '@/types/error.interface'
 import type { AxiosProgressEvent } from 'axios'
 import Cookies from 'js-cookie'
 import { clearAuth } from '../auth-helpers'
-import { convertToDays } from '../convertToDays'
-import { parseBackendError } from '../errorHandler'
+import { getRetryAfter, parseBackendError } from '../errorHandler'
 import { getIsRefreshing, processQueue, pushToQueue, setIsRefreshing } from './authQueue'
 import { api } from './axiosInstances'
 import { getGlobalShowAlert } from './globalAlert'
@@ -28,9 +27,7 @@ api.interceptors.request.use(config => {
 		updateNetworkProgress(requestId, event.loaded ?? 0, event.total ?? undefined)
 	}
 
-	config.headers = config.headers || {}
-	const token = Cookies.get(AUTH.TOKEN)
-	if (token) config.headers.Authorization = `Bearer ${token}`
+	config.withCredentials = true
 
 	return config
 })
@@ -57,7 +54,6 @@ api.interceptors.response.use(
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
 				if (typeof window !== 'undefined') {
-					Cookies.remove(AUTH.TOKEN)
 					Cookies.remove(AUTH.SUBDOMAIN)
 					clearAuth()
 					useAlertStore.getState().setPendingAlert({
@@ -73,14 +69,11 @@ api.interceptors.response.use(
 				return new Promise((resolve, reject) => {
 					pushToQueue(resolve, reject)
 				})
-					.then(token => {
-						if (token) {
-							originalRequest.headers = originalRequest.headers || {}
-							originalRequest.headers['Authorization'] = `Bearer ${token}`
-							originalRequest.headers['X-Request-ID'] = startNetworkRequest(
-								originalRequest.url || 'retry',
-							)
-						}
+					.then(() => {
+						originalRequest.headers = originalRequest.headers || {}
+						originalRequest.headers['X-Request-ID'] = startNetworkRequest(
+							originalRequest.url || 'retry',
+						)
 						return api(originalRequest)
 					})
 					.catch(err => Promise.reject(err))
@@ -90,65 +83,64 @@ api.interceptors.response.use(
 			setIsRefreshing(true)
 
 			try {
-				const {
-					data: { token: newToken },
-				} = await refreshToken()
-				if (newToken) {
-					const tokenExpiresInDays = convertToDays(
-						process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d',
-					)
-					Cookies.set(AUTH.TOKEN, newToken, {
-						expires: tokenExpiresInDays,
-						secure: process.env.NODE_ENV === 'production',
-						sameSite: 'strict',
-					})
+				const { data } = await refreshToken()
 
-					api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
-					processQueue(null, newToken)
+				if (data.success) {
+					processQueue(null, null)
 
 					originalRequest.headers = originalRequest.headers || {}
-					originalRequest.headers['Authorization'] = `Bearer ${newToken}`
 					originalRequest.headers['X-Request-ID'] = startNetworkRequest(
 						originalRequest.url || 'refresh-retry',
 					)
 
-					getGlobalShowAlert()?.('info', 'Session refreshed successfully.')
 					return api(originalRequest)
 				}
+
+				throw new Error('Token refresh failed')
 			} catch (err) {
 				processQueue(err, null)
+
 				if (typeof window !== 'undefined') {
-					Cookies.remove(AUTH.TOKEN)
 					Cookies.remove(AUTH.SUBDOMAIN)
 					clearAuth()
+
 					const currentPath = window.location.pathname
 					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(
 						currentPath,
 					)}`
-					try {
-						useAlertStore.getState().setPendingAlert({
-							severity: 'error',
-							text: parseBackendError(err as IAxiosError).join('\n'),
-						})
-					} catch {
-						clearAuth()
-						useAlertStore.getState().setPendingAlert({
-							severity: 'warning',
-							text: 'Your session has expired. Redirecting to login page.',
-						})
-					}
+
+					useAlertStore.getState().setPendingAlert({
+						severity: 'warning',
+						text: 'Your session has expired. Redirecting to login page.',
+					})
+
 					window.location.href = loginUrl
 				}
+
 				return Promise.reject(err)
 			} finally {
 				setIsRefreshing(false)
 			}
 		}
 
+		if (error.response?.status === 429) {
+			const retryAfter = getRetryAfter(error as IAxiosError)
+			const errorMessage = parseBackendError(error as IAxiosError).join('\n')
+
+			useAlertStore.getState().setPendingAlert({
+				severity: 'error',
+				text: errorMessage,
+				...(retryAfter !== null && { retryAfter }),
+			})
+
+			return Promise.reject(error)
+		}
+
 		if (typeof window !== 'undefined') {
 			const status = error.response?.status
 			const shouldShowAlert =
 				status !== 401 &&
+				status !== 429 &&
 				!originalRequest.url?.includes(API_URL.AUTH.LOGIN) &&
 				!originalRequest.url?.includes(API_URL.AUTH.REGISTER) &&
 				!shouldHideGlobalError
