@@ -12,22 +12,28 @@ export const dishFilters: FilterConfig[] = [
 		suffix: '$',
 	},
 	{
-		type: 'boolean',
+		type: 'select',
 		key: 'available',
-		label: 'Available Only',
+		label: 'Status',
+		placeholder: 'All statuses',
+		options: [
+			{ value: 'true', label: 'Active (Available)' },
+			{ value: 'false', label: 'Inactive (Hidden)' },
+		],
 	},
+
 	{
 		type: 'select',
 		key: 'sortBy',
 		label: 'Sort By',
-		placeholder: 'Select sorting',
+		placeholder: 'Default sorting',
 		options: [
-			{ value: 'name-asc', label: 'Name (A → Z)' },
-			{ value: 'name-desc', label: 'Name (Z → A)' },
-			{ value: 'price-asc', label: 'Price (Low → High)' },
-			{ value: 'price-desc', label: 'Price (High → Low)' },
-			{ value: 'createdAt-asc', label: 'Date Created (Oldest First)' },
-			{ value: 'createdAt-desc', label: 'Date Created (Newest First)' },
+			{ value: 'createdAt-desc', label: 'Created: Newest first' },
+			{ value: 'createdAt-asc', label: 'Created: Oldest first' },
+			{ value: 'name-asc', label: 'Name (A-Z)' },
+			{ value: 'name-desc', label: 'Name (Z-A)' },
+			{ value: 'price-asc', label: 'Price (Low-High)' },
+			{ value: 'price-desc', label: 'Price (High-Low)' },
 		],
 	},
 ] as const

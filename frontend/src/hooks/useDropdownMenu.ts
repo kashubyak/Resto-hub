@@ -7,7 +7,7 @@ interface IPosition {
 	left: number
 }
 
-export const useDropdownMenu = (offset = 8, margin = 8) => {
+export const useKebabMenu = (offset = 8, margin = 8) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [position, setPosition] = useState<IPosition>({ top: 0, left: 0 })
 

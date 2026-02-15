@@ -1,3 +1,4 @@
+import CategoryIcon from '@mui/icons-material/Category'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
 import type { ComponentType } from 'react'
@@ -42,7 +43,9 @@ export const ROUTES = {
 		},
 		ADMIN: {
 			DISH: '/dish',
-			DISH_ID: (id: number | string) => `/dish/${id}`,
+			DISH_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.DISH}/${id}`,
+			CATEGORY: '/category',
+			CATEGORY_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.CATEGORY}/${id}`,
 		},
 		COOK: {},
 		WAITER: {},
@@ -69,7 +72,11 @@ export const AUTH_ROUTES_LIST: string[] = [
 const SHARED_ROUTES: string[] = [ROUTES.PRIVATE.SHARED.DASHBOARD]
 
 export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
-	[UserRole.ADMIN]: [...SHARED_ROUTES, ROUTES.PRIVATE.ADMIN.DISH],
+	[UserRole.ADMIN]: [
+		...SHARED_ROUTES,
+		ROUTES.PRIVATE.ADMIN.DISH,
+		ROUTES.PRIVATE.ADMIN.CATEGORY,
+	],
 	[UserRole.COOK]: [...SHARED_ROUTES],
 	[UserRole.WAITER]: [...SHARED_ROUTES],
 }
@@ -93,6 +100,12 @@ export const ALL_ROUTES: IRouteConfig[] = [
 		path: ROUTES.PRIVATE.ADMIN.DISH,
 		name: 'Dishes',
 		icon: RestaurantMenuIcon,
+		roles: ADMIN_ROLES,
+	},
+	{
+		path: ROUTES.PRIVATE.ADMIN.CATEGORY,
+		name: 'Categories',
+		icon: CategoryIcon,
 		roles: ADMIN_ROLES,
 	},
 ]
