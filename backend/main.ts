@@ -22,12 +22,24 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaExceptionFilter());
   app.useWebSocketAdapter(new IoAdapter(app));
 
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map((o) => o.trim()) || [];
+  const isDev = process.env.NODE_ENV === 'development';
 
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      if (!origin || allowedOrigins.includes(origin)) callback(null, true);
-      else callback(new Error(`Not allowed by CORS: ${origin}`));
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      if (isDev && /^https?:\/\/[^.]+\.localhost(:\d+)?$/.test(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error(`Not allowed by CORS: ${origin}`));
     },
     credentials: true,
   });

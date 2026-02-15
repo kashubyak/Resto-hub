@@ -2,7 +2,7 @@ import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
 import { registerCompany } from '@/services/auth/company.service'
 import type { IAxiosError } from '@/types/error.interface'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { getCompanyUrl } from '@/utils/api'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -24,8 +24,6 @@ export const useRegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
 	const { login } = useAuth()
 	const { showBackendError } = useAlert()
-	const searchParams = useSearchParams()
-	const router = useRouter()
 	const [hasMounted, setHasMounted] = useState(false)
 
 	const [savedPreviews, setSavedPreviews] = useState<{
@@ -122,13 +120,14 @@ export const useRegisterCompany = () => {
 						password: data.adminPassword,
 					})
 
-					router.push(`/auth/register-success?subdomain=${data.subdomain}`)
+					const companyUrl = getCompanyUrl(data.subdomain)
+					window.location.href = `${companyUrl}/auth/register-success?subdomain=${data.subdomain}`
 				}
 			} catch (err) {
 				showBackendError(err as IAxiosError)
 			}
 		},
-		[step, location, setValue, savedFiles, login, searchParams, router, showBackendError],
+		[step, location, setValue, savedFiles, login, showBackendError],
 	)
 
 	const validateLogo = useCallback(() => {

@@ -108,6 +108,23 @@ yarn start:dev
 The API will be available at: `http://localhost:3000`
 Swagger documentation: `http://localhost:3000/api/docs#/`
 
+### Local development with subdomains
+
+The app uses subdomains for company context (e.g. `mycompany.localhost`). For login and all company-scoped features to work locally:
+
+1. Add your company subdomain to `/etc/hosts`:
+   ```
+   127.0.0.1 mycompany.localhost
+   ```
+   Replace `mycompany` with your actual subdomain from registration.
+
+2. Include the subdomain origin in `ALLOWED_ORIGINS` in backend `.env`:
+   ```
+   ALLOWED_ORIGINS=http://localhost:3001,http://mycompany.localhost:3001
+   ```
+
+3. Open the app at `http://mycompany.localhost:3001` instead of `http://localhost:3001`.
+
 ## Running Tests
 
 To run end-to-end (e2e) tests:

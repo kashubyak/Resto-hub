@@ -1,7 +1,5 @@
-import { AUTH } from '@/constants/auth.constant'
 import { useAlertStore } from '@/store/alert.store'
 import type { IAxiosError } from '@/types/error.interface'
-import Cookies from 'js-cookie'
 import { parseBackendError } from '../errorHandler'
 import { api } from './axiosInstances'
 
@@ -60,9 +58,7 @@ export function setApiSubdomain(subdomain?: string | null): void {
 
 export function initApiSubdomain(): void {
 	const subdomainFromHostname = getSubdomainFromHostname()
-	const subdomainFromCookie = Cookies.get(AUTH.SUBDOMAIN)
-
-	const subdomain = subdomainFromHostname || subdomainFromCookie
+	const subdomain = subdomainFromHostname
 
 	if (subdomain) setApiSubdomain(subdomain)
 	api.defaults.withCredentials = true

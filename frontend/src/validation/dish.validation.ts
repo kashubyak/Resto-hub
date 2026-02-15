@@ -22,8 +22,8 @@ export const imageValidation = {
 	validate: {
 		validType: (value: FileList | null) =>
 			!value?.[0] ||
-			['image/jpeg', 'image/png', 'image/webp'].includes(value[0].type) ||
-			'Only JPG, PNG, or WebP allowed',
+			value[0].type.startsWith('image/') ||
+			'Only image files are allowed',
 	},
 }
 
