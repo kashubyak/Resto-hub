@@ -1,11 +1,12 @@
 'use client'
 
+import { AuthPasswordField, AuthTextField } from '@/components/auth/AuthFields'
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
 import { ROUTES } from '@/constants/pages.constant'
 import { useLogin } from '@/hooks/useLogin'
 import { emailValidation, passwordValidation } from '@/validation/login.validation'
 import { subdomainValidation } from '@/validation/register.validation'
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import { Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { memo, useState } from 'react'
 
@@ -33,108 +34,41 @@ const LoginComponent = () => {
 				{/* Login Form Card */}
 				<div className="bg-card rounded-xl sm:rounded-3xl shadow-lg border border-border/50 p-4 sm:p-8 backdrop-blur-sm">
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
-						{/* Subdomain Field */}
-						<div className="space-y-2">
-							<label
-								htmlFor="subdomain"
-								className="block text-sm font-medium text-card-foreground"
-							>
-								Subdomain
-							</label>
-							<div className="relative">
-								<input
-									id="subdomain"
-									type="text"
-									{...register('subdomain', subdomainValidation)}
-									className={`w-full pl-4 pr-4 py-3 bg-input rounded-xl border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
-										errors.subdomain
-											? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-											: 'border-border'
-									}`}
-									placeholder="your-company"
-								/>
-							</div>
-							{errors.subdomain?.message && (
-								<p className="text-xs text-red-500">{errors.subdomain.message}</p>
-							)}
-						</div>
+						<AuthTextField
+							id="subdomain"
+							label="Subdomain"
+							placeholder="your-company"
+							error={errors.subdomain?.message}
+							register={register('subdomain', subdomainValidation)}
+						/>
 
-						{/* Email Field */}
-						<div className="space-y-2">
-							<label
-								htmlFor="email"
-								className="block text-sm font-medium text-card-foreground"
-							>
-								Email
-							</label>
-							<div className="relative">
-								<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-									<Mail className="h-5 w-5 text-muted-foreground" />
-								</div>
-								<input
-									id="email"
-									type="email"
-									{...register('email', emailValidation)}
-									className={`w-full pl-12 pr-4 py-3 bg-input rounded-xl border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
-										errors.email
-											? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-											: 'border-border'
-									}`}
-									placeholder="your@email.com"
-								/>
-							</div>
-							{errors.email?.message && (
-								<p className="text-xs text-red-500">{errors.email.message}</p>
-							)}
-						</div>
+						<AuthTextField
+							id="email"
+							label="Email"
+							type="email"
+							placeholder="your@email.com"
+							error={errors.email?.message}
+							leftIcon={<Mail className="h-5 w-5 text-muted-foreground" />}
+							register={register('email', emailValidation)}
+						/>
 
-						{/* Password Field */}
-						<div className="space-y-2">
-							<div className="flex items-center justify-between">
-								<label
-									htmlFor="password"
-									className="block text-sm font-medium text-card-foreground"
-								>
-									Password
-								</label>
+						<AuthPasswordField
+							id="password"
+							label="Password"
+							error={errors.password?.message}
+							leftIcon={<Lock className="h-5 w-5 text-muted-foreground" />}
+							register={register('password', passwordValidation)}
+							showPassword={showPassword}
+							onTogglePassword={() => setShowPassword(!showPassword)}
+							rightLabel={
 								<button
 									type="button"
 									className="text-sm text-primary hover:text-primary-hover transition-colors"
 								>
 									Forgot password?
 								</button>
-							</div>
-							<div className="relative">
-								<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-									<Lock className="h-5 w-5 text-muted-foreground" />
-								</div>
-								<input
-									id="password"
-									type={showPassword ? 'text' : 'password'}
-									{...register('password', passwordValidation)}
-									className={`w-full pl-12 pr-12 py-3 bg-input rounded-xl border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
-										errors.password
-											? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-											: 'border-border'
-									}`}
-									placeholder="••••••••"
-								/>
-								<button
-									type="button"
-									onClick={() => setShowPassword(!showPassword)}
-									className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-card-foreground transition-colors"
-								>
-									{showPassword ? (
-										<EyeOff className="h-5 w-5" />
-									) : (
-										<Eye className="h-5 w-5" />
-									)}
-								</button>
-							</div>
-							{errors.password?.message && (
-								<p className="text-xs text-red-500">{errors.password.message}</p>
-							)}
-						</div>
+							}
+						/>
 
 						{/* Submit Button */}
 						<button

@@ -1,10 +1,25 @@
-import { IsEmail, IsString, Matches, MinLength } from '@nestjs/class-validator'
+import {
+	IsEmail,
+	IsOptional,
+	IsString,
+	Matches,
+	MinLength,
+} from '@nestjs/class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
 const PASSWORD_REGEX =
 	/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
 
 export class LoginDto {
+	@ApiProperty({
+		description: 'Company subdomain (optional when Host header contains subdomain)',
+		example: 'mycompany',
+		required: false,
+	})
+	@IsOptional()
+	@IsString()
+	subdomain?: string
+
 	@ApiProperty({
 		description: 'User email address',
 		example: 'admin@company.com',

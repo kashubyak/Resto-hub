@@ -1,6 +1,7 @@
 'use client'
 
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
+import { ROUTES } from '@/constants/pages.constant'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { getCompanyUrl } from '@/utils/api'
 import { Check, Copy, ExternalLink, LayoutDashboard } from 'lucide-react'
@@ -97,7 +98,7 @@ const RegisterCompanySuccessComponent = () => {
 
 					<div className="flex flex-col gap-3">
 						<Link
-							href="/"
+							href={ROUTES.PRIVATE.SHARED.DASHBOARD}
 							className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center justify-center gap-2"
 						>
 							<LayoutDashboard className="w-4 h-4" />

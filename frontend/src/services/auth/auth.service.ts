@@ -1,4 +1,5 @@
 import { API_URL } from '@/config/api'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import type { ApiResponse } from '@/types/api.interface'
 import type {
 	ILoginRequest,
@@ -6,7 +7,6 @@ import type {
 	ILogoutResponse,
 } from '@/types/auth.interface'
 import api, { getSubdomainFromHostname, setApiSubdomain } from '@/utils/api'
-import { getSupabaseClient } from '@/lib/supabase/client'
 
 export const login = async (
 	data: ILoginRequest,
@@ -29,6 +29,10 @@ export const login = async (
 	if (error) throw error
 	if (!authData.session)
 		throw new Error('Login succeeded but no session returned')
+
+	await api.post<ILoginResponse>(API_URL.AUTH.LOGIN, data, {
+		withCredentials: true,
+	})
 
 	return {
 		status: 200,

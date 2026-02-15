@@ -4,6 +4,7 @@ import {
 	HttpCode,
 	HttpStatus,
 	Post,
+	Req,
 	Res,
 	UploadedFiles,
 	UseInterceptors,
@@ -19,10 +20,11 @@ import {
 	ApiTooManyRequestsResponse,
 } from '@nestjs/swagger'
 import { Throttle } from '@nestjs/throttler'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { Public } from 'src/common/decorators/public.decorator'
 import { multerOptions } from 'src/common/s3/file-upload.util'
 import { AuthService } from './auth.service'
+import { LoginDto } from './dto/request/login.dto'
 import { RegisterCompanyDto } from './dto/request/register-company.dto'
 import { RegisterCompanyResponseDto } from './dto/response/register-company-response.dto'
 import { ICompanyRegistrationFiles } from './interfaces/file-upload.interface'
@@ -30,6 +32,30 @@ import { ICompanyRegistrationFiles } from './interfaces/file-upload.interface'
 @Controller('auth')
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
+
+	@Post('login')
+	@Public()
+	@HttpCode(HttpStatus.OK)
+	@ApiBody({ type: LoginDto })
+	@ApiOkResponse({ description: 'Logged in successfully' })
+	login(
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response,
+		@Body() dto: LoginDto,
+	) {
+		return this.authService.loginUser(req, res, dto)
+	}
+
+	@Post('refresh')
+	@Public()
+	@HttpCode(HttpStatus.OK)
+	@ApiOkResponse({ description: 'Token refreshed successfully' })
+	refresh(
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		return this.authService.refreshUser(req, res)
+	}
 
 	@Post('register-company')
 	@Public()

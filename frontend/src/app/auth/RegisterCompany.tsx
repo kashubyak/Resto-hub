@@ -1,5 +1,6 @@
 'use client'
 
+import { AuthPasswordField, AuthTextField } from '@/components/auth/AuthFields'
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
 import { LocationSearch } from '@/components/auth/LocationSearch'
 import { MapPanel } from '@/components/auth/MapPanel'
@@ -13,7 +14,7 @@ import {
 	passwordValidation,
 	subdomainValidation,
 } from '@/validation/register.validation'
-import { AlertCircle, Building2, Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
+import { Building2, Lock, Mail, User } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { memo, useCallback, useState } from 'react'
@@ -22,12 +23,6 @@ const Map = dynamic(
 	() => import('@/components/auth/Map').then((m) => ({ default: m.Map })),
 	{ ssr: false },
 )
-
-const inputBase =
-	'w-full pl-12 pr-4 py-3 bg-input rounded-xl border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all'
-const inputError =
-	'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-const inputNormal = 'border-border focus:border-primary focus:ring-primary/20'
 
 const RegisterCompanyComponent = () => {
 	const [showPassword, setShowPassword] = useState(false)
@@ -114,69 +109,28 @@ const RegisterCompanyComponent = () => {
 							>
 								{step === 0 ? (
 									<>
-										{/* Company Name */}
-										<div className="space-y-2">
-											<label
-												htmlFor="name"
-												className="block text-sm font-medium text-card-foreground"
-											>
-												Company name
-											</label>
-											<div className="relative">
-												<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-													<Building2 className="h-5 w-5 text-muted-foreground" />
-												</div>
-												<input
-													id="name"
-													type="text"
-													{...register('name', CompanyNameValidation)}
-													className={`${inputBase} ${
-														errors.name ? inputError : inputNormal
-													}`}
-													placeholder="Your company"
-												/>
-											</div>
-											{errors.name?.message && (
-												<div className="flex items-center gap-1.5 text-red-500 mt-1">
-													<AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
-													<p className="text-xs">{errors.name.message}</p>
-												</div>
-											)}
-										</div>
+										<AuthTextField
+											id="name"
+											label="Company name"
+											placeholder="Your company"
+											autoComplete="organization"
+											error={errors.name?.message}
+											leftIcon={<Building2 className="h-5 w-5 text-muted-foreground" />}
+											register={register('name', CompanyNameValidation)}
+										/>
 
-										{/* Subdomain */}
-										<div className="space-y-2">
-											<label
-												htmlFor="subdomain"
-												className="block text-sm font-medium text-card-foreground"
-											>
-												Subdomain
-											</label>
-											<div className="relative">
-												<input
-													id="subdomain"
-													type="text"
-													{...register('subdomain', subdomainValidation)}
-													className={`w-full pl-4 pr-4 py-3 bg-input rounded-xl border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all ${
-														errors.subdomain ? inputError : inputNormal
-													}`}
-													placeholder="your-company"
-												/>
-											</div>
-											{errors.subdomain?.message && (
-												<div className="flex items-center gap-1.5 text-red-500 mt-1">
-													<AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
-													<p className="text-xs">{errors.subdomain.message}</p>
-												</div>
-											)}
-											{!errors.subdomain?.message && (
-												<p className="text-xs text-muted-foreground mt-1">
-													{(watch('subdomain') ?? '')
-														? `${watch('subdomain') ?? ''}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'}`
-														: 'Your unique login address'}
-												</p>
-											)}
-										</div>
+										<AuthTextField
+											id="subdomain"
+											label="Subdomain"
+											placeholder="your-company"
+											error={errors.subdomain?.message}
+											hint={
+												(watch('subdomain') ?? '')
+													? `${watch('subdomain') ?? ''}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'}`
+													: 'Your unique login address'
+											}
+											register={register('subdomain', subdomainValidation)}
+										/>
 
 										<LocationSearch
 											onLocationSelect={onLocationSelect}
@@ -205,159 +159,55 @@ const RegisterCompanyComponent = () => {
 									</>
 								) : (
 									<>
-										{/* Admin Name */}
-										<div className="space-y-2">
-											<label
-												htmlFor="adminName"
-												className="block text-sm font-medium text-card-foreground"
-											>
-												Full name
-											</label>
-											<div className="relative">
-												<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-													<User className="h-5 w-5 text-muted-foreground" />
-												</div>
-												<input
-													id="adminName"
-													type="text"
-													{...register('adminName', adminNameValidation)}
-													className={`${inputBase} ${
-														errors.adminName ? inputError : inputNormal
-													}`}
-													placeholder="John Doe"
-												/>
-											</div>
-											{errors.adminName?.message && (
-												<div className="flex items-center gap-1.5 text-red-500 mt-1">
-													<AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
-													<p className="text-xs">{errors.adminName.message}</p>
-												</div>
-											)}
-										</div>
+										<AuthTextField
+											id="adminName"
+											label="Full name"
+											placeholder="John Doe"
+											autoComplete="name"
+											error={errors.adminName?.message}
+											leftIcon={<User className="h-5 w-5 text-muted-foreground" />}
+											register={register('adminName', adminNameValidation)}
+										/>
 
-										{/* Admin Email */}
-										<div className="space-y-2">
-											<label
-												htmlFor="adminEmail"
-												className="block text-sm font-medium text-card-foreground"
-											>
-												Email
-											</label>
-											<div className="relative">
-												<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-													<Mail className="h-5 w-5 text-muted-foreground" />
-												</div>
-												<input
-													id="adminEmail"
-													type="email"
-													{...register('adminEmail', emailValidation)}
-													className={`${inputBase} ${
-														errors.adminEmail ? inputError : inputNormal
-													}`}
-													placeholder="your@email.com"
-												/>
-											</div>
-											{errors.adminEmail?.message && (
-												<div className="flex items-center gap-1.5 text-red-500 mt-1">
-													<AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
-													<p className="text-xs">{errors.adminEmail.message}</p>
-												</div>
-											)}
-										</div>
+										<AuthTextField
+											id="adminEmail"
+											label="Email"
+											type="email"
+											placeholder="your@email.com"
+											error={errors.adminEmail?.message}
+											leftIcon={<Mail className="h-5 w-5 text-muted-foreground" />}
+											register={register('adminEmail', emailValidation)}
+										/>
 
-										{/* Password */}
-										<div className="space-y-2">
-											<label
-												htmlFor="adminPassword"
-												className="block text-sm font-medium text-card-foreground"
-											>
-												Password
-											</label>
-											<div className="relative">
-												<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-													<Lock className="h-5 w-5 text-muted-foreground" />
-												</div>
-												<input
-													id="adminPassword"
-													type={showPassword ? 'text' : 'password'}
-													{...register('adminPassword', passwordValidation)}
-													className={`w-full pl-12 pr-12 py-3 bg-input rounded-xl border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all ${
-														errors.adminPassword ? inputError : inputNormal
-													}`}
-													placeholder="••••••••"
-												/>
-												<button
-													type="button"
-													onClick={() => setShowPassword(!showPassword)}
-													className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-card-foreground transition-colors"
-												>
-													{showPassword ? (
-														<EyeOff className="h-5 w-5" />
-													) : (
-														<Eye className="h-5 w-5" />
-													)}
-												</button>
-											</div>
-											{errors.adminPassword?.message && (
-												<div className="flex items-center gap-1.5 text-red-500 mt-1">
-													<AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
-													<p className="text-xs">{errors.adminPassword.message}</p>
-												</div>
-											)}
-										</div>
+										<AuthPasswordField
+											id="adminPassword"
+											label="Password"
+											error={errors.adminPassword?.message}
+											leftIcon={<Lock className="h-5 w-5 text-muted-foreground" />}
+											register={register('adminPassword', passwordValidation)}
+											showPassword={showPassword}
+											onTogglePassword={() => setShowPassword(!showPassword)}
+										/>
 
-										{/* Confirm Password */}
-										<div className="space-y-2">
-											<label
-												htmlFor="confirmPassword"
-												className="block text-sm font-medium text-card-foreground"
-											>
-												Confirm password
-											</label>
-											<div className="relative">
-												<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-													<Lock className="h-5 w-5 text-muted-foreground" />
-												</div>
-												<input
-													id="confirmPassword"
-													type={showConfirmPassword ? 'text' : 'password'}
-													{...register('confirmPassword', {
-														required: 'Please confirm your password',
-														validate: {
-															matchesPassword: validatePasswordMatch,
-															notEmpty: (v) =>
-																v.length > 0 ||
-																'Password confirmation cannot be empty',
-														},
-													})}
-													className={`w-full pl-12 pr-12 py-3 bg-input rounded-xl border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all ${
-														errors.confirmPassword ? inputError : inputNormal
-													}`}
-													placeholder="••••••••"
-												/>
-												<button
-													type="button"
-													onClick={() =>
-														setShowConfirmPassword(!showConfirmPassword)
-													}
-													className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-card-foreground transition-colors"
-												>
-													{showConfirmPassword ? (
-														<EyeOff className="h-5 w-5" />
-													) : (
-														<Eye className="h-5 w-5" />
-													)}
-												</button>
-											</div>
-											{errors.confirmPassword?.message && (
-												<div className="flex items-center gap-1.5 text-red-500 mt-1">
-													<AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
-													<p className="text-xs">
-														{errors.confirmPassword.message}
-													</p>
-												</div>
-											)}
-										</div>
+										<AuthPasswordField
+											id="confirmPassword"
+											label="Confirm password"
+											error={errors.confirmPassword?.message}
+											leftIcon={<Lock className="h-5 w-5 text-muted-foreground" />}
+											register={register('confirmPassword', {
+												required: 'Please confirm your password',
+												validate: {
+													matchesPassword: validatePasswordMatch,
+													notEmpty: (v) =>
+														v.length > 0 ||
+														'Password confirmation cannot be empty',
+												},
+											})}
+											showPassword={showConfirmPassword}
+											onTogglePassword={() =>
+												setShowConfirmPassword(!showConfirmPassword)
+											}
+										/>
 
 										{/* Admin Avatar */}
 										<div className="space-y-2">
