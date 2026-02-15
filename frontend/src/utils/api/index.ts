@@ -6,6 +6,7 @@ export {
 	initApiSubdomain,
 	initApiFromCookies,
 	setApiSubdomain,
+	getSubdomainFromHost,
 	getSubdomainFromHostname,
 	getCompanyUrl,
 } from './subdomain'

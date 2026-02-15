@@ -1,20 +1,28 @@
 'use client'
 
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
+import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { getCompanyUrl } from '@/utils/api'
-import { Check, Copy, ExternalLink, LayoutDashboard } from 'lucide-react'
+import { Check, Copy, ExternalLink, LayoutDashboard, LogIn } from 'lucide-react'
+import Cookies from 'js-cookie'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 
 const RegisterCompanySuccessComponent = () => {
 	const searchParams = useSearchParams()
 	const { copy, copied } = useCopyToClipboard()
+	const [isAuthenticated, setIsAuthenticated] = useState(false)
 
 	const subdomain = searchParams.get('subdomain') || ''
 	const companyUrl = subdomain ? getCompanyUrl(subdomain) : ''
+	const loginUrl = subdomain ? `${companyUrl}${ROUTES.PUBLIC.AUTH.LOGIN}` : ''
+
+	useEffect(() => {
+		setIsAuthenticated(Cookies.get(AUTH.AUTH_STATUS) === 'true')
+	}, [])
 
 	const handleCopy = useCallback(() => {
 		if (companyUrl) copy(companyUrl)
@@ -97,13 +105,23 @@ const RegisterCompanySuccessComponent = () => {
 					</div>
 
 					<div className="flex flex-col gap-3">
-						<Link
-							href={ROUTES.PRIVATE.SHARED.DASHBOARD}
-							className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center justify-center gap-2"
-						>
-							<LayoutDashboard className="w-4 h-4" />
-							Go to Dashboard
-						</Link>
+						{isAuthenticated ? (
+							<Link
+								href={ROUTES.PRIVATE.SHARED.DASHBOARD}
+								className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+							>
+								<LayoutDashboard className="w-4 h-4" />
+								Go to Dashboard
+							</Link>
+						) : (
+							<a
+								href={loginUrl}
+								className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+							>
+								<LogIn className="w-4 h-4" />
+								Log in at your company
+							</a>
+						)}
 						<a
 							href={companyUrl}
 							target="_blank"

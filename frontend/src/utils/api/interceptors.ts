@@ -1,4 +1,5 @@
 import { API_URL } from '@/config/api'
+import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import {
@@ -57,6 +58,9 @@ api.interceptors.response.use(
 		const shouldHideGlobalError = originalRequest?._hideGlobalError === true
 
 		if (error.response?.status === 401 && !originalRequest._retry) {
+			if (originalRequest.url?.includes(API_URL.AUTH.LOGOUT)) {
+				return Promise.reject(error)
+			}
 			if (getIsRefreshing()) {
 				return new Promise((resolve, reject) => {
 					pushToQueue(resolve, reject)
@@ -105,7 +109,7 @@ api.interceptors.response.use(
 
 					useAlertStore.getState().setPendingAlert({
 						severity: 'warning',
-						text: 'Your session has expired. Redirecting to login page.',
+						text: AUTH.SESSION_EXPIRED_MESSAGE,
 					})
 
 					window.location.href = loginUrl

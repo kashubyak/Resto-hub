@@ -6,7 +6,11 @@ import type {
 	ILoginResponse,
 	ILogoutResponse,
 } from '@/types/auth.interface'
-import api, { getSubdomainFromHostname, setApiSubdomain } from '@/utils/api'
+import api, {
+	getSubdomainFromHostname,
+	initApiSubdomain,
+	setApiSubdomain,
+} from '@/utils/api'
 
 export const login = async (
 	data: ILoginRequest,
@@ -47,13 +51,17 @@ export const login = async (
 }
 
 export const logout = async (): Promise<ApiResponse<ILogoutResponse>> => {
-	await getSupabaseClient().auth.signOut()
-
-	const response = await api.post<ILogoutResponse>(
-		API_URL.AUTH.LOGOUT,
-		{},
-		{ withCredentials: true },
-	)
-
-	return response
+	initApiSubdomain()
+	try {
+		const response = await api.post<ILogoutResponse>(
+			API_URL.AUTH.LOGOUT,
+			{},
+			{ withCredentials: true },
+		)
+		await getSupabaseClient().auth.signOut()
+		return response
+	} catch (err) {
+		await getSupabaseClient().auth.signOut()
+		throw err
+	}
 }

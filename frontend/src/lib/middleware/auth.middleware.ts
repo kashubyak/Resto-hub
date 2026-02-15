@@ -13,7 +13,7 @@ const ALERT_COOKIE_OPTIONS = {
 
 const SESSION_EXPIRED_ALERT = JSON.stringify({
 	severity: 'warning',
-	text: 'Your session has expired. Please log in again.',
+	text: AUTH.SESSION_EXPIRED_MESSAGE,
 })
 
 export async function authMiddleware(request: NextRequest): Promise<NextResponse> {

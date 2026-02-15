@@ -4,6 +4,7 @@ import {
 	Injectable,
 	UnauthorizedException,
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Company, Role, User } from '@prisma/client'
 import type { CookieOptions } from 'express'
 import { Request, Response } from 'express'
@@ -20,7 +21,25 @@ const ACCESS_TOKEN_COOKIE = 'access_token'
 const REFRESH_TOKEN_COOKIE = 'jid'
 const AUTH_STATUS_COOKIE = 'is_authenticated'
 
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+function parseExpiryToSeconds(value: string | undefined): number {
+	if (!value || typeof value !== 'string') return 0
+	const match = value.trim().match(/^(\d+)(s|m|h|d)$/i)
+	if (!match || match[1] == null || match[2] == null) return 0
+	const num = parseInt(match[1], 10)
+	const unit = match[2].toLowerCase()
+	switch (unit) {
+		case 's':
+			return num
+		case 'm':
+			return num * 60
+		case 'h':
+			return num * 60 * 60
+		case 'd':
+			return num * 24 * 60 * 60
+		default:
+			return 0
+	}
+}
 
 @Injectable()
 export class AuthService {
@@ -28,6 +47,7 @@ export class AuthService {
 		private readonly prisma: PrismaService,
 		private readonly supabase: SupabaseService,
 		private readonly S3Service: S3Service,
+		private readonly config: ConfigService,
 	) {}
 
 	async registerCompany(
@@ -197,14 +217,7 @@ export class AuthService {
 	}
 
 	logoutUser(res: Response): { message: string } {
-		const isProd = process.env.NODE_ENV === 'production'
-		const clearOptions: CookieOptions = {
-			httpOnly: true,
-			secure: isProd,
-			sameSite: isProd ? 'strict' : 'lax',
-			path: '/',
-			maxAge: 0,
-		}
+		const clearOptions = this.getBaseCookieOptions(0)
 		res.clearCookie(ACCESS_TOKEN_COOKIE, clearOptions)
 		res.clearCookie(REFRESH_TOKEN_COOKIE, clearOptions)
 		res.clearCookie(AUTH_STATUS_COOKIE, { ...clearOptions, httpOnly: false })
@@ -218,31 +231,40 @@ export class AuthService {
 		return sub
 	}
 
-	private setAuthCookies(
-		res: Response,
-		payload: { accessToken: string; refreshToken?: string },
-	): void {
-		const isProd = process.env.NODE_ENV === 'production'
-		const baseOptions: CookieOptions = {
+	private getBaseCookieOptions(maxAgeSec: number): CookieOptions {
+		const isProd = this.config.get('NODE_ENV') === 'production'
+		return {
 			httpOnly: true,
 			secure: isProd,
 			sameSite: isProd ? 'strict' : 'lax',
 			path: '/',
+			maxAge: maxAgeSec,
 		}
+	}
+
+	private setAuthCookies(
+		res: Response,
+		payload: { accessToken: string; refreshToken?: string },
+	): void {
+		const accessTtlSec = parseExpiryToSeconds(this.config.get('JWT_EXPIRES_IN'))
+		const refreshTtlSec = parseExpiryToSeconds(
+			this.config.get('JWT_REFRESH_EXPIRES_IN'),
+		)
+		if (!accessTtlSec || !refreshTtlSec)
+			throw new Error(
+				'JWT_EXPIRES_IN and JWT_REFRESH_EXPIRES_IN must be set in env (e.g. 15m, 7d)',
+			)
 
 		res.cookie(ACCESS_TOKEN_COOKIE, payload.accessToken, {
-			...baseOptions,
-			maxAge: 60 * 60,
+			...this.getBaseCookieOptions(accessTtlSec),
 		})
 		if (payload.refreshToken)
 			res.cookie(REFRESH_TOKEN_COOKIE, payload.refreshToken, {
-				...baseOptions,
-				maxAge: Math.floor(SEVEN_DAYS_MS / 1000),
+				...this.getBaseCookieOptions(refreshTtlSec),
 			})
 		res.cookie(AUTH_STATUS_COOKIE, 'true', {
-			...baseOptions,
+			...this.getBaseCookieOptions(refreshTtlSec),
 			httpOnly: false,
-			maxAge: Math.floor(SEVEN_DAYS_MS / 1000),
 		})
 	}
 }

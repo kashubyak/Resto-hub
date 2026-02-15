@@ -4,13 +4,106 @@ import { AuthPasswordField, AuthTextField } from '@/components/auth/AuthFields'
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
 import { ROUTES } from '@/constants/pages.constant'
 import { useLogin } from '@/hooks/useLogin'
+import { getCompanyUrl, getSubdomainFromHost, getSubdomainFromHostname } from '@/utils/api'
 import { emailValidation, passwordValidation } from '@/validation/login.validation'
-import { subdomainValidation } from '@/validation/register.validation'
-import { Lock, Mail } from 'lucide-react'
+import { AlertCircle, Building2, Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { memo, useState } from 'react'
 
-const LoginComponent = () => {
+function LoginSubdomainGate() {
+	const searchParams = useSearchParams()
+	const [subdomain, setSubdomain] = useState('')
+	const [error, setError] = useState<string | null>(null)
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault()
+		const value = subdomain.trim().toLowerCase()
+		if (!value) {
+			setError('Subdomain is required')
+			return
+		}
+		if (!/^[a-z][a-z0-9]*$/.test(value) || value.length < 3) {
+			setError('Use 3+ lowercase letters/numbers, start with a letter')
+			return
+		}
+		if (['www', 'api', 'admin'].includes(value)) {
+			setError('This subdomain is reserved')
+			return
+		}
+		setError(null)
+		const search = searchParams.toString()
+		const url = `${getCompanyUrl(value)}${ROUTES.PUBLIC.AUTH.LOGIN}${search ? `?${search}` : ''}`
+		window.location.href = url
+	}
+
+	return (
+		<div className="min-h-screen w-full flex items-center justify-center bg-background px-2 sm:px-4 py-4 sm:py-8 relative overflow-hidden">
+			<BackgroundDecorations />
+			<div className="w-full max-w-md relative z-10">
+				<div className="text-center mb-6">
+					<div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 mb-4">
+						<Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+					</div>
+					<h1 className="text-xl sm:text-3xl font-semibold text-foreground mb-2">
+						Sign in
+					</h1>
+					<p className="text-sm text-muted-foreground mb-6">
+						Enter your company subdomain to continue
+					</p>
+				</div>
+				<div className="bg-card rounded-xl sm:rounded-3xl shadow-lg border border-border/50 p-6 sm:p-8 backdrop-blur-sm">
+					<form onSubmit={handleSubmit} className="space-y-4">
+						<div className="space-y-2">
+							<label
+								htmlFor="gate-subdomain"
+								className="block text-sm font-medium text-card-foreground"
+							>
+								Company subdomain
+							</label>
+							<input
+								id="gate-subdomain"
+								type="text"
+								value={subdomain}
+								onChange={e => {
+									setSubdomain(e.target.value.toLowerCase())
+									setError(null)
+								}}
+								placeholder="your-company"
+								className="w-full pl-4 pr-4 py-3 bg-input rounded-xl border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+							/>
+							{error && (
+								<div className="flex items-center gap-1.5 text-red-500 mt-1">
+									<AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+									<p className="text-xs">{error}</p>
+								</div>
+							)}
+						</div>
+						<button
+							type="submit"
+							className="w-full py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+						>
+							Continue
+						</button>
+					</form>
+				</div>
+				<p className="text-center mt-6 text-sm text-muted-foreground">
+					Don&apos;t have an account?{' '}
+					<Link href={ROUTES.PUBLIC.AUTH.REGISTER} className="text-primary hover:underline">
+						Sign up
+					</Link>
+				</p>
+			</div>
+		</div>
+	)
+}
+
+const LoginComponent = ({ host = '' }: { host?: string }) => {
+	const hostSubdomain =
+		(typeof host === 'string' && host ? getSubdomainFromHost(host) : null) ??
+		getSubdomainFromHostname()
+	if (!hostSubdomain) return <LoginSubdomainGate />
+
 	const [showPassword, setShowPassword] = useState(false)
 	const { register, handleSubmit, errors, onSubmit } = useLogin()
 
@@ -34,14 +127,6 @@ const LoginComponent = () => {
 				{/* Login Form Card */}
 				<div className="bg-card rounded-xl sm:rounded-3xl shadow-lg border border-border/50 p-4 sm:p-8 backdrop-blur-sm">
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
-						<AuthTextField
-							id="subdomain"
-							label="Subdomain"
-							placeholder="your-company"
-							error={errors.subdomain?.message}
-							register={register('subdomain', subdomainValidation)}
-						/>
-
 						<AuthTextField
 							id="email"
 							label="Email"
