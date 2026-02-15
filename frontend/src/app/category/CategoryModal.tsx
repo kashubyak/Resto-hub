@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/Button'
-import { useDishModal } from '@/hooks/useDishModal'
+import { useCategoryModal } from '@/hooks/useCategoryModal'
 import CloseIcon from '@mui/icons-material/Close'
 import {
 	Dialog,
@@ -9,36 +9,37 @@ import {
 	DialogContent,
 	DialogTitle,
 	IconButton,
+	TextField,
 	useMediaQuery,
 	useTheme,
 } from '@mui/material'
 import { useCallback, useMemo } from 'react'
-import { BasicInformationSection } from './components/modal/BasicInformationSection'
-import { ImageUploadSection } from './components/modal/ImageUploadSection'
-import { IngredientsSection } from './components/modal/IngredientsSection'
-import { NutritionalInfoSection } from './components/modal/NutritionalInfoSection'
-import { PricingCategorySection } from './components/modal/PricingCategorySection'
 
-type DishModalProps = {
+type CategoryModalProps = {
 	open: boolean
 	onClose: () => void
 }
 
-export const DishModal = ({ open, onClose }: DishModalProps) => {
-	const {
-		onSubmit,
-		register,
-		errors,
-		handleSubmit,
-		control,
-		setError,
-		clearErrors,
-		watch,
-	} = useDishModal(onClose)
+const textFieldSx = {
+	'& .MuiOutlinedInput-root': {
+		backgroundColor: 'var(--input)',
+		color: 'var(--foreground)',
+		borderRadius: '8px',
+		'& fieldset': { borderColor: 'var(--border)' },
+		'&:hover fieldset': { borderColor: 'var(--primary)' },
+		'&.Mui-focused fieldset': { borderColor: 'var(--primary)', borderWidth: '1px' },
+	},
+	'& .MuiInputLabel-root': { color: 'var(--muted-foreground)' },
+	'& .MuiInputLabel-root.Mui-focused': { color: 'var(--primary)' },
+	'& .MuiInputBase-input': { color: 'var(--foreground)' },
+}
+
+export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
+	const { onSubmit, register, errors, handleSubmit, isSubmitting } =
+		useCategoryModal(onClose)
 
 	const theme = useTheme()
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-	const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'xl'))
 
 	const safeClose = useCallback(() => {
 		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
@@ -47,16 +48,16 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 
 	const paperSx = useMemo(
 		() => ({
-			width: isMobile ? '100vw' : isTablet ? '960px' : '720px',
+			width: isMobile ? '100vw' : '500px',
 			maxWidth: '100%',
-			height: isMobile ? '100vh' : '90vh',
+			margin: isMobile ? 0 : 32,
 			borderRadius: isMobile ? 0 : '16px',
 			backgroundColor: 'var(--secondary)',
 			color: 'var(--foreground)',
 			display: 'flex',
 			flexDirection: 'column',
 		}),
-		[isMobile, isTablet],
+		[isMobile],
 	)
 
 	return (
@@ -80,44 +81,48 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					fontWeight: 'bold',
 					color: 'var(--stable-light)',
 					borderBottom: '1px solid var(--border)',
-					padding: isMobile ? '1rem 1rem' : '1.5rem 2rem',
+					padding: isMobile ? '1rem' : '1.5rem 2rem',
 					background: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
-					flexShrink: 0,
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
 				}}
 			>
-				<span>🍽️ Create New Dish</span>
-				<IconButton onClick={safeClose}>
+				<span>📁 New Category</span>
+				<IconButton onClick={safeClose} sx={{ color: 'var(--stable-light)' }}>
 					<CloseIcon />
 				</IconButton>
 			</DialogTitle>
 
-			<form
-				onSubmit={handleSubmit(onSubmit)}
-				className='flex flex-1 flex-col overflow-hidden'
-			>
+			<form onSubmit={handleSubmit(onSubmit)} className='flex flex-col flex-1'>
 				<DialogContent
 					sx={{
-						padding: isMobile ? '1rem' : '2rem',
-						flex: 1,
-						overflow: 'hidden',
+						padding: isMobile ? '1.5rem 1rem' : '2rem',
 						display: 'flex',
 						flexDirection: 'column',
+						gap: 3,
 					}}
 				>
-					<div className={`flex-1 overflow-y-auto ${isMobile ? 'space-y-4' : ''}`}>
-						<BasicInformationSection register={register} errors={errors} watch={watch} />
-						<PricingCategorySection register={register} control={control} />
-						<IngredientsSection
-							control={control}
-							errors={errors}
-							setError={setError}
-							clearErrors={clearErrors}
+					<div className='space-y-1'>
+						<TextField
+							fullWidth
+							label='Category Name'
+							error={!!errors.name}
+							helperText={errors.name?.message}
+							variant='outlined'
+							sx={textFieldSx}
+							{...register('name', {
+								required: 'Name is required',
+								minLength: {
+									value: 3,
+									message: 'Name must be at least 3 characters',
+								},
+								maxLength: {
+									value: 50,
+									message: 'Name cannot exceed 50 characters',
+								},
+							})}
 						/>
-						<ImageUploadSection register={register} errors={errors} />
-						<NutritionalInfoSection register={register} errors={errors} />
 					</div>
 				</DialogContent>
 
@@ -125,21 +130,21 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					sx={{
 						padding: isMobile ? '1rem' : '1.5rem 2rem',
 						gap: isMobile ? '0.5rem' : '1rem',
-						justifyContent: isMobile ? 'stretch' : 'flex-end',
 						borderTop: '1px solid var(--border)',
 						flexDirection: isMobile ? 'column-reverse' : 'row',
-						flexShrink: 0,
 					}}
 				>
 					<Button
 						type='button'
 						text='Cancel'
 						onClick={safeClose}
-						className={isMobile ? 'w-full' : ''}
+						className={`bg-transparent border border-border text-foreground hover:bg-muted ${
+							isMobile ? 'w-full' : ''
+						}`}
 					/>
 					<Button
 						type='submit'
-						text='Create'
+						text={isSubmitting ? 'Creating...' : 'Create'}
 						className={`${
 							isMobile ? 'w-full' : 'w-auto px-4 py-2'
 						} bg-success text-foreground hover:bg-success`}
