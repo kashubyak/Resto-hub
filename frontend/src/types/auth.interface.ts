@@ -7,7 +7,11 @@ export interface ILoginRequest {
 }
 
 export interface ILoginResponse {
-	token: string
+	success: boolean
+	user?: {
+		id: number
+		role: string
+	}
 }
 
 export interface IRegisterCompanyRequest {
@@ -29,7 +33,11 @@ export interface IRegisterCompanyResponse {
 }
 
 export interface IRefreshTokenResponse {
-	token: string
+	success: boolean
+	user?: {
+		id: number
+		role: string
+	}
 }
 
 export interface ILogoutResponse {

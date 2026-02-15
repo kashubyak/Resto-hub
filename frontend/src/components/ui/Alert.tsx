@@ -1,12 +1,15 @@
 import { MAX_LENGTH_ALERT } from '@/constants/alert.constant'
+import { formatRetryTime, useRateLimitTimer } from '@/hooks/useRateLimitTimer'
 import type { AlertSeverity } from '@/types/alert.interface'
 import Alert from '@mui/material/Alert'
 import { styled } from '@mui/material/styles'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 interface IAlertProps {
 	severity: AlertSeverity
 	text: string
+	retryAfter?: number
+	onTimerComplete?: () => void
 }
 
 const CustomAlert = styled(Alert)(({ theme }) => ({
@@ -59,14 +62,28 @@ const CustomAlert = styled(Alert)(({ theme }) => ({
 	},
 }))
 
-export const AlertUI = memo<IAlertProps>(({ severity, text }) => {
+export const AlertUI = memo<IAlertProps>(({ severity, text, retryAfter, onTimerComplete }) => {
 	const [expanded, setExpanded] = useState(false)
+	const secondsLeft = useRateLimitTimer(retryAfter)
+
+	useEffect(() => {
+		if (retryAfter !== undefined && secondsLeft === null && onTimerComplete) {
+			onTimerComplete()
+		}
+	}, [secondsLeft, retryAfter, onTimerComplete])
+
 	const isLong = useMemo(() => text.length > MAX_LENGTH_ALERT, [text.length])
 
 	const displayText = useMemo(() => {
-		if (!isLong || expanded) return text
-		return text.slice(0, MAX_LENGTH_ALERT) + '...'
-	}, [text, isLong, expanded])
+		let baseText = text
+
+		if (isLong && !expanded)
+			baseText = text.slice(0, MAX_LENGTH_ALERT) + '...'
+		if (retryAfter !== undefined && secondsLeft !== null && secondsLeft > 0)
+			return `${baseText} Try again in ${formatRetryTime(secondsLeft)}.`
+
+		return baseText
+	}, [text, isLong, expanded, retryAfter, secondsLeft])
 
 	const handleToggle = useCallback(() => setExpanded(prev => !prev), [])
 

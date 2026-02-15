@@ -1,23 +1,9 @@
 import { AUTH } from '@/constants/auth.constant'
-import { convertToDays } from '@/utils/convertToDays'
 import { NextRequest, NextResponse } from 'next/server'
-import { decodeJWT } from './jwt-decoder'
 import { redirectToHome, redirectToLogin, redirectToNotFound } from './redirects'
 import { hasRoleAccess } from './role-guards'
 import { isAuthRoute, isPublicRoute } from './route-guards'
-import { refreshAccessToken } from './token-refresh'
-
-const EXPIRES_IN_DAYS = convertToDays(process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d')
-const MAX_AGE_MS = EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000
-const IS_PRODUCTION = process.env.NODE_ENV === 'production'
-
-const COOKIE_OPTIONS = {
-	httpOnly: false,
-	secure: IS_PRODUCTION,
-	sameSite: 'strict' as const,
-	maxAge: MAX_AGE_MS,
-	path: '/',
-}
+import { type IRefreshResult, refreshAccessToken } from './token-refresh'
 
 const ALERT_COOKIE_OPTIONS = {
 	path: '/',
@@ -31,22 +17,13 @@ const SESSION_EXPIRED_ALERT = JSON.stringify({
 
 export async function authMiddleware(request: NextRequest): Promise<NextResponse> {
 	const { pathname } = request.nextUrl
+
 	if (isPublicRoute(pathname)) return NextResponse.next()
-	const accessToken = request.cookies.get(AUTH.TOKEN)?.value
-	if (isAuthRoute(pathname))
-		return accessToken ? redirectToHome(request) : NextResponse.next()
 
-	if (accessToken) {
-		const decodedToken = decodeJWT(accessToken)
+	const isAuthenticated = request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true'
+	if (isAuthRoute(pathname)) return isAuthenticated ? redirectToHome(request) : NextResponse.next()
 
-		if (decodedToken) {
-			return hasRoleAccess(decodedToken.role, pathname)
-				? NextResponse.next()
-				: redirectToNotFound(request)
-		}
-
-		return handleTokenRefresh(request, pathname)
-	}
+	if (isAuthenticated) return NextResponse.next()
 
 	return handleTokenRefresh(request, pathname)
 }
@@ -57,18 +34,26 @@ async function handleTokenRefresh(
 ): Promise<NextResponse> {
 	const refreshResult = await refreshAccessToken(request)
 
-	if (refreshResult.success && refreshResult.token) {
-		const decodedToken = decodeJWT(refreshResult.token)
-		if (decodedToken && hasRoleAccess(decodedToken.role, pathname))
-			return setNewTokenAndContinue(refreshResult.token)
+	if (refreshResult.success) {
+		if (refreshResult.user) {
+			if (!hasRoleAccess(refreshResult.user.role, pathname)) return redirectToNotFound(request)
+		}
+
+		return forwardCookiesAndContinue(refreshResult)
 	}
 
 	return handleSessionExpired(request, pathname)
 }
 
-function setNewTokenAndContinue(token: string): NextResponse {
+function forwardCookiesAndContinue(refreshResult: IRefreshResult): NextResponse {
 	const response = NextResponse.next()
-	response.cookies.set(AUTH.TOKEN, token, COOKIE_OPTIONS)
+
+	if (refreshResult.setCookieHeaders) {
+		for (const setCookie of refreshResult.setCookieHeaders) {
+			response.headers.append('Set-Cookie', setCookie)
+		}
+	}
+
 	return response
 }
 

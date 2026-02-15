@@ -140,22 +140,11 @@ export const passwordValidation = {
 		hasNumber: (value: string) =>
 			/\d/.test(value) || 'Password must contain at least one number',
 		hasSpecialChar: (value: string) =>
-			/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value) ||
-			'Password must contain at least one special character',
-		noSpaces: (value: string) => !/\s/.test(value) || 'Password cannot contain spaces',
-		noSequential: (value: string) =>
-			!/123|abc|qwerty|password|admin/i.test(value) ||
-			'Password cannot contain common sequences',
-		notTooRepetitive: (value: string) => {
-			const chars = value.split('')
-			const unique = new Set(chars)
-			return (
-				unique.size >= Math.min(4, value.length / 2) ||
-				'Password has too many repeated characters'
-			)
-		},
+			/[@$!%*?&]/.test(value) ||
+			'Password must contain at least one special character (@$!%*?&)',
 		validCharacters: (value: string) =>
-			/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/.test(value) ||
-			'Password contains invalid characters',
+			/^[A-Za-z\d@$!%*?&]+$/.test(value) ||
+			'Password can only contain letters, numbers, and special characters (@$!%*?&)',
+		noSpaces: (value: string) => !/\s/.test(value) || 'Password cannot contain spaces',
 	},
 }

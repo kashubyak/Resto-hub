@@ -1,4 +1,4 @@
-import { type Role } from '@prisma/client'
+import type { Role } from '@prisma/client'
 
 export interface IJwtPayload {
 	sub: number
@@ -21,4 +21,12 @@ export interface ITokenPair {
 
 export interface ITokenResponse {
 	token: string
+}
+
+export interface IAuthResponse {
+	success: boolean
+	user?: {
+		id: number
+		role: Role
+	}
 }

@@ -9,8 +9,5 @@ export const updateDishService = async (
 	data: UpdateDishPayload,
 ): Promise<ApiResponse<IDish>> => {
 	const { id, ...updateData } = data
-	const response = await api.patch<IDish>(API_URL.DISH.ID(id), updateData)
-	console.log('Updated fields:', updateData)
-	console.log('Response:', response)
-	return response
+	return api.patch<IDish>(API_URL.DISH.ID(id), updateData)
 }

@@ -1,6 +1,5 @@
 'use client'
-import { AUTH } from '@/constants/auth.constant'
-import { ROUTES } from '@/constants/pages.constant'
+import { ROUTES, UserRole } from '@/constants/pages.constant'
 import {
 	login as loginRequest,
 	logout as logoutRequest,
@@ -9,8 +8,9 @@ import { getCurrentUser } from '@/services/user/user.service'
 import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILoginRequest } from '@/types/auth.interface'
-import { initApiFromCookies } from '@/utils/api'
+import { initApiSubdomain } from '@/utils/api'
 import { initializeAuth } from '@/utils/auth-helpers'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import Cookies from 'js-cookie'
 import {
 	createContext,
@@ -30,23 +30,27 @@ const AuthContext = createContext<IAuthContext>({
 })
 
 export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
-	const { user, isAuth, hydrated, clearAuth } = useAuthStore()
+	const { user, isAuth, hydrated, clearAuth, setUserRole } = useAuthStore()
 	const { setPendingAlert } = useAlertStore()
 
-	const login = useCallback(async (data: ILoginRequest) => {
-		const response = await loginRequest(data)
-		if (response.status === 200) {
-			initApiFromCookies()
-			const currentUser = await getCurrentUser()
-			initializeAuth(currentUser.data)
-		}
-	}, [])
+	const login = useCallback(
+		async (data: ILoginRequest) => {
+			const response = await loginRequest(data)
+			if (response.status === 200 && response.data.success) {
+				initApiSubdomain()
+
+				if (response.data.user?.role) setUserRole(response.data.user.role as UserRole)
+
+				const currentUser = await getCurrentUser()
+				initializeAuth(currentUser.data, currentUser.data.role as UserRole)
+			}
+		},
+		[setUserRole],
+	)
 
 	const logout = useCallback(async () => {
 		try {
 			const response = await logoutRequest()
-			Cookies.remove(AUTH.TOKEN)
-			Cookies.remove(AUTH.SUBDOMAIN)
 			clearAuth()
 
 			setPendingAlert({
@@ -55,6 +59,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 			})
 			window.location.href = ROUTES.PUBLIC.AUTH.LOGIN
 		} catch {
+			clearAuth()
 			setPendingAlert({
 				severity: 'error',
 				text: 'Logout failed. Please try again later.',
@@ -75,12 +80,19 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 			}
 		}
 
-		if (!user && Cookies.get(AUTH.TOKEN)) {
-			initApiFromCookies()
-			getCurrentUser()
-				.then(current => initializeAuth(current.data))
-				.catch(() => clearAuth())
-		}
+		void getSupabaseClient()
+			.auth.getSession()
+			.then(({ data: { session } }) => {
+				const isAuthenticated = !!session
+				if (!user && isAuthenticated) {
+					initApiSubdomain()
+					return getCurrentUser()
+						.then(current => initializeAuth(current.data, current.data.role as UserRole))
+						.catch(() => clearAuth())
+				}
+				if (!isAuthenticated && user) clearAuth()
+				return undefined
+			})
 	}, [hydrated, user, clearAuth, setPendingAlert])
 
 	const contextValue = useMemo(

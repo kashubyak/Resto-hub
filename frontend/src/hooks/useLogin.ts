@@ -1,23 +1,38 @@
 import { ROUTES } from '@/constants/pages.constant'
+import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
-import { useAlertStore } from '@/store/alert.store'
 import type { ILoginRequest } from '@/types/auth.interface'
+import { getSubdomainFromHostname } from '@/utils/api'
 import { toAxiosError } from '@/utils/errorConverter'
-import { parseBackendError } from '@/utils/errorHandler'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 export const useLogin = () => {
+	const searchParams = useSearchParams()
+	const subdomainFromUrl = searchParams.get('subdomain')
+	const hostnameSubdomain = getSubdomainFromHostname()
+
+	const defaultSubdomain = hostnameSubdomain || subdomainFromUrl || ''
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<ILoginRequest>()
+		setValue,
+	} = useForm<ILoginRequest>({
+		defaultValues: {
+			subdomain: defaultSubdomain,
+		},
+	})
+
+	useEffect(() => {
+		if (defaultSubdomain) setValue('subdomain', defaultSubdomain)
+	}, [defaultSubdomain, setValue])
 
 	const router = useRouter()
 	const { login } = useAuth()
-	const searchParams = useSearchParams()
+	const { showBackendError } = useAlert()
 
 	const onSubmit = useCallback(
 		async (data: ILoginRequest) => {
@@ -29,14 +44,11 @@ export const useLogin = () => {
 					router.push(redirectTo)
 				else router.push('/')
 			} catch (err: unknown) {
-				useAlertStore.getState().setPendingAlert({
-					severity: 'error',
-					text: parseBackendError(toAxiosError(err)).join('\n'),
-				})
+				showBackendError(toAxiosError(err))
 			}
 		},
-		[login, searchParams, router],
+		[login, searchParams, router, showBackendError],
 	)
 
-	return { register, handleSubmit, errors, onSubmit }
+	return { register, handleSubmit, errors, onSubmit, setValue }
 }

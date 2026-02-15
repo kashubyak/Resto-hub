@@ -4,7 +4,6 @@ import {
 	HttpCode,
 	HttpStatus,
 	Post,
-	Req,
 	Res,
 	UploadedFiles,
 	UseInterceptors,
@@ -17,18 +16,16 @@ import {
 	ApiOkResponse,
 	ApiOperation,
 	ApiTags,
+	ApiTooManyRequestsResponse,
 } from '@nestjs/swagger'
+import { Throttle } from '@nestjs/throttler'
 import { Response } from 'express'
 import { Public } from 'src/common/decorators/public.decorator'
-import { IRequestWithCompanyId } from 'src/common/interface/request.interface'
 import { multerOptions } from 'src/common/s3/file-upload.util'
 import { AuthService } from './auth.service'
-import { LoginDto } from './dto/request/login.dto'
 import { RegisterCompanyDto } from './dto/request/register-company.dto'
 import { RegisterCompanyResponseDto } from './dto/response/register-company-response.dto'
 import { ICompanyRegistrationFiles } from './interfaces/file-upload.interface'
-import { ITokenResponse } from './interfaces/jwt.interface'
-
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
@@ -36,6 +33,7 @@ export class AuthController {
 
 	@Post('register-company')
 	@Public()
+	@Throttle({ default: { limit: 3, ttl: 60000 } })
 	@UseInterceptors(
 		FileFieldsInterceptor(
 			[
@@ -51,6 +49,9 @@ export class AuthController {
 		description: 'Company registered successfully.',
 		type: RegisterCompanyResponseDto,
 	})
+	@ApiTooManyRequestsResponse({
+		description: 'Too many registration attempts.',
+	})
 	registerCompany(
 		@Body() dto: RegisterCompanyDto,
 		@UploadedFiles()
@@ -58,50 +59,6 @@ export class AuthController {
 		@Res({ passthrough: true }) res: Response,
 	): Promise<Omit<RegisterCompanyResponseDto, 'refresh_token'>> {
 		return this.authService.registerCompany(dto, files, res)
-	}
-
-	@Post('login')
-	@Public()
-	@HttpCode(HttpStatus.OK)
-	@ApiOperation({
-		description: 'Log in and get JWT token which expires in 1 day.',
-	})
-	@ApiBody({ type: LoginDto })
-	@ApiOkResponse({
-		description: 'Signed in successfully.',
-		schema: {
-			example: {
-				token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-			},
-		},
-	})
-	async login(
-		@Body() dto: LoginDto,
-		@Req() req: IRequestWithCompanyId,
-		@Res({ passthrough: true }) res: Response,
-	): Promise<ITokenResponse> {
-		return this.authService.processLogin(dto, req, res)
-	}
-
-	@Post('refresh')
-	@Public()
-	@HttpCode(HttpStatus.OK)
-	@ApiOperation({
-		description: 'Refresh access token using cookie-based refresh token.',
-	})
-	@ApiOkResponse({
-		description: 'Token refreshed successfully.',
-		schema: {
-			example: {
-				token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-			},
-		},
-	})
-	async refresh(
-		@Req() req: IRequestWithCompanyId,
-		@Res({ passthrough: true }) res: Response,
-	): Promise<ITokenResponse> {
-		return this.authService.processRefresh(req, res)
 	}
 
 	@Post('logout')
