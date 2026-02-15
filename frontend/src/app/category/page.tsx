@@ -1,5 +1,7 @@
 'use client'
 
+import { categoryFilters } from '@/components/elements/Filters/category.filters'
+import { FilterDrawer } from '@/components/elements/Filters/FilterDrawer'
 import { Button } from '@/components/ui/Button'
 import { SearchInput } from '@/components/ui/SearchInput'
 import type { FilterValues } from '@/types/filter.interface'
@@ -41,13 +43,21 @@ export default function CategoryPage() {
 								className='w-full'
 							/>
 						</div>
+
+						<div className='flex-shrink-0'>
+							<FilterDrawer
+								filters={categoryFilters}
+								initialValues={filters}
+								onApply={handleFilterApply}
+								onReset={handleFilterReset}
+							/>
+						</div>
 					</div>
 				</div>
 
 				<CategoryModal open={isModalOpen} onClose={handleModalClose} />
 			</div>
-
-			<CategoryListItem />
+			<CategoryListItem searchQuery={searchQuery} filters={filters} />
 		</div>
 	)
 }

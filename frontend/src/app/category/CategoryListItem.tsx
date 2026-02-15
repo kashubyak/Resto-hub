@@ -31,7 +31,7 @@ const CategoryListItemComponent = ({
 		isFetchingNextPage,
 		isLoading,
 		isError,
-	} = useCategories()
+	} = useCategories(searchQuery, filters)
 
 	const [viewMode, setViewMode] = useState<ViewMode>('grid')
 	const loaderRef = useRef<HTMLDivElement | null>(null)
@@ -50,6 +50,8 @@ const CategoryListItemComponent = ({
 		if (loaderRef.current) observer.observe(loaderRef.current)
 		return () => observer.disconnect()
 	}, [handleIntersection])
+
+	const hasActiveFilters = Object.keys(filters).length > 0
 
 	if (isLoading) {
 		return (
@@ -90,7 +92,11 @@ const CategoryListItemComponent = ({
 			<NotFound
 				icon='📁'
 				title='No Categories Available'
-				message='Looks like there are no categories yet.'
+				message={
+					searchQuery || hasActiveFilters
+						? `No categories found matching your ${searchQuery ? 'search' : 'filters'}`
+						: 'Looks like there are no categories yet.'
+				}
 			/>
 		)
 
