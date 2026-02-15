@@ -4,9 +4,9 @@ import type {
 	ILoginRequest,
 	ILoginResponse,
 	ILogoutResponse,
-	IRefreshTokenResponse,
 } from '@/types/auth.interface'
-import api, { getSubdomainFromHostname, refreshApi, setApiSubdomain } from '@/utils/api'
+import api, { getSubdomainFromHostname, setApiSubdomain } from '@/utils/api'
+import { getSupabaseClient } from '@/lib/supabase/client'
 
 export const login = async (
 	data: ILoginRequest,
@@ -20,35 +20,31 @@ export const login = async (
 
 	setApiSubdomain(subdomain)
 
-	const response = await api.post<ILoginResponse>(
-		API_URL.AUTH.LOGIN,
-		{
-			email: data.email,
-			password: data.password,
+	const supabase = getSupabaseClient()
+	const { data: authData, error } = await supabase.auth.signInWithPassword({
+		email: data.email,
+		password: data.password,
+	})
+
+	if (error) throw error
+	if (!authData.session)
+		throw new Error('Login succeeded but no session returned')
+
+	return {
+		status: 200,
+		statusText: 'OK',
+		headers: {},
+		config: { headers: {} } as never,
+		data: {
+			success: true,
+			user: { id: 0, role: authData.user?.user_metadata?.role ?? 'WAITER' },
 		},
-		{ withCredentials: true },
-	)
-
-	return response
+	} as ApiResponse<ILoginResponse>
 }
 
-/**
- * Refresh access token using httpOnly refresh token cookie.
- * New tokens are set automatically by the backend.
- */
-export const refreshToken = async (): Promise<ApiResponse<IRefreshTokenResponse>> => {
-	const response = await refreshApi.post<IRefreshTokenResponse>(
-		API_URL.AUTH.REFRESH,
-		{},
-		{ withCredentials: true },
-	)
-	return response
-}
-
-/**
- * Logout user and clear all auth cookies on the server.
- */
 export const logout = async (): Promise<ApiResponse<ILogoutResponse>> => {
+	await getSupabaseClient().auth.signOut()
+
 	const response = await api.post<ILogoutResponse>(
 		API_URL.AUTH.LOGOUT,
 		{},

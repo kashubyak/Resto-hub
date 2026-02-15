@@ -5,7 +5,6 @@ interface IPendingAlert {
 	severity: AlertSeverity
 	text: string
 	duration?: number
-	/** Time in seconds until rate limit resets (for 429 errors) */
 	retryAfter?: number
 }
 
@@ -19,8 +18,8 @@ export const useAlertStore = create<IAlertStore>(() => ({
 		if (!isBrowser) return
 		try {
 			localStorage.setItem('pending-alert', JSON.stringify(alert))
-		} catch (error) {
-			console.error('Failed to save alert to localStorage:', error)
+		} catch {
+			//
 		}
 	},
 

@@ -1,8 +1,6 @@
-import { AUTH } from '@/constants/auth.constant'
 import { UserRole } from '@/constants/pages.constant'
 import type { IUser } from '@/types/user.interface'
 import { clearAuth } from '@/utils/auth-helpers'
-import Cookies from 'js-cookie'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
@@ -17,10 +15,6 @@ interface IAuthStore {
 	setHydrated: (state: boolean) => void
 	setUserRole: (role: UserRole | null) => void
 	hasRole: (role: UserRole | UserRole[]) => boolean
-	/**
-	 * Check if user is authenticated based on the is_authenticated cookie
-	 * Note: This cookie is set by the backend alongside the httpOnly access_token
-	 */
 	checkAuthStatus: () => boolean
 	clearAuth: () => void
 }
@@ -45,24 +39,7 @@ export const useAuthStore = create<IAuthStore>()(
 				return userRole === roleOrRoles
 			},
 
-			/**
-			 * Check if user is authenticated by reading the is_authenticated cookie.
-			 * The actual token validation is handled server-side with httpOnly cookies.
-			 */
-			checkAuthStatus: () => {
-				const isAuthenticated = Cookies.get(AUTH.AUTH_STATUS) === 'true'
-				const currentState = get()
-
-				// Update store if cookie state differs from store state
-				if (currentState.isAuth !== isAuthenticated) {
-					set({ isAuth: isAuthenticated })
-					if (!isAuthenticated) {
-						set({ user: null, userRole: null })
-					}
-				}
-
-				return isAuthenticated
-			},
+			checkAuthStatus: () => get().isAuth,
 
 			clearAuth: () => clearAuth(),
 		}),
@@ -72,8 +49,7 @@ export const useAuthStore = create<IAuthStore>()(
 			onRehydrateStorage: () => state => {
 				if (!state) return
 				state.setHydrated(true)
-				// Sync auth status from cookie on hydration
-				state.checkAuthStatus()
+			state.checkAuthStatus()
 			},
 			partialize: state => ({
 				user: state.user,

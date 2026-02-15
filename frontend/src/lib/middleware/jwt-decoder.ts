@@ -35,8 +35,7 @@ export const decodeJWT = (token: string): IJwtPayload | null => {
 		}
 
 		return tokenData
-	} catch (error) {
-		if (process.env.NODE_ENV !== 'production') console.error('Error decoding JWT:', error)
+	} catch {
 		return null
 	}
 }

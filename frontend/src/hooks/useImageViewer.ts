@@ -47,8 +47,8 @@ export const useImageViewer = ({ open, onClose }: UseImageViewerProps) => {
 				await document.exitFullscreen()
 				setIsFullscreen(false)
 			}
-		} catch (error) {
-			console.error('Fullscreen error:', error)
+		} catch {
+			//
 		}
 	}, [])
 

@@ -28,20 +28,20 @@ model Company {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  name         String
-  email        String
-  password     String
-  role         Role
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  avatarUrl    String   @map("avatar_url")
-  companyId    Int
-  cookOrders   Order[]  @relation("CookOrders")
-  waiterOrders Order[]  @relation("WaiterOrders")
-  company      Company  @relation(fields: [companyId], references: [id])
+  id              Int      @id @default(autoincrement())
+  supabaseUserId  String?  @map("supabase_user_id")
+  name            String
+  email           String
+  role            Role
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  avatarUrl       String   @map("avatar_url")
+  companyId       Int
+  cookOrders      Order[]  @relation("CookOrders")
+  waiterOrders    Order[]  @relation("WaiterOrders")
+  company         Company  @relation(fields: [companyId], references: [id])
 
-  @@unique([email, companyId])
+  @@unique([supabaseUserId, companyId])
   @@map("users")
 }
 

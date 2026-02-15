@@ -1,6 +1,6 @@
 # Resto-hub — Restaurant Management System
 
-**Resto-hub** is a restaurant and cafe management system consisting of a backend API and a frontend interface.  
+**Resto-hub** is a restaurant and cafe management system consisting of a backend API and a frontend interface.
 This repository contains both parts of the application:
 
 - `backend/` — REST API built with [NestJS](https://nestjs.com/)
@@ -78,7 +78,7 @@ DATABASE_DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.
 NODE_ENV=test
 ```
 
-> ⚠️ **Important:** 
+> ⚠️ **Important:**
 > - Replace `[PROJECT_REF]`, `[PASSWORD]`, `[REGION]` with your actual Supabase project credentials
 > - Get connection strings from Supabase Dashboard → Project Settings → Database
 > - Never commit `.env` files to version control

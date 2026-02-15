@@ -11,7 +11,6 @@ import {
 	type IUserRepositoryResult,
 	type IUserRepositoryResultOrNull,
 	type IUserWithCompanyIdResult,
-	type IUserWithPasswordResult,
 } from '../interfaces/repository.interface'
 
 const USER_BASE_SELECT = {
@@ -77,6 +76,21 @@ export class UserRepository {
 		}) as Promise<IUserRepositoryResultOrNull>
 	}
 
+	async findUserWithSupabaseId(
+		id: number,
+		companyId: number,
+	): Promise<
+		(IUserRepositoryResult & { supabaseUserId: string | null }) | null
+	> {
+		const user = await this.prisma.user.findFirst({
+			where: { id, companyId },
+			select: { ...USER_BASE_SELECT, supabaseUserId: true } as never,
+		})
+		return user as
+			| (IUserRepositoryResult & { supabaseUserId: string | null })
+			| null
+	}
+
 	async updateUser(
 		id: number,
 		data: IUserUpdateInput,
@@ -89,35 +103,13 @@ export class UserRepository {
 		}) as Promise<IUserRepositoryResult>
 	}
 
-	async findUserWithPassword(
-		id: number,
-		companyId: number,
-	): Promise<IUserWithPasswordResult | null> {
-		return this.prisma.user.findFirst({
-			where: { id, companyId },
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				password: true,
-				role: true,
-				avatarUrl: true,
-			},
-		}) as Promise<IUserWithPasswordResult | null>
-	}
-
 	async findByEmail(
 		email: string,
 		companyId: number,
 	): Promise<IUserFullResultOrNull> {
-		return this.prisma.user.findUnique({
-			where: {
-				email_companyId: {
-					email,
-					companyId,
-				},
-			},
-		})
+		return this.prisma.user.findFirst({
+			where: { email, companyId },
+		}) as Promise<IUserFullResultOrNull>
 	}
 
 	async deleteUser(

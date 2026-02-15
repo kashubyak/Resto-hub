@@ -10,14 +10,18 @@ import {
 	MinLength,
 } from 'class-validator'
 
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
+const PASSWORD_REGEX =
+	/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
 
 export class RegisterCompanyDto {
 	@ApiProperty({ description: 'Company name', example: 'My Restaurant' })
 	@IsString()
 	name!: string
 
-	@ApiProperty({ description: 'Subdomain for the company', example: 'myrestaurant' })
+	@ApiProperty({
+		description: 'Subdomain for the company',
+		example: 'myrestaurant',
+	})
 	@IsString()
 	subdomain!: string
 

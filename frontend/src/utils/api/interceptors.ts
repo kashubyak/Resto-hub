@@ -1,12 +1,12 @@
 import { API_URL } from '@/config/api'
 import { ROUTES } from '@/constants/pages.constant'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import {
 	completeNetworkRequest,
 	failNetworkRequest,
 	startNetworkRequest,
 	updateNetworkProgress,
 } from '@/hooks/useNetworkProgress'
-import { refreshToken } from '@/services/auth/auth.service'
 import { useAlertStore } from '@/store/alert.store'
 import type { CustomAxiosRequestConfig } from '@/types/axios.interface'
 import type { IAxiosError } from '@/types/error.interface'
@@ -17,7 +17,7 @@ import { getIsRefreshing, processQueue, pushToQueue, setIsRefreshing } from './a
 import { api } from './axiosInstances'
 import { getGlobalShowAlert } from './globalAlert'
 
-api.interceptors.request.use(config => {
+api.interceptors.request.use(async config => {
 	const requestId = startNetworkRequest(config.url || 'unknown')
 	config.headers['X-Request-ID'] = requestId
 
@@ -26,6 +26,13 @@ api.interceptors.request.use(config => {
 	}
 
 	config.withCredentials = true
+
+	if (typeof window !== 'undefined') {
+		const { data: { session } } = await getSupabaseClient().auth.getSession()
+		if (session?.access_token) {
+			config.headers.Authorization = `Bearer ${session.access_token}`
+		}
+	}
 
 	return config
 })
@@ -50,18 +57,6 @@ api.interceptors.response.use(
 		const shouldHideGlobalError = originalRequest?._hideGlobalError === true
 
 		if (error.response?.status === 401 && !originalRequest._retry) {
-			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
-				if (typeof window !== 'undefined') {
-					clearAuth()
-					useAlertStore.getState().setPendingAlert({
-						severity: 'warning',
-						text: 'Your session has expired. Please log in again.',
-					})
-					window.location.href = ROUTES.PUBLIC.AUTH.LOGIN
-				}
-				return Promise.reject(error)
-			}
-
 			if (getIsRefreshing()) {
 				return new Promise((resolve, reject) => {
 					pushToQueue(resolve, reject)
@@ -80,25 +75,28 @@ api.interceptors.response.use(
 			setIsRefreshing(true)
 
 			try {
-				const { data } = await refreshToken()
+				const { data: { session } } =
+					await getSupabaseClient().auth.refreshSession()
 
-				if (data.success) {
+				if (session?.access_token) {
 					processQueue(null, null)
 
 					originalRequest.headers = originalRequest.headers || {}
+					originalRequest.headers.Authorization = `Bearer ${session.access_token}`
 					originalRequest.headers['X-Request-ID'] = startNetworkRequest(
-						originalRequest.url || 'refresh-retry',
+						originalRequest.url || 'retry',
 					)
 
 					return api(originalRequest)
 				}
 
-				throw new Error('Token refresh failed')
+				throw new Error('Session refresh failed')
 			} catch (err) {
 				processQueue(err, null)
 
 				if (typeof window !== 'undefined') {
 					clearAuth()
+					getSupabaseClient().auth.signOut()
 
 					const currentPath = window.location.pathname
 					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(

@@ -43,9 +43,7 @@ export async function refreshAccessToken(request: NextRequest): Promise<IRefresh
 			setCookieHeaders,
 			user: data.user,
 		}
-	} catch (error) {
-		if (process.env.NODE_ENV !== 'production') console.error('Token refresh error:', error)
-
+	} catch {
 		return { success: false, error: 'Network error' }
 	}
 }

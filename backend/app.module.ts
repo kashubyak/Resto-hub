@@ -5,8 +5,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { join } from 'path';
 import { PrismaService } from 'prisma/prisma.service';
-import { JwtAuthGuard } from 'src/api/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/api/auth/guards/roles.guard';
+import { SupabaseJwtStrategy } from 'src/api/auth/strategies/supabase-jwt.strategy';
 import { CategoryModule } from 'src/api/category/category.module';
 import { CompanyModule } from 'src/api/company/company.module';
 import { DishModule } from 'src/api/dish/dish.module';
@@ -54,7 +54,7 @@ import { AuthModule } from './src/api/auth/auth.module';
     },
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
+      useClass: SupabaseJwtStrategy,
     },
     {
       provide: APP_GUARD,

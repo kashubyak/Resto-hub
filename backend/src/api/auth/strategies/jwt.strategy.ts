@@ -10,9 +10,8 @@ import { IJwtUser } from '../interfaces/user.interface'
 const ACCESS_TOKEN_COOKIE = 'access_token'
 
 const cookieExtractor = (req: Request): string | null => {
-	if (req?.cookies?.[ACCESS_TOKEN_COOKIE])
-		return req.cookies[ACCESS_TOKEN_COOKIE] as string
-	return null
+	const value = req.cookies[ACCESS_TOKEN_COOKIE] as string | undefined
+	return typeof value === 'string' ? value : null
 }
 
 @Injectable()

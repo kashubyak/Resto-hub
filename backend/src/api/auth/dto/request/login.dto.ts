@@ -1,7 +1,8 @@
 import { IsEmail, IsString, Matches, MinLength } from '@nestjs/class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
+const PASSWORD_REGEX =
+	/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
 
 export class LoginDto {
 	@ApiProperty({

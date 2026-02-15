@@ -1,5 +1,4 @@
 'use client'
-import { AUTH } from '@/constants/auth.constant'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
 import {
 	login as loginRequest,
@@ -11,6 +10,7 @@ import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILoginRequest } from '@/types/auth.interface'
 import { initApiSubdomain } from '@/utils/api'
 import { initializeAuth } from '@/utils/auth-helpers'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import Cookies from 'js-cookie'
 import {
 	createContext,
@@ -80,14 +80,19 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 			}
 		}
 
-		const isAuthenticated = Cookies.get(AUTH.AUTH_STATUS) === 'true'
-
-		if (!user && isAuthenticated) {
-			initApiSubdomain()
-			getCurrentUser()
-				.then(current => initializeAuth(current.data, current.data.role as UserRole))
-				.catch(() => clearAuth())
-		}
+		void getSupabaseClient()
+			.auth.getSession()
+			.then(({ data: { session } }) => {
+				const isAuthenticated = !!session
+				if (!user && isAuthenticated) {
+					initApiSubdomain()
+					return getCurrentUser()
+						.then(current => initializeAuth(current.data, current.data.role as UserRole))
+						.catch(() => clearAuth())
+				}
+				if (!isAuthenticated && user) clearAuth()
+				return undefined
+			})
 	}, [hydrated, user, clearAuth, setPendingAlert])
 
 	const contextValue = useMemo(
