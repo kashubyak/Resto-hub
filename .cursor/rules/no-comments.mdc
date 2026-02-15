@@ -1,0 +1,11 @@
+---
+description: No comments in source code
+globs: **/*.{ts,tsx,js,jsx,vue,css,scss,html}
+alwaysApply: false
+---
+
+# No comments in code
+
+Do **not** write any comments in source code — no line comments (`//`), no block comments (`/* */`), no JSDoc, no explanatory comments.
+
+Code should be self-documenting; do not add explanations in comments.

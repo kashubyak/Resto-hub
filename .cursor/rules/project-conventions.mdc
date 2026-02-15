@@ -1,0 +1,32 @@
+---
+description: Package managers and agent behavior for Resto-hub
+alwaysApply: true
+---
+
+# Project Conventions
+
+## Package managers
+
+- **Backend** (folder `backend/`): use **yarn** only (yarn install, yarn add, yarn run, etc.).
+- **Frontend** (folder `frontend/`): use **bun** only (bun install, bun add, bun run, etc.).
+
+## Agent mode — do not run these commands
+
+In agent mode **do not run** these or similar commands:
+
+- Build: `build`, `yarn build`, `bun run build`, `npm run build`
+- Package installs: `install`, `yarn install`, `bun install`, `npm install`, `yarn add`, `bun add`
+- Lint / checks: `lint`, `yarn lint`, `bun run lint`, `eslint`, `tsc --noEmit` as standalone check commands
+- Other long or “verification” commands of the same kind
+
+Only write and edit code; leave running build, install, and lint to the user.
+
+## What to specify at the end
+
+After making code changes **briefly state at the end of your response** what the user should run manually, when relevant:
+
+- Dependencies added or changed in `backend/` → e.g. “In backend run: `yarn install`”
+- Dependencies added or changed in `frontend/` → e.g. “In frontend run: `bun install`”
+- Changes after which build or checks are useful → e.g. “You can then run `yarn build` in backend” or “Check with: `yarn lint` and `yarn tsc --noEmit`”
+
+Do not run these commands yourself — only explicitly list which commands to run and in which folder.
