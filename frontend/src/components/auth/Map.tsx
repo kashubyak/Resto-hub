@@ -1,8 +1,8 @@
 'use client'
 
+import { usePrefersColorScheme } from '@/hooks/usePrefersColorScheme'
 import L from 'leaflet'
 import { useEffect, useRef } from 'react'
-import { usePrefersColorScheme } from '@/hooks/usePrefersColorScheme'
 
 interface MapProps {
 	center?: [number, number]

@@ -1,14 +1,8 @@
 'use client'
 
-import dynamic from 'next/dynamic'
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
 import { LocationSearch } from '@/components/auth/LocationSearch'
 import { MapPanel } from '@/components/auth/MapPanel'
-
-const Map = dynamic(
-	() => import('@/components/auth/Map').then((m) => ({ default: m.Map })),
-	{ ssr: false },
-)
 import { UploadImage } from '@/components/elements/UploadImage'
 import { ROUTES } from '@/constants/pages.constant'
 import { useRegisterCompany } from '@/hooks/useRegisterCompany'
@@ -20,8 +14,14 @@ import {
 	subdomainValidation,
 } from '@/validation/register.validation'
 import { AlertCircle, Building2, Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { memo, useCallback, useState } from 'react'
+
+const Map = dynamic(
+	() => import('@/components/auth/Map').then((m) => ({ default: m.Map })),
+	{ ssr: false },
+)
 
 const inputBase =
 	'w-full pl-12 pr-4 py-3 bg-input rounded-xl border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all'
@@ -172,7 +172,7 @@ const RegisterCompanyComponent = () => {
 											{!errors.subdomain?.message && (
 												<p className="text-xs text-muted-foreground mt-1">
 													{(watch('subdomain') ?? '')
-														? `${watch('subdomain') ?? ''}.yourdomain.com`
+														? `${watch('subdomain') ?? ''}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'}`
 														: 'Your unique login address'}
 												</p>
 											)}

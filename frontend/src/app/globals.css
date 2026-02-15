@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 @import 'leaflet/dist/leaflet.css';
 
 :root {
@@ -119,6 +120,44 @@
 	background-size: 1000px 100%;
 }
 
+@keyframes success-icon-ping {
+	75%,
+	100% {
+		transform: scale(2);
+		opacity: 0;
+	}
+}
+
+@keyframes success-icon-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+.animate-ping {
+	animation: success-icon-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-pulse {
+	animation: success-icon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.success-icon-circle {
+	background-image: linear-gradient(
+		to bottom,
+		#b9a1e0,
+		#8d7bb9
+	);
+	/* Soft purple glow beneath the circle */
+	box-shadow:
+		0 6px 20px -4px rgba(185, 161, 224, 0.45),
+		0 10px 28px -6px rgba(141, 123, 185, 0.35);
+}
+
 .location-dropdown-scroll::-webkit-scrollbar {
 	width: 8px;
 }
@@ -194,6 +233,9 @@ html {
 	}
 	.text-primary-foreground {
 		color: var(--primary-foreground);
+	}
+	.text-white {
+		color: #ffffff;
 	}
 	.bg-secondary {
 		background-color: var(--secondary);
@@ -302,5 +344,8 @@ html {
 	}
 	.bg-red-500\/5 {
 		background-color: color-mix(in oklab, #ef4444 5%, transparent);
+	}
+	.hover\:bg-input\/80:hover {
+		background-color: color-mix(in oklab, var(--input) 80%, transparent);
 	}
 }

@@ -1,13 +1,14 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
+import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { getCompanyUrl } from '@/utils/api'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Check, Copy, ExternalLink, LayoutDashboard } from 'lucide-react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { memo, useCallback } from 'react'
 
 const RegisterCompanySuccessComponent = () => {
-	const router = useRouter()
 	const searchParams = useSearchParams()
 	const { copy, copied } = useCopyToClipboard()
 
@@ -19,56 +20,99 @@ const RegisterCompanySuccessComponent = () => {
 	}, [companyUrl, copy])
 
 	return (
-		<div className='flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50'>
-			<div className='bg-white rounded-lg shadow-lg p-8 max-w-md w-full'>
-				<div className='text-center mb-6'>
-					<div className='w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-						<svg
-							className='w-8 h-8 text-green-600'
-							fill='none'
-							stroke='currentColor'
-							viewBox='0 0 24 24'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								strokeWidth={2}
-								d='M5 13l4 4L19 7'
+		<div className="min-h-screen w-full flex items-center justify-center bg-background px-2 sm:px-4 py-4 sm:py-8 relative overflow-x-hidden">
+			<BackgroundDecorations />
+
+			<div className="w-full max-w-lg relative z-10">
+				<div className="bg-card rounded-xl sm:rounded-3xl shadow-lg border border-border/50 p-6 sm:p-10 backdrop-blur-sm">
+					<div className="flex justify-center mb-6 sm:mb-8">
+						<div className="relative w-20 h-20 sm:w-24 sm:h-24">
+							<div
+								className="absolute inset-0 rounded-full pointer-events-none"
+								style={{
+									backgroundColor: 'color-mix(in oklab, var(--primary) 20%, transparent)',
+									animation: 'success-icon-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+								}}
 							/>
-						</svg>
+							<div
+								className="absolute inset-0 rounded-full pointer-events-none"
+								style={{
+									backgroundColor: 'color-mix(in oklab, var(--primary) 10%, transparent)',
+									animation: 'success-icon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+								}}
+							/>
+							<div className="relative w-full h-full rounded-full success-icon-circle flex items-center justify-center">
+								<Check
+									className="w-10 h-10 sm:w-12 sm:h-12 text-white stroke-[3]"
+									strokeWidth={3}
+								/>
+							</div>
+						</div>
 					</div>
-					<h1 className='text-2xl font-bold text-gray-900 mb-2'>
-						Company Registered Successfully!
-					</h1>
-					<p className='text-gray-600'>
-						Share this link with your team members to access your company portal.
-					</p>
-				</div>
 
-				<div className='mb-6'>
-					<label className='block text-sm font-medium text-gray-700 mb-2'>
-						Company Link
-					</label>
-					<div className='flex gap-2'>
-						<input
-							type='text'
-							value={companyUrl}
-							readOnly
-							className='flex-1 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
-						/>
-						<Button onClick={handleCopy} type='button'>
-							{copied ? 'Copied!' : 'Copy Link'}
-						</Button>
+					<div className="text-center mb-6 sm:mb-8">
+						<h1 className="text-2xl sm:text-3xl font-semibold text-foreground mb-2 sm:mb-3">
+							Company Registered Successfully!
+						</h1>
+						<p className="text-sm sm:text-base text-muted-foreground">
+							Your company portal is ready. Share the link below with your team.
+						</p>
 					</div>
-					<p className='mt-2 text-xs text-gray-500'>
-						This link will take users directly to your company login page
-					</p>
-				</div>
 
-				<div className='flex gap-3'>
-					<Button onClick={() => router.push('/')} className='flex-1'>
-						Go to Dashboard
-					</Button>
+					<div className="space-y-4 mb-6">
+						<label className="block text-sm font-medium text-card-foreground">
+							Company Link
+						</label>
+						<div className="flex gap-2">
+							<div className="flex-1 relative">
+								<input
+									type="text"
+									value={companyUrl}
+									readOnly
+									className="w-full px-4 py-3 bg-input rounded-xl border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+								/>
+							</div>
+							<button
+								type="button"
+								onClick={handleCopy}
+								className="px-4 sm:px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center gap-2 whitespace-nowrap"
+							>
+								{copied ? (
+									<>
+										<Check className="w-4 h-4" />
+										<span className="hidden sm:inline">Copied!</span>
+									</>
+								) : (
+									<>
+										<Copy className="w-4 h-4" />
+										<span className="hidden sm:inline">Copy</span>
+									</>
+								)}
+							</button>
+						</div>
+						<p className="text-xs text-muted-foreground">
+							This link will take users directly to your company login page
+						</p>
+					</div>
+
+					<div className="flex flex-col gap-3">
+						<Link
+							href="/"
+							className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+						>
+							<LayoutDashboard className="w-4 h-4" />
+							Go to Dashboard
+						</Link>
+						<a
+							href={companyUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="w-full px-6 py-3 bg-input text-foreground rounded-xl font-medium hover:bg-input/80 border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+						>
+							<ExternalLink className="w-4 h-4" />
+							Open Company Portal
+						</a>
+					</div>
 				</div>
 			</div>
 		</div>
