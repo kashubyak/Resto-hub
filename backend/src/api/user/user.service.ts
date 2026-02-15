@@ -4,9 +4,9 @@ import {
 	NotFoundException,
 } from '@nestjs/common'
 import { Role } from '@prisma/client'
-import * as bcrypt from 'bcryptjs'
 import { folder_avatar } from 'src/common/constants'
 import { type IPaginatedResponse } from 'src/common/interface/pagination.interface'
+import { SupabaseService } from 'src/common/supabase/supabase.service'
 import { S3Service } from 'src/common/s3/s3.service'
 import { RegisterDto } from '../auth/dto/request/register.dto'
 import { FilterUserDto } from './dto/request/filter-user.dto'
@@ -22,6 +22,7 @@ import { UserRepository } from './repository/user.repository'
 export class UserService {
 	constructor(
 		private readonly userRepository: UserRepository,
+		private readonly supabase: SupabaseService,
 		private readonly s3Service: S3Service,
 	) {}
 
@@ -38,17 +39,32 @@ export class UserService {
 		if (existingUser) throw new BadRequestException('Email already exists')
 		if (dto.role === Role.ADMIN)
 			throw new BadRequestException('Cannot assign ADMIN role')
-		const hashedPassword = await bcrypt.hash(dto.password, 10)
+
+		const { data: supabaseUser, error: supabaseError } = await this.supabase
+			.getClient()
+			.auth.admin.createUser({
+				email: dto.email,
+				password: dto.password,
+				email_confirm: true,
+				user_metadata: { name: dto.name },
+			})
+		if (supabaseError) {
+			if (supabaseError.message.includes('already been registered'))
+				throw new BadRequestException('Email already exists')
+			throw new BadRequestException(supabaseError.message)
+		}
+		if (!supabaseUser.user.id)
+			throw new BadRequestException('Failed to create Supabase user')
+
 		const avatarUrl = await this.s3Service.uploadFile(file, folder_avatar)
 		const user = await this.userRepository.createUser(
 			{
+				supabaseUserId: supabaseUser.user.id,
 				name: dto.name,
 				email: dto.email,
-				password: hashedPassword,
 				role: dto.role,
 				avatarUrl,
-				companyId,
-			},
+			} as never,
 			companyId,
 		)
 
@@ -122,7 +138,7 @@ export class UserService {
 		file: Express.Multer.File | undefined,
 		companyId: number,
 	): Promise<IUserRepositoryResult> {
-		const user = await this.userRepository.findUserWithPassword(id, companyId)
+		const user = await this.userRepository.findUserWithSupabaseId(id, companyId)
 		if (!user) throw new NotFoundException(`User with ID ${id} not found`)
 
 		if (dto.role === Role.ADMIN)
@@ -136,17 +152,13 @@ export class UserService {
 			if (existingEmail) throw new BadRequestException('Email already exists')
 		}
 
-		if (dto.password) {
-			if (!dto.oldPassword)
-				throw new BadRequestException(
-					'Old password is required to set new password',
-				)
-			if (dto.oldPassword && !dto.password)
-				throw new BadRequestException('New password is required')
-
-			const isMatch = await bcrypt.compare(dto.oldPassword, user.password)
-			if (!isMatch) throw new BadRequestException('Old password is incorrect')
-			dto.password = await bcrypt.hash(dto.password, 10)
+		if (dto.password && user.supabaseUserId) {
+			const { error } = await this.supabase
+				.getClient()
+				.auth.admin.updateUserById(user.supabaseUserId, {
+					password: dto.password,
+				})
+			if (error) throw new BadRequestException(error.message)
 		}
 
 		let avatarUrl = user.avatarUrl
@@ -155,7 +167,7 @@ export class UserService {
 			avatarUrl = await this.s3Service.uploadFile(file, folder_avatar)
 		}
 
-		const { oldPassword: _oldPassword, ...safeData } = dto
+		const { oldPassword: _oldPassword, password: _password, ...safeData } = dto
 		return this.userRepository.updateUser(
 			id,
 			{

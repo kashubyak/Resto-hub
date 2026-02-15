@@ -26,6 +26,7 @@ const AlertInitializer = () => {
 				severity: pending.severity,
 				text: pending.text,
 				duration: pending.duration,
+				retryAfter: pending.retryAfter,
 			})
 	}, [showAlert])
 

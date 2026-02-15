@@ -4,7 +4,7 @@ import { useAlert } from '@/providers/AlertContext'
 import CloseIcon from '@mui/icons-material/Close'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 import { AlertUI } from '../ui/Alert'
 
 const AlertContainer = styled('div')(() => ({
@@ -24,6 +24,14 @@ const AlertContainer = styled('div')(() => ({
 
 function AlertDisplayComponent() {
 	const { alerts, removeAlert, pauseAlertTimer, resumeAlertTimer } = useAlert()
+
+	const handleTimerComplete = useCallback(
+		(alertId: string) => {
+			removeAlert(alertId)
+		},
+		[removeAlert],
+	)
+
 	if (alerts.length === 0) return null
 
 	return (
@@ -35,7 +43,12 @@ function AlertDisplayComponent() {
 					onMouseEnter={() => pauseAlertTimer(alert.id)}
 					onMouseLeave={() => resumeAlertTimer(alert.id)}
 				>
-					<AlertUI severity={alert.severity} text={alert.text} />
+					<AlertUI
+						severity={alert.severity}
+						text={alert.text}
+						retryAfter={alert.retryAfter}
+						onTimerComplete={() => handleTimerComplete(alert.id)}
+					/>
 					<IconButton
 						size='small'
 						onClick={() => removeAlert(alert.id)}

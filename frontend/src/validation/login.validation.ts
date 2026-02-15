@@ -45,15 +45,21 @@ export const emailValidation = {
 export const passwordValidation = {
 	required: 'Password is required',
 	validate: {
-		minLength: (value: string) => value.length >= 1 || 'Password cannot be empty',
+		minLength: (value: string) =>
+			value.length >= 8 || 'Password must be at least 8 characters long',
 		maxLength: (value: string) => value.length <= 128 || 'Password is too long',
+		hasUppercase: (value: string) =>
+			/[A-Z]/.test(value) || 'Password must contain at least one uppercase letter',
+		hasLowercase: (value: string) =>
+			/[a-z]/.test(value) || 'Password must contain at least one lowercase letter',
+		hasNumber: (value: string) =>
+			/\d/.test(value) || 'Password must contain at least one number',
+		hasSpecialChar: (value: string) =>
+			/[@$!%*?&]/.test(value) ||
+			'Password must contain at least one special character (@$!%*?&)',
 		validCharacters: (value: string) =>
-			/^[\x20-\x7E\u00A0-\uFFFF]*$/.test(value) || 'Password contains invalid characters',
-		noOnlySpaces: (value: string) =>
-			value.trim().length > 0 || 'Password cannot contain only spaces',
-		notCommonWeak: (value: string) => {
-			const weak = ['123456', 'password', 'admin', '12345678', 'qwerty', 'abc123']
-			return !weak.includes(value.toLowerCase()) || 'This password is too common and weak'
-		},
+			/^[A-Za-z\d@$!%*?&]+$/.test(value) ||
+			'Password can only contain letters, numbers, and special characters (@$!%*?&)',
+		noSpaces: (value: string) => !/\s/.test(value) || 'Password cannot contain spaces',
 	},
 }

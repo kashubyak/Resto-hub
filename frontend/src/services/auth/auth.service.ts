@@ -1,57 +1,55 @@
 import { API_URL } from '@/config/api'
-import { AUTH } from '@/constants/auth.constant'
 import type { ApiResponse } from '@/types/api.interface'
 import type {
 	ILoginRequest,
 	ILoginResponse,
 	ILogoutResponse,
-	IRefreshTokenResponse,
 } from '@/types/auth.interface'
-import api, { refreshApi, setApiSubdomain } from '@/utils/api'
-import { convertToDays } from '@/utils/convertToDays'
-import Cookies from 'js-cookie'
+import api, { getSubdomainFromHostname, setApiSubdomain } from '@/utils/api'
+import { getSupabaseClient } from '@/lib/supabase/client'
 
 export const login = async (
 	data: ILoginRequest,
 ): Promise<ApiResponse<ILoginResponse>> => {
-	Cookies.set(AUTH.SUBDOMAIN, data.subdomain, {
-		expires: 365,
-		secure: true,
-		sameSite: 'strict',
-	})
-	setApiSubdomain(data.subdomain)
+	const hostnameSubdomain = getSubdomainFromHostname()
+	const subdomain = hostnameSubdomain || data.subdomain
 
-	const response = await api.post<ILoginResponse>(API_URL.AUTH.LOGIN, {
+	if (hostnameSubdomain && hostnameSubdomain !== data.subdomain) {
+		throw new Error('Subdomain mismatch: URL subdomain does not match input')
+	}
+
+	setApiSubdomain(subdomain)
+
+	const supabase = getSupabaseClient()
+	const { data: authData, error } = await supabase.auth.signInWithPassword({
 		email: data.email,
 		password: data.password,
 	})
 
-	if (response.data?.token) {
-		const TOKEN_EXPIRES_IN = process.env.NEXT_PUBLIC_JWT_EXPIRES_IN || '1d'
-		Cookies.set(AUTH.TOKEN, response.data.token, {
-			expires: convertToDays(TOKEN_EXPIRES_IN),
-			secure: true,
-			sameSite: 'strict',
-		})
-	}
+	if (error) throw error
+	if (!authData.session)
+		throw new Error('Login succeeded but no session returned')
 
-	return response
-}
-
-export const refreshToken = async (): Promise<ApiResponse<IRefreshTokenResponse>> => {
-	const response = await refreshApi.post<IRefreshTokenResponse>(
-		API_URL.AUTH.REFRESH,
-		{},
-		{ withCredentials: true },
-	)
-	return response
+	return {
+		status: 200,
+		statusText: 'OK',
+		headers: {},
+		config: { headers: {} } as never,
+		data: {
+			success: true,
+			user: { id: 0, role: authData.user?.user_metadata?.role ?? 'WAITER' },
+		},
+	} as ApiResponse<ILoginResponse>
 }
 
 export const logout = async (): Promise<ApiResponse<ILogoutResponse>> => {
+	await getSupabaseClient().auth.signOut()
+
 	const response = await api.post<ILogoutResponse>(
 		API_URL.AUTH.LOGOUT,
 		{},
 		{ withCredentials: true },
 	)
+
 	return response
 }

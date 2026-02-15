@@ -34,7 +34,7 @@ export const DishActions = ({ id }: { id: number }) => {
 						</Button>
 						<Button
 							className='h-10 inline-flex items-center justify-center font-semibold'
-							onClick={() => console.log('Assign category')}
+							onClick={() => {}}
 						>
 							<Category className='w-4 h-4 mr-2' />
 							Assign Category

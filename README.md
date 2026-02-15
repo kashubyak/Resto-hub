@@ -1,6 +1,6 @@
 # Resto-hub — Restaurant Management System
 
-**Resto-hub** is a restaurant and cafe management system consisting of a backend API and a frontend interface.  
+**Resto-hub** is a restaurant and cafe management system consisting of a backend API and a frontend interface.
 This repository contains both parts of the application:
 
 - `backend/` — REST API built with [NestJS](https://nestjs.com/)
@@ -78,7 +78,7 @@ DATABASE_DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.
 NODE_ENV=test
 ```
 
-> ⚠️ **Important:** 
+> ⚠️ **Important:**
 > - Replace `[PROJECT_REF]`, `[PASSWORD]`, `[REGION]` with your actual Supabase project credentials
 > - Get connection strings from Supabase Dashboard → Project Settings → Database
 > - Never commit `.env` files to version control
@@ -107,6 +107,23 @@ yarn start:dev
 
 The API will be available at: `http://localhost:3000`
 Swagger documentation: `http://localhost:3000/api/docs#/`
+
+### Local development with subdomains
+
+The app uses subdomains for company context (e.g. `mycompany.localhost`). For login and all company-scoped features to work locally:
+
+1. Add your company subdomain to `/etc/hosts`:
+   ```
+   127.0.0.1 mycompany.localhost
+   ```
+   Replace `mycompany` with your actual subdomain from registration.
+
+2. Include the subdomain origin in `ALLOWED_ORIGINS` in backend `.env`:
+   ```
+   ALLOWED_ORIGINS=http://localhost:3001,http://mycompany.localhost:3001
+   ```
+
+3. Open the app at `http://mycompany.localhost:3001` instead of `http://localhost:3001`.
 
 ## Running Tests
 

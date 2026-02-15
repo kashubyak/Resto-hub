@@ -1,9 +1,10 @@
 import { API_URL } from '@/config/api'
 import { NextRequest } from 'next/server'
 
-interface IRefreshResult {
+export interface IRefreshResult {
 	success: boolean
-	token?: string
+	setCookieHeaders?: string[]
+	user?: { id: number; role: string }
 	error?: string
 }
 
@@ -30,14 +31,19 @@ export async function refreshAccessToken(request: NextRequest): Promise<IRefresh
 		})
 
 		if (!response.ok) return { success: false, error: `HTTP ${response.status}` }
-		const data = await response.json()
 
-		return data.token
-			? { success: true, token: data.token }
-			: { success: false, error: 'No token in response' }
-	} catch (error) {
-		if (process.env.NODE_ENV !== 'production')
-			console.error('Token refresh error:', error)
+		const data = (await response.json()) as { success: boolean; user?: { id: number; role: string } }
+
+		if (!data.success) return { success: false, error: 'Refresh failed' }
+
+		const setCookieHeaders = response.headers.getSetCookie()
+
+		return {
+			success: true,
+			setCookieHeaders,
+			user: data.user,
+		}
+	} catch {
 		return { success: false, error: 'Network error' }
 	}
 }

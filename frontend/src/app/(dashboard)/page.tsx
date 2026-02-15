@@ -8,9 +8,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser'
 export default function DashboardPage() {
 	const { user, userRole, hasRole } = useCurrentUser()
 
-	const handleAdminActions = () => {
-		console.log('Admin Actions')
-	}
+	const handleAdminActions = () => {}
 
 	return (
 		<SafeRender title='Loading Dashboard...' showNetworkProgress>

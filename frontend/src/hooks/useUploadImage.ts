@@ -13,8 +13,11 @@ type UseUploadImageParams = {
 
 const createFileFromBase64 = (base64: string, fileName: string = 'image.jpg'): File => {
 	const arr = base64.split(',')
-	const mime = arr[0].match(/:(.*?);/)![1]
-	const bstr = atob(arr[1])
+	const match = arr[0]?.match(/:(.*?);/)
+	const mime = match?.[1] ?? 'image/jpeg'
+	const base64Data = arr[1]
+	if (!base64Data) throw new Error('Invalid base64 string: missing data part')
+	const bstr = atob(base64Data)
 	let n = bstr.length
 	const u8arr = new Uint8Array(n)
 	while (n--) {

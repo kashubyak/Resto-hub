@@ -8,113 +8,92 @@ datasource db {
   directUrl = env("DATABASE_DIRECT_URL")
 }
 
-enum Role {
-  ADMIN
-  COOK
-  WAITER
-}
-
-enum OrderStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETE
-  DELIVERED
-  FINISHED
-  CANCELED
-}
-
 model Company {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  subdomain String   @unique
-  address   String
-  latitude  Float
-  longitude Float
-  logoUrl   String   @map("logo_url")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  users      User[]
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  address    String
+  latitude   Float
+  longitude  Float
+  logoUrl    String     @map("logo_url")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  subdomain  String     @unique
   categories Category[]
   dishes     Dish[]
   orders     Order[]
   tables     Table[]
+  users      User[]
 
   @@map("companies")
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String
-  password  String
-  role      Role
-  avatarUrl String   @map("avatar_url")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id              Int      @id @default(autoincrement())
+  supabaseUserId  String?  @map("supabase_user_id")
+  name            String
+  email           String
+  role            Role
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  avatarUrl       String   @map("avatar_url")
+  companyId       Int
+  cookOrders      Order[]  @relation("CookOrders")
+  waiterOrders    Order[]  @relation("WaiterOrders")
+  company         Company  @relation(fields: [companyId], references: [id])
 
-  companyId Int
-  company   Company @relation(fields: [companyId], references: [id])
-
-  waiterOrders Order[] @relation("WaiterOrders")
-  cookOrders   Order[] @relation("CookOrders")
-
-  @@unique([email, companyId])
+  @@unique([supabaseUserId, companyId])
   @@map("users")
 }
 
 model Category {
   id        Int      @id @default(autoincrement())
   name      String
-  dishes    Dish[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  Company   Company? @relation(fields: [companyId], references: [id])
   companyId Int?
+  Company   Company? @relation(fields: [companyId], references: [id])
+  dishes    Dish[]
 
   @@unique([name, companyId])
   @@map("categories")
 }
 
 model Dish {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   description String
   price       Float
-  imageUrl    String   @map("image_url")
+  imageUrl    String      @map("image_url")
   categoryId  Int?
-  ingredients String[]
-  weightGr    Int?     @map("weight_gr")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  available   Boolean     @default(true)
   calories    Int?
-  available   Boolean  @default(true)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  category   Category?   @relation(fields: [categoryId], references: [id])
-  orderItems OrderItem[]
-  Company    Company?    @relation(fields: [companyId], references: [id])
-  companyId  Int?
+  ingredients String[]
+  weightGr    Int?        @map("weight_gr")
+  companyId   Int?
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  Company     Company?    @relation(fields: [companyId], references: [id])
+  orderItems  OrderItem[]
 
   @@unique([name, companyId])
   @@map("dishes")
 }
 
 model Order {
-  id        Int         @id @default(autoincrement())
-  waiterId  Int
-  cookId    Int?
-  status    OrderStatus @default(PENDING)
-  tableId   Int?
-  companyId Int
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  company    Company     @relation(fields: [companyId], references: [id])
-  waiter     User        @relation("WaiterOrders", fields: [waiterId], references: [id])
-  cook       User?       @relation("CookOrders", fields: [cookId], references: [id])
+  id         Int         @id @default(autoincrement())
+  waiterId   Int
+  cookId     Int?
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  tableId    Int?
+  companyId  Int
   orderItems OrderItem[]
+  company    Company     @relation(fields: [companyId], references: [id])
+  cook       User?       @relation("CookOrders", fields: [cookId], references: [id])
   table      Table?      @relation(fields: [tableId], references: [id])
+  waiter     User        @relation("WaiterOrders", fields: [waiterId], references: [id])
 
   @@index([createdAt])
   @@index([status])
@@ -130,27 +109,39 @@ model OrderItem {
   quantity Int
   price    Float
   notes    String?
-
-  order Order @relation(fields: [orderId], references: [id])
-  dish  Dish  @relation(fields: [dishId], references: [id])
+  dish     Dish    @relation(fields: [dishId], references: [id])
+  order    Order   @relation(fields: [orderId], references: [id])
 
   @@index([dishId])
   @@map("order_items")
 }
 
 model Table {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   number    Int
   seats     Int
-  active    Boolean @default(true)
-  companyId Int
-
-  company Company @relation(fields: [companyId], references: [id])
-  orders  Order[]
-
+  active    Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  companyId Int
+  orders    Order[]
+  company   Company  @relation(fields: [companyId], references: [id])
 
   @@unique([companyId, number])
   @@map("tables")
+}
+
+enum Role {
+  ADMIN
+  COOK
+  WAITER
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETE
+  CANCELED
+  DELIVERED
+  FINISHED
 }
