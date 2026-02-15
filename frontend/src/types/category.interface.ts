@@ -22,3 +22,11 @@ export interface IGetAllCategoriesParams {
 	sortBy?: string
 	order?: 'asc' | 'desc'
 }
+
+export interface ICategoryFormValues {
+	name: string
+}
+
+export interface ICreateCategoryResponse {
+	category: ICategory
+}

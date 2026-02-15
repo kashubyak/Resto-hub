@@ -38,7 +38,7 @@ export default function DishesPage() {
 						<div className='flex-1 min-w-0'>
 							<SearchInput
 								onSearch={handleSearch}
-								placeholder='Search dishes by name...'
+								placeholder='Search dishes...'
 								debounceMs={500}
 								className='w-full'
 							/>

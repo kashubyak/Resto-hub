@@ -6,21 +6,28 @@ import type {
 	ICategoryListResponse,
 	ICategoryWithDishes,
 } from '@/types/category.interface'
+import type { FilterValues } from '@/types/filter.interface'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
 
-export const useCategories = (searchQuery?: string) => {
+export const useCategories = (searchQuery?: string, filters?: FilterValues) => {
 	const queryClient = useQueryClient()
 	// const { showSuccess, showError } = useAlert()
 	const normalizedSearchQuery = searchQuery?.trim() || undefined
 
+	const filterKey = useMemo(() => {
+		if (!filters || Object.keys(filters).length === 0) return 'no-filters'
+		return JSON.stringify(filters)
+	}, [filters])
+
 	const categoriesQuery = useInfiniteQuery<ICategoryListResponse, Error>({
-		queryKey: [CATEGORIES_QUERY_KEY.ALL, normalizedSearchQuery],
+		queryKey: [CATEGORIES_QUERY_KEY.ALL, normalizedSearchQuery, filterKey],
 		queryFn: async ({ pageParam = 1 }) => {
 			const response = await getCategoriesService({
 				page: pageParam as number,
 				limit: LIMIT,
 				...(normalizedSearchQuery && { search: normalizedSearchQuery }),
+				...filters,
 			})
 			return response.data
 		},
