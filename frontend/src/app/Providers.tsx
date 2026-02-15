@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertDisplay } from '@/components/container/AlertContainer'
+import { AUTH } from '@/constants/auth.constant'
 import { AlertProvider, useAlert } from '@/providers/AlertContext'
 import { AuthProvider } from '@/providers/AuthContext'
 import { useAlertStore } from '@/store/alert.store'
@@ -21,13 +22,16 @@ const AlertInitializer = () => {
 
 	useEffect(() => {
 		const pending = useAlertStore.getState().consumePendingAlert()
-		if (pending)
+		if (pending) {
+			if (pending.text === AUTH.SESSION_EXPIRED_MESSAGE && typeof window !== 'undefined')
+				sessionStorage.setItem(AUTH.SESSION_EXPIRED_SHOWN_KEY, '1')
 			showAlert({
 				severity: pending.severity,
 				text: pending.text,
 				duration: pending.duration,
 				retryAfter: pending.retryAfter,
 			})
+		}
 	}, [showAlert])
 
 	return null

@@ -1,5 +1,7 @@
 'use client'
+import { AUTH } from '@/constants/auth.constant'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import {
 	login as loginRequest,
 	logout as logoutRequest,
@@ -10,7 +12,6 @@ import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILoginRequest } from '@/types/auth.interface'
 import { initApiSubdomain } from '@/utils/api'
 import { initializeAuth } from '@/utils/auth-helpers'
-import { getSupabaseClient } from '@/lib/supabase/client'
 import Cookies from 'js-cookie'
 import {
 	createContext,
@@ -37,6 +38,8 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 		async (data: ILoginRequest) => {
 			const response = await loginRequest(data)
 			if (response.status === 200 && response.data.success) {
+				if (typeof window !== 'undefined')
+					sessionStorage.removeItem(AUTH.SESSION_EXPIRED_SHOWN_KEY)
 				initApiSubdomain()
 
 				if (response.data.user?.role) setUserRole(response.data.user.role as UserRole)
@@ -73,7 +76,14 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 		if (pending) {
 			try {
 				const alertObj = JSON.parse(decodeURIComponent(pending))
-				setPendingAlert(alertObj)
+				if (
+					alertObj.text === AUTH.SESSION_EXPIRED_MESSAGE &&
+					typeof window !== 'undefined' &&
+					sessionStorage.getItem(AUTH.SESSION_EXPIRED_SHOWN_KEY)
+				) {
+				} else {
+					setPendingAlert(alertObj)
+				}
 			} catch {
 			} finally {
 				Cookies.remove('pending-alert')

@@ -107,10 +107,12 @@ api.interceptors.response.use(
 						currentPath,
 					)}`
 
-					useAlertStore.getState().setPendingAlert({
-						severity: 'warning',
-						text: AUTH.SESSION_EXPIRED_MESSAGE,
-					})
+					if (!sessionStorage.getItem(AUTH.SESSION_EXPIRED_SHOWN_KEY)) {
+						useAlertStore.getState().setPendingAlert({
+							severity: 'warning',
+							text: AUTH.SESSION_EXPIRED_MESSAGE,
+						})
+					}
 
 					window.location.href = loginUrl
 				}

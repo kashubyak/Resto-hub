@@ -1,5 +1,6 @@
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
+import { getSubdomainFromHost } from '@/utils/api/subdomain'
 import { NextRequest, NextResponse } from 'next/server'
 import { redirectToHome, redirectToLogin, redirectToNotFound } from './redirects'
 import { hasRoleAccess } from './role-guards'
@@ -18,6 +19,12 @@ const SESSION_EXPIRED_ALERT = JSON.stringify({
 
 export async function authMiddleware(request: NextRequest): Promise<NextResponse> {
 	const { pathname } = request.nextUrl
+	const host = request.nextUrl.hostname ?? request.headers.get('host') ?? ''
+	const subdomain = getSubdomainFromHost(host)
+
+	if (subdomain && (pathname.startsWith(ROUTES.PUBLIC.AUTH.REGISTER) || pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS)) {
+		return redirectToLogin(request, pathname)
+	}
 
 	if (isPublicRoute(pathname)) return NextResponse.next()
 
@@ -33,6 +40,9 @@ async function handleTokenRefresh(
 	request: NextRequest,
 	pathname: string,
 ): Promise<NextResponse> {
+	const hadAuth =
+		request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true' ||
+		request.cookies.has('jid')
 	const refreshResult = await refreshAccessToken(request)
 
 	if (refreshResult.success) {
@@ -43,7 +53,7 @@ async function handleTokenRefresh(
 		return forwardCookiesAndContinue(refreshResult)
 	}
 
-	return handleSessionExpired(request, pathname)
+	return handleSessionExpired(request, pathname, hadAuth)
 }
 
 function forwardCookiesAndContinue(refreshResult: IRefreshResult): NextResponse {
@@ -58,12 +68,18 @@ function forwardCookiesAndContinue(refreshResult: IRefreshResult): NextResponse 
 	return response
 }
 
-function handleSessionExpired(request: NextRequest, currentPath: string): NextResponse {
+function handleSessionExpired(
+	request: NextRequest,
+	currentPath: string,
+	hadAuth: boolean,
+): NextResponse {
 	const response = redirectToLogin(request, currentPath)
-	response.cookies.set(
-		'pending-alert',
-		encodeURIComponent(SESSION_EXPIRED_ALERT),
-		ALERT_COOKIE_OPTIONS,
-	)
+	if (hadAuth) {
+		response.cookies.set(
+			'pending-alert',
+			encodeURIComponent(SESSION_EXPIRED_ALERT),
+			ALERT_COOKIE_OPTIONS,
+		)
+	}
 	return response
 }

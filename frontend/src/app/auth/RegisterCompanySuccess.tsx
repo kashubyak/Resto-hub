@@ -5,9 +5,8 @@ import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { getCompanyUrl } from '@/utils/api'
-import { Check, Copy, ExternalLink, LayoutDashboard, LogIn } from 'lucide-react'
 import Cookies from 'js-cookie'
-import Link from 'next/link'
+import { Check, Copy, ExternalLink, LayoutDashboard, LogIn } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { memo, useCallback, useEffect, useState } from 'react'
 
@@ -106,31 +105,33 @@ const RegisterCompanySuccessComponent = () => {
 
 					<div className="flex flex-col gap-3">
 						{isAuthenticated ? (
-							<Link
-								href={ROUTES.PRIVATE.SHARED.DASHBOARD}
+							<a
+								href={companyUrl}
 								className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center justify-center gap-2"
 							>
 								<LayoutDashboard className="w-4 h-4" />
 								Go to Dashboard
-							</Link>
-						) : (
-							<a
-								href={loginUrl}
-								className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center justify-center gap-2"
-							>
-								<LogIn className="w-4 h-4" />
-								Log in at your company
 							</a>
+						) : (
+							<>
+								<a
+									href={loginUrl}
+									className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+								>
+									<LogIn className="w-4 h-4" />
+									Log in at your company
+								</a>
+								<a
+									href={companyUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="w-full px-6 py-3 bg-input text-foreground rounded-xl font-medium hover:bg-input/80 border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+								>
+									<ExternalLink className="w-4 h-4" />
+									Open Company Portal
+								</a>
+							</>
 						)}
-						<a
-							href={companyUrl}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="w-full px-6 py-3 bg-input text-foreground rounded-xl font-medium hover:bg-input/80 border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
-						>
-							<ExternalLink className="w-4 h-4" />
-							Open Company Portal
-						</a>
 					</div>
 				</div>
 			</div>
