@@ -1,4 +1,5 @@
 import { AUTH } from '@/constants/auth.constant'
+import { ROUTES } from '@/constants/pages.constant'
 import { NextRequest, NextResponse } from 'next/server'
 import { redirectToHome, redirectToLogin, redirectToNotFound } from './redirects'
 import { hasRoleAccess } from './role-guards'
@@ -6,7 +7,7 @@ import { isAuthRoute, isPublicRoute } from './route-guards'
 import { type IRefreshResult, refreshAccessToken } from './token-refresh'
 
 const ALERT_COOKIE_OPTIONS = {
-	path: '/',
+	path: ROUTES.PRIVATE.SHARED.DASHBOARD,
 	httpOnly: false,
 }
 

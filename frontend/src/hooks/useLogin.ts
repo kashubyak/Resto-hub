@@ -42,7 +42,7 @@ export const useLogin = () => {
 				const redirectTo = searchParams.get('redirect')
 				if (redirectTo && !redirectTo.startsWith(ROUTES.PUBLIC.AUTH.ROOT))
 					router.push(redirectTo)
-				else router.push('/')
+				else router.push(ROUTES.PRIVATE.SHARED.DASHBOARD)
 			} catch (err: unknown) {
 				showBackendError(toAxiosError(err))
 			}

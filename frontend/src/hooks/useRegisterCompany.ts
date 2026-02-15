@@ -1,3 +1,4 @@
+import { ROUTES } from '@/constants/pages.constant'
 import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
 import { registerCompany } from '@/services/auth/company.service'
@@ -124,7 +125,7 @@ export const useRegisterCompany = () => {
 					})
 
 					const companyUrl = getCompanyUrl(data.subdomain)
-					window.location.href = `${companyUrl}/auth/register-success?subdomain=${data.subdomain}`
+					window.location.href = `${companyUrl}${ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS}?subdomain=${data.subdomain}`
 				}
 			} catch (err) {
 				showBackendError(err as IAxiosError)

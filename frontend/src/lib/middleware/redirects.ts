@@ -8,7 +8,7 @@ export function redirectToLogin(request: NextRequest, currentPath: string): Next
 }
 
 export function redirectToHome(request: NextRequest): NextResponse {
-	return NextResponse.redirect(new URL('/', request.url))
+	return NextResponse.redirect(new URL(ROUTES.PRIVATE.SHARED.DASHBOARD, request.url))
 }
 
 export function redirectToNotFound(request: NextRequest): NextResponse {

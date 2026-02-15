@@ -22,6 +22,7 @@ export const ROUTES = {
 			ROOT: '/auth',
 			LOGIN: '/auth/login',
 			REGISTER: '/auth/register',
+			REGISTER_SUCCESS: '/auth/register-success',
 		} as const,
 		STATIC: {
 			ROOT: '/_next',
