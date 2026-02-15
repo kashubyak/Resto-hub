@@ -1,60 +1,64 @@
 @import 'tailwindcss';
 
 :root {
-	--background: #fcfcfc;
-	--background-rgb: 252, 252, 252;
-	--foreground: #0a0e13;
-	--muted: #f5f6fa;
-	--muted-hover: #f1f2f8;
-	--muted-foreground: #48536b;
-	--primary: #207be6;
+	--background: #0a0a0a;
+	--background-rgb: 10, 10, 10;
+	--foreground: #fafafa;
+	--muted: #171717;
+	--muted-hover: #262626;
+	--muted-foreground: #a3a3a3;
+	--primary: #8b5cf6;
 	--primary-foreground: #ffffff;
-	--primary-hover: #328df6;
-	--secondary: #f5f6fa;
-	--secondary-foreground: #8c8e92;
-	--secondary-hover: #eceef5;
-	--success: #06923e;
-	--success-hover: #06aa48;
-	--destructive: #c20b0a;
-	--destructive-hover: #dc2626;
-	--warning: #eab308;
-	--warning-hover: #ca8a04;
-	--info: #047af2;
-	--info-hover: #0369d1;
-	--border: #e0e4ec;
-	--input: #f5f6fa;
+	--primary-hover: #a78bfa;
+	--secondary: #262626;
+	--secondary-foreground: #a3a3a3;
+	--secondary-hover: #404040;
+	--success: #22c55e;
+	--success-hover: #4ade80;
+	--destructive: #ef4444;
+	--destructive-hover: #f87171;
+	--warning: #f59e0b;
+	--warning-hover: #fbbf24;
+	--warning-foreground: #0a0a0a;
+	--info: #06b6d4;
+	--info-hover: #22d3ee;
+	--info-foreground: #0a0a0a;
+	--border: #262626;
+	--input: #171717;
 	--stable-light: #fff;
-	--active-item: #e8eaf1;
-	--shadow: rgba(27, 27, 27, 0.1);
+	--active-item: #262626;
+	--shadow: rgba(0, 0, 0, 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--background: #05070a;
-		--background-rgb: 5, 7, 10;
-		--foreground: #fff;
-		--muted: #0a0e13;
-		--muted-hover: #151a24;
-		--muted-foreground: #949fb7;
-		--primary: #3187f3;
-		--primary-foreground: #e0e6f2;
-		--primary-hover: #4c8aef;
-		--secondary: #0c1018;
-		--secondary-foreground: #b7b8ba;
-		--secondary-hover: #151a24;
-		--success: #07b201;
-		--success-hover: #08c102;
-		--destructive: #c20b0a;
-		--destructive-hover: #dc2626;
-		--warning: #eab308;
-		--warning-hover: #ca8a04;
-		--info: #047af2;
-		--info-hover: #0369d1;
-		--border: #242a37;
-		--input: #0e1217;
+		--background: #000000;
+		--background-rgb: 0, 0, 0;
+		--foreground: #fafafa;
+		--muted: #0a0a0a;
+		--muted-hover: #171717;
+		--muted-foreground: #737373;
+		--primary: #a78bfa;
+		--primary-foreground: #000000;
+		--primary-hover: #c4b5fd;
+		--secondary: #171717;
+		--secondary-foreground: #a3a3a3;
+		--secondary-hover: #262626;
+		--success: #4ade80;
+		--success-hover: #86efac;
+		--destructive: #f87171;
+		--destructive-hover: #fca5a5;
+		--warning: #fbbf24;
+		--warning-hover: #fcd34d;
+		--warning-foreground: #0a0a0a;
+		--info: #22d3ee;
+		--info-hover: #67e8f9;
+		--info-foreground: #0a0a0a;
+		--border: #171717;
+		--input: #0a0a0a;
 		--stable-light: #fff;
-		--active-item: #202735;
-		--shadow: rgba(27, 27, 27, 0.6);
+		--active-item: #262626;
+		--shadow: rgba(0, 0, 0, 0.7);
 	}
 }
 
@@ -110,6 +114,9 @@ body {
 	.bg-info {
 		background-color: var(--info);
 	}
+	.text-info {
+		color: var(--info);
+	}
 	.text-info-foreground {
 		color: var(--info-foreground);
 	}
@@ -145,8 +152,5 @@ body {
 	}
 	.hover\:bg-info:hover {
 		background-color: var(--info-hover);
-	}
-	.hover\:bg-secondary:hover {
-		background-color: var(--secondary-hover);
 	}
 }

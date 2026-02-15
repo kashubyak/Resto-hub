@@ -84,10 +84,10 @@ const NoResultsMessage = memo(({ searchValue }: { searchValue: string }) => (
 NoResultsMessage.displayName = 'NoResultsMessage'
 
 const HelpInfo = memo(() => (
-	<div className='bg-info rounded-md p-3'>
-		<div className='text-sm stable-light'>
-			<div className='font-medium mb-1'>💡 How to use:</div>
-			<div className='space-y-1'>
+	<div className='rounded-md p-3 bg-muted border border-border border-l-4 border-l-info'>
+		<div className='text-sm text-foreground'>
+			<div className='font-medium mb-1 text-info'>💡 How to use:</div>
+			<div className='space-y-1 text-muted-foreground'>
 				<div>
 					• Enter the name of the city in any language: Kyiv, Kiev, Paris, Berlin, etc.
 				</div>

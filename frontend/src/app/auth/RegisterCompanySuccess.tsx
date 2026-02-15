@@ -3,8 +3,8 @@
 import { Button } from '@/components/ui/Button'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { getCompanyUrl } from '@/utils/api'
-import { memo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { memo, useCallback } from 'react'
 
 const RegisterCompanySuccessComponent = () => {
 	const router = useRouter()
