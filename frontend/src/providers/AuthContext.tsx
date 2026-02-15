@@ -9,7 +9,7 @@ import { getCurrentUser } from '@/services/user/user.service'
 import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILoginRequest } from '@/types/auth.interface'
-import { initApiFromCookies } from '@/utils/api'
+import { initApiSubdomain } from '@/utils/api'
 import { initializeAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
 import {
@@ -37,7 +37,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 		async (data: ILoginRequest) => {
 			const response = await loginRequest(data)
 			if (response.status === 200 && response.data.success) {
-				initApiFromCookies()
+				initApiSubdomain()
 
 				if (response.data.user?.role) setUserRole(response.data.user.role as UserRole)
 
@@ -83,7 +83,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 		const isAuthenticated = Cookies.get(AUTH.AUTH_STATUS) === 'true'
 
 		if (!user && isAuthenticated) {
-			initApiFromCookies()
+			initApiSubdomain()
 			getCurrentUser()
 				.then(current => initializeAuth(current.data, current.data.role as UserRole))
 				.catch(() => clearAuth())

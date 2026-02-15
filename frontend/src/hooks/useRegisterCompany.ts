@@ -121,11 +121,9 @@ export const useRegisterCompany = () => {
 						email: data.adminEmail,
 						password: data.adminPassword,
 					})
-				}
 
-				const redirectTo = searchParams.get('redirect')
-				if (redirectTo && !redirectTo.startsWith('/auth')) router.push(redirectTo)
-				else router.push('/')
+					router.push(`/auth/register-success?subdomain=${data.subdomain}`)
+				}
 			} catch (err) {
 				showBackendError(err as IAxiosError)
 			}

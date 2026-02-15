@@ -1,5 +1,4 @@
 import { API_URL } from '@/config/api'
-import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import {
 	completeNetworkRequest,
@@ -12,7 +11,6 @@ import { useAlertStore } from '@/store/alert.store'
 import type { CustomAxiosRequestConfig } from '@/types/axios.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import type { AxiosProgressEvent } from 'axios'
-import Cookies from 'js-cookie'
 import { clearAuth } from '../auth-helpers'
 import { getRetryAfter, parseBackendError } from '../errorHandler'
 import { getIsRefreshing, processQueue, pushToQueue, setIsRefreshing } from './authQueue'
@@ -54,7 +52,6 @@ api.interceptors.response.use(
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			if (originalRequest.url?.includes(API_URL.AUTH.REFRESH)) {
 				if (typeof window !== 'undefined') {
-					Cookies.remove(AUTH.SUBDOMAIN)
 					clearAuth()
 					useAlertStore.getState().setPendingAlert({
 						severity: 'warning',
@@ -101,7 +98,6 @@ api.interceptors.response.use(
 				processQueue(err, null)
 
 				if (typeof window !== 'undefined') {
-					Cookies.remove(AUTH.SUBDOMAIN)
 					clearAuth()
 
 					const currentPath = window.location.pathname
