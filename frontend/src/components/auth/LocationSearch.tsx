@@ -33,7 +33,8 @@ export function LocationSearch({
 	const [results, setResults] = useState<LocationResult[]>([])
 	const [loading, setLoading] = useState(false)
 	const [showDropdown, setShowDropdown] = useState(false)
-	const searchTimeoutRef = useRef<NodeJS.Timeout>(null)
+	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const abortControllerRef = useRef<AbortController | null>(null)
 	const dropdownRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
@@ -48,22 +49,24 @@ export function LocationSearch({
 		}
 
 		searchTimeoutRef.current = setTimeout(async () => {
+			abortControllerRef.current?.abort()
+			abortControllerRef.current = new AbortController()
+			const signal = abortControllerRef.current.signal
+
 			setLoading(true)
 			try {
 				const response = await fetch(
-					`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5`,
-					{
-						headers: {
-							Accept: 'application/json',
-							'User-Agent': 'RestoHub-App/1.0 (contact@example.com)',
-						},
-					},
+					`/api/geocode/search?q=${encodeURIComponent(query)}`,
+					{ signal },
 				)
+				if (!response.ok)
+					throw new Error(`Search error: ${response.status}`)
+
 				const data = await response.json()
-				setResults(data)
+				setResults(Array.isArray(data) ? data : [])
 				setShowDropdown(true)
 			} catch (err) {
-				console.error('Search error:', err)
+				if (err instanceof Error && err.name === 'AbortError') return
 				setResults([])
 			} finally {
 				setLoading(false)
@@ -73,7 +76,10 @@ export function LocationSearch({
 		return () => {
 			if (searchTimeoutRef.current) {
 				clearTimeout(searchTimeoutRef.current)
+				searchTimeoutRef.current = null
 			}
+			abortControllerRef.current?.abort()
+			abortControllerRef.current = null
 		}
 	}, [query])
 
@@ -82,9 +88,8 @@ export function LocationSearch({
 			if (
 				dropdownRef.current &&
 				!dropdownRef.current.contains(event.target as Node)
-			) {
+			)
 				setShowDropdown(false)
-			}
 		}
 		document.addEventListener('mousedown', handleClickOutside)
 		return () => document.removeEventListener('mousedown', handleClickOutside)

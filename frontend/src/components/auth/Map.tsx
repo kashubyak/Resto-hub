@@ -103,13 +103,7 @@ export function Map({ center, marker, onLocationSelect }: MapProps) {
 			const { lat, lng } = e.latlng
 			try {
 				const response = await fetch(
-					`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
-					{
-						headers: {
-							Accept: 'application/json',
-							'User-Agent': 'RestoHub-App/1.0 (contact@example.com)',
-						},
-					},
+					`/api/geocode/reverse?lat=${lat}&lon=${lng}`,
 				)
 				const data = await response.json()
 				const address =
