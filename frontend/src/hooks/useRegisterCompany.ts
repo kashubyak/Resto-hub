@@ -52,6 +52,8 @@ export const useRegisterCompany = () => {
 		address: '',
 	})
 
+	const [locationError, setLocationError] = useState<string | null>(null)
+
 	useEffect(() => setHasMounted(true), [])
 
 	const {
@@ -88,9 +90,10 @@ export const useRegisterCompany = () => {
 		async (data: IFormValues) => {
 			if (step === 0) {
 				if (!location.address) {
-					alert('Please select a location')
+					setLocationError('Please select a location')
 					return
 				}
+				setLocationError(null)
 				setValue('address', location.address)
 				setValue('latitude', location.lat)
 				setValue('longitude', location.lng)
@@ -163,6 +166,7 @@ export const useRegisterCompany = () => {
 		setStep,
 		hasMounted,
 		register,
+		watch,
 		errors,
 		setLocation,
 		validateLogo,
@@ -171,5 +175,7 @@ export const useRegisterCompany = () => {
 		savedPreviews,
 		handleImageData,
 		location,
+		locationError,
+		setLocationError,
 	}
 }

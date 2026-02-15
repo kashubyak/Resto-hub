@@ -182,12 +182,22 @@ export const useUploadImage = ({
 		return () => input.removeEventListener('change', handleChange)
 	}, [handleFile])
 
+	const clearPreview = useCallback(() => {
+		setPreview(null)
+		onDataChange?.(null, null)
+		if (inputRef.current) {
+			inputRef.current.value = ''
+			inputRef.current.files = null
+		}
+	}, [onDataChange])
+
 	return {
 		preview,
 		isDragging,
 		inputRef,
 		handleDrop,
 		preventDefaults,
+		clearPreview,
 		ref,
 		...restRegister,
 	}
