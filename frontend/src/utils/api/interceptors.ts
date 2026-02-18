@@ -1,13 +1,13 @@
 import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
-import { getSupabaseClient } from '@/lib/supabase/client'
 import {
 	completeNetworkRequest,
 	failNetworkRequest,
 	startNetworkRequest,
 	updateNetworkProgress,
 } from '@/hooks/useNetworkProgress'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import { useAlertStore } from '@/store/alert.store'
 import type { CustomAxiosRequestConfig } from '@/types/axios.interface'
 import type { IAxiosError } from '@/types/error.interface'
@@ -29,9 +29,12 @@ api.interceptors.request.use(async config => {
 	config.withCredentials = true
 
 	if (typeof window !== 'undefined') {
-		const { data: { session } } = await getSupabaseClient().auth.getSession()
-		if (session?.access_token) {
-			config.headers.Authorization = `Bearer ${session.access_token}`
+		try {
+			const { data: { session } } = await getSupabaseClient().auth.getSession()
+			if (session?.access_token) {
+				config.headers.Authorization = `Bearer ${session.access_token}`
+			}
+		} catch {
 		}
 	}
 
@@ -100,7 +103,10 @@ api.interceptors.response.use(
 
 				if (typeof window !== 'undefined') {
 					clearAuth()
-					getSupabaseClient().auth.signOut()
+					try {
+						getSupabaseClient().auth.signOut()
+					} catch {
+					}
 
 					const currentPath = window.location.pathname
 					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(

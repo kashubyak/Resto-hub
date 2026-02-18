@@ -103,6 +103,9 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 				if (!isAuthenticated && user) clearAuth()
 				return undefined
 			})
+			.catch(() => {
+				clearAuth()
+			})
 	}, [hydrated, user, clearAuth, setPendingAlert])
 
 	const contextValue = useMemo(
