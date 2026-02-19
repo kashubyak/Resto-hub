@@ -7,15 +7,8 @@ export function getSubdomainFromHost(host: string): string | null {
 	const hostname = (host.split(':')[0] ?? '').trim()
 	if (!hostname) return null
 	if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) return null
+	if (hostname === 'localhost' || hostname.endsWith('.localhost')) return null
 	const parts = hostname.split('.')
-	if (hostname.includes('localhost')) {
-		if (parts.length === 1) return null
-		const subdomain = parts[0]
-		if (!subdomain) return null
-		const reserved = ['www', 'api']
-		if (reserved.includes(subdomain.toLowerCase())) return null
-		return subdomain
-	}
 	const subdomain = parts[0]
 	if (!subdomain) return null
 	const reserved = ['www', 'api', 'lvh']
@@ -27,27 +20,14 @@ export function getSubdomainFromHostname(): string | null {
 	if (typeof window === 'undefined') return null
 
 	const hostname = window.location.hostname
-	if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname))
-		return null
-
+	if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) return null
+	if (hostname === 'localhost' || hostname.endsWith('.localhost')) return null
 
 	const parts = hostname.split('.')
-
-	if (hostname.includes('localhost')) {
-		if (parts.length === 1) return null
-
-		const subdomain = parts[0]
-		if (!subdomain) return null
-		const reserved = ['www', 'api', 'lvh']
-		if (reserved.includes(subdomain.toLowerCase())) return null
-		return subdomain
-	}
-
 	const subdomain = parts[0]
 	if (!subdomain) return null
 	const reserved = ['www', 'api', 'lvh']
 	if (reserved.includes(subdomain.toLowerCase())) return null
-
 	return subdomain
 }
 

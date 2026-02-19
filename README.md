@@ -110,22 +110,11 @@ Swagger documentation: `http://localhost:3000/api/docs#/`
 
 ### Local development with subdomains
 
-The app uses subdomains for company context (e.g. `mycompany.localhost`). For login and all company-scoped features to work locally:
+The app uses subdomains for company context. Subdomains on `localhost` are not supported (browsers reject cookies with `domain=.localhost`). For dev, use **lvh.me** (resolves to 127.0.0.1):
 
-1. Add your company subdomain to `/etc/hosts`:
-   ```
-   127.0.0.1 mycompany.localhost
-   ```
-   Replace `mycompany` with your actual subdomain from registration.
-
-2. Include the subdomain origin in `ALLOWED_ORIGINS` in backend `.env`:
-   ```
-   ALLOWED_ORIGINS=http://localhost:3001,http://mycompany.localhost:3001
-   ```
-
-3. Open the app at `http://mycompany.localhost:3001` instead of `http://localhost:3001`.
-
-**Alternative (shared cookies):** Browsers reject cookies with `domain=.localhost`. For subdomain cookies in dev, use **lvh.me**: set `NEXT_PUBLIC_ROOT_DOMAIN=lvh.me` in frontend `.env.development`, open `http://lvh.me:3001` and company dashboards at `http://<subdomain>.lvh.me:3001`. Add `http://lvh.me:3001` to backend `ALLOWED_ORIGINS`; backend CORS allows `*.lvh.me` in development.
+1. In frontend `.env.development`: set `NEXT_PUBLIC_ROOT_DOMAIN=lvh.me`.
+2. In backend `.env`: set `ALLOWED_ORIGINS=http://lvh.me:3001` (backend CORS already allows `*.lvh.me` in development).
+3. Open the main site at `http://lvh.me:3001` and company dashboards at `http://<subdomain>.lvh.me:3001`.
 
 ## Deploy (Vercel)
 

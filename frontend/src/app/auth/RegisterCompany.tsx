@@ -127,7 +127,7 @@ const RegisterCompanyComponent = () => {
 											error={errors.subdomain?.message}
 											hint={
 												(watch('subdomain') ?? '')
-													? `${watch('subdomain') ?? ''}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'}`
+													? `${watch('subdomain') ?? ''}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'lvh.me'}`
 													: 'Your unique login address'
 											}
 											register={register('subdomain', subdomainValidation)}

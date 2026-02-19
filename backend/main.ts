@@ -38,10 +38,6 @@ async function bootstrap() {
         callback(null, true);
         return;
       }
-      if (isDev && /^https?:\/\/[^.]+\.localhost(:\d+)?$/.test(origin)) {
-        callback(null, true);
-        return;
-      }
       if (isDev && (/^https?:\/\/lvh\.me(:\d+)?$/.test(origin) || /^https?:\/\/[^.]+\.lvh\.me(:\d+)?$/.test(origin))) {
         callback(null, true);
         return;
