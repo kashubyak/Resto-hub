@@ -55,6 +55,8 @@ export class AuthService {
 		files: ICompanyRegistrationFiles,
 		_res: Response,
 	): Promise<Omit<RegisterCompanyResponseDto, 'refresh_token'>> {
+		const subdomain = dto.subdomain
+
 		const logo = files.logoUrl?.[0]
 		const avatar = files.avatarUrl?.[0]
 		if (!logo || !avatar)
@@ -86,7 +88,7 @@ export class AuthService {
 		const company = await this.prisma.$transaction(async (tx) => {
 			const existingCompany = await tx.company.findFirst({
 				where: {
-					OR: [{ name: dto.name }, { subdomain: dto.subdomain }],
+					OR: [{ name: dto.name }, { subdomain }],
 				},
 			})
 			if (existingCompany)
@@ -95,7 +97,7 @@ export class AuthService {
 			const created: Company & { users: User[] } = await tx.company.create({
 				data: {
 					name: dto.name,
-					subdomain: dto.subdomain,
+					subdomain,
 					address: dto.address,
 					latitude: dto.latitude,
 					longitude: dto.longitude,

@@ -1,9 +1,9 @@
 import { ROUTES } from '@/constants/pages.constant'
 import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
-import { getRootAppUrl } from '@/utils/api'
 import { registerCompany } from '@/services/auth/company.service'
 import type { IAxiosError } from '@/types/error.interface'
+import { getRootAppUrl } from '@/utils/api'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 

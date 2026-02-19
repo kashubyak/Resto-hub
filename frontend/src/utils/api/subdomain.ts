@@ -1,3 +1,4 @@
+import { ROUTES } from '@/constants/pages.constant'
 import { useAlertStore } from '@/store/alert.store'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '../errorHandler'
@@ -77,6 +78,18 @@ export function setApiSubdomain(subdomain?: string | null): void {
 }
 
 export function initApiSubdomain(): void {
+	if (typeof window !== 'undefined') {
+		const pathname = window.location.pathname ?? ''
+		if (
+			pathname === ROUTES.PUBLIC.AUTH.REGISTER ||
+			pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS
+		) {
+			api.defaults.baseURL = getRootAppUrl() + '/api'
+			api.defaults.withCredentials = true
+			return
+		}
+	}
+
 	const subdomainFromHostname = getSubdomainFromHostname()
 	const subdomain = subdomainFromHostname
 
