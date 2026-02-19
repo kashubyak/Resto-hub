@@ -125,6 +125,12 @@ The app uses subdomains for company context (e.g. `mycompany.localhost`). For lo
 
 3. Open the app at `http://mycompany.localhost:3001` instead of `http://localhost:3001`.
 
+**Alternative (shared cookies):** Browsers reject cookies with `domain=.localhost`. For subdomain cookies in dev, use **lvh.me**: set `NEXT_PUBLIC_ROOT_DOMAIN=lvh.me` in frontend `.env.development`, open `http://lvh.me:3001` and company dashboards at `http://<subdomain>.lvh.me:3001`. Add `http://lvh.me:3001` to backend `ALLOWED_ORIGINS`; backend CORS allows `*.lvh.me` in development.
+
+## Deploy (Vercel)
+
+For production on **Vercel**, use **one origin**: deploy the Next.js frontend on Vercel and serve the API on the same domain (e.g. `/api/*` via Vercel rewrites to your backend). Then set `NEXT_PUBLIC_API_URL` to that same domain (e.g. `https://yourapp.vercel.app/api` or relative `/api`). Cookies and CORS stay same-origin. If the backend runs on a different host, cookie-based auth across origins will not work; use a token-in-header scheme instead.
+
 ## Running Tests
 
 To run end-to-end (e2e) tests:

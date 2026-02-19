@@ -1,5 +1,6 @@
 'use client'
 
+import { ApiSubdomainInitializer } from '@/components/init/ApiSubdomainInitializer'
 import { AlertDisplay } from '@/components/container/AlertContainer'
 import { AUTH } from '@/constants/auth.constant'
 import { AlertProvider, useAlert } from '@/providers/AlertContext'
@@ -45,6 +46,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 		<QueryClientProvider client={queryClientRef.current}>
 			<AlertProvider>
 				<AuthProvider>
+					<ApiSubdomainInitializer />
 					<AlertInitializer />
 					{children}
 					<AlertDisplay />

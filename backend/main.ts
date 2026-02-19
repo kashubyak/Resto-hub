@@ -10,6 +10,9 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const httpAdapter = app.getHttpAdapter();
+  const expressApp = httpAdapter.getInstance();
+  (expressApp as { set: (name: string, value: number) => void }).set('trust proxy', 1);
   app.setGlobalPrefix('api');
   app.use(cookieParser());
   app.useGlobalPipes(
@@ -36,6 +39,10 @@ async function bootstrap() {
         return;
       }
       if (isDev && /^https?:\/\/[^.]+\.localhost(:\d+)?$/.test(origin)) {
+        callback(null, true);
+        return;
+      }
+      if (isDev && (/^https?:\/\/lvh\.me(:\d+)?$/.test(origin) || /^https?:\/\/[^.]+\.lvh\.me(:\d+)?$/.test(origin))) {
         callback(null, true);
         return;
       }

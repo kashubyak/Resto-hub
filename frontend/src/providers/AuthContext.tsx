@@ -2,6 +2,7 @@
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { usePathname } from 'next/navigation'
 import {
 	login as loginRequest,
 	logout as logoutRequest,
@@ -10,6 +11,7 @@ import { getCurrentUser } from '@/services/user/user.service'
 import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILoginRequest } from '@/types/auth.interface'
+import type { IUser } from '@/types/user.interface'
 import { initApiSubdomain } from '@/utils/api'
 import { initializeAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
@@ -31,11 +33,14 @@ const AuthContext = createContext<IAuthContext>({
 })
 
 export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
+	const pathname = usePathname()
 	const { user, isAuth, hydrated, clearAuth, setUserRole } = useAuthStore()
+	const setUser = useAuthStore.getState().setUser
+	const setIsAuth = useAuthStore.getState().setIsAuth
 	const { setPendingAlert } = useAlertStore()
 
 	const login = useCallback(
-		async (data: ILoginRequest) => {
+		async (data: ILoginRequest, options?: { skipGetCurrentUser?: boolean }) => {
 			const response = await loginRequest(data)
 			if (response.status === 200 && response.data.success) {
 				if (typeof window !== 'undefined')
@@ -43,6 +48,23 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 				initApiSubdomain()
 
 				if (response.data.user?.role) setUserRole(response.data.user.role as UserRole)
+
+				if (options?.skipGetCurrentUser) {
+					const u = response.data.user
+					if (u) {
+						setIsAuth(true)
+						setUser({
+							id: String(u.id),
+							name: '',
+							email: '',
+							role: u.role as UserRole,
+							avatarUrl: null,
+							createdAt: '',
+							updatedAt: '',
+						} as IUser)
+					}
+					return
+				}
 
 				const currentUser = await getCurrentUser()
 				initializeAuth(currentUser.data, currentUser.data.role as UserRole)
@@ -93,12 +115,18 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 		void getSupabaseClient()
 			.auth.getSession()
 			.then(({ data: { session } }) => {
-				const isAuthenticated = !!session
+				const hasBackendAuth =
+					typeof window !== 'undefined' &&
+					(Cookies.get(AUTH.AUTH_STATUS) === 'true' || !!Cookies.get(AUTH.TOKEN))
+				const isAuthenticated = !!session || !!hasBackendAuth
 				if (!user && isAuthenticated) {
+					if (pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS) return undefined
 					initApiSubdomain()
 					return getCurrentUser()
 						.then(current => initializeAuth(current.data, current.data.role as UserRole))
-						.catch(() => clearAuth())
+						.catch(() => {
+							if (pathname !== ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS) clearAuth()
+						})
 				}
 				if (!isAuthenticated && user) clearAuth()
 				return undefined
@@ -106,7 +134,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 			.catch(() => {
 				clearAuth()
 			})
-	}, [hydrated, user, clearAuth, setPendingAlert])
+	}, [hydrated, user, pathname, clearAuth, setPendingAlert])
 
 	const contextValue = useMemo(
 		() => ({

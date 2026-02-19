@@ -48,13 +48,14 @@ export const useAuthStore = create<IAuthStore>()(
 			storage: createJSONStorage(() => localStorage),
 			onRehydrateStorage: () => state => {
 				if (!state) return
+				if (!state.user && !state.isAuth) state.setUserRole(null)
 				state.setHydrated(true)
-			state.checkAuthStatus()
+				state.checkAuthStatus()
 			},
 			partialize: state => ({
 				user: state.user,
 				isAuth: state.isAuth,
-				userRole: state.userRole,
+				userRole: state.user && state.isAuth ? state.userRole : null,
 			}),
 		},
 	),

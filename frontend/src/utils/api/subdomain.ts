@@ -18,7 +18,7 @@ export function getSubdomainFromHost(host: string): string | null {
 	}
 	const subdomain = parts[0]
 	if (!subdomain) return null
-	const reserved = ['www', 'api']
+	const reserved = ['www', 'api', 'lvh']
 	if (reserved.includes(subdomain.toLowerCase())) return null
 	return subdomain
 }
@@ -38,17 +38,31 @@ export function getSubdomainFromHostname(): string | null {
 
 		const subdomain = parts[0]
 		if (!subdomain) return null
-		const reserved = ['www', 'api']
+		const reserved = ['www', 'api', 'lvh']
 		if (reserved.includes(subdomain.toLowerCase())) return null
 		return subdomain
 	}
 
 	const subdomain = parts[0]
 	if (!subdomain) return null
-	const reserved = ['www', 'api']
+	const reserved = ['www', 'api', 'lvh']
 	if (reserved.includes(subdomain.toLowerCase())) return null
 
 	return subdomain
+}
+
+export function getRootAppUrl(): string {
+	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+	const useHttpAndPort = rootDomain === 'localhost' || rootDomain === 'lvh.me'
+	if (typeof window !== 'undefined') {
+		const port = window.location.port || '3001'
+		return useHttpAndPort
+			? `http://${rootDomain}:${port}`
+			: `https://${rootDomain}`
+	}
+	return useHttpAndPort
+		? `http://${rootDomain}:3001`
+		: `https://${rootDomain}`
 }
 
 export function setApiSubdomain(subdomain?: string | null): void {
@@ -59,6 +73,12 @@ export function setApiSubdomain(subdomain?: string | null): void {
 
 	if (!actualSubdomain) {
 		api.defaults.baseURL = apiBase
+		return
+	}
+
+	// Same-origin BFF: on client with subdomain, use Next.js /api so cookies work
+	if (typeof window !== 'undefined') {
+		api.defaults.baseURL = window.location.origin + '/api'
 		return
 	}
 
@@ -88,13 +108,14 @@ export const initApiFromCookies = initApiSubdomain
 
 export function getCompanyUrl(subdomain: string): string {
 	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+	const useHttpAndPort = rootDomain === 'localhost' || rootDomain === 'lvh.me'
 	if (typeof window !== 'undefined') {
 		const port = window.location.port || '3001'
-		return rootDomain === 'localhost'
+		return useHttpAndPort
 			? `http://${subdomain}.${rootDomain}:${port}`
 			: `https://${subdomain}.${rootDomain}`
 	}
-	return rootDomain === 'localhost'
+	return useHttpAndPort
 		? `http://${subdomain}.${rootDomain}:3001`
 		: `https://${subdomain}.${rootDomain}`
 }

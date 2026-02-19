@@ -1,9 +1,9 @@
 import { ROUTES } from '@/constants/pages.constant'
 import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
+import { getRootAppUrl } from '@/utils/api'
 import { registerCompany } from '@/services/auth/company.service'
 import type { IAxiosError } from '@/types/error.interface'
-import { getCompanyUrl } from '@/utils/api'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -23,6 +23,7 @@ interface IFormValues {
 
 export const useRegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const { login } = useAuth()
 	const { showBackendError } = useAlert()
 	const [hasMounted, setHasMounted] = useState(false)
@@ -87,7 +88,7 @@ export const useRegisterCompany = () => {
 		[clearErrors],
 	)
 
-	const onSubmit = useCallback(
+		const onSubmit = useCallback(
 		async (data: IFormValues) => {
 			if (step === 0) {
 				if (!location.address) {
@@ -102,6 +103,7 @@ export const useRegisterCompany = () => {
 				return
 			}
 
+			setIsSubmitting(true)
 			try {
 				const formData = new FormData()
 				formData.append('name', data.name)
@@ -118,17 +120,21 @@ export const useRegisterCompany = () => {
 				const response = await registerCompany(formData)
 
 				if (response.status === 201) {
-					await login({
-						subdomain: data.subdomain,
-						email: data.adminEmail,
-						password: data.adminPassword,
-					})
+					await login(
+						{
+							subdomain: data.subdomain,
+							email: data.adminEmail,
+							password: data.adminPassword,
+						},
+						{ skipGetCurrentUser: true },
+					)
 
-					const companyUrl = getCompanyUrl(data.subdomain)
-					window.location.href = `${companyUrl}${ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS}?subdomain=${data.subdomain}`
+					window.location.href = `${getRootAppUrl()}${ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS}?subdomain=${data.subdomain}`
 				}
 			} catch (err) {
 				showBackendError(err as IAxiosError)
+			} finally {
+				setIsSubmitting(false)
 			}
 		},
 		[step, location, setValue, savedFiles, login, showBackendError],
@@ -163,6 +169,7 @@ export const useRegisterCompany = () => {
 	return {
 		handleSubmit,
 		onSubmit,
+		isSubmitting,
 		step,
 		setStep,
 		hasMounted,

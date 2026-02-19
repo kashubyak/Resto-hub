@@ -92,6 +92,8 @@ desktop.ini
 *.bak
 *.swp
 *.swo
+**/Redesign*/
+*18-44-37*
 
 # Runtime data
 pids/

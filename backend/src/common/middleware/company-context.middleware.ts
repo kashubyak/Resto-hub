@@ -9,10 +9,15 @@ export class CompanyContextMiddleware implements NestMiddleware {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async use(req: IRequestWithCompanyId, _res: Response, next: NextFunction) {
-		const host = req.hostname
-		const subdomain = host.split('.')[0]
+		// Skip company lookup for register-company (company does not exist yet)
+		if (req.path?.includes('register-company') || req.url?.includes('register-company'))
+			return next()
 
-		if (!subdomain || ['www', 'api', 'localhost'].includes(subdomain))
+		const host = (req.headers['x-forwarded-host'] as string) ?? req.hostname ?? ''
+		const hostPart = host.split(':')[0] ?? ''
+		const subdomain = hostPart.split('.')[0] ?? ''
+
+		if (!subdomain || ['www', 'api', 'localhost', 'lvh'].includes(subdomain))
 			return next()
 
 		const company = await this.prisma.company.findUnique({

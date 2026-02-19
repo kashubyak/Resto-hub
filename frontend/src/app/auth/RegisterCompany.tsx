@@ -31,6 +31,7 @@ const RegisterCompanyComponent = () => {
 	const {
 		handleSubmit,
 		onSubmit,
+		isSubmitting,
 		step,
 		setStep,
 		register,
@@ -236,9 +237,10 @@ const RegisterCompanyComponent = () => {
 									)}
 									<button
 										type="submit"
-										className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+										disabled={isSubmitting}
+										className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-60 disabled:pointer-events-none disabled:transform-none"
 									>
-										{step === 0 ? 'Continue' : 'Create account'}
+										{step === 0 ? 'Continue' : isSubmitting ? 'Creating account...' : 'Create account'}
 									</button>
 								</div>
 							</form>

@@ -3,12 +3,13 @@ import './interceptors'
 
 export { setGlobalAlertFunction } from './globalAlert'
 export {
+	getCompanyUrl,
+	getRootAppUrl,
+	getSubdomainFromHost,
+	getSubdomainFromHostname,
 	initApiSubdomain,
 	initApiFromCookies,
 	setApiSubdomain,
-	getSubdomainFromHost,
-	getSubdomainFromHostname,
-	getCompanyUrl,
 } from './subdomain'
 export { api, refreshApi }
 

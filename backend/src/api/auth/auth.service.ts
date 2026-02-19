@@ -135,7 +135,7 @@ export class AuthService {
 		dto: LoginDto,
 	): Promise<{ success: true; user: { id: number; role: Role }; token: string }> {
 		const subdomain =
-			this.getSubdomainFromRequest(req) ?? dto.subdomain ?? null
+			dto.subdomain ?? this.getSubdomainFromRequest(req) ?? null
 		if (!subdomain)
 			throw new UnauthorizedException('Company subdomain is required')
 
@@ -225,8 +225,10 @@ export class AuthService {
 	}
 
 	private getSubdomainFromRequest(req: Request): string | null {
-		const host = req.hostname ?? req.headers.host?.split(':')[0] ?? ''
-		const sub = host.split('.')[0]
+		const host =
+			(req.headers['x-forwarded-host'] as string) ?? req.hostname ?? req.headers.host?.split(':')[0] ?? ''
+		const hostPart = host.split(':')[0] ?? ''
+		const sub = hostPart.split('.')[0]
 		if (!sub || ['www', 'api', 'localhost'].includes(sub)) return null
 		return sub
 	}
