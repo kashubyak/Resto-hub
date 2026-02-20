@@ -4,15 +4,19 @@ import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
+import { useAlert } from '@/providers/AlertContext'
 import { getCompanyUrl } from '@/utils/api'
 import Cookies from 'js-cookie'
 import { Check, Copy, ExternalLink, LayoutDashboard, LogIn } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { memo, useCallback, useEffect, useState } from 'react'
 
+const COPIED_ALERT_DURATION = 2000
+
 const RegisterCompanySuccessComponent = () => {
 	const searchParams = useSearchParams()
 	const { copy, copied } = useCopyToClipboard()
+	const { showInfo } = useAlert()
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 
 	const subdomain = searchParams.get('subdomain') || ''
@@ -23,9 +27,11 @@ const RegisterCompanySuccessComponent = () => {
 		setIsAuthenticated(Cookies.get(AUTH.AUTH_STATUS) === 'true')
 	}, [])
 
-	const handleCopy = useCallback(() => {
-		if (companyUrl) copy(companyUrl)
-	}, [companyUrl, copy])
+	const handleCopy = useCallback(async () => {
+		if (!companyUrl) return
+		const ok = await copy(companyUrl)
+		if (ok) showInfo('Link copied to clipboard', COPIED_ALERT_DURATION)
+	}, [companyUrl, copy, showInfo])
 
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-background px-2 sm:px-4 py-4 sm:py-8 relative overflow-x-hidden">
