@@ -5,12 +5,12 @@ import type { ILoginRequest } from '@/types/auth.interface'
 import { getSubdomainFromHostname } from '@/utils/api'
 import { toAxiosError } from '@/utils/errorConverter'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 
 export const useLogin = () => {
 	const searchParams = useSearchParams()
-	const hostnameSubdomain = getSubdomainFromHostname()
+	const hostnameSubdomain = useMemo(() => getSubdomainFromHostname(), [])
 
 	const {
 		register,

@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import type {
 	Control,
 	FieldPath,
@@ -28,7 +28,7 @@ export interface AuthTextFieldProps {
 	register: UseFormRegisterReturn
 }
 
-export function AuthTextField({
+export const AuthTextField = memo(function AuthTextField({
 	id,
 	label,
 	error,
@@ -76,7 +76,7 @@ export function AuthTextField({
 			)}
 		</div>
 	)
-}
+})
 
 export interface AuthControllerTextFieldProps<T extends FieldValues> {
 	control: Control<T>
@@ -162,7 +162,7 @@ export interface AuthPasswordFieldProps {
 	rightLabel?: ReactNode
 }
 
-export function AuthPasswordField({
+export const AuthPasswordField = memo(function AuthPasswordField({
 	id,
 	label,
 	error,
@@ -223,4 +223,4 @@ export function AuthPasswordField({
 			)}
 		</div>
 	)
-}
+})

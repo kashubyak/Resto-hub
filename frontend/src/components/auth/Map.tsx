@@ -2,6 +2,7 @@
 
 import { usePrefersColorScheme } from '@/hooks/usePrefersColorScheme'
 import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 import { useEffect, useRef } from 'react'
 
 interface MapProps {

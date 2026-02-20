@@ -17,7 +17,7 @@ import {
 import { AlertCircle, Building2, Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { memo, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 
 function LoginSubdomainGate() {
 	const searchParams = useSearchParams()
@@ -110,6 +110,9 @@ function LoginSubdomainGate() {
 	)
 }
 
+const MailIcon = <Mail className="h-5 w-5 text-muted-foreground" />
+const LockIcon = <Lock className="h-5 w-5 text-muted-foreground" />
+
 const LoginComponent = ({ host = '' }: { host?: string }) => {
 	const searchParams = useSearchParams()
 	const hostSubdomain =
@@ -120,7 +123,12 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 	const [showPassword, setShowPassword] = useState(false)
 	const { register, handleSubmit, errors, onSubmit } = useLogin()
 
-	const changeCompanyUrl = `${getRootAppUrl()}${ROUTES.PUBLIC.AUTH.LOGIN}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
+	const onTogglePassword = useCallback(() => setShowPassword((s) => !s), [])
+	const changeCompanyUrl = useMemo(
+		() =>
+			`${getRootAppUrl()}${ROUTES.PUBLIC.AUTH.LOGIN}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`,
+		[searchParams],
+	)
 
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-background px-2 sm:px-4 py-4 sm:py-8 relative overflow-hidden">
@@ -165,7 +173,7 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 							autoComplete="email"
 							placeholder="your@email.com"
 							error={errors.email?.message}
-							leftIcon={<Mail className="h-5 w-5 text-muted-foreground" />}
+							leftIcon={MailIcon}
 							register={register('email', emailValidation)}
 						/>
 
@@ -174,10 +182,10 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 							label="Password"
 							autoComplete="current-password"
 							error={errors.password?.message}
-							leftIcon={<Lock className="h-5 w-5 text-muted-foreground" />}
+							leftIcon={LockIcon}
 							register={register('password', passwordValidation)}
 							showPassword={showPassword}
-							onTogglePassword={() => setShowPassword(!showPassword)}
+							onTogglePassword={onTogglePassword}
 							rightLabel={
 								<button
 									type="button"

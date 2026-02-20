@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'leaflet/dist/leaflet.css';
 
 :root {
 	--font-size: 16px;
@@ -107,6 +106,12 @@
 
 .animate-float {
 	animation: float 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.animate-float {
+		animation: none;
+	}
 }
 
 .animate-shimmer {

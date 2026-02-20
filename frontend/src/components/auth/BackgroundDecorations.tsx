@@ -1,6 +1,8 @@
 'use client'
 
-export function BackgroundDecorations() {
+import { memo } from 'react'
+
+export const BackgroundDecorations = memo(function BackgroundDecorations() {
 	return (
 		<>
 			{/* Gradient orbs */}
@@ -27,4 +29,4 @@ export function BackgroundDecorations() {
 			/>
 		</>
 	)
-}
+})
