@@ -39,12 +39,14 @@ export const useDishModal = (onClose: () => void) => {
 
 				if (data.categoryId != null)
 					formData.append('categoryId', data.categoryId.toString())
-				data.ingredients.forEach(ingredient =>
+				data.ingredients.forEach((ingredient) =>
 					formData.append('ingredients', ingredient.trim()),
 				)
 
-				if (data.weightGr != null) formData.append('weightGr', data.weightGr.toString())
-				if (data.calories != null) formData.append('calories', data.calories.toString())
+				if (data.weightGr != null)
+					formData.append('weightGr', data.weightGr.toString())
+				if (data.calories != null)
+					formData.append('calories', data.calories.toString())
 				formData.append('imageUrl', data.imageUrl[0])
 				formData.append('available', data.available.toString())
 

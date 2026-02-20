@@ -18,7 +18,7 @@ export const useRateLimitTimer = (retryAfter: number | null | undefined) => {
 		setSecondsLeft(retryAfter)
 
 		intervalRef.current = setInterval(() => {
-			setSecondsLeft(prev => {
+			setSecondsLeft((prev) => {
 				if (prev === null || prev <= 1) {
 					if (intervalRef.current) {
 						clearInterval(intervalRef.current)
@@ -40,7 +40,6 @@ export const useRateLimitTimer = (retryAfter: number | null | undefined) => {
 
 	return secondsLeft
 }
-
 
 export const formatRetryTime = (seconds: number): string => {
 	if (seconds <= 0) return '0s'

@@ -22,30 +22,30 @@ const ExpandedUserView = memo(
 		isOpen: boolean
 	}) => (
 		<>
-			<div className='flex items-center gap-2 overflow-hidden'>
+			<div className="flex items-center gap-2 overflow-hidden">
 				<ViewableImage
 					src={user?.avatarUrl || '/Resto-Hub.png'}
-					alt='User avatar'
+					alt="User avatar"
 					width={40}
 					height={40}
-					className='rounded-md'
+					className="rounded-md"
 				/>
-				<div className='flex flex-col min-w-0'>
-					<span className='text-sm font-medium text-foreground truncate'>
+				<div className="flex flex-col min-w-0">
+					<span className="text-sm font-medium text-foreground truncate">
 						{user?.name}
 					</span>
-					<span className='text-xs text-secondary truncate'>{user?.email}</span>
+					<span className="text-xs text-secondary truncate">{user?.email}</span>
 				</div>
 			</div>
 			<button
 				ref={buttonRef}
 				onClick={toggleMenu}
-				className='w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground transition-colors duration-150'
-				aria-label='User menu'
+				className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground transition-colors duration-150"
+				aria-label="User menu"
 				aria-expanded={isOpen}
-				aria-haspopup='true'
+				aria-haspopup="true"
 			>
-				<MoreVertIcon fontSize='small' />
+				<MoreVertIcon fontSize="small" />
 			</button>
 		</>
 	),
@@ -67,23 +67,23 @@ const CollapsedUserView = memo(
 		<button
 			ref={buttonRef}
 			onClick={toggleMenu}
-			className='group w-12 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground relative overflow-hidden transition-colors duration-150'
-			aria-label='User menu'
+			className="group w-12 h-10 flex items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground relative overflow-hidden transition-colors duration-150"
+			aria-label="User menu"
 			aria-expanded={isOpen}
-			aria-haspopup='true'
+			aria-haspopup="true"
 		>
-			<span className='relative w-10 h-10 flex items-center justify-center'>
-				<span className='absolute inset-0 flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0'>
+			<span className="relative w-10 h-10 flex items-center justify-center">
+				<span className="absolute inset-0 flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0">
 					<ViewableImage
 						src={user?.avatarUrl || '/Resto-Hub.png'}
-						alt='User avatar'
+						alt="User avatar"
 						width={40}
 						height={40}
-						className='object-cover rounded-md'
+						className="object-cover rounded-md"
 					/>
 				</span>
-				<span className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
-					<MoreVertIcon fontSize='small' />
+				<span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+					<MoreVertIcon fontSize="small" />
 				</span>
 			</span>
 		</button>
@@ -93,7 +93,8 @@ CollapsedUserView.displayName = 'CollapsedUserView'
 
 export const SideBarUser = memo(({ collapsed }: { collapsed: boolean }) => {
 	const { user, logout } = useAuth()
-	const { isOpen, position, toggleMenu, closeMenu, menuRef, buttonRef } = useKebabMenu()
+	const { isOpen, position, toggleMenu, closeMenu, menuRef, buttonRef } =
+		useKebabMenu()
 
 	const menuItems: IMenuItem[] = useMemo(
 		() => [
@@ -101,14 +102,14 @@ export const SideBarUser = memo(({ collapsed }: { collapsed: boolean }) => {
 				id: 'logout',
 				label: 'Logout',
 				onClick: logout,
-				icon: <LogoutIcon fontSize='small' />,
+				icon: <LogoutIcon fontSize="small" />,
 			},
 		],
 		[logout],
 	)
 
 	return (
-		<div className='p-2 border-t border-border flex items-center justify-between relative'>
+		<div className="p-2 border-t border-border flex items-center justify-between relative">
 			{!collapsed ? (
 				<ExpandedUserView
 					user={user}

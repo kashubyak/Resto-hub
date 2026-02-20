@@ -53,219 +53,230 @@ const generateId = () => `alert-${Date.now()}-${Math.random()}`
 const formatText = (text: string | string[]): string =>
 	Array.isArray(text) ? text.join('\n') : text
 
-export const AlertProvider = memo<{ children: React.ReactNode }>(({ children }) => {
-	const [alerts, setAlerts] = useState<IAlert[]>([])
-	const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+export const AlertProvider = memo<{ children: React.ReactNode }>(
+	({ children }) => {
+		const [alerts, setAlerts] = useState<IAlert[]>([])
+		const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
-	const clearTimer = useCallback((id: string) => {
-		const t = timers.current[id]
-		if (t) {
-			clearTimeout(t)
-			delete timers.current[id]
-		}
-	}, [])
-
-	const removeAlert = useCallback(
-		(id: string) => {
-			clearTimer(id)
-			setAlerts(prev => prev.filter(a => a.id !== id))
-		},
-		[clearTimer],
-	)
-
-	const startTimer = useCallback(
-		(id: string, duration: number) => {
-			if (duration > 0) {
-				clearTimer(id)
-				timers.current[id] = setTimeout(() => {
-					removeAlert(id)
-				}, duration)
+		const clearTimer = useCallback((id: string) => {
+			const t = timers.current[id]
+			if (t) {
+				clearTimeout(t)
+				delete timers.current[id]
 			}
-		},
-		[clearTimer, removeAlert],
-	)
+		}, [])
 
-	const pauseAlertTimer = useCallback(
-		(id: string) => {
-			clearTimer(id)
-		},
-		[clearTimer],
-	)
+		const removeAlert = useCallback(
+			(id: string) => {
+				clearTimer(id)
+				setAlerts((prev) => prev.filter((a) => a.id !== id))
+			},
+			[clearTimer],
+		)
 
-	const resumeAlertTimer = useCallback(
-		(id: string) => {
-			const alert = alerts.find(a => a.id === id)
-			if (!alert) return
-			const duration = alert.duration ?? DEFAULT_DURATION_ALERT
-			startTimer(id, duration)
-		},
-		[alerts, startTimer],
-	)
+		const startTimer = useCallback(
+			(id: string, duration: number) => {
+				if (duration > 0) {
+					clearTimer(id)
+					timers.current[id] = setTimeout(() => {
+						removeAlert(id)
+					}, duration)
+				}
+			},
+			[clearTimer, removeAlert],
+		)
 
-	const showAlert = useCallback(
-		(alert: Omit<IAlert, 'id'>) => {
-			setAlerts(prev => {
-				if (alert.retryAfter !== undefined) {
-					const existingRateLimit = prev.find(a => a.retryAfter !== undefined)
-					if (existingRateLimit) {
-						const updatedAlert: IAlert = {
-							...existingRateLimit,
-							...alert,
-							id: existingRateLimit.id,
+		const pauseAlertTimer = useCallback(
+			(id: string) => {
+				clearTimer(id)
+			},
+			[clearTimer],
+		)
+
+		const resumeAlertTimer = useCallback(
+			(id: string) => {
+				const alert = alerts.find((a) => a.id === id)
+				if (!alert) return
+				const duration = alert.duration ?? DEFAULT_DURATION_ALERT
+				startTimer(id, duration)
+			},
+			[alerts, startTimer],
+		)
+
+		const showAlert = useCallback(
+			(alert: Omit<IAlert, 'id'>) => {
+				setAlerts((prev) => {
+					if (alert.retryAfter !== undefined) {
+						const existingRateLimit = prev.find(
+							(a) => a.retryAfter !== undefined,
+						)
+						if (existingRateLimit) {
+							const updatedAlert: IAlert = {
+								...existingRateLimit,
+								...alert,
+								id: existingRateLimit.id,
+							}
+							const d = (alert.retryAfter + 1) * 1000
+							startTimer(existingRateLimit.id, d)
+							return prev.map((a) =>
+								a.id === existingRateLimit.id ? updatedAlert : a,
+							)
 						}
-						const d = (alert.retryAfter + 1) * 1000
-						startTimer(existingRateLimit.id, d)
-						return prev.map(a => (a.id === existingRateLimit.id ? updatedAlert : a))
+
+						const id = generateId()
+						const newAlert: IAlert = {
+							...alert,
+							id,
+							duration: (alert.retryAfter + 1) * 1000,
+						}
+						startTimer(id, newAlert.duration!)
+						return [...prev, newAlert]
+					}
+
+					const existing = prev.find(
+						(a) => a.severity === alert.severity && a.retryAfter === undefined,
+					)
+
+					if (existing) {
+						const merged: IAlert = {
+							...existing,
+							text: `${existing.text}\n${alert.text}`.trim(),
+						}
+						const d =
+							existing.duration ?? alert.duration ?? DEFAULT_DURATION_ALERT
+						startTimer(existing.id, d)
+						return prev.map((a) => (a.id === existing.id ? merged : a))
 					}
 
 					const id = generateId()
 					const newAlert: IAlert = {
 						...alert,
 						id,
-						duration: (alert.retryAfter + 1) * 1000,
+						duration: alert.duration ?? DEFAULT_DURATION_ALERT,
 					}
 					startTimer(id, newAlert.duration!)
 					return [...prev, newAlert]
+				})
+			},
+			[startTimer],
+		)
+
+		const showSuccess = useCallback(
+			(text: string | string[], duration?: number) =>
+				showAlert({
+					severity: 'success',
+					text: formatText(text),
+					duration,
+				}),
+			[showAlert],
+		)
+
+		const showError = useCallback(
+			(text: string | string[], duration?: number) =>
+				showAlert({
+					severity: 'error',
+					text: formatText(text),
+					duration,
+				}),
+			[showAlert],
+		)
+
+		const showWarning = useCallback(
+			(text: string | string[], duration?: number) =>
+				showAlert({
+					severity: 'warning',
+					text: formatText(text),
+					duration,
+				}),
+			[showAlert],
+		)
+
+		const showInfo = useCallback(
+			(text: string | string[], duration?: number) =>
+				showAlert({
+					severity: 'info',
+					text: formatText(text),
+					duration,
+				}),
+			[showAlert],
+		)
+
+		const showRateLimitError = useCallback(
+			(retryAfter: number, message?: string) => {
+				showAlert({
+					severity: 'error',
+					text: message || 'Too many requests',
+					retryAfter,
+				})
+			},
+			[showAlert],
+		)
+
+		const showBackendError = useCallback(
+			(error: IAxiosError, duration?: number) => {
+				const errorMessages = parseBackendError(error)
+				const retryAfter = getRetryAfter(error)
+
+				if (retryAfter !== null) {
+					showRateLimitError(retryAfter, errorMessages.join('\n'))
+					return
 				}
 
-				const existing = prev.find(
-					a => a.severity === alert.severity && a.retryAfter === undefined,
-				)
+				showError(errorMessages, duration)
+			},
+			[showError, showRateLimitError],
+		)
 
-				if (existing) {
-					const merged: IAlert = {
-						...existing,
-						text: `${existing.text}\n${alert.text}`.trim(),
+		useEffect(() => {
+			const currentTimers = timers.current
+
+			return () => {
+				Object.keys(currentTimers).forEach((id) => {
+					const timer = currentTimers[id]
+					if (timer) {
+						clearTimeout(timer)
+						delete currentTimers[id]
 					}
-					const d = existing.duration ?? alert.duration ?? DEFAULT_DURATION_ALERT
-					startTimer(existing.id, d)
-					return prev.map(a => (a.id === existing.id ? merged : a))
-				}
-
-				const id = generateId()
-				const newAlert: IAlert = {
-					...alert,
-					id,
-					duration: alert.duration ?? DEFAULT_DURATION_ALERT,
-				}
-				startTimer(id, newAlert.duration!)
-				return [...prev, newAlert]
-			})
-		},
-		[startTimer],
-	)
-
-	const showSuccess = useCallback(
-		(text: string | string[], duration?: number) =>
-			showAlert({
-				severity: 'success',
-				text: formatText(text),
-				duration,
-			}),
-		[showAlert],
-	)
-
-	const showError = useCallback(
-		(text: string | string[], duration?: number) =>
-			showAlert({
-				severity: 'error',
-				text: formatText(text),
-				duration,
-			}),
-		[showAlert],
-	)
-
-	const showWarning = useCallback(
-		(text: string | string[], duration?: number) =>
-			showAlert({
-				severity: 'warning',
-				text: formatText(text),
-				duration,
-			}),
-		[showAlert],
-	)
-
-	const showInfo = useCallback(
-		(text: string | string[], duration?: number) =>
-			showAlert({
-				severity: 'info',
-				text: formatText(text),
-				duration,
-			}),
-		[showAlert],
-	)
-
-	const showRateLimitError = useCallback(
-		(retryAfter: number, message?: string) => {
-			showAlert({
-				severity: 'error',
-				text: message || 'Too many requests',
-				retryAfter,
-			})
-		},
-		[showAlert],
-	)
-
-	const showBackendError = useCallback(
-		(error: IAxiosError, duration?: number) => {
-			const errorMessages = parseBackendError(error)
-			const retryAfter = getRetryAfter(error)
-
-			if (retryAfter !== null) {
-				showRateLimitError(retryAfter, errorMessages.join('\n'))
-				return
+				})
 			}
+		}, [])
 
-			showError(errorMessages, duration)
-		},
-		[showError, showRateLimitError],
-	)
+		const contextValue = useMemo(
+			() => ({
+				alerts,
+				showAlert,
+				removeAlert,
+				pauseAlertTimer,
+				resumeAlertTimer,
+				showSuccess,
+				showError,
+				showWarning,
+				showInfo,
+				showBackendError,
+				showRateLimitError,
+			}),
+			[
+				alerts,
+				showAlert,
+				removeAlert,
+				pauseAlertTimer,
+				resumeAlertTimer,
+				showSuccess,
+				showError,
+				showWarning,
+				showInfo,
+				showBackendError,
+				showRateLimitError,
+			],
+		)
 
-	useEffect(() => {
-		const currentTimers = timers.current
-
-		return () => {
-			Object.keys(currentTimers).forEach(id => {
-				const timer = currentTimers[id]
-				if (timer) {
-					clearTimeout(timer)
-					delete currentTimers[id]
-				}
-			})
-		}
-	}, [])
-
-	const contextValue = useMemo(
-		() => ({
-			alerts,
-			showAlert,
-			removeAlert,
-			pauseAlertTimer,
-			resumeAlertTimer,
-			showSuccess,
-			showError,
-			showWarning,
-			showInfo,
-			showBackendError,
-			showRateLimitError,
-		}),
-		[
-			alerts,
-			showAlert,
-			removeAlert,
-			pauseAlertTimer,
-			resumeAlertTimer,
-			showSuccess,
-			showError,
-			showWarning,
-			showInfo,
-			showBackendError,
-			showRateLimitError,
-		],
-	)
-
-	return <AlertContext.Provider value={contextValue}>{children}</AlertContext.Provider>
-})
+		return (
+			<AlertContext.Provider value={contextValue}>
+				{children}
+			</AlertContext.Provider>
+		)
+	},
+)
 
 AlertProvider.displayName = 'AlertProvider'
 

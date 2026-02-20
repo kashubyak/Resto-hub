@@ -17,7 +17,7 @@ function notifyListeners(): void {
 			? requests.reduce((sum, req) => sum + req.progress, 0) / requests.length
 			: 0
 
-	progressListeners.forEach(listener => listener(avgProgress))
+	progressListeners.forEach((listener) => listener(avgProgress))
 }
 
 export const useNetworkProgress = () => {
@@ -67,7 +67,9 @@ export function updateNetworkProgress(
 	const request = networkRequests.get(requestId)
 	if (!request) return
 
-	const progress = total ? Math.min((loaded / total) * 100, 99) : request.progress
+	const progress = total
+		? Math.min((loaded / total) * 100, 99)
+		: request.progress
 	networkRequests.set(requestId, { ...request, progress })
 	notifyListeners()
 }

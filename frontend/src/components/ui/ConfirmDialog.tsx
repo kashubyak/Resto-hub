@@ -42,7 +42,8 @@ export const ConfirmDialog = memo<IConfirmDialogProps>(
 		const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'xl'))
 
 		const safeClose = useCallback(() => {
-			if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+			if (document.activeElement instanceof HTMLElement)
+				document.activeElement.blur()
 			onClose()
 		}, [onClose])
 
@@ -77,7 +78,8 @@ export const ConfirmDialog = memo<IConfirmDialogProps>(
 		const colorConfig = useMemo(() => {
 			const configs = {
 				destructive: {
-					gradient: 'linear-gradient(135deg, var(--destructive) 0%, var(--muted) 90%)',
+					gradient:
+						'linear-gradient(135deg, var(--destructive) 0%, var(--muted) 90%)',
 					buttonClass: 'bg-destructive hover:bg-destructive text-foreground',
 				},
 				info: {
@@ -85,11 +87,13 @@ export const ConfirmDialog = memo<IConfirmDialogProps>(
 					buttonClass: 'bg-primary hover:bg-primary text-foreground',
 				},
 				success: {
-					gradient: 'linear-gradient(135deg, var(--success) 0%, var(--muted) 90%)',
+					gradient:
+						'linear-gradient(135deg, var(--success) 0%, var(--muted) 90%)',
 					buttonClass: 'bg-success hover:bg-success text-foreground',
 				},
 				warning: {
-					gradient: 'linear-gradient(135deg, var(--warning) 0%, var(--muted) 90%)',
+					gradient:
+						'linear-gradient(135deg, var(--warning) 0%, var(--muted) 90%)',
 					buttonClass: 'bg-warning hover:bg-warning text-foreground',
 				},
 			}
@@ -143,7 +147,8 @@ export const ConfirmDialog = memo<IConfirmDialogProps>(
 			() => ({
 				color: 'var(--foreground)',
 				'&:hover': {
-					backgroundColor: 'color-mix(in oklab, var(--foreground) 10%, transparent)',
+					backgroundColor:
+						'color-mix(in oklab, var(--foreground) 10%, transparent)',
 				},
 			}),
 			[],
@@ -169,13 +174,13 @@ export const ConfirmDialog = memo<IConfirmDialogProps>(
 
 				<DialogActions sx={actionsSx}>
 					<Button
-						type='button'
+						type="button"
 						text={cancelText}
 						onClick={safeClose}
 						className={isMobile ? 'w-full' : ''}
 					/>
 					<Button
-						type='button'
+						type="button"
 						onClick={handleConfirm}
 						text={confirmText}
 						className={confirmButtonClass}

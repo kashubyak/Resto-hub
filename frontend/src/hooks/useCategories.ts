@@ -31,7 +31,7 @@ export const useCategories = (searchQuery?: string, filters?: FilterValues) => {
 			})
 			return response.data
 		},
-		getNextPageParam: lastPage =>
+		getNextPageParam: (lastPage) =>
 			lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
 		initialPageParam: 1,
 		staleTime: 30000,
@@ -43,7 +43,7 @@ export const useCategories = (searchQuery?: string, filters?: FilterValues) => {
 	}, [queryClient])
 
 	const allCategories = useMemo<ICategoryWithDishes[]>(
-		() => categoriesQuery.data?.pages.flatMap(page => page.data) ?? [],
+		() => categoriesQuery.data?.pages.flatMap((page) => page.data) ?? [],
 		[categoriesQuery.data?.pages],
 	)
 

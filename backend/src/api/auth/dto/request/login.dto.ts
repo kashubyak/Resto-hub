@@ -12,7 +12,8 @@ const PASSWORD_REGEX =
 
 export class LoginDto {
 	@ApiProperty({
-		description: 'Company subdomain (optional when Host header contains subdomain)',
+		description:
+			'Company subdomain (optional when Host header contains subdomain)',
 		example: 'mycompany',
 		required: false,
 	})

@@ -27,7 +27,10 @@ const textFieldSx = {
 		borderRadius: '8px',
 		'& fieldset': { borderColor: 'var(--border)' },
 		'&:hover fieldset': { borderColor: 'var(--primary)' },
-		'&.Mui-focused fieldset': { borderColor: 'var(--primary)', borderWidth: '1px' },
+		'&.Mui-focused fieldset': {
+			borderColor: 'var(--primary)',
+			borderWidth: '1px',
+		},
 	},
 	'& .MuiInputLabel-root': { color: 'var(--muted-foreground)' },
 	'& .MuiInputLabel-root.Mui-focused': { color: 'var(--primary)' },
@@ -42,7 +45,8 @@ export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
 	const safeClose = useCallback(() => {
-		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+		if (document.activeElement instanceof HTMLElement)
+			document.activeElement.blur()
 		onClose()
 	}, [onClose])
 
@@ -82,7 +86,8 @@ export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
 					color: 'var(--stable-light)',
 					borderBottom: '1px solid var(--border)',
 					padding: isMobile ? '1rem' : '1.5rem 2rem',
-					background: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
+					background:
+						'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
@@ -94,7 +99,7 @@ export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
 				</IconButton>
 			</DialogTitle>
 
-			<form onSubmit={handleSubmit(onSubmit)} className='flex flex-col flex-1'>
+			<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1">
 				<DialogContent
 					sx={{
 						padding: isMobile ? '1.5rem 1rem' : '2rem',
@@ -103,13 +108,13 @@ export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
 						gap: 3,
 					}}
 				>
-					<div className='space-y-1'>
+					<div className="space-y-1">
 						<TextField
 							fullWidth
-							label='Category Name'
+							label="Category Name"
 							error={!!errors.name}
 							helperText={errors.name?.message}
-							variant='outlined'
+							variant="outlined"
 							sx={textFieldSx}
 							{...register('name', {
 								required: 'Name is required',
@@ -135,15 +140,15 @@ export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
 					}}
 				>
 					<Button
-						type='button'
-						text='Cancel'
+						type="button"
+						text="Cancel"
 						onClick={safeClose}
 						className={`bg-transparent border border-border text-foreground hover:bg-muted ${
 							isMobile ? 'w-full' : ''
 						}`}
 					/>
 					<Button
-						type='submit'
+						type="submit"
 						text={isSubmitting ? 'Creating...' : 'Create'}
 						className={`${
 							isMobile ? 'w-full' : 'w-auto px-4 py-2'

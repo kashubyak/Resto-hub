@@ -24,11 +24,15 @@ export const ViewableImage = memo(
 		style,
 		...imageProps
 	}: ViewableImageProps) => {
-		const { isOpen, imageSrc, imageAlt, openViewer, closeViewer } = useViewableImage()
+		const { isOpen, imageSrc, imageAlt, openViewer, closeViewer } =
+			useViewableImage()
 		const theme = useTheme()
 		const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-		const isFill = useMemo(() => 'fill' in imageProps && imageProps.fill, [imageProps])
+		const isFill = useMemo(
+			() => 'fill' in imageProps && imageProps.fill,
+			[imageProps],
+		)
 
 		const handleImageClick = useCallback(() => {
 			if (onClick) onClick()
@@ -88,17 +92,22 @@ export const ViewableImage = memo(
 
 					{showViewIcon && (
 						<IconButton
-							className='view-icon'
+							className="view-icon"
 							onClick={handleViewIconClick}
 							sx={iconButtonStyles}
-							size='small'
+							size="small"
 						>
-							<VisibilityIcon fontSize='small' />
+							<VisibilityIcon fontSize="small" />
 						</IconButton>
 					)}
 				</Box>
 
-				<ImageViewer open={isOpen} onClose={closeViewer} src={imageSrc} alt={imageAlt} />
+				<ImageViewer
+					open={isOpen}
+					onClose={closeViewer}
+					src={imageSrc}
+					alt={imageAlt}
+				/>
 			</>
 		)
 	},

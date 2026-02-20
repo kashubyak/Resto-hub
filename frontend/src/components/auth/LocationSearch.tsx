@@ -59,8 +59,7 @@ export function LocationSearch({
 					`/api/geocode/search?q=${encodeURIComponent(query)}`,
 					{ signal },
 				)
-				if (!response.ok)
-					throw new Error(`Search error: ${response.status}`)
+				if (!response.ok) throw new Error(`Search error: ${response.status}`)
 
 				const data = await response.json()
 				setResults(Array.isArray(data) ? data : [])
@@ -112,10 +111,7 @@ export function LocationSearch({
 
 	const getLocationLabel = (result: LocationResult) => {
 		const city =
-			result.address.city ||
-			result.address.town ||
-			result.address.village ||
-			''
+			result.address.city || result.address.town || result.address.village || ''
 		const country = result.address.country || ''
 		if (city && country) {
 			return { primary: city, secondary: country }
@@ -129,7 +125,10 @@ export function LocationSearch({
 
 	return (
 		<div className="space-y-2" ref={dropdownRef}>
-			<label className="block text-sm font-medium text-card-foreground">
+			<label
+				htmlFor="company-location"
+				className="block text-sm font-medium text-card-foreground"
+			>
 				Company location
 			</label>
 			<div className="relative">
@@ -138,7 +137,9 @@ export function LocationSearch({
 						<Search className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
 					</div>
 					<input
+						id="company-location"
 						type="text"
+						autoComplete="off"
 						value={query}
 						onChange={handleInputChange}
 						onFocus={() => setShowDropdown(true)}

@@ -11,7 +11,10 @@ type UseUploadImageParams = {
 	onDataChange?: (preview: string | null, file: File | null) => void
 }
 
-const createFileFromBase64 = (base64: string, fileName: string = 'image.jpg'): File => {
+const createFileFromBase64 = (
+	base64: string,
+	fileName: string = 'image.jpg',
+): File => {
 	const arr = base64.split(',')
 	const match = arr[0]?.match(/:(.*?);/)
 	const mime = match?.[1] ?? 'image/jpeg'

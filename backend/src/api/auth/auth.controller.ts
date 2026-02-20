@@ -1,23 +1,23 @@
 import {
-    Body,
-    Controller,
-    HttpCode,
-    HttpStatus,
-    Post,
-    Req,
-    Res,
-    UploadedFiles,
-    UseInterceptors,
+	Body,
+	Controller,
+	HttpCode,
+	HttpStatus,
+	Post,
+	Req,
+	Res,
+	UploadedFiles,
+	UseInterceptors,
 } from '@nestjs/common'
 import { FileFieldsInterceptor } from '@nestjs/platform-express/multer/interceptors'
 import {
-    ApiBearerAuth,
-    ApiBody,
-    ApiCreatedResponse,
-    ApiOkResponse,
-    ApiOperation,
-    ApiTags,
-    ApiTooManyRequestsResponse,
+	ApiBearerAuth,
+	ApiBody,
+	ApiCreatedResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+	ApiTooManyRequestsResponse,
 } from '@nestjs/swagger'
 import { Throttle } from '@nestjs/throttler'
 import { Request, Response } from 'express'
@@ -50,10 +50,7 @@ export class AuthController {
 	@Public()
 	@HttpCode(HttpStatus.OK)
 	@ApiOkResponse({ description: 'Token refreshed successfully' })
-	refresh(
-		@Req() req: Request,
-		@Res({ passthrough: true }) res: Response,
-	) {
+	refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
 		return this.authService.refreshUser(req, res)
 	}
 

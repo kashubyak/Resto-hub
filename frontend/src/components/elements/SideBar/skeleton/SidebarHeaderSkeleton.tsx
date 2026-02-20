@@ -8,13 +8,13 @@ interface SidebarHeaderSkeletonProps {
 const ExpandedHeaderSkeleton = memo(() => (
 	<>
 		<Skeleton
-			variant='rounded'
+			variant="rounded"
 			width={40}
 			height={40}
 			sx={{ bgcolor: 'var(--active-item)', borderRadius: '6px' }}
 		/>
 		<Skeleton
-			variant='rounded'
+			variant="rounded"
 			width={40}
 			height={40}
 			sx={{ bgcolor: 'var(--active-item)', borderRadius: '8px' }}
@@ -25,7 +25,7 @@ ExpandedHeaderSkeleton.displayName = 'ExpandedHeaderSkeleton'
 
 const CollapsedHeaderSkeleton = memo(() => (
 	<Skeleton
-		variant='rounded'
+		variant="rounded"
 		width={48}
 		height={40}
 		sx={{ bgcolor: 'var(--active-item)', borderRadius: '8px' }}
@@ -33,12 +33,14 @@ const CollapsedHeaderSkeleton = memo(() => (
 ))
 CollapsedHeaderSkeleton.displayName = 'CollapsedHeaderSkeleton'
 
-export const SidebarHeaderSkeleton = memo(({ collapsed }: SidebarHeaderSkeletonProps) => {
-	return (
-		<div className='flex items-center justify-between border-b border-border p-2'>
-			{!collapsed ? <ExpandedHeaderSkeleton /> : <CollapsedHeaderSkeleton />}
-		</div>
-	)
-})
+export const SidebarHeaderSkeleton = memo(
+	({ collapsed }: SidebarHeaderSkeletonProps) => {
+		return (
+			<div className="flex items-center justify-between border-b border-border p-2">
+				{!collapsed ? <ExpandedHeaderSkeleton /> : <CollapsedHeaderSkeleton />}
+			</div>
+		)
+	},
+)
 
 SidebarHeaderSkeleton.displayName = 'SidebarHeaderSkeleton'

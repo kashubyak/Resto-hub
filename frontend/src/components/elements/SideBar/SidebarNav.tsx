@@ -32,7 +32,7 @@ const NavItem = memo(
 						: 'text-muted-foreground hover:bg-secondary hover:text-foreground',
 				)}
 			>
-				<span className='flex items-center justify-center w-6 h-6'>
+				<span className="flex items-center justify-center w-6 h-6">
 					<Icon />
 				</span>
 				<span
@@ -55,7 +55,7 @@ export const SidebarNav = memo(({ collapsed }: ISidebarNavProps) => {
 
 	const routesWithActiveState = useMemo(
 		() =>
-			routes.map(route => ({
+			routes.map((route) => ({
 				...route,
 				isActive: pathname === route.path,
 			})),
@@ -63,8 +63,8 @@ export const SidebarNav = memo(({ collapsed }: ISidebarNavProps) => {
 	)
 
 	return (
-		<nav className='flex-1 p-2 space-y-1'>
-			{routesWithActiveState.map(route => (
+		<nav className="flex-1 p-2 space-y-1">
+			{routesWithActiveState.map((route) => (
 				<NavItem
 					key={route.path}
 					route={route}

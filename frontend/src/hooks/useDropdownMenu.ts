@@ -82,7 +82,10 @@ export const useKebabMenu = (offset = 8, margin = 8) => {
 		const handleDocumentClick = (e: Event) => {
 			const target = e.target as Node | null
 			if (!menuRef.current || !buttonRef.current) return
-			if (!menuRef.current.contains(target) && !buttonRef.current.contains(target))
+			if (
+				!menuRef.current.contains(target) &&
+				!buttonRef.current.contains(target)
+			)
 				closeMenu()
 		}
 

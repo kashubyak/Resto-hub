@@ -7,7 +7,10 @@ import {
 	type SelectChangeEvent,
 } from '@mui/material'
 import { memo } from 'react'
-import type { ControllerFieldState, ControllerRenderProps } from 'react-hook-form'
+import type {
+	ControllerFieldState,
+	ControllerRenderProps,
+} from 'react-hook-form'
 
 type ValueType = string | number | null | undefined
 type FormValues = {
@@ -26,7 +29,8 @@ const MENU_PROPS_SX = {
 	'& .MuiPaper-root': {
 		marginTop: '0.5rem',
 		borderRadius: '0.375rem',
-		boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+		boxShadow:
+			'0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
 		border: '1px solid var(--border)',
 		backgroundColor: 'var(--muted)',
 		color: 'var(--foreground)',
@@ -114,34 +118,34 @@ export const DropdownCategory = memo((props: DropdownCategoryProps) => {
 
 	return (
 		<FormControl fullWidth error={isError}>
-			<InputLabel id='dropdown-category-label' sx={INPUT_LABEL_SX(isError)}>
+			<InputLabel id="dropdown-category-label" sx={INPUT_LABEL_SX(isError)}>
 				Category
 			</InputLabel>
 			<Select
-				labelId='dropdown-category-label'
-				id='dropdown-category-select'
+				labelId="dropdown-category-label"
+				id="dropdown-category-select"
 				{...restFieldProps}
 				value={selectedValue}
 				onChange={handleChange}
-				label='Category'
-				variant='outlined'
+				label="Category"
+				variant="outlined"
 				sx={SELECT_SX(isError)}
 				MenuProps={{
 					sx: MENU_PROPS_SX,
 				}}
 			>
-				<MenuItem value='' sx={MENU_ITEM_SX}>
+				<MenuItem value="" sx={MENU_ITEM_SX}>
 					None
 				</MenuItem>
 
-				{allCategories.map(category => (
+				{allCategories.map((category) => (
 					<MenuItem key={category.id} value={category.id} sx={MENU_ITEM_SX}>
 						{category.name}
 					</MenuItem>
 				))}
 			</Select>
 			{isError && (
-				<span className='text-[var(--destructive)] text-sm mt-1'>
+				<span className="text-[var(--destructive)] text-sm mt-1">
 					{fieldState.error?.message}
 				</span>
 			)}

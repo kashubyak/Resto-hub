@@ -7,7 +7,10 @@ import { memo, useCallback } from 'react'
 interface BooleanFilterProps {
 	config: BooleanFilterConfig
 	values: Record<string, string | number | boolean | undefined | null>
-	onChange: (key: string, value: string | number | boolean | undefined | null) => void
+	onChange: (
+		key: string,
+		value: string | number | boolean | undefined | null,
+	) => void
 }
 
 const switchSx = {
@@ -50,12 +53,13 @@ const BooleanFilterComponent: React.FC<BooleanFilterProps> = ({
 	const value = values[config.key] ?? false
 
 	const handleChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => onChange(config.key, e.target.checked),
+		(e: React.ChangeEvent<HTMLInputElement>) =>
+			onChange(config.key, e.target.checked),
 		[config.key, onChange],
 	)
 
 	return (
-		<div className='space-y-2'>
+		<div className="space-y-2">
 			<FormControlLabel
 				control={
 					<Switch

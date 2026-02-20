@@ -23,13 +23,13 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 
 	return (
 		<Controller
-			name='available'
+			name="available"
 			control={control}
 			defaultValue={true}
 			render={({ field: { value, onChange } }) => (
-				<FormControl component='fieldset'>
+				<FormControl component="fieldset">
 					<FormLabel
-						component='legend'
+						component="legend"
 						sx={{
 							color: 'var(--foreground)',
 							fontSize: '1rem',
@@ -45,7 +45,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 					</FormLabel>
 					<RadioGroup
 						value={String(value)}
-						onChange={e => onChange(e.target.value === 'true')}
+						onChange={(e) => onChange(e.target.value === 'true')}
 						row={!isFullScreen}
 						sx={{
 							gap: isFullScreen ? '0.5rem' : '1rem',
@@ -53,7 +53,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 						}}
 					>
 						<FormControlLabel
-							value='true'
+							value="true"
 							control={
 								<Radio
 									sx={{
@@ -68,7 +68,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 									}}
 								/>
 							}
-							label='Available'
+							label="Available"
 							sx={{
 								'& .MuiFormControlLabel-label': {
 									color: 'var(--foreground)',
@@ -79,7 +79,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 							}}
 						/>
 						<FormControlLabel
-							value='false'
+							value="false"
 							control={
 								<Radio
 									sx={{
@@ -94,7 +94,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 									}}
 								/>
 							}
-							label='Not Available'
+							label="Not Available"
 							sx={{
 								'& .MuiFormControlLabel-label': {
 									color: 'var(--foreground)',

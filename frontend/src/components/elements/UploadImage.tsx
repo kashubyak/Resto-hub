@@ -15,7 +15,13 @@ type UploadImageProps = {
 }
 
 export const UploadImage = memo(
-	({ label, error, savedPreview, onDataChange, register }: UploadImageProps) => {
+	({
+		label,
+		error,
+		savedPreview,
+		onDataChange,
+		register,
+	}: UploadImageProps) => {
 		const [isDraggingOver, setIsDraggingOver] = useState(false)
 
 		const {
@@ -48,15 +54,21 @@ export const UploadImage = memo(
 			[ref, inputRef],
 		)
 
-		const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-			preventDefaults(e)
-			setIsDraggingOver(true)
-		}, [preventDefaults])
+		const handleDragEnter = useCallback(
+			(e: React.DragEvent<HTMLDivElement>) => {
+				preventDefaults(e)
+				setIsDraggingOver(true)
+			},
+			[preventDefaults],
+		)
 
-		const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-			preventDefaults(e)
-			setIsDraggingOver(false)
-		}, [preventDefaults])
+		const handleDragLeave = useCallback(
+			(e: React.DragEvent<HTMLDivElement>) => {
+				preventDefaults(e)
+				setIsDraggingOver(false)
+			},
+			[preventDefaults],
+		)
 
 		const handleDropZone = useCallback(
 			(e: React.DragEvent<HTMLDivElement>) => {
@@ -125,9 +137,7 @@ export const UploadImage = memo(
 								<p className="text-sm font-medium text-foreground truncate">
 									{label ?? 'Image'}
 								</p>
-								<p className="text-xs text-muted-foreground">
-									Image uploaded
-								</p>
+								<p className="text-xs text-muted-foreground">Image uploaded</p>
 							</div>
 							<button
 								type="button"

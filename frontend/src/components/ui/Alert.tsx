@@ -62,44 +62,46 @@ const CustomAlert = styled(Alert)(({ theme }) => ({
 	},
 }))
 
-export const AlertUI = memo<IAlertProps>(({ severity, text, retryAfter, onTimerComplete }) => {
-	const [expanded, setExpanded] = useState(false)
-	const secondsLeft = useRateLimitTimer(retryAfter)
+export const AlertUI = memo<IAlertProps>(
+	({ severity, text, retryAfter, onTimerComplete }) => {
+		const [expanded, setExpanded] = useState(false)
+		const secondsLeft = useRateLimitTimer(retryAfter)
 
-	useEffect(() => {
-		if (retryAfter !== undefined && secondsLeft === null && onTimerComplete) {
-			onTimerComplete()
-		}
-	}, [secondsLeft, retryAfter, onTimerComplete])
+		useEffect(() => {
+			if (retryAfter !== undefined && secondsLeft === null && onTimerComplete) {
+				onTimerComplete()
+			}
+		}, [secondsLeft, retryAfter, onTimerComplete])
 
-	const isLong = useMemo(() => text.length > MAX_LENGTH_ALERT, [text.length])
+		const isLong = useMemo(() => text.length > MAX_LENGTH_ALERT, [text.length])
 
-	const displayText = useMemo(() => {
-		let baseText = text
+		const displayText = useMemo(() => {
+			let baseText = text
 
-		if (isLong && !expanded)
-			baseText = text.slice(0, MAX_LENGTH_ALERT) + '...'
-		if (retryAfter !== undefined && secondsLeft !== null && secondsLeft > 0)
-			return `${baseText} Try again in ${formatRetryTime(secondsLeft)}.`
+			if (isLong && !expanded)
+				baseText = text.slice(0, MAX_LENGTH_ALERT) + '...'
+			if (retryAfter !== undefined && secondsLeft !== null && secondsLeft > 0)
+				return `${baseText} Try again in ${formatRetryTime(secondsLeft)}.`
 
-		return baseText
-	}, [text, isLong, expanded, retryAfter, secondsLeft])
+			return baseText
+		}, [text, isLong, expanded, retryAfter, secondsLeft])
 
-	const handleToggle = useCallback(() => setExpanded(prev => !prev), [])
+		const handleToggle = useCallback(() => setExpanded((prev) => !prev), [])
 
-	return (
-		<CustomAlert severity={severity}>
-			<span>{displayText}</span>
-			{isLong && (
-				<span
-					className='ml-1 sm:ml-2 underline cursor-pointer text-[11px] sm:text-xs opacity-80 text-nowrap'
-					onClick={handleToggle}
-				>
-					{expanded ? 'Show less' : 'Show more'}
-				</span>
-			)}
-		</CustomAlert>
-	)
-})
+		return (
+			<CustomAlert severity={severity}>
+				<span>{displayText}</span>
+				{isLong && (
+					<span
+						className="ml-1 sm:ml-2 underline cursor-pointer text-[11px] sm:text-xs opacity-80 text-nowrap"
+						onClick={handleToggle}
+					>
+						{expanded ? 'Show less' : 'Show more'}
+					</span>
+				)}
+			</CustomAlert>
+		)
+	},
+)
 
 AlertUI.displayName = 'AlertUI'

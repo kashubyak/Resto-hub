@@ -24,7 +24,10 @@ const AlertInitializer = () => {
 	useEffect(() => {
 		const pending = useAlertStore.getState().consumePendingAlert()
 		if (pending) {
-			if (pending.text === AUTH.SESSION_EXPIRED_MESSAGE && typeof window !== 'undefined')
+			if (
+				pending.text === AUTH.SESSION_EXPIRED_MESSAGE &&
+				typeof window !== 'undefined'
+			)
 				sessionStorage.setItem(AUTH.SESSION_EXPIRED_SHOWN_KEY, '1')
 			showAlert({
 				severity: pending.severity,

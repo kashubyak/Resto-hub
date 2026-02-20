@@ -71,8 +71,12 @@ export const IngredientsSection = ({
 	)
 
 	const handleDelete = useCallback(
-		(ingredient: string, value: string[], onChange: (newValue: string[]) => void) => {
-			const updated = value.filter(i => i !== ingredient)
+		(
+			ingredient: string,
+			value: string[],
+			onChange: (newValue: string[]) => void,
+		) => {
+			const updated = value.filter((i) => i !== ingredient)
 			onChange(updated)
 
 			if (updated.length === 0)
@@ -161,25 +165,26 @@ export const IngredientsSection = ({
 			</h3>
 
 			<Controller
-				name='ingredients'
+				name="ingredients"
 				control={control}
 				defaultValue={[]}
 				rules={{
 					required: 'At least one ingredient is required',
-					validate: value => value.length > 0 || 'At least one ingredient is required',
+					validate: (value) =>
+						value.length > 0 || 'At least one ingredient is required',
 				}}
 				render={({ field: { value, onChange } }) => (
-					<div className='w-full'>
+					<div className="w-full">
 						<div
 							className={`flex ${isFullScreen ? 'flex-col gap-2' : 'gap-2 items-start'}`}
 						>
-							<div className='flex-1'>
+							<div className="flex-1">
 								<Input
-									label='Add ingredient'
+									label="Add ingredient"
 									value={inputValue}
 									error={errors.ingredients?.message as string}
-									onChange={e => setInputValue(e.target.value)}
-									onKeyDown={e => {
+									onChange={(e) => setInputValue(e.target.value)}
+									onKeyDown={(e) => {
 										if (e.key === 'Enter') {
 											e.preventDefault()
 											handleAdd(value, onChange)
@@ -204,11 +209,15 @@ export const IngredientsSection = ({
 								}}
 							>
 								<AddIcon />
-								{isFullScreen && <span className='ml-2 text-sm'>Add Ingredient</span>}
+								{isFullScreen && (
+									<span className="ml-2 text-sm">Add Ingredient</span>
+								)}
 							</IconButton>
 						</div>
 
-						<div className={`flex flex-wrap gap-2 ${isFullScreen ? 'mt-2' : 'mt-3'}`}>
+						<div
+							className={`flex flex-wrap gap-2 ${isFullScreen ? 'mt-2' : 'mt-3'}`}
+						>
 							{value.map((ingredient, idx) => (
 								<IngredientChip
 									key={`${ingredient}-${idx}`}
@@ -222,7 +231,7 @@ export const IngredientsSection = ({
 									onDragOver={handleDragOver}
 									onDragEnter={handleDragEnter}
 									onDragLeave={handleDragLeave}
-									onDrop={e => handleDrop(e, idx, value, onChange)}
+									onDrop={(e) => handleDrop(e, idx, value, onChange)}
 									onDelete={() => handleDelete(ingredient, value, onChange)}
 								/>
 							))}

@@ -60,6 +60,7 @@ export const useRegisterCompany = () => {
 
 	const {
 		register,
+		control,
 		handleSubmit,
 		formState: { errors },
 		watch,
@@ -71,11 +72,11 @@ export const useRegisterCompany = () => {
 
 	const handleImageData = useCallback(
 		(type: 'logo' | 'avatar', preview: string | null, file: File | null) => {
-			setSavedPreviews(prev => ({
+			setSavedPreviews((prev) => ({
 				...prev,
 				[type]: preview,
 			}))
-			setSavedFiles(prev => ({
+			setSavedFiles((prev) => ({
 				...prev,
 				[type]: file,
 			}))
@@ -88,7 +89,7 @@ export const useRegisterCompany = () => {
 		[clearErrors],
 	)
 
-		const onSubmit = useCallback(
+	const onSubmit = useCallback(
 		async (data: IFormValues) => {
 			if (step === 0) {
 				if (!location.address) {
@@ -174,6 +175,7 @@ export const useRegisterCompany = () => {
 		setStep,
 		hasMounted,
 		register,
+		control,
 		watch,
 		errors,
 		setLocation,

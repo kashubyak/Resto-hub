@@ -105,7 +105,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 							control={control}
 							errors={errors}
 							watch={watch}
-							mode='update'
+							mode="update"
 						/>
 					)
 				case 'pricing':
@@ -113,7 +113,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 						<PricingCategorySection
 							key={config.type}
 							control={control}
-							mode='update'
+							mode="update"
 							trigger={trigger}
 						/>
 					)
@@ -133,7 +133,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 							key={config.type}
 							control={control}
 							errors={errors}
-							mode='update'
+							mode="update"
 						/>
 					)
 				case 'image':
@@ -142,7 +142,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 							key={config.type}
 							control={control}
 							errors={errors}
-							mode='update'
+							mode="update"
 							currentImageUrl={dishData?.imageUrl ?? null}
 						/>
 					)
@@ -150,39 +150,56 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 					return null
 			}
 		},
-		[control, errors, watch, setError, clearErrors, dishData?.imageUrl, trigger],
+		[
+			control,
+			errors,
+			watch,
+			setError,
+			clearErrors,
+			dishData?.imageUrl,
+			trigger,
+		],
 	)
 
 	return (
-		<Drawer anchor='right' open={open} onClose={onClose} sx={drawerSx}>
-			<form onSubmit={handleFormSubmit} className='flex flex-col h-full'>
-				<div className='flex items-center justify-between p-4 border-b border-border'>
-					<h2 className='text-xl font-bold flex items-center gap-2'>
+		<Drawer anchor="right" open={open} onClose={onClose} sx={drawerSx}>
+			<form onSubmit={handleFormSubmit} className="flex flex-col h-full">
+				<div className="flex items-center justify-between p-4 border-b border-border">
+					<h2 className="text-xl font-bold flex items-center gap-2">
 						<EditIcon />
 						{title}
 					</h2>
 					<IconButton
 						onClick={onClose}
-						size='small'
-						aria-label='close drawer'
+						size="small"
+						aria-label="close drawer"
 						sx={iconButtonSx}
 					>
 						<CloseIcon />
 					</IconButton>
 				</div>
 
-				<div className='flex-1 overflow-y-auto p-4'>
-					<div className='space-y-6'>{sections.map(renderSection)}</div>
+				<div className="flex-1 overflow-y-auto p-4">
+					<div className="space-y-6">{sections.map(renderSection)}</div>
 				</div>
 
-				<div className='p-4 border-t border-border space-y-2'>
-					<div className='flex justify-between gap-2'>
-						<Button type='button' onClick={onClose} text='Cancel' disabled={isLoading} />
-						<Button type='submit' text='Update dish' disabled={isLoading || !isDirty} />
+				<div className="p-4 border-t border-border space-y-2">
+					<div className="flex justify-between gap-2">
+						<Button
+							type="button"
+							onClick={onClose}
+							text="Cancel"
+							disabled={isLoading}
+						/>
+						<Button
+							type="submit"
+							text="Update dish"
+							disabled={isLoading || !isDirty}
+						/>
 					</div>
 					{isDirty && (
-						<Button type='button' onClick={handleReset} disabled={isLoading}>
-							<RestartAltIcon fontSize='small' />
+						<Button type="button" onClick={handleReset} disabled={isLoading}>
+							<RestartAltIcon fontSize="small" />
 							Reset to Initial
 						</Button>
 					)}

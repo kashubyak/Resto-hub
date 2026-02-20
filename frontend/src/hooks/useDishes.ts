@@ -49,13 +49,13 @@ export const useDishes = (
 			)
 			queryClient.setQueryData<InfiniteData<IDishListResponse>>(
 				[DISHES_QUERY_KEY.ALL, searchKey, filterKey],
-				oldData => {
+				(oldData) => {
 					if (!oldData) return oldData
 					return {
 						...oldData,
-						pages: oldData.pages.map(page => ({
+						pages: oldData.pages.map((page) => ({
 							...page,
-							data: page.data.map(dish =>
+							data: page.data.map((dish) =>
 								dish.id === updatedDish.id ? updatedDish : dish,
 							),
 						})),
@@ -77,7 +77,7 @@ export const useDishes = (
 			})
 			return response.data
 		},
-		getNextPageParam: lastPage =>
+		getNextPageParam: (lastPage) =>
 			lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
 		initialPageParam: 1,
 		enabled: !dishId,
@@ -103,7 +103,8 @@ export const useDishes = (
 	}, [showSuccess, queryClient, router])
 
 	const handleDeleteDishError = useCallback(
-		(err: unknown) => showError(parseBackendError(err as IAxiosError).join('\n')),
+		(err: unknown) =>
+			showError(parseBackendError(err as IAxiosError).join('\n')),
 		[showError],
 	)
 
@@ -119,13 +120,25 @@ export const useDishes = (
 	const handleDeleteDishFromCategorySuccess = useCallback(
 		(updatedDish: IDish) => {
 			showSuccess('Dish removed from category successfully')
-			updateDishCache(queryClient, updatedDish, normalizedSearchQuery, filterKey)
+			updateDishCache(
+				queryClient,
+				updatedDish,
+				normalizedSearchQuery,
+				filterKey,
+			)
 		},
-		[showSuccess, updateDishCache, queryClient, normalizedSearchQuery, filterKey],
+		[
+			showSuccess,
+			updateDishCache,
+			queryClient,
+			normalizedSearchQuery,
+			filterKey,
+		],
 	)
 
 	const handleDeleteDishFromCategoryError = useCallback(
-		(err: unknown) => showError(parseBackendError(err as IAxiosError).join('\n')),
+		(err: unknown) =>
+			showError(parseBackendError(err as IAxiosError).join('\n')),
 		[showError],
 	)
 
@@ -144,7 +157,7 @@ export const useDishes = (
 	)
 
 	const allDishes = useMemo<IDish[]>(
-		() => dishesQuery.data?.pages.flatMap(page => page.data) ?? [],
+		() => dishesQuery.data?.pages.flatMap((page) => page.data) ?? [],
 		[dishesQuery.data?.pages],
 	)
 

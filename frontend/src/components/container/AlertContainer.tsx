@@ -36,7 +36,7 @@ function AlertDisplayComponent() {
 
 	return (
 		<AlertContainer>
-			{alerts.map(alert => (
+			{alerts.map((alert) => (
 				<div
 					key={alert.id}
 					style={{ position: 'relative' }}
@@ -50,7 +50,7 @@ function AlertDisplayComponent() {
 						onTimerComplete={() => handleTimerComplete(alert.id)}
 					/>
 					<IconButton
-						size='small'
+						size="small"
 						onClick={() => removeAlert(alert.id)}
 						sx={{
 							position: 'absolute',
@@ -61,7 +61,7 @@ function AlertDisplayComponent() {
 							'&:hover': { opacity: 1 },
 						}}
 					>
-						<CloseIcon fontSize='small' />
+						<CloseIcon fontSize="small" />
 					</IconButton>
 				</div>
 			))}

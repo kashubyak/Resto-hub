@@ -8,6 +8,9 @@ export const deleteDish = async (
 	id: number,
 	config?: CustomAxiosRequestConfig,
 ): Promise<ApiResponse<IDeleteDishResponse>> => {
-	const response = await api.delete<IDeleteDishResponse>(API_URL.DISH.ID(id), config)
+	const response = await api.delete<IDeleteDishResponse>(
+		API_URL.DISH.ID(id),
+		config,
+	)
 	return response
 }

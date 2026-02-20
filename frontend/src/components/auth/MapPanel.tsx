@@ -4,10 +4,9 @@ import { MapPin } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { LocationSearch } from './LocationSearch'
 
-const Map = dynamic(
-	() => import('./Map').then((m) => ({ default: m.Map })),
-	{ ssr: false },
-)
+const Map = dynamic(() => import('./Map').then((m) => ({ default: m.Map })), {
+	ssr: false,
+})
 
 interface Location {
 	lat: number

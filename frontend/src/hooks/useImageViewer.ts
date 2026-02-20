@@ -16,7 +16,10 @@ export const useImageViewer = ({ open, onClose }: UseImageViewerProps) => {
 	const [position, setPosition] = useState<Position>({ x: 0, y: 0 })
 	const [isDragging, setIsDragging] = useState(false)
 	const [dragStart, setDragStart] = useState<Position>({ x: 0, y: 0 })
-	const [initialPosition, setInitialPosition] = useState<Position>({ x: 0, y: 0 })
+	const [initialPosition, setInitialPosition] = useState<Position>({
+		x: 0,
+		y: 0,
+	})
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	const imageBoxRef = useRef<HTMLDivElement>(null)
@@ -33,8 +36,14 @@ export const useImageViewer = ({ open, onClose }: UseImageViewerProps) => {
 		}
 	}, [open])
 
-	const handleZoomIn = useCallback(() => setZoom(prev => Math.min(prev * 1.2, 3)), [])
-	const handleZoomOut = useCallback(() => setZoom(prev => Math.max(prev / 1.2, 0.5)), [])
+	const handleZoomIn = useCallback(
+		() => setZoom((prev) => Math.min(prev * 1.2, 3)),
+		[],
+	)
+	const handleZoomOut = useCallback(
+		() => setZoom((prev) => Math.max(prev / 1.2, 0.5)),
+		[],
+	)
 
 	const handleFullscreen = useCallback(async () => {
 		if (!containerRef.current) return

@@ -2,7 +2,10 @@
 
 import { Input } from '@/components/ui/Input'
 import type { IDishFormValues } from '@/types/dish.interface'
-import { caloriesValidation, weightValidation } from '@/validation/dish.validation'
+import {
+	caloriesValidation,
+	weightValidation,
+} from '@/validation/dish.validation'
 import { useMediaQuery, useTheme } from '@mui/material'
 import { memo } from 'react'
 import {
@@ -48,15 +51,15 @@ const NutritionalInfoSectionFunction = ({
 					<>
 						<Input
 							register={register('weightGr', weightValidation)}
-							label='Weight (grams)'
-							type='number'
+							label="Weight (grams)"
+							type="number"
 							error={errors.weightGr?.message}
 						/>
 
 						<Input
 							register={register('calories', caloriesValidation)}
-							label='Calories'
-							type='number'
+							label="Calories"
+							type="number"
 							error={errors.calories?.message}
 						/>
 					</>
@@ -64,27 +67,27 @@ const NutritionalInfoSectionFunction = ({
 					control && (
 						<>
 							<Controller
-								name='weightGr'
+								name="weightGr"
 								control={control}
 								rules={weightValidation}
 								render={({ field }) => (
 									<Input
 										{...field}
-										label='Weight (grams)'
-										type='number'
+										label="Weight (grams)"
+										type="number"
 										error={errors.weightGr?.message}
 									/>
 								)}
 							/>
 							<Controller
-								name='calories'
+								name="calories"
 								control={control}
 								rules={caloriesValidation}
 								render={({ field }) => (
 									<Input
 										{...field}
-										label='Calories'
-										type='number'
+										label="Calories"
+										type="number"
 										error={errors.calories?.message}
 									/>
 								)}

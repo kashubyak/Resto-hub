@@ -17,8 +17,8 @@ export const useCompanySettings = (userCompanyId?: number) => {
 	useEffect(() => {
 		if (!userCompanyId) return
 		getCompany()
-			.then(res => setCompany(res.data))
-			.catch(err => showBackendError(err as IAxiosError))
+			.then((res) => setCompany(res.data))
+			.catch((err) => showBackendError(err as IAxiosError))
 	}, [userCompanyId, showBackendError])
 
 	const handleCopy = useCallback(() => {

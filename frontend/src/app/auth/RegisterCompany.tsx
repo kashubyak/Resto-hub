@@ -1,6 +1,10 @@
 'use client'
 
-import { AuthPasswordField, AuthTextField } from '@/components/auth/AuthFields'
+import {
+	AuthControllerTextField,
+	AuthPasswordField,
+	AuthTextField,
+} from '@/components/auth/AuthFields'
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
 import { LocationSearch } from '@/components/auth/LocationSearch'
 import { MapPanel } from '@/components/auth/MapPanel'
@@ -35,6 +39,7 @@ const RegisterCompanyComponent = () => {
 		step,
 		setStep,
 		register,
+		control,
 		watch,
 		errors,
 		setLocation,
@@ -105,7 +110,10 @@ const RegisterCompanyComponent = () => {
 						<div className="bg-card rounded-xl sm:rounded-3xl shadow-lg border border-border/50 p-4 sm:p-8 backdrop-blur-sm flex-shrink-0">
 							<form
 								onSubmit={handleSubmit(onSubmit)}
+								method="post"
+								action="#"
 								encType="multipart/form-data"
+								autoComplete="on"
 								className="space-y-4 sm:space-y-6"
 							>
 								{step === 0 ? (
@@ -116,7 +124,9 @@ const RegisterCompanyComponent = () => {
 											placeholder="Your company"
 											autoComplete="organization"
 											error={errors.name?.message}
-											leftIcon={<Building2 className="h-5 w-5 text-muted-foreground" />}
+											leftIcon={
+												<Building2 className="h-5 w-5 text-muted-foreground" />
+											}
 											register={register('name', CompanyNameValidation)}
 										/>
 
@@ -124,6 +134,7 @@ const RegisterCompanyComponent = () => {
 											id="subdomain"
 											label="Subdomain"
 											placeholder="your-company"
+											autoComplete="off"
 											error={errors.subdomain?.message}
 											hint={
 												(watch('subdomain') ?? '')
@@ -160,31 +171,46 @@ const RegisterCompanyComponent = () => {
 									</>
 								) : (
 									<>
-										<AuthTextField
+										<AuthControllerTextField
+											control={control}
+											name="adminName"
+											rules={adminNameValidation}
 											id="adminName"
 											label="Full name"
-											placeholder="John Doe"
+											autocompleteName="name"
+											type="text"
 											autoComplete="name"
+											placeholder="John Doe"
+											leftIcon={
+												<User className="h-5 w-5 text-muted-foreground" />
+											}
 											error={errors.adminName?.message}
-											leftIcon={<User className="h-5 w-5 text-muted-foreground" />}
-											register={register('adminName', adminNameValidation)}
 										/>
 
-										<AuthTextField
+										<AuthControllerTextField
+											control={control}
+											name="adminEmail"
+											rules={emailValidation}
 											id="adminEmail"
 											label="Email"
+											autocompleteName="email"
 											type="email"
+											autoComplete="email"
 											placeholder="your@email.com"
+											leftIcon={
+												<Mail className="h-5 w-5 text-muted-foreground" />
+											}
 											error={errors.adminEmail?.message}
-											leftIcon={<Mail className="h-5 w-5 text-muted-foreground" />}
-											register={register('adminEmail', emailValidation)}
 										/>
 
 										<AuthPasswordField
 											id="adminPassword"
 											label="Password"
+											autoComplete="new-password"
 											error={errors.adminPassword?.message}
-											leftIcon={<Lock className="h-5 w-5 text-muted-foreground" />}
+											leftIcon={
+												<Lock className="h-5 w-5 text-muted-foreground" />
+											}
 											register={register('adminPassword', passwordValidation)}
 											showPassword={showPassword}
 											onTogglePassword={() => setShowPassword(!showPassword)}
@@ -193,8 +219,11 @@ const RegisterCompanyComponent = () => {
 										<AuthPasswordField
 											id="confirmPassword"
 											label="Confirm password"
+											autoComplete="new-password"
 											error={errors.confirmPassword?.message}
-											leftIcon={<Lock className="h-5 w-5 text-muted-foreground" />}
+											leftIcon={
+												<Lock className="h-5 w-5 text-muted-foreground" />
+											}
 											register={register('confirmPassword', {
 												required: 'Please confirm your password',
 												validate: {
@@ -240,7 +269,11 @@ const RegisterCompanyComponent = () => {
 										disabled={isSubmitting}
 										className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-60 disabled:pointer-events-none disabled:transform-none"
 									>
-										{step === 0 ? 'Continue' : isSubmitting ? 'Creating account...' : 'Create account'}
+										{step === 0
+											? 'Continue'
+											: isSubmitting
+												? 'Creating account...'
+												: 'Create account'}
 									</button>
 								</div>
 							</form>
@@ -260,14 +293,10 @@ const RegisterCompanyComponent = () => {
 						<div className="md:hidden w-full min-h-[280px] flex-1 mt-6">
 							<Map
 								center={
-									location.address
-										? [location.lat, location.lng]
-										: undefined
+									location.address ? [location.lat, location.lng] : undefined
 								}
 								marker={
-									location.address
-										? [location.lat, location.lng]
-										: undefined
+									location.address ? [location.lat, location.lng] : undefined
 								}
 							/>
 						</div>

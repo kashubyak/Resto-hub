@@ -2,7 +2,11 @@ import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { getSubdomainFromHost } from '@/utils/api/subdomain'
 import { NextRequest, NextResponse } from 'next/server'
-import { redirectToHome, redirectToLogin, redirectToNotFound } from './redirects'
+import {
+	redirectToHome,
+	redirectToLogin,
+	redirectToNotFound,
+} from './redirects'
 import { hasRoleAccess } from './role-guards'
 import { isAuthRoute, isPublicRoute } from './route-guards'
 import { type IRefreshResult, refreshAccessToken } from './token-refresh'
@@ -17,19 +21,27 @@ const SESSION_EXPIRED_ALERT = JSON.stringify({
 	text: AUTH.SESSION_EXPIRED_MESSAGE,
 })
 
-export async function authMiddleware(request: NextRequest): Promise<NextResponse> {
+export async function authMiddleware(
+	request: NextRequest,
+): Promise<NextResponse> {
 	const { pathname } = request.nextUrl
 	const host = request.nextUrl.hostname ?? request.headers.get('host') ?? ''
 	const subdomain = getSubdomainFromHost(host)
 
-	if (subdomain && (pathname.startsWith(ROUTES.PUBLIC.AUTH.REGISTER) || pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS)) {
+	if (
+		subdomain &&
+		(pathname.startsWith(ROUTES.PUBLIC.AUTH.REGISTER) ||
+			pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS)
+	) {
 		return redirectToLogin(request, pathname)
 	}
 
 	if (isPublicRoute(pathname)) return NextResponse.next()
 
-	const isAuthenticated = request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true'
-	if (isAuthRoute(pathname)) return isAuthenticated ? redirectToHome(request) : NextResponse.next()
+	const isAuthenticated =
+		request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true'
+	if (isAuthRoute(pathname))
+		return isAuthenticated ? redirectToHome(request) : NextResponse.next()
 
 	if (isAuthenticated) return NextResponse.next()
 
@@ -47,7 +59,8 @@ async function handleTokenRefresh(
 
 	if (refreshResult.success) {
 		if (refreshResult.user) {
-			if (!hasRoleAccess(refreshResult.user.role, pathname)) return redirectToNotFound(request)
+			if (!hasRoleAccess(refreshResult.user.role, pathname))
+				return redirectToNotFound(request)
 		}
 
 		return forwardCookiesAndContinue(refreshResult)
@@ -56,7 +69,9 @@ async function handleTokenRefresh(
 	return handleSessionExpired(request, pathname, hadAuth)
 }
 
-function forwardCookiesAndContinue(refreshResult: IRefreshResult): NextResponse {
+function forwardCookiesAndContinue(
+	refreshResult: IRefreshResult,
+): NextResponse {
 	const response = NextResponse.next()
 
 	if (refreshResult.setCookieHeaders) {

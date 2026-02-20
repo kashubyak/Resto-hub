@@ -5,6 +5,10 @@ export const metadata: Metadata = {
 	title: 'Category',
 }
 
-export default function CategoryLayout({ children }: { children: React.ReactNode }) {
+export default function CategoryLayout({
+	children,
+}: {
+	children: React.ReactNode
+}) {
 	return <SidebarShell>{children}</SidebarShell>
 }

@@ -38,12 +38,12 @@ function IngredientChipComponent({
 		<div
 			key={`${ingredient}-${idx}`}
 			draggable
-			onDragStart={e => onDragStart(e, idx)}
+			onDragStart={(e) => onDragStart(e, idx)}
 			onDragEnd={onDragEnd}
 			onDragOver={onDragOver}
-			onDragEnter={e => onDragEnter(e, idx)}
+			onDragEnter={(e) => onDragEnter(e, idx)}
 			onDragLeave={onDragLeave}
-			onDrop={e => onDrop(e, idx)}
+			onDrop={(e) => onDrop(e, idx)}
 			className={`
 				flex items-center gap-1 cursor-move transition-all duration-200
 				${draggedIndex === idx ? 'scale-105 rotate-2' : ''}
@@ -55,8 +55,8 @@ function IngredientChipComponent({
 					draggedIndex === idx
 						? 'scale(1.05) rotate(2deg)'
 						: dragOverIndex === idx && draggedIndex !== idx
-						? 'scale(1.1)'
-						: 'scale(1)',
+							? 'scale(1.1)'
+							: 'scale(1)',
 				transition: 'all 0.2s ease-in-out',
 			}}
 		>

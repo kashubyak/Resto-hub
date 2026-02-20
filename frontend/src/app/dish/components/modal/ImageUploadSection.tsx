@@ -48,33 +48,38 @@ const ImageUploadSectionFunction = ({
 
 	if (control) {
 		return (
-			<div className='mb-6'>
-				<h3 className='text-lg font-semibold mb-4 text-foreground flex items-center gap-2'>
+			<div className="mb-6">
+				<h3 className="text-lg font-semibold mb-4 text-foreground flex items-center gap-2">
 					📸 Dish Image
 				</h3>
-				<div className='rounded-lg p-4 border border-border'>
+				<div className="rounded-lg p-4 border border-border">
 					<Controller
-						name='imageUrl'
+						name="imageUrl"
 						control={control}
 						rules={validationRules}
 						render={({ field }) => {
 							const { onChange, onBlur, ref, name } = field
 
-							const handleDataChange = (preview: string | null, file: File | null) => {
+							const handleDataChange = (
+								preview: string | null,
+								file: File | null,
+							) => {
 								if (file) onChange(file)
 								else onChange(preview || '')
 							}
 
-							const handleInputChange: ChangeHandler = async e => {
+							const handleInputChange: ChangeHandler = async (e) => {
 								const file = (e?.target as HTMLInputElement)?.files?.[0]
 								onChange(file ?? '')
 							}
 
 							return (
 								<UploadImage
-									label='Upload dish image'
+									label="Upload dish image"
 									error={errors?.imageUrl?.message}
-									savedPreview={mode === 'update' ? currentImageUrl ?? null : null}
+									savedPreview={
+										mode === 'update' ? (currentImageUrl ?? null) : null
+									}
 									onDataChange={handleDataChange}
 									register={{
 										name,
@@ -87,7 +92,7 @@ const ImageUploadSectionFunction = ({
 						}}
 					/>
 					{mode === 'update' && currentImageUrl && (
-						<p className='text-xs text-muted-foreground mt-2'>
+						<p className="text-xs text-muted-foreground mt-2">
 							💡 Leave empty to keep current image
 						</p>
 					)}
@@ -97,15 +102,15 @@ const ImageUploadSectionFunction = ({
 	}
 
 	return (
-		<div className='mb-6'>
-			<h3 className='text-lg font-semibold mb-4 text-foreground flex items-center gap-2'>
+		<div className="mb-6">
+			<h3 className="text-lg font-semibold mb-4 text-foreground flex items-center gap-2">
 				📸 Dish Image
 			</h3>
-			<div className='rounded-lg p-4 border border-border'>
+			<div className="rounded-lg p-4 border border-border">
 				<UploadImage
-					label='Upload dish image'
+					label="Upload dish image"
 					error={errors?.imageUrl?.message}
-					savedPreview={mode === 'update' ? currentImageUrl ?? null : null}
+					savedPreview={mode === 'update' ? (currentImageUrl ?? null) : null}
 					onDataChange={handleStandaloneChange}
 					register={registerForImage}
 				/>

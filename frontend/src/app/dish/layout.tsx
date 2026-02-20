@@ -5,6 +5,10 @@ export const metadata: Metadata = {
 	title: 'Dishes',
 }
 
-export default function DishesLayout({ children }: { children: React.ReactNode }) {
+export default function DishesLayout({
+	children,
+}: {
+	children: React.ReactNode
+}) {
 	return <SidebarShell>{children}</SidebarShell>
 }

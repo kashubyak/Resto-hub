@@ -4,8 +4,15 @@ import { AuthPasswordField, AuthTextField } from '@/components/auth/AuthFields'
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
 import { ROUTES } from '@/constants/pages.constant'
 import { useLogin } from '@/hooks/useLogin'
-import { getCompanyUrl, getSubdomainFromHost, getSubdomainFromHostname } from '@/utils/api'
-import { emailValidation, passwordValidation } from '@/validation/login.validation'
+import {
+	getCompanyUrl,
+	getSubdomainFromHost,
+	getSubdomainFromHostname,
+} from '@/utils/api'
+import {
+	emailValidation,
+	passwordValidation,
+} from '@/validation/login.validation'
 import { AlertCircle, Building2, Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -64,8 +71,9 @@ function LoginSubdomainGate() {
 							<input
 								id="gate-subdomain"
 								type="text"
+								autoComplete="off"
 								value={subdomain}
-								onChange={e => {
+								onChange={(e) => {
 									setSubdomain(e.target.value.toLowerCase())
 									setError(null)
 								}}
@@ -89,7 +97,10 @@ function LoginSubdomainGate() {
 				</div>
 				<p className="text-center mt-6 text-sm text-muted-foreground">
 					Don&apos;t have an account?{' '}
-					<Link href={ROUTES.PUBLIC.AUTH.REGISTER} className="text-primary hover:underline">
+					<Link
+						href={ROUTES.PUBLIC.AUTH.REGISTER}
+						className="text-primary hover:underline"
+					>
 						Sign up
 					</Link>
 				</p>
@@ -126,11 +137,18 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 
 				{/* Login Form Card */}
 				<div className="bg-card rounded-xl sm:rounded-3xl shadow-lg border border-border/50 p-4 sm:p-8 backdrop-blur-sm">
-					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+					<form
+						onSubmit={handleSubmit(onSubmit)}
+						method="post"
+						action="#"
+						autoComplete="on"
+						className="space-y-4 sm:space-y-6"
+					>
 						<AuthTextField
 							id="email"
 							label="Email"
 							type="email"
+							autoComplete="email"
 							placeholder="your@email.com"
 							error={errors.email?.message}
 							leftIcon={<Mail className="h-5 w-5 text-muted-foreground" />}
@@ -140,6 +158,7 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 						<AuthPasswordField
 							id="password"
 							label="Password"
+							autoComplete="current-password"
 							error={errors.password?.message}
 							leftIcon={<Lock className="h-5 w-5 text-muted-foreground" />}
 							register={register('password', passwordValidation)}

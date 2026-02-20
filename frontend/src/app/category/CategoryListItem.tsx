@@ -9,10 +9,10 @@ import { CategoryCard } from './components/list/CategoryCard'
 import { CategoryRowItem } from './components/list/CategoryRowItem'
 
 const CardSkeleton = () => (
-	<div className='h-[200px] bg-muted/50 border border-border rounded-xl animate-pulse' />
+	<div className="h-[200px] bg-muted/50 border border-border rounded-xl animate-pulse" />
 )
 const RowSkeleton = () => (
-	<div className='h-[80px] bg-muted/50 border border-border rounded-lg animate-pulse' />
+	<div className="h-[80px] bg-muted/50 border border-border rounded-lg animate-pulse" />
 )
 
 interface CategoryListItemProps {
@@ -55,20 +55,20 @@ const CategoryListItemComponent = ({
 
 	if (isLoading) {
 		return (
-			<div className='p-3 sm:p-6'>
-				<div className='flex justify-between items-center mb-6'>
-					<h2 className='text-2xl font-bold'>Categories</h2>
+			<div className="p-3 sm:p-6">
+				<div className="flex justify-between items-center mb-6">
+					<h2 className="text-2xl font-bold">Categories</h2>
 					<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 				</div>
 
 				{viewMode === 'grid' ? (
-					<div className='grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+					<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 						{[...Array(8)].map((_, i) => (
 							<CardSkeleton key={i} />
 						))}
 					</div>
 				) : (
-					<div className='space-y-3'>
+					<div className="space-y-3">
 						{[...Array(8)].map((_, i) => (
 							<RowSkeleton key={i} />
 						))}
@@ -81,17 +81,17 @@ const CategoryListItemComponent = ({
 	if (isError)
 		return (
 			<NotFound
-				icon='📁'
-				title='Categories Not Found'
-				message='Sorry, we could not load the categories.'
+				icon="📁"
+				title="Categories Not Found"
+				message="Sorry, we could not load the categories."
 			/>
 		)
 
 	if (!allCategories.length)
 		return (
 			<NotFound
-				icon='📁'
-				title='No Categories Available'
+				icon="📁"
+				title="No Categories Available"
 				message={
 					searchQuery || hasActiveFilters
 						? `No categories found matching your ${searchQuery ? 'search' : 'filters'}`
@@ -101,26 +101,27 @@ const CategoryListItemComponent = ({
 		)
 
 	return (
-		<div className='p-3 sm:p-6'>
-			<div className='flex justify-between items-center mb-6'>
-				<h2 className='text-2xl font-bold'>
+		<div className="p-3 sm:p-6">
+			<div className="flex justify-between items-center mb-6">
+				<h2 className="text-2xl font-bold">
 					Categories
-					<span className='text-base font-normal text-muted-foreground ml-2'>
-						({allCategories.length} {allCategories.length === 1 ? 'item' : 'items'})
+					<span className="text-base font-normal text-muted-foreground ml-2">
+						({allCategories.length}{' '}
+						{allCategories.length === 1 ? 'item' : 'items'})
 					</span>
 				</h2>
 				<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 			</div>
 
 			{viewMode === 'grid' ? (
-				<div className='grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-					{allCategories.map(category => (
+				<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+					{allCategories.map((category) => (
 						<CategoryCard key={category.id} category={category} />
 					))}
 				</div>
 			) : (
-				<div className='space-y-3'>
-					{allCategories.map(category => (
+				<div className="space-y-3">
+					{allCategories.map((category) => (
 						<CategoryRowItem key={category.id} category={category} />
 					))}
 				</div>
@@ -135,12 +136,16 @@ const CategoryListItemComponent = ({
 					}`}
 				>
 					{[...Array(4)].map((_, i) =>
-						viewMode === 'grid' ? <CardSkeleton key={i} /> : <RowSkeleton key={i} />,
+						viewMode === 'grid' ? (
+							<CardSkeleton key={i} />
+						) : (
+							<RowSkeleton key={i} />
+						),
 					)}
 				</div>
 			)}
 
-			<div ref={loaderRef} className='h-1' />
+			<div ref={loaderRef} className="h-1" />
 		</div>
 	)
 }

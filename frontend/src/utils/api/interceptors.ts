@@ -15,23 +15,34 @@ import type { AxiosProgressEvent } from 'axios'
 import { clearAuth } from '../auth-helpers'
 import { getRetryAfter, parseBackendError } from '../errorHandler'
 import Cookies from 'js-cookie'
-import { getIsRefreshing, processQueue, pushToQueue, setIsRefreshing } from './authQueue'
+import {
+	getIsRefreshing,
+	processQueue,
+	pushToQueue,
+	setIsRefreshing,
+} from './authQueue'
 import { api } from './axiosInstances'
 import { getGlobalShowAlert } from './globalAlert'
 
-api.interceptors.request.use(async config => {
+api.interceptors.request.use(async (config) => {
 	const requestId = startNetworkRequest(config.url || 'unknown')
 	config.headers['X-Request-ID'] = requestId
 
 	config.onDownloadProgress = (event: AxiosProgressEvent) => {
-		updateNetworkProgress(requestId, event.loaded ?? 0, event.total ?? undefined)
+		updateNetworkProgress(
+			requestId,
+			event.loaded ?? 0,
+			event.total ?? undefined,
+		)
 	}
 
 	config.withCredentials = true
 
 	if (typeof window !== 'undefined') {
 		try {
-			const { data: { session } } = await getSupabaseClient().auth.getSession()
+			const {
+				data: { session },
+			} = await getSupabaseClient().auth.getSession()
 			if (session?.access_token) {
 				config.headers.Authorization = `Bearer ${session.access_token}`
 			}
@@ -39,15 +50,14 @@ api.interceptors.request.use(async config => {
 				const token = Cookies.get(AUTH.TOKEN)
 				if (token) config.headers.Authorization = `Bearer ${token}`
 			}
-		} catch {
-		}
+		} catch {}
 	}
 
 	return config
 })
 
 api.interceptors.response.use(
-	response => {
+	(response) => {
 		const requestId = response.config.headers['X-Request-ID'] as string
 		if (requestId) completeNetworkRequest(requestId)
 
@@ -58,7 +68,7 @@ api.interceptors.response.use(
 
 		return response
 	},
-	async error => {
+	async (error) => {
 		const requestId = error.config?.headers?.['X-Request-ID'] as string
 		if (requestId) failNetworkRequest(requestId)
 
@@ -80,7 +90,7 @@ api.interceptors.response.use(
 						)
 						return api(originalRequest)
 					})
-					.catch(err => Promise.reject(err))
+					.catch((err) => Promise.reject(err))
 			}
 
 			originalRequest._retry = true
@@ -88,12 +98,14 @@ api.interceptors.response.use(
 
 			try {
 				// Try backend refresh first (valid when auth is cookie-only, e.g. subdomain)
-				const backendRefreshRes = await api.post<{ success: boolean; token?: string }>(
-					API_URL.AUTH.REFRESH,
-					{},
-					{ withCredentials: true },
-				)
-				if (backendRefreshRes?.status >= 200 && backendRefreshRes?.status < 300) {
+				const backendRefreshRes = await api.post<{
+					success: boolean
+					token?: string
+				}>(API_URL.AUTH.REFRESH, {}, { withCredentials: true })
+				if (
+					backendRefreshRes?.status >= 200 &&
+					backendRefreshRes?.status < 300
+				) {
 					processQueue(null, null)
 					originalRequest.headers = originalRequest.headers || {}
 					originalRequest.headers['X-Request-ID'] = startNetworkRequest(
@@ -106,8 +118,9 @@ api.interceptors.response.use(
 			}
 
 			try {
-				const { data: { session } } =
-					await getSupabaseClient().auth.refreshSession()
+				const {
+					data: { session },
+				} = await getSupabaseClient().auth.refreshSession()
 
 				if (session?.access_token) {
 					processQueue(null, null)
@@ -129,8 +142,7 @@ api.interceptors.response.use(
 					clearAuth()
 					try {
 						getSupabaseClient().auth.signOut()
-					} catch {
-					}
+					} catch {}
 
 					const currentPath = window.location.pathname
 					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(
@@ -204,8 +216,11 @@ api.interceptors.response.use(
 			message: err?.message,
 			code: err?.code,
 		}
-		if (err?.response?.data !== undefined) logPayload.responseData = err.response.data
-		const hasAny = Object.keys(logPayload).some(k => logPayload[k] !== undefined)
+		if (err?.response?.data !== undefined)
+			logPayload.responseData = err.response.data
+		const hasAny = Object.keys(logPayload).some(
+			(k) => logPayload[k] !== undefined,
+		)
 		if (!hasAny) {
 			logPayload.raw = String(error)
 			if (error && typeof (error as Error).stack === 'string')

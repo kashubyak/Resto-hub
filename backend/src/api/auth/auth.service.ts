@@ -135,9 +135,12 @@ export class AuthService {
 		req: Request,
 		res: Response,
 		dto: LoginDto,
-	): Promise<{ success: true; user: { id: number; role: Role }; token: string }> {
-		const subdomain =
-			dto.subdomain ?? this.getSubdomainFromRequest(req) ?? null
+	): Promise<{
+		success: true
+		user: { id: number; role: Role }
+		token: string
+	}> {
+		const subdomain = dto.subdomain ?? this.getSubdomainFromRequest(req) ?? null
 		if (!subdomain)
 			throw new UnauthorizedException('Company subdomain is required')
 
@@ -145,8 +148,7 @@ export class AuthService {
 			where: { subdomain },
 			select: { id: true },
 		})
-		if (!company)
-			throw new UnauthorizedException('Company not found')
+		if (!company) throw new UnauthorizedException('Company not found')
 
 		const { data, error } = await this.supabase
 			.getClient()
@@ -156,8 +158,7 @@ export class AuthService {
 			})
 
 		if (error) throw new UnauthorizedException('Invalid credentials')
-		if (!data.session?.user?.id)
-			throw new UnauthorizedException('Login failed')
+		if (!data.session?.user?.id) throw new UnauthorizedException('Login failed')
 
 		const user = await this.prisma.user.findFirst({
 			where: {
@@ -166,8 +167,7 @@ export class AuthService {
 			},
 			select: { id: true, role: true },
 		})
-		if (!user)
-			throw new UnauthorizedException('User not found in company')
+		if (!user) throw new UnauthorizedException('User not found in company')
 
 		this.setAuthCookies(res, {
 			accessToken: data.session.access_token,
@@ -203,8 +203,7 @@ export class AuthService {
 			where: { supabaseUserId: data.session.user.id },
 			select: { id: true, role: true },
 		})
-		if (!user)
-			throw new UnauthorizedException('User not found')
+		if (!user) throw new UnauthorizedException('User not found')
 
 		this.setAuthCookies(res, {
 			accessToken: data.session.access_token,
@@ -228,7 +227,10 @@ export class AuthService {
 
 	private getSubdomainFromRequest(req: Request): string | null {
 		const host =
-			(req.headers['x-forwarded-host'] as string) ?? req.hostname ?? req.headers.host?.split(':')[0] ?? ''
+			(req.headers['x-forwarded-host'] as string) ??
+			req.hostname ??
+			req.headers.host?.split(':')[0] ??
+			''
 		const hostPart = host.split(':')[0] ?? ''
 		const sub = hostPart.split('.')[0]
 		if (!sub || ['www', 'api', 'localhost'].includes(sub)) return null

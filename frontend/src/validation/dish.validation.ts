@@ -59,7 +59,6 @@ export const priceValidation = {
 
 export const VALID_NUMBER_PATTERN = /^-?\d*\.?\d*$/
 
-
 export const categoryIdValidation = {
 	setValueAs: (value: string) => (value === '' ? null : Number(value)),
 	validate: (value: number | null | undefined) =>

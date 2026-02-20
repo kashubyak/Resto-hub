@@ -8,11 +8,15 @@ export const createDish = async (
 	formData: FormData,
 	config?: CustomAxiosRequestConfig,
 ): Promise<ApiResponse<ICreateDishResponse>> => {
-	const response = await api.post<ICreateDishResponse>(API_URL.DISH.CREATE, formData, {
-		headers: {
-			'Content-Type': 'multipart/form-data',
+	const response = await api.post<ICreateDishResponse>(
+		API_URL.DISH.CREATE,
+		formData,
+		{
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+			...config,
 		},
-		...config,
-	})
+	)
 	return response
 }

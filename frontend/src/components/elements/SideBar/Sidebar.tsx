@@ -7,9 +7,9 @@ import { SidebarContent } from './SidebarContent'
 
 const MobileOverlay = memo(({ onClose }: { onClose: () => void }) => (
 	<div
-		className='absolute inset-0 bg-background opacity-50'
+		className="absolute inset-0 bg-background opacity-50"
 		onClick={onClose}
-		aria-hidden='true'
+		aria-hidden="true"
 	/>
 ))
 MobileOverlay.displayName = 'MobileOverlay'
@@ -21,7 +21,7 @@ const DesktopSidebar = memo(({ collapsed }: { collapsed: boolean }) => (
 			collapsed ? 'w-16 bg-background' : 'w-56 bg-secondary',
 		)}
 	>
-		<SidebarContent mode='desktop' collapsed={collapsed} />
+		<SidebarContent mode="desktop" collapsed={collapsed} />
 	</aside>
 ))
 DesktopSidebar.displayName = 'DesktopSidebar'
@@ -34,17 +34,20 @@ const MobileSidebar = memo(
 				isOpen ? 'translate-x-0' : '-translate-x-full',
 			)}
 		>
-			<SidebarContent mode='mobile' collapsed={collapsed && !isOpen} />
+			<SidebarContent mode="mobile" collapsed={collapsed && !isOpen} />
 		</aside>
 	),
 )
 MobileSidebar.displayName = 'MobileSidebar'
 
 export const Sidebar = memo(() => {
-	const mobileOpen = useSidebarStore(state => state.mobileOpen)
-	const collapsed = useSidebarStore(state => state.collapsed)
-	const setMobileOpen = useSidebarStore(state => state.setMobileOpen)
-	const handleMobileClose = useCallback(() => setMobileOpen(false), [setMobileOpen])
+	const mobileOpen = useSidebarStore((state) => state.mobileOpen)
+	const collapsed = useSidebarStore((state) => state.collapsed)
+	const setMobileOpen = useSidebarStore((state) => state.setMobileOpen)
+	const handleMobileClose = useCallback(
+		() => setMobileOpen(false),
+		[setMobileOpen],
+	)
 
 	return (
 		<>

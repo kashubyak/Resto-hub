@@ -15,7 +15,8 @@ export const CompanyNameValidation = {
 		startsWithLetter: (value: string) =>
 			/^[a-zA-Z]/.test(value) || 'Company name must start with a letter',
 		noSpecialAtStart: (value: string) =>
-			!/^[\s\-&.,'()]/.test(value) || 'Company name cannot start with special characters',
+			!/^[\s\-&.,'()]/.test(value) ||
+			'Company name cannot start with special characters',
 	},
 }
 export const subdomainValidation = {
@@ -32,7 +33,8 @@ export const subdomainValidation = {
 		maxLength: (value: string) =>
 			value.length <= 30 || 'Subdomain must be at most 30 characters',
 		noConsecutiveNumbers: (value: string) =>
-			!/\d{4,}/.test(value) || 'Subdomain cannot have more than 3 consecutive numbers',
+			!/\d{4,}/.test(value) ||
+			'Subdomain cannot have more than 3 consecutive numbers',
 		notReserved: (value: string) => {
 			const reserved = [
 				'www',
@@ -47,7 +49,9 @@ export const subdomainValidation = {
 				'prod',
 				'production',
 			]
-			return !reserved.includes(value.toLowerCase()) || 'This subdomain is reserved'
+			return (
+				!reserved.includes(value.toLowerCase()) || 'This subdomain is reserved'
+			)
 		},
 		balanced: (value: string) => {
 			const letters = (value.match(/[a-z]/g) || []).length
@@ -71,16 +75,19 @@ export const adminNameValidation = {
 		noConsecutiveSpaces: (value: string) =>
 			!/\s{2,}/.test(value) || 'Admin name cannot have consecutive spaces',
 		startsWithLetter: (value: string) =>
-			/^[a-zA-ZА-Яа-яІіЇїЄє]/.test(value) || 'Admin name must start with a letter',
+			/^[a-zA-ZА-Яа-яІіЇїЄє]/.test(value) ||
+			'Admin name must start with a letter',
 		endsWithLetter: (value: string) =>
-			/[a-zA-ZА-Яа-яІіЇїЄє]$/.test(value) || 'Admin name must end with a letter',
+			/[a-zA-ZА-Яа-яІіЇїЄє]$/.test(value) ||
+			'Admin name must end with a letter',
 		noSpecialAtStartEnd: (value: string) =>
 			!/^[\s\-']|[\s\-']$/.test(value) ||
 			'Admin name cannot start or end with special characters',
 		hasValidName: (value: string) => {
 			const words = value.trim().split(/\s+/)
 			return (
-				(words.length >= 1 && words.length <= 4) || 'Admin name should have 1-4 words'
+				(words.length >= 1 && words.length <= 4) ||
+				'Admin name should have 1-4 words'
 			)
 		},
 	},
@@ -92,13 +99,17 @@ export const emailValidation = {
 		validEmail: (value: string) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) ||
 			'Please enter a valid email address',
-		minLength: (value: string) => value.length >= 5 || 'Email address is too short',
-		maxLength: (value: string) => value.length <= 254 || 'Email address is too long',
+		minLength: (value: string) =>
+			value.length >= 5 || 'Email address is too short',
+		maxLength: (value: string) =>
+			value.length <= 254 || 'Email address is too long',
 		noConsecutiveDots: (value: string) =>
 			!/\.{2,}/.test(value) || 'Email cannot have consecutive dots',
 		validLocalPart: (value: string) => {
 			const localPart = value.split('@')[0]
-			return (localPart && localPart.length <= 64) || 'Email local part is too long'
+			return (
+				(localPart && localPart.length <= 64) || 'Email local part is too long'
+			)
 		},
 		validDomain: (value: string) => {
 			const parts = value.split('@')
@@ -112,14 +123,16 @@ export const emailValidation = {
 				'Invalid email domain'
 			)
 		},
-		noSpaces: (value: string) => !/\s/.test(value) || 'Email cannot contain spaces',
+		noSpaces: (value: string) =>
+			!/\s/.test(value) || 'Email cannot contain spaces',
 		startsCorrectly: (value: string) =>
-			!/^[.\-_]/.test(value) || 'Email cannot start with dot, dash, or underscore',
+			!/^[.\-_]/.test(value) ||
+			'Email cannot start with dot, dash, or underscore',
 		commonDomains: (value: string) => {
 			const domain = value.split('@')[1]?.toLowerCase()
 			const suspicious = ['tempmail', '10minutemail', 'guerrillamail']
 			return (
-				!suspicious.some(s => domain?.includes(s)) ||
+				!suspicious.some((s) => domain?.includes(s)) ||
 				'Please use a permanent email address'
 			)
 		},
@@ -134,9 +147,11 @@ export const passwordValidation = {
 		maxLength: (value: string) =>
 			value.length <= 128 || 'Password must be at most 128 characters long',
 		hasUppercase: (value: string) =>
-			/[A-Z]/.test(value) || 'Password must contain at least one uppercase letter',
+			/[A-Z]/.test(value) ||
+			'Password must contain at least one uppercase letter',
 		hasLowercase: (value: string) =>
-			/[a-z]/.test(value) || 'Password must contain at least one lowercase letter',
+			/[a-z]/.test(value) ||
+			'Password must contain at least one lowercase letter',
 		hasNumber: (value: string) =>
 			/\d/.test(value) || 'Password must contain at least one number',
 		hasSpecialChar: (value: string) =>
@@ -145,6 +160,7 @@ export const passwordValidation = {
 		validCharacters: (value: string) =>
 			/^[A-Za-z\d@$!%*?&]+$/.test(value) ||
 			'Password can only contain letters, numbers, and special characters (@$!%*?&)',
-		noSpaces: (value: string) => !/\s/.test(value) || 'Password cannot contain spaces',
+		noSpaces: (value: string) =>
+			!/\s/.test(value) || 'Password cannot contain spaces',
 	},
 }

@@ -1,7 +1,10 @@
-import { AUTH_ROUTES_LIST, PUBLIC_ROUTES_LIST } from '@/constants/pages.constant'
+import {
+	AUTH_ROUTES_LIST,
+	PUBLIC_ROUTES_LIST,
+} from '@/constants/pages.constant'
 
 export const isPublicRoute = (pathname: string): boolean =>
-	PUBLIC_ROUTES_LIST.some(route => pathname.startsWith(route))
+	PUBLIC_ROUTES_LIST.some((route) => pathname.startsWith(route))
 
 export const isAuthRoute = (pathname: string): boolean =>
-	AUTH_ROUTES_LIST.some(route => pathname.startsWith(route))
+	AUTH_ROUTES_LIST.some((route) => pathname.startsWith(route))

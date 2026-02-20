@@ -10,10 +10,14 @@ export class CompanyContextMiddleware implements NestMiddleware {
 
 	async use(req: IRequestWithCompanyId, _res: Response, next: NextFunction) {
 		// Skip company lookup for register-company (company does not exist yet)
-		if (req.path?.includes('register-company') || req.url?.includes('register-company'))
+		if (
+			req.path?.includes('register-company') ||
+			req.url?.includes('register-company')
+		)
 			return next()
 
-		const host = (req.headers['x-forwarded-host'] as string) ?? req.hostname ?? ''
+		const host =
+			(req.headers['x-forwarded-host'] as string) ?? req.hostname ?? ''
 		const hostPart = host.split(':')[0] ?? ''
 		const subdomain = hostPart.split('.')[0] ?? ''
 

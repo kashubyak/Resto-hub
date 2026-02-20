@@ -7,7 +7,10 @@ import { memo, useCallback, useMemo } from 'react'
 interface SelectFilterProps {
 	config: SelectFilterConfig
 	values: Record<string, string | number | boolean | undefined | null>
-	onChange: (key: string, value: string | number | boolean | undefined | null) => void
+	onChange: (
+		key: string,
+		value: string | number | boolean | undefined | null,
+	) => void
 }
 
 const textFieldSx = {
@@ -90,7 +93,7 @@ const SelectFilterComponent: React.FC<SelectFilterProps> = ({
 
 	const emptyMenuItem = useMemo(
 		() => (
-			<MenuItem value=''>
+			<MenuItem value="">
 				<em>{config.placeholder || 'None'}</em>
 			</MenuItem>
 		),
@@ -99,7 +102,7 @@ const SelectFilterComponent: React.FC<SelectFilterProps> = ({
 
 	const optionMenuItems = useMemo(
 		() =>
-			config.options.map(option => (
+			config.options.map((option) => (
 				<MenuItem key={option.value} value={option.value}>
 					{option.label}
 				</MenuItem>
@@ -108,15 +111,17 @@ const SelectFilterComponent: React.FC<SelectFilterProps> = ({
 	)
 
 	return (
-		<div className='space-y-2'>
-			<label className='block text-sm font-medium text-foreground'>{config.label}</label>
+		<div className="space-y-2">
+			<label className="block text-sm font-medium text-foreground">
+				{config.label}
+			</label>
 			<TextField
 				fullWidth
 				select
 				value={value}
 				onChange={handleChange}
 				placeholder={config.placeholder}
-				size='small'
+				size="small"
 				disabled={config.disabled}
 				sx={textFieldSx}
 				SelectProps={{

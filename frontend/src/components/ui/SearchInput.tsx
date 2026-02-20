@@ -90,15 +90,20 @@ const SearchInputComponent: React.FC<SearchInputProps> = ({
 	)
 
 	const startAdornment = (
-		<InputAdornment position='start'>
+		<InputAdornment position="start">
 			<SearchIcon />
 		</InputAdornment>
 	)
 
 	const endAdornment = searchValue ? (
-		<InputAdornment position='end'>
-			<IconButton onClick={handleClear} edge='end' size='small' aria-label='clear search'>
-				<ClearIcon fontSize='small' />
+		<InputAdornment position="end">
+			<IconButton
+				onClick={handleClear}
+				edge="end"
+				size="small"
+				aria-label="clear search"
+			>
+				<ClearIcon fontSize="small" />
 			</IconButton>
 		</InputAdornment>
 	) : null
@@ -109,8 +114,8 @@ const SearchInputComponent: React.FC<SearchInputProps> = ({
 			value={searchValue}
 			onChange={handleChange}
 			placeholder={placeholder}
-			variant='outlined'
-			size='small'
+			variant="outlined"
+			size="small"
 			className={className}
 			sx={textFieldSx}
 			InputProps={{

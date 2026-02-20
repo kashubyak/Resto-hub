@@ -1,7 +1,12 @@
 'use client'
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
-import { IconButton, InputAdornment, TextField, type TextFieldProps } from '@mui/material'
+import {
+	IconButton,
+	InputAdornment,
+	TextField,
+	type TextFieldProps,
+} from '@mui/material'
 import { memo, useCallback, useMemo, useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
@@ -15,13 +20,24 @@ type InputProps = {
 } & Omit<TextFieldProps, 'type' | 'error' | 'rows' | 'size'>
 
 export const Input = memo<InputProps>(
-	({ register, error, type = 'text', multiline = false, rows = 4, size, ...rest }) => {
+	({
+		register,
+		error,
+		type = 'text',
+		multiline = false,
+		rows = 4,
+		size,
+		...rest
+	}) => {
 		const [showPassword, setShowPassword] = useState(false)
 
 		const finalSize = size || 'medium'
 		const isPasswordField = type === 'password' && !multiline
 
-		const togglePasswordVisibility = useCallback(() => setShowPassword(prev => !prev), [])
+		const togglePasswordVisibility = useCallback(
+			() => setShowPassword((prev) => !prev),
+			[],
+		)
 
 		const inputType = useMemo(() => {
 			if (!isPasswordField) return type
@@ -29,7 +45,9 @@ export const Input = memo<InputProps>(
 		}, [isPasswordField, showPassword, type])
 
 		const safeValue = useMemo(() => {
-			return typeof rest.value === 'number' && Number.isNaN(rest.value) ? '' : rest.value
+			return typeof rest.value === 'number' && Number.isNaN(rest.value)
+				? ''
+				: rest.value
 		}, [rest.value])
 
 		const iconButtonSx = useMemo(
@@ -37,11 +55,13 @@ export const Input = memo<InputProps>(
 				transition: 'all 0.2s ease',
 				'&:hover': {
 					color: 'var(--foreground)',
-					backgroundColor: 'color-mix(in oklab, var(--foreground) 10%, transparent)',
+					backgroundColor:
+						'color-mix(in oklab, var(--foreground) 10%, transparent)',
 				},
 				'&:active': {
 					transform: 'scale(0.9)',
-					backgroundColor: 'color-mix(in oklab, var(--foreground) 20%, transparent)',
+					backgroundColor:
+						'color-mix(in oklab, var(--foreground) 20%, transparent)',
 				},
 			}),
 			[],
@@ -51,18 +71,18 @@ export const Input = memo<InputProps>(
 			() => ({
 				...rest.InputProps,
 				endAdornment: isPasswordField ? (
-					<InputAdornment position='end'>
+					<InputAdornment position="end">
 						<IconButton
 							onClick={togglePasswordVisibility}
-							edge='end'
+							edge="end"
 							tabIndex={-1}
 							aria-label={showPassword ? 'Hide password' : 'Show password'}
 							sx={iconButtonSx}
 						>
 							{showPassword ? (
-								<VisibilityOff className='text-muted-foreground h-5 w-5' />
+								<VisibilityOff className="text-muted-foreground h-5 w-5" />
 							) : (
-								<Visibility className='text-muted-foreground h-5 w-5' />
+								<Visibility className="text-muted-foreground h-5 w-5" />
 							)}
 						</IconButton>
 					</InputAdornment>
@@ -118,7 +138,7 @@ export const Input = memo<InputProps>(
 		)
 
 		return (
-			<div className='flex flex-col'>
+			<div className="flex flex-col">
 				<TextField
 					{...register}
 					{...rest}
@@ -126,7 +146,7 @@ export const Input = memo<InputProps>(
 					type={multiline ? undefined : inputType}
 					multiline={multiline}
 					minRows={multiline ? rows : undefined}
-					variant='outlined'
+					variant="outlined"
 					fullWidth
 					error={!!error}
 					helperText={null}
@@ -134,7 +154,11 @@ export const Input = memo<InputProps>(
 					InputProps={inputProps}
 					sx={textFieldSx}
 				/>
-				{error && <span className='text-[var(--destructive)] text-sm mt-1'>{error}</span>}
+				{error && (
+					<span className="text-[var(--destructive)] text-sm mt-1">
+						{error}
+					</span>
+				)}
 			</div>
 		)
 	},

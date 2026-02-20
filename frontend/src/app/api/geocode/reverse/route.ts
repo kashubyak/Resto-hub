@@ -6,10 +6,7 @@ export async function GET(request: NextRequest) {
 	const lat = request.nextUrl.searchParams.get('lat')
 	const lon = request.nextUrl.searchParams.get('lon')
 	if (lat == null || lon == null) {
-		return NextResponse.json(
-			{ error: 'Missing lat or lon' },
-			{ status: 400 },
-		)
+		return NextResponse.json({ error: 'Missing lat or lon' }, { status: 400 })
 	}
 
 	try {
@@ -37,7 +34,10 @@ export async function GET(request: NextRequest) {
 
 		const p = first.properties
 		const parts = [p.street, p.name, p.city, p.state, p.country].filter(Boolean)
-		const display_name = parts.length > 0 ? parts.join(', ') : `${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}`
+		const display_name =
+			parts.length > 0
+				? parts.join(', ')
+				: `${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}`
 		return NextResponse.json({ display_name })
 	} catch (error) {
 		console.error('Geocode reverse error:', error)

@@ -27,10 +27,10 @@ export const useAuthStore = create<IAuthStore>()(
 			hydrated: false,
 			userRole: null,
 
-			setUser: user => set({ user }),
-			setIsAuth: isAuth => set({ isAuth }),
-			setHydrated: hydrated => set({ hydrated }),
-			setUserRole: role => set({ userRole: role }),
+			setUser: (user) => set({ user }),
+			setIsAuth: (isAuth) => set({ isAuth }),
+			setHydrated: (hydrated) => set({ hydrated }),
+			setUserRole: (role) => set({ userRole: role }),
 
 			hasRole: (roleOrRoles: UserRole | UserRole[]) => {
 				const { userRole } = get()
@@ -46,13 +46,13 @@ export const useAuthStore = create<IAuthStore>()(
 		{
 			name: 'user-storage',
 			storage: createJSONStorage(() => localStorage),
-			onRehydrateStorage: () => state => {
+			onRehydrateStorage: () => (state) => {
 				if (!state) return
 				if (!state.user && !state.isAuth) state.setUserRole(null)
 				state.setHydrated(true)
 				state.checkAuthStatus()
 			},
-			partialize: state => ({
+			partialize: (state) => ({
 				user: state.user,
 				isAuth: state.isAuth,
 				userRole: state.user && state.isAuth ? state.userRole : null,

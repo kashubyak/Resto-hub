@@ -11,7 +11,7 @@ export default function DashboardPage() {
 	const handleAdminActions = () => {}
 
 	return (
-		<SafeRender title='Loading Dashboard...' showNetworkProgress>
+		<SafeRender title="Loading Dashboard..." showNetworkProgress>
 			{user && userRole && (
 				<p>
 					Hi, {user.name}! Your role: {userRole}

@@ -47,7 +47,8 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 					sessionStorage.removeItem(AUTH.SESSION_EXPIRED_SHOWN_KEY)
 				initApiSubdomain()
 
-				if (response.data.user?.role) setUserRole(response.data.user.role as UserRole)
+				if (response.data.user?.role)
+					setUserRole(response.data.user.role as UserRole)
 
 				if (options?.skipGetCurrentUser) {
 					const u = response.data.user
@@ -117,13 +118,16 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 			.then(({ data: { session } }) => {
 				const hasBackendAuth =
 					typeof window !== 'undefined' &&
-					(Cookies.get(AUTH.AUTH_STATUS) === 'true' || !!Cookies.get(AUTH.TOKEN))
+					(Cookies.get(AUTH.AUTH_STATUS) === 'true' ||
+						!!Cookies.get(AUTH.TOKEN))
 				const isAuthenticated = !!session || !!hasBackendAuth
 				if (!user && isAuthenticated) {
 					if (pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS) return undefined
 					initApiSubdomain()
 					return getCurrentUser()
-						.then(current => initializeAuth(current.data, current.data.role as UserRole))
+						.then((current) =>
+							initializeAuth(current.data, current.data.role as UserRole),
+						)
 						.catch(() => {
 							if (pathname !== ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS) clearAuth()
 						})
@@ -146,7 +150,9 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 		[user, isAuth, login, logout],
 	)
 
-	return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+	return (
+		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+	)
 })
 
 AuthProvider.displayName = 'AuthProvider'

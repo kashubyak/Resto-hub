@@ -41,9 +41,7 @@ export function getRootAppUrl(): string {
 			? `http://${rootDomain}:${port}`
 			: `https://${rootDomain}`
 	}
-	return useHttpAndPort
-		? `http://${rootDomain}:3001`
-		: `https://${rootDomain}`
+	return useHttpAndPort ? `http://${rootDomain}:3001` : `https://${rootDomain}`
 }
 
 export function setApiSubdomain(subdomain?: string | null): void {

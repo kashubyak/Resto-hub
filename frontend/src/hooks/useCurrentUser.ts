@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNetworkProgress } from './useNetworkProgress'
 
 export function useCurrentUser() {
-	const { user, userRole, isAuth, hydrated, hasRole, checkAuthStatus } = useAuthStore()
+	const { user, userRole, isAuth, hydrated, hasRole, checkAuthStatus } =
+		useAuthStore()
 
 	const [initialized, setInitialized] = useState(false)
 	const { totalProgress } = useNetworkProgress()

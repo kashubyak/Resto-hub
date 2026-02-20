@@ -40,7 +40,12 @@ const PricingCategorySectionFunction = ({
 						: 'grid-cols-1 md:grid-cols-2 gap-6'
 				}`}
 			>
-				<PriceInput register={register} control={control} mode={mode} trigger={trigger} />
+				<PriceInput
+					register={register}
+					control={control}
+					mode={mode}
+					trigger={trigger}
+				/>
 				<CategoryInput control={control} />
 			</div>
 

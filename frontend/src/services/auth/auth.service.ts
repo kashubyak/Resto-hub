@@ -36,7 +36,11 @@ export const login = async (
 		})
 		return response
 	} catch (err: unknown) {
-		const axiosErr = err as { response?: unknown; message?: string; config?: { url?: string } }
+		const axiosErr = err as {
+			response?: unknown
+			message?: string
+			config?: { url?: string }
+		}
 		console.error('[auth.service] login failed', {
 			message: axiosErr?.message ?? (err as Error)?.message,
 			response: axiosErr?.response,

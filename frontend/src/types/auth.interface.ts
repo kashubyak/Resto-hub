@@ -60,6 +60,9 @@ export interface ICompany {
 export interface IAuthContext {
 	user: IUser | null
 	isAuth: boolean
-	login: (data: ILoginRequest, options?: { skipGetCurrentUser?: boolean }) => Promise<void>
+	login: (
+		data: ILoginRequest,
+		options?: { skipGetCurrentUser?: boolean },
+	) => Promise<void>
 	logout: () => void
 }

@@ -9,11 +9,11 @@ export const useUserRoutes = () => {
 
 	const userRoutes = useMemo(() => {
 		if (!userRole) return []
-		return ALL_ROUTES.filter(route => route.roles.includes(userRole))
+		return ALL_ROUTES.filter((route) => route.roles.includes(userRole))
 	}, [userRole])
 
 	const currentRoute = useMemo(() => {
-		return userRoutes.find(route => route.path === pathname) || null
+		return userRoutes.find((route) => route.path === pathname) || null
 	}, [pathname, userRoutes])
 
 	return {

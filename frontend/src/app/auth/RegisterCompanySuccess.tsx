@@ -38,15 +38,19 @@ const RegisterCompanySuccessComponent = () => {
 							<div
 								className="absolute inset-0 rounded-full pointer-events-none"
 								style={{
-									backgroundColor: 'color-mix(in oklab, var(--primary) 20%, transparent)',
-									animation: 'success-icon-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+									backgroundColor:
+										'color-mix(in oklab, var(--primary) 20%, transparent)',
+									animation:
+										'success-icon-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
 								}}
 							/>
 							<div
 								className="absolute inset-0 rounded-full pointer-events-none"
 								style={{
-									backgroundColor: 'color-mix(in oklab, var(--primary) 10%, transparent)',
-									animation: 'success-icon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+									backgroundColor:
+										'color-mix(in oklab, var(--primary) 10%, transparent)',
+									animation:
+										'success-icon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 								}}
 							/>
 							<div className="relative w-full h-full rounded-full success-icon-circle flex items-center justify-center">
@@ -68,15 +72,20 @@ const RegisterCompanySuccessComponent = () => {
 					</div>
 
 					<div className="space-y-4 mb-6">
-						<label className="block text-sm font-medium text-card-foreground">
+						<label
+							htmlFor="company-link"
+							className="block text-sm font-medium text-card-foreground"
+						>
 							Company Link
 						</label>
 						<div className="flex gap-2">
 							<div className="flex-1 relative">
 								<input
+									id="company-link"
 									type="text"
 									value={companyUrl}
 									readOnly
+									aria-readonly="true"
 									className="w-full px-4 py-3 bg-input rounded-xl border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
 								/>
 							</div>

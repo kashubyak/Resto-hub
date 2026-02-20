@@ -41,7 +41,8 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 	const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'xl'))
 
 	const safeClose = useCallback(() => {
-		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+		if (document.activeElement instanceof HTMLElement)
+			document.activeElement.blur()
 		onClose()
 	}, [onClose])
 
@@ -81,7 +82,8 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					color: 'var(--stable-light)',
 					borderBottom: '1px solid var(--border)',
 					padding: isMobile ? '1rem 1rem' : '1.5rem 2rem',
-					background: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
+					background:
+						'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
 					flexShrink: 0,
 					display: 'flex',
 					alignItems: 'center',
@@ -96,7 +98,7 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 
 			<form
 				onSubmit={handleSubmit(onSubmit)}
-				className='flex flex-1 flex-col overflow-hidden'
+				className="flex flex-1 flex-col overflow-hidden"
 			>
 				<DialogContent
 					sx={{
@@ -107,8 +109,14 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 						flexDirection: 'column',
 					}}
 				>
-					<div className={`flex-1 overflow-y-auto ${isMobile ? 'space-y-4' : ''}`}>
-						<BasicInformationSection register={register} errors={errors} watch={watch} />
+					<div
+						className={`flex-1 overflow-y-auto ${isMobile ? 'space-y-4' : ''}`}
+					>
+						<BasicInformationSection
+							register={register}
+							errors={errors}
+							watch={watch}
+						/>
 						<PricingCategorySection register={register} control={control} />
 						<IngredientsSection
 							control={control}
@@ -132,14 +140,14 @@ export const DishModal = ({ open, onClose }: DishModalProps) => {
 					}}
 				>
 					<Button
-						type='button'
-						text='Cancel'
+						type="button"
+						text="Cancel"
 						onClick={safeClose}
 						className={isMobile ? 'w-full' : ''}
 					/>
 					<Button
-						type='submit'
-						text='Create'
+						type="submit"
+						text="Create"
 						className={`${
 							isMobile ? 'w-full' : 'w-auto px-4 py-2'
 						} bg-success text-foreground hover:bg-success`}

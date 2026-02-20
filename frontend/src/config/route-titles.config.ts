@@ -2,11 +2,11 @@ import { API_URL } from './api'
 
 const titleCache = new Map<string, string>()
 export const DYNAMIC_ROUTE_TITLES: Record<string, (id: string) => string> = {
-	[API_URL.DISH.ROOT]: id => `Dish #${id}`,
-	[API_URL.CATEGORY.ROOT]: id => `Category #${id}`,
-	[API_URL.ORDER.ROOT]: id => `Order #${id}`,
-	[API_URL.TABLE.ROOT]: id => `Table #${id}`,
-	[API_URL.USER.ROOT]: id => `User #${id}`,
+	[API_URL.DISH.ROOT]: (id) => `Dish #${id}`,
+	[API_URL.CATEGORY.ROOT]: (id) => `Category #${id}`,
+	[API_URL.ORDER.ROOT]: (id) => `Order #${id}`,
+	[API_URL.TABLE.ROOT]: (id) => `Table #${id}`,
+	[API_URL.USER.ROOT]: (id) => `User #${id}`,
 }
 
 export const getPageTitle = (
