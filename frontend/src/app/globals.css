@@ -151,6 +151,16 @@
 	animation: success-icon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+.success-icon-ping-layer {
+	background-color: color-mix(in oklab, var(--primary) 20%, transparent);
+	animation: success-icon-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.success-icon-pulse-layer {
+	background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+	animation: success-icon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .success-icon-circle {
 	background-image: linear-gradient(
 		to bottom,

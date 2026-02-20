@@ -8,24 +8,19 @@ import { useAlert } from '@/providers/AlertContext'
 import { getCompanyUrl } from '@/utils/api'
 import Cookies from 'js-cookie'
 import { Check, Copy, ExternalLink, LayoutDashboard, LogIn } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
-import { memo, useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 const COPIED_ALERT_DURATION = 2000
 
-const RegisterCompanySuccessComponent = () => {
-	const searchParams = useSearchParams()
+export function RegisterCompanySuccess({ subdomain }: { subdomain: string }) {
 	const { copy, copied } = useCopyToClipboard()
 	const { showInfo } = useAlert()
-	const [isAuthenticated, setIsAuthenticated] = useState(false)
+	const [isAuthenticated] = useState(
+		() => Cookies.get(AUTH.AUTH_STATUS) === 'true',
+	)
 
-	const subdomain = searchParams.get('subdomain') || ''
 	const companyUrl = subdomain ? getCompanyUrl(subdomain) : ''
 	const loginUrl = subdomain ? `${companyUrl}${ROUTES.PUBLIC.AUTH.LOGIN}` : ''
-
-	useEffect(() => {
-		setIsAuthenticated(Cookies.get(AUTH.AUTH_STATUS) === 'true')
-	}, [])
 
 	const handleCopy = useCallback(async () => {
 		if (!companyUrl) return
@@ -41,24 +36,8 @@ const RegisterCompanySuccessComponent = () => {
 				<div className="bg-card rounded-xl sm:rounded-3xl shadow-lg border border-border/50 p-6 sm:p-10 backdrop-blur-sm">
 					<div className="flex justify-center mb-6 sm:mb-8">
 						<div className="relative w-20 h-20 sm:w-24 sm:h-24">
-							<div
-								className="absolute inset-0 rounded-full pointer-events-none"
-								style={{
-									backgroundColor:
-										'color-mix(in oklab, var(--primary) 20%, transparent)',
-									animation:
-										'success-icon-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
-								}}
-							/>
-							<div
-								className="absolute inset-0 rounded-full pointer-events-none"
-								style={{
-									backgroundColor:
-										'color-mix(in oklab, var(--primary) 10%, transparent)',
-									animation:
-										'success-icon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-								}}
-							/>
+							<div className="absolute inset-0 rounded-full pointer-events-none success-icon-ping-layer" />
+							<div className="absolute inset-0 rounded-full pointer-events-none success-icon-pulse-layer" />
 							<div className="relative w-full h-full rounded-full success-icon-circle flex items-center justify-center">
 								<Check
 									className="w-10 h-10 sm:w-12 sm:h-12 text-white stroke-[3]"
@@ -153,5 +132,3 @@ const RegisterCompanySuccessComponent = () => {
 		</div>
 	)
 }
-
-export const RegisterCompanySuccess = memo(RegisterCompanySuccessComponent)
