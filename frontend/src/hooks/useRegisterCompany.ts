@@ -21,6 +21,21 @@ export interface IFormValues {
 	avatarUrl: FileList
 }
 
+const STEP_1_FIELDS: (keyof IFormValues)[] = ['name', 'subdomain', 'logoUrl']
+const STEP_2_FIELDS: (keyof IFormValues)[] = [
+	'adminName',
+	'adminEmail',
+	'adminPassword',
+	'confirmPassword',
+	'avatarUrl',
+]
+
+function createFileList(file: File): FileList {
+	const dt = new DataTransfer()
+	dt.items.add(file)
+	return dt.files
+}
+
 export const useRegisterCompany = () => {
 	const [step, setStep] = useState<0 | 1>(0)
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -55,15 +70,6 @@ export const useRegisterCompany = () => {
 
 	const [locationError, setLocationError] = useState<string | null>(null)
 
-	const STEP_1_FIELDS: (keyof IFormValues)[] = ['name', 'subdomain', 'logoUrl']
-	const STEP_2_FIELDS: (keyof IFormValues)[] = [
-		'adminName',
-		'adminEmail',
-		'adminPassword',
-		'confirmPassword',
-		'avatarUrl',
-	]
-
 	const {
 		register,
 		control,
@@ -76,12 +82,6 @@ export const useRegisterCompany = () => {
 	} = useForm<IFormValues>({
 		mode: 'onChange',
 	})
-
-	const createFileList = (file: File): FileList => {
-		const dt = new DataTransfer()
-		dt.items.add(file)
-		return dt.files
-	}
 
 	const handleImageData = useCallback(
 		(type: 'logo' | 'avatar', preview: string | null, file: File | null) => {
@@ -201,7 +201,6 @@ export const useRegisterCompany = () => {
 		setStep,
 		register,
 		control,
-		watch,
 		errors,
 		setLocation,
 		validateLogo,

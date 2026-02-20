@@ -4,7 +4,11 @@ import { ROUTES } from '@/constants/pages.constant'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { memo, useEffect } from 'react'
-import { Login } from './Login'
+
+const Login = dynamic(
+	() => import('./Login').then((m) => ({ default: m.Login })),
+	{ ssr: false, loading: () => <AuthPageLoadingFallback /> },
+)
 
 const RegisterCompany = dynamic(
 	() => import('./RegisterCompany').then((m) => ({ default: m.RegisterCompany })),

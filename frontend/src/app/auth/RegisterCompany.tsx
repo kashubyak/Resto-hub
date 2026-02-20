@@ -25,12 +25,24 @@ import { Building2, Lock, Mail, User } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { memo, useCallback, useState } from 'react'
-import type { RegisterOptions } from 'react-hook-form'
+import {
+	type Control,
+	type RegisterOptions,
+	useWatch,
+} from 'react-hook-form'
 
 const Map = dynamic(
 	() => import('@/components/auth/Map').then((m) => ({ default: m.Map })),
 	{ ssr: false },
 )
+
+function SubdomainHint({ control }: { control: Control<IFormValues> }) {
+	const subdomain = useWatch({ control, name: 'subdomain', defaultValue: '' })
+	const value = subdomain ?? ''
+	return value
+		? `${value}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'lvh.me'}`
+		: 'Your unique login address'
+}
 
 const RegisterCompanyComponent = () => {
 	const [showPassword, setShowPassword] = useState(false)
@@ -44,7 +56,6 @@ const RegisterCompanyComponent = () => {
 		setStep,
 		register,
 		control,
-		watch,
 		errors,
 		setLocation,
 		validateLogo,
@@ -58,6 +69,11 @@ const RegisterCompanyComponent = () => {
 	} = useRegisterCompany()
 
 	const goBack = useCallback(() => setStep(0), [setStep])
+
+	const onLocationClear = useCallback(() => {
+		setLocation({ lat: 0, lng: 0, address: '' })
+		setLocationError(null)
+	}, [setLocation, setLocationError])
 
 	const onLocationSelect = useCallback(
 		(lat: number, lng: number, address: string) => {
@@ -76,6 +92,15 @@ const RegisterCompanyComponent = () => {
 		(preview: string | null, file: File | null) =>
 			handleImageData('avatar', preview, file),
 		[handleImageData],
+	)
+
+	const onTogglePassword = useCallback(
+		() => setShowPassword((s) => !s),
+		[],
+	)
+	const onToggleConfirmPassword = useCallback(
+		() => setShowConfirmPassword((s) => !s),
+		[],
 	)
 
 	return (
@@ -144,11 +169,7 @@ const RegisterCompanyComponent = () => {
 											placeholder="your-company"
 											autoComplete="off"
 											error={errors.subdomain?.message}
-											hint={
-												(watch('subdomain') ?? '')
-													? `${watch('subdomain') ?? ''}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'lvh.me'}`
-													: 'Your unique login address'
-											}
+											hint={<SubdomainHint control={control} />}
 											register={register('subdomain', subdomainValidation)}
 										/>
 
@@ -158,10 +179,7 @@ const RegisterCompanyComponent = () => {
 												selectedLocation={
 													location.address ? location.address : undefined
 												}
-												onClear={() => {
-													setLocation({ lat: 0, lng: 0, address: '' })
-													setLocationError(null)
-												}}
+												onClear={onLocationClear}
 												error={locationError ?? undefined}
 											/>
 										</div>
@@ -248,7 +266,7 @@ const RegisterCompanyComponent = () => {
 											}
 											register={register('adminPassword', passwordValidation)}
 											showPassword={showPassword}
-											onTogglePassword={() => setShowPassword(!showPassword)}
+											onTogglePassword={onTogglePassword}
 										/>
 
 										<AuthPasswordField
@@ -269,9 +287,7 @@ const RegisterCompanyComponent = () => {
 												},
 											})}
 											showPassword={showConfirmPassword}
-											onTogglePassword={() =>
-												setShowConfirmPassword(!showConfirmPassword)
-											}
+											onTogglePassword={onToggleConfirmPassword}
 										/>
 
 										{/* Admin Avatar */}
@@ -345,10 +361,7 @@ const RegisterCompanyComponent = () => {
 								: null
 						}
 						onLocationSelect={onLocationSelect}
-						onLocationClear={() => {
-							setLocation({ lat: 0, lng: 0, address: '' })
-							setLocationError(null)
-						}}
+						onLocationClear={onLocationClear}
 						onChangeLocation={goBack}
 						error={locationError ?? undefined}
 					/>

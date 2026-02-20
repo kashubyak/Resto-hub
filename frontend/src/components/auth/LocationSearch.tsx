@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertCircle, Loader2, MapPin, Search, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 
 interface LocationResult {
 	display_name: string
@@ -23,12 +23,12 @@ interface LocationSearchProps {
 	error?: string
 }
 
-export function LocationSearch({
+const LocationSearchComponent = ({
 	onLocationSelect,
 	selectedLocation,
 	onClear,
 	error,
-}: LocationSearchProps) {
+}: LocationSearchProps) => {
 	const [query, setQuery] = useState('')
 	const [results, setResults] = useState<LocationResult[]>([])
 	const [loading, setLoading] = useState(false)
@@ -237,3 +237,5 @@ export function LocationSearch({
 		</div>
 	)
 }
+
+export const LocationSearch = memo(LocationSearchComponent)

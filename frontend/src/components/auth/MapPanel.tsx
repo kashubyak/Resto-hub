@@ -2,6 +2,7 @@
 
 import { MapPin } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { memo } from 'react'
 import { LocationSearch } from './LocationSearch'
 
 const Map = dynamic(() => import('./Map').then((m) => ({ default: m.Map })), {
@@ -23,14 +24,14 @@ interface MapPanelProps {
 	error?: string
 }
 
-export function MapPanel({
+const MapPanelComponent = ({
 	step,
 	location,
 	onLocationSelect,
 	onLocationClear,
 	onChangeLocation,
 	error,
-}: MapPanelProps) {
+}: MapPanelProps) => {
 	return (
 		<div className="hidden md:flex md:flex-col md:gap-4 w-full min-h-0 h-full">
 			<div className="bg-card rounded-2xl sm:rounded-3xl shadow-lg border border-border/50 p-4 sm:p-6 backdrop-blur-sm flex-shrink-0">
@@ -88,3 +89,5 @@ export function MapPanel({
 		</div>
 	)
 }
+
+export const MapPanel = memo(MapPanelComponent)

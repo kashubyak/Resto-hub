@@ -113,8 +113,7 @@ export function Map({ center, marker, onLocationSelect }: MapProps) {
 				const address =
 					data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`
 				onLocationSelect(lat, lng, address)
-			} catch (error) {
-				console.error('Geocoding error:', error)
+			} catch {
 				onLocationSelect(lat, lng, `${lat.toFixed(4)}, ${lng.toFixed(4)}`)
 			}
 		}
