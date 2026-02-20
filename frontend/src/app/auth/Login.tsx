@@ -6,6 +6,7 @@ import { ROUTES } from '@/constants/pages.constant'
 import { useLogin } from '@/hooks/useLogin'
 import {
 	getCompanyUrl,
+	getRootAppUrl,
 	getSubdomainFromHost,
 	getSubdomainFromHostname,
 } from '@/utils/api'
@@ -110,6 +111,7 @@ function LoginSubdomainGate() {
 }
 
 const LoginComponent = ({ host = '' }: { host?: string }) => {
+	const searchParams = useSearchParams()
 	const hostSubdomain =
 		(typeof host === 'string' && host ? getSubdomainFromHost(host) : null) ??
 		getSubdomainFromHostname()
@@ -117,6 +119,8 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 
 	const [showPassword, setShowPassword] = useState(false)
 	const { register, handleSubmit, errors, onSubmit } = useLogin()
+
+	const changeCompanyUrl = `${getRootAppUrl()}${ROUTES.PUBLIC.AUTH.LOGIN}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
 
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-background px-2 sm:px-4 py-4 sm:py-8 relative overflow-hidden">
@@ -132,6 +136,16 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 					</h1>
 					<p className="text-sm sm:text-base text-muted-foreground">
 						Sign in to continue
+					</p>
+					<p className="text-sm text-muted-foreground mt-2">
+						Company: <span className="font-medium text-foreground">{hostSubdomain}</span>
+						{' · '}
+						<Link
+							href={changeCompanyUrl}
+							className="text-primary hover:underline"
+						>
+							Change
+						</Link>
 					</p>
 				</div>
 
