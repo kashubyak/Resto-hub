@@ -1,23 +1,24 @@
 'use client'
 
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
-import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { useAlert } from '@/providers/AlertContext'
 import { getCompanyUrl } from '@/utils/api'
-import Cookies from 'js-cookie'
 import { Check, Copy, ExternalLink, LayoutDashboard, LogIn } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 
 const COPIED_ALERT_DURATION = 2000
 
-export function RegisterCompanySuccess({ subdomain }: { subdomain: string }) {
+export function RegisterCompanySuccess({
+	subdomain,
+	isAuthenticated,
+}: {
+	subdomain: string
+	isAuthenticated: boolean
+}) {
 	const { copy, copied } = useCopyToClipboard()
 	const { showInfo } = useAlert()
-	const [isAuthenticated] = useState(
-		() => Cookies.get(AUTH.AUTH_STATUS) === 'true',
-	)
 
 	const companyUrl = subdomain ? getCompanyUrl(subdomain) : ''
 	const loginUrl = subdomain ? `${companyUrl}${ROUTES.PUBLIC.AUTH.LOGIN}` : ''
