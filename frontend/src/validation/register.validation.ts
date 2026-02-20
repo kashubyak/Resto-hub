@@ -60,30 +60,55 @@ export const subdomainValidation = {
 	},
 }
 
-export const adminNameValidation = {
+function asString(value: string | number | FileList): value is string {
+	return typeof value === 'string'
+}
+
+type StringFieldValidate = Record<
+	string,
+	(value: string | number | FileList) => true | string
+>
+
+export const adminNameValidation: {
+	required: string
+	validate: StringFieldValidate
+} = {
 	required: 'Admin name is required',
 	validate: {
-		minLength: (value: string) =>
-			value.length >= 2 || 'Admin name must be at least 2 characters',
-		maxLength: (value: string) =>
-			value.length <= 50 || 'Admin name must be at most 50 characters',
-		noOnlySpaces: (value: string) =>
-			value.trim().length > 0 || 'Admin name cannot contain only spaces',
-		validCharacters: (value: string) =>
-			/^[a-zA-ZА-Яа-яІіЇїЄє\s\-']+$/.test(value) ||
-			'Admin name can only contain letters, spaces, hyphens, and apostrophes',
-		noConsecutiveSpaces: (value: string) =>
-			!/\s{2,}/.test(value) || 'Admin name cannot have consecutive spaces',
-		startsWithLetter: (value: string) =>
-			/^[a-zA-ZА-Яа-яІіЇїЄє]/.test(value) ||
-			'Admin name must start with a letter',
-		endsWithLetter: (value: string) =>
-			/[a-zA-ZА-Яа-яІіЇїЄє]$/.test(value) ||
-			'Admin name must end with a letter',
-		noSpecialAtStartEnd: (value: string) =>
-			!/^[\s\-']|[\s\-']$/.test(value) ||
-			'Admin name cannot start or end with special characters',
-		hasValidName: (value: string) => {
+		minLength: (value: string | number | FileList) =>
+			!asString(value) || value.length >= 2
+				? true
+				: 'Admin name must be at least 2 characters',
+		maxLength: (value: string | number | FileList) =>
+			!asString(value) || value.length <= 50
+				? true
+				: 'Admin name must be at most 50 characters',
+		noOnlySpaces: (value: string | number | FileList) =>
+			!asString(value) || value.trim().length > 0
+				? true
+				: 'Admin name cannot contain only spaces',
+		validCharacters: (value: string | number | FileList) =>
+			!asString(value) || /^[a-zA-ZА-Яа-яІіЇїЄє\s\-']+$/.test(value)
+				? true
+				: 'Admin name can only contain letters, spaces, hyphens, and apostrophes',
+		noConsecutiveSpaces: (value: string | number | FileList) =>
+			!asString(value) || !/\s{2,}/.test(value)
+				? true
+				: 'Admin name cannot have consecutive spaces',
+		startsWithLetter: (value: string | number | FileList) =>
+			!asString(value) || /^[a-zA-ZА-Яа-яІіЇїЄє]/.test(value)
+				? true
+				: 'Admin name must start with a letter',
+		endsWithLetter: (value: string | number | FileList) =>
+			!asString(value) || /[a-zA-ZА-Яа-яІіЇїЄє]$/.test(value)
+				? true
+				: 'Admin name must end with a letter',
+		noSpecialAtStartEnd: (value: string | number | FileList) =>
+			!asString(value) || !/^[\s\-']|[\s\-']$/.test(value)
+				? true
+				: 'Admin name cannot start or end with special characters',
+		hasValidName: (value: string | number | FileList) => {
+			if (!asString(value)) return true
 			const words = value.trim().split(/\s+/)
 			return (
 				(words.length >= 1 && words.length <= 4) ||
@@ -93,25 +118,34 @@ export const adminNameValidation = {
 	},
 }
 
-export const emailValidation = {
+export const emailValidation: {
+	required: string
+	validate: StringFieldValidate
+} = {
 	required: 'Admin email is required',
 	validate: {
-		validEmail: (value: string) =>
-			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) ||
-			'Please enter a valid email address',
-		minLength: (value: string) =>
-			value.length >= 5 || 'Email address is too short',
-		maxLength: (value: string) =>
-			value.length <= 254 || 'Email address is too long',
-		noConsecutiveDots: (value: string) =>
-			!/\.{2,}/.test(value) || 'Email cannot have consecutive dots',
-		validLocalPart: (value: string) => {
+		validEmail: (value: string | number | FileList) =>
+			!asString(value) ||
+			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)
+				? true
+				: 'Please enter a valid email address',
+		minLength: (value: string | number | FileList) =>
+			!asString(value) || value.length >= 5 ? true : 'Email address is too short',
+		maxLength: (value: string | number | FileList) =>
+			!asString(value) || value.length <= 254 ? true : 'Email address is too long',
+		noConsecutiveDots: (value: string | number | FileList) =>
+			!asString(value) || !/\.{2,}/.test(value)
+				? true
+				: 'Email cannot have consecutive dots',
+		validLocalPart: (value: string | number | FileList) => {
+			if (!asString(value)) return true
 			const localPart = value.split('@')[0]
 			return (
 				(localPart && localPart.length <= 64) || 'Email local part is too long'
 			)
 		},
-		validDomain: (value: string) => {
+		validDomain: (value: string | number | FileList) => {
+			if (!asString(value)) return true
 			const parts = value.split('@')
 			if (parts.length !== 2) return 'Invalid email format'
 			const domain = parts[1]
@@ -123,12 +157,14 @@ export const emailValidation = {
 				'Invalid email domain'
 			)
 		},
-		noSpaces: (value: string) =>
-			!/\s/.test(value) || 'Email cannot contain spaces',
-		startsCorrectly: (value: string) =>
-			!/^[.\-_]/.test(value) ||
-			'Email cannot start with dot, dash, or underscore',
-		commonDomains: (value: string) => {
+		noSpaces: (value: string | number | FileList) =>
+			!asString(value) || !/\s/.test(value) ? true : 'Email cannot contain spaces',
+		startsCorrectly: (value: string | number | FileList) =>
+			!asString(value) || !/^[.\-_]/.test(value)
+				? true
+				: 'Email cannot start with dot, dash, or underscore',
+		commonDomains: (value: string | number | FileList) => {
+			if (!asString(value)) return true
 			const domain = value.split('@')[1]?.toLowerCase()
 			const suspicious = ['tempmail', '10minutemail', 'guerrillamail']
 			return (

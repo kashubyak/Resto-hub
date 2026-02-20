@@ -7,7 +7,7 @@ import { getRootAppUrl } from '@/utils/api'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-interface IFormValues {
+export interface IFormValues {
 	name: string
 	subdomain: string
 	address: string

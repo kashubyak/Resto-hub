@@ -71,7 +71,10 @@ export function Map({ center, marker, onLocationSelect }: MapProps) {
 
 	useEffect(() => {
 		if (!mapInstanceRef.current || !center) return
-		mapInstanceRef.current.setView(center, 12)
+		const map = mapInstanceRef.current
+		const currentZoom = map.getZoom()
+		const newZoom = Math.max(12, currentZoom)
+		map.setView(center, newZoom, { animate: true })
 	}, [center])
 
 	useEffect(() => {

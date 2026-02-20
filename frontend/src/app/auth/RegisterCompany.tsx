@@ -10,7 +10,10 @@ import { LocationSearch } from '@/components/auth/LocationSearch'
 import { MapPanel } from '@/components/auth/MapPanel'
 import { UploadImage } from '@/components/elements/UploadImage'
 import { ROUTES } from '@/constants/pages.constant'
-import { useRegisterCompany } from '@/hooks/useRegisterCompany'
+import {
+	useRegisterCompany,
+	type IFormValues,
+} from '@/hooks/useRegisterCompany'
 import {
 	adminNameValidation,
 	CompanyNameValidation,
@@ -22,6 +25,7 @@ import { Building2, Lock, Mail, User } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { memo, useCallback, useState } from 'react'
+import type { RegisterOptions } from 'react-hook-form'
 
 const Map = dynamic(
 	() => import('@/components/auth/Map').then((m) => ({ default: m.Map })),
@@ -144,17 +148,41 @@ const RegisterCompanyComponent = () => {
 											register={register('subdomain', subdomainValidation)}
 										/>
 
-										<LocationSearch
-											onLocationSelect={onLocationSelect}
-											selectedLocation={
-												location.address ? location.address : undefined
-											}
-											onClear={() => {
-												setLocation({ lat: 0, lng: 0, address: '' })
-												setLocationError(null)
-											}}
-											error={locationError ?? undefined}
-										/>
+										<div className="relative z-10">
+											<LocationSearch
+												onLocationSelect={onLocationSelect}
+												selectedLocation={
+													location.address ? location.address : undefined
+												}
+												onClear={() => {
+													setLocation({ lat: 0, lng: 0, address: '' })
+													setLocationError(null)
+												}}
+												error={locationError ?? undefined}
+											/>
+										</div>
+
+										{/* Map on mobile - only step 0, right after location search */}
+										<div className="md:hidden w-full mt-4 space-y-2 relative z-0">
+											<p className="text-sm text-muted-foreground">
+												Or tap on the map to select location
+											</p>
+											<div className="w-full h-[280px] rounded-xl overflow-hidden relative">
+												<Map
+													center={
+														location.address
+															? [location.lat, location.lng]
+															: undefined
+													}
+													marker={
+														location.address
+															? [location.lat, location.lng]
+															: undefined
+													}
+													onLocationSelect={onLocationSelect}
+												/>
+											</div>
+										</div>
 
 										{/* Company Logo */}
 										<div className="space-y-2">
@@ -174,7 +202,7 @@ const RegisterCompanyComponent = () => {
 										<AuthControllerTextField
 											control={control}
 											name="adminName"
-											rules={adminNameValidation}
+											rules={adminNameValidation as RegisterOptions<IFormValues>}
 											id="adminName"
 											label="Full name"
 											autocompleteName="name"
@@ -190,7 +218,7 @@ const RegisterCompanyComponent = () => {
 										<AuthControllerTextField
 											control={control}
 											name="adminEmail"
-											rules={emailValidation}
+											rules={emailValidation as RegisterOptions<IFormValues>}
 											id="adminEmail"
 											label="Email"
 											autocompleteName="email"
@@ -288,18 +316,6 @@ const RegisterCompanyComponent = () => {
 								Sign in
 							</Link>
 						</p>
-
-						{/* Map on mobile */}
-						<div className="md:hidden w-full min-h-[280px] flex-1 mt-6">
-							<Map
-								center={
-									location.address ? [location.lat, location.lng] : undefined
-								}
-								marker={
-									location.address ? [location.lat, location.lng] : undefined
-								}
-							/>
-						</div>
 					</div>
 
 					<MapPanel
