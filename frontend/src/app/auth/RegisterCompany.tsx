@@ -37,8 +37,8 @@ const RegisterCompanyComponent = () => {
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
 	const {
-		handleSubmit,
-		onSubmit,
+		handleStep0Submit,
+		handleStep1Submit,
 		isSubmitting,
 		step,
 		setStep,
@@ -113,7 +113,11 @@ const RegisterCompanyComponent = () => {
 
 						<div className="bg-card rounded-xl sm:rounded-3xl shadow-lg border border-border/50 p-4 sm:p-8 backdrop-blur-sm flex-shrink-0">
 							<form
-								onSubmit={handleSubmit(onSubmit)}
+								onSubmit={(e) => {
+									e.preventDefault()
+									if (step === 0) handleStep0Submit()
+									else handleStep1Submit()
+								}}
 								method="post"
 								action="#"
 								encType="multipart/form-data"
@@ -187,6 +191,7 @@ const RegisterCompanyComponent = () => {
 										{/* Company Logo */}
 										<div className="space-y-2">
 											<UploadImage
+												key="company-logo"
 												label="Company Logo"
 												register={register('logoUrl', {
 													validate: validateLogo,
@@ -202,7 +207,9 @@ const RegisterCompanyComponent = () => {
 										<AuthControllerTextField
 											control={control}
 											name="adminName"
-											rules={adminNameValidation as RegisterOptions<IFormValues>}
+											rules={
+												adminNameValidation as RegisterOptions<IFormValues>
+											}
 											id="adminName"
 											label="Full name"
 											autocompleteName="name"
@@ -270,6 +277,7 @@ const RegisterCompanyComponent = () => {
 										{/* Admin Avatar */}
 										<div className="space-y-2">
 											<UploadImage
+												key="admin-avatar"
 												label="Admin avatar"
 												register={register('avatarUrl', {
 													validate: validateAvatar,
@@ -292,17 +300,24 @@ const RegisterCompanyComponent = () => {
 											Back
 										</button>
 									)}
-									<button
-										type="submit"
-										disabled={isSubmitting}
-										className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-60 disabled:pointer-events-none disabled:transform-none"
-									>
-										{step === 0
-											? 'Continue'
-											: isSubmitting
-												? 'Creating account...'
-												: 'Create account'}
-									</button>
+									{step === 0 ? (
+										<button
+											type="button"
+											onClick={handleStep0Submit}
+											className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+										>
+											Continue
+										</button>
+									) : (
+										<button
+											type="button"
+											onClick={handleStep1Submit}
+											disabled={isSubmitting}
+											className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-60 disabled:pointer-events-none disabled:transform-none"
+										>
+											{isSubmitting ? 'Creating account...' : 'Create account'}
+										</button>
+									)}
 								</div>
 							</form>
 						</div>

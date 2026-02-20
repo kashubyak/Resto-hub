@@ -183,7 +183,7 @@ export const useUploadImage = ({
 		input.addEventListener('change', handleChange)
 
 		return () => input.removeEventListener('change', handleChange)
-	}, [handleFile])
+	}, [handleFile, preview])
 
 	const clearPreview = useCallback(() => {
 		setPreview(null)

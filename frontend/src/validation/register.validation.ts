@@ -130,9 +130,13 @@ export const emailValidation: {
 				? true
 				: 'Please enter a valid email address',
 		minLength: (value: string | number | FileList) =>
-			!asString(value) || value.length >= 5 ? true : 'Email address is too short',
+			!asString(value) || value.length >= 5
+				? true
+				: 'Email address is too short',
 		maxLength: (value: string | number | FileList) =>
-			!asString(value) || value.length <= 254 ? true : 'Email address is too long',
+			!asString(value) || value.length <= 254
+				? true
+				: 'Email address is too long',
 		noConsecutiveDots: (value: string | number | FileList) =>
 			!asString(value) || !/\.{2,}/.test(value)
 				? true
@@ -158,7 +162,9 @@ export const emailValidation: {
 			)
 		},
 		noSpaces: (value: string | number | FileList) =>
-			!asString(value) || !/\s/.test(value) ? true : 'Email cannot contain spaces',
+			!asString(value) || !/\s/.test(value)
+				? true
+				: 'Email cannot contain spaces',
 		startsCorrectly: (value: string | number | FileList) =>
 			!asString(value) || !/^[.\-_]/.test(value)
 				? true

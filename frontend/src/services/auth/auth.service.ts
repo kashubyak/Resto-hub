@@ -33,6 +33,7 @@ export const login = async (
 
 		const response = await api.post<ILoginResponse>(API_URL.AUTH.LOGIN, data, {
 			withCredentials: true,
+			...(data.subdomain && { headers: { 'X-Subdomain': data.subdomain } }),
 		})
 		return response
 	} catch (err: unknown) {

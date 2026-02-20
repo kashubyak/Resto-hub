@@ -128,6 +128,7 @@ export function AuthControllerTextField<T extends FieldValues>({
 						)}
 						<input
 							{...field}
+							value={field.value ?? ''}
 							id={id}
 							name={autocompleteName}
 							type={type}

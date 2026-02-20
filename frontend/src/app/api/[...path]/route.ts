@@ -22,7 +22,8 @@ function corsHeaders(origin: string | null): Record<string, string> {
 	return {
 		'Access-Control-Allow-Origin': allowOrigin,
 		'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-		'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
+		'Access-Control-Allow-Headers':
+			'Content-Type, Authorization, Cookie, X-Request-ID, X-Subdomain',
 		'Access-Control-Allow-Credentials': 'true',
 	}
 }
@@ -44,6 +45,7 @@ function proxy(
 				const cookie = request.headers.get('cookie') ?? ''
 				const auth = request.headers.get('authorization') ?? ''
 				const contentType = request.headers.get('content-type') ?? ''
+				const xSubdomain = request.headers.get('x-subdomain') ?? ''
 
 				const options: http.RequestOptions = {
 					method: request.method,
@@ -59,6 +61,9 @@ function proxy(
 				if (contentType)
 					(options.headers as Record<string, string>)['content-type'] =
 						contentType
+				if (xSubdomain)
+					(options.headers as Record<string, string>)['x-subdomain'] =
+						xSubdomain
 
 				const doRequest = (reqBody: Buffer | undefined) => {
 					if (

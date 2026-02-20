@@ -3,8 +3,8 @@ import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
 import { registerCompany } from '@/services/auth/company.service'
 import type { IAxiosError } from '@/types/error.interface'
-import { getRootAppUrl } from '@/utils/api'
-import { useCallback, useEffect, useState } from 'react'
+import { getCompanyUrl } from '@/utils/api'
+import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 export interface IFormValues {
@@ -26,7 +26,6 @@ export const useRegisterCompany = () => {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const { login } = useAuth()
 	const { showBackendError } = useAlert()
-	const [hasMounted, setHasMounted] = useState(false)
 
 	const [savedPreviews, setSavedPreviews] = useState<{
 		logo: string | null
@@ -56,12 +55,20 @@ export const useRegisterCompany = () => {
 
 	const [locationError, setLocationError] = useState<string | null>(null)
 
-	useEffect(() => setHasMounted(true), [])
+	const STEP_1_FIELDS: (keyof IFormValues)[] = ['name', 'subdomain', 'logoUrl']
+	const STEP_2_FIELDS: (keyof IFormValues)[] = [
+		'adminName',
+		'adminEmail',
+		'adminPassword',
+		'confirmPassword',
+		'avatarUrl',
+	]
 
 	const {
 		register,
 		control,
-		handleSubmit,
+		trigger,
+		getValues,
 		formState: { errors },
 		watch,
 		setValue,
@@ -69,6 +76,12 @@ export const useRegisterCompany = () => {
 	} = useForm<IFormValues>({
 		mode: 'onChange',
 	})
+
+	const createFileList = (file: File): FileList => {
+		const dt = new DataTransfer()
+		dt.items.add(file)
+		return dt.files
+	}
 
 	const handleImageData = useCallback(
 		(type: 'logo' | 'avatar', preview: string | null, file: File | null) => {
@@ -81,29 +94,35 @@ export const useRegisterCompany = () => {
 				[type]: file,
 			}))
 
-			if (file) {
-				if (type === 'logo') clearErrors('logoUrl')
-				else clearErrors('avatarUrl')
+			const emptyFileList = new DataTransfer().files
+			if (type === 'logo') {
+				setValue('logoUrl', file ? createFileList(file) : emptyFileList)
+				if (file) clearErrors('logoUrl')
+			} else {
+				setValue('avatarUrl', file ? createFileList(file) : emptyFileList)
+				if (file) clearErrors('avatarUrl')
 			}
 		},
-		[clearErrors],
+		[clearErrors, setValue],
 	)
 
-	const onSubmit = useCallback(
-		async (data: IFormValues) => {
-			if (step === 0) {
-				if (!location.address) {
-					setLocationError('Please select a location')
-					return
-				}
-				setLocationError(null)
-				setValue('address', location.address)
-				setValue('latitude', location.lat)
-				setValue('longitude', location.lng)
-				setStep(1)
-				return
-			}
+	const handleStep0Submit = useCallback(async () => {
+		const valid = await trigger(STEP_1_FIELDS)
+		if (!valid) return
+		if (!location.address) {
+			setLocationError('Please select a location')
+			return
+		}
+		setLocationError(null)
+		setValue('address', location.address)
+		setValue('latitude', location.lat)
+		setValue('longitude', location.lng)
+		setStep(1)
+		clearErrors()
+	}, [trigger, location, setValue, setStep, setLocationError, clearErrors])
 
+	const submitRegistration = useCallback(
+		async (data: IFormValues) => {
 			setIsSubmitting(true)
 			try {
 				const formData = new FormData()
@@ -130,7 +149,7 @@ export const useRegisterCompany = () => {
 						{ skipGetCurrentUser: true },
 					)
 
-					window.location.href = `${getRootAppUrl()}${ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS}?subdomain=${data.subdomain}`
+					window.location.href = `${getCompanyUrl(data.subdomain)}${ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS}?subdomain=${data.subdomain}`
 				}
 			} catch (err) {
 				showBackendError(err as IAxiosError)
@@ -138,8 +157,15 @@ export const useRegisterCompany = () => {
 				setIsSubmitting(false)
 			}
 		},
-		[step, location, setValue, savedFiles, login, showBackendError],
+		[location, savedFiles, login, showBackendError],
 	)
+
+	const handleStep1Submit = useCallback(async () => {
+		const valid = await trigger(STEP_2_FIELDS)
+		if (!valid) return
+		const data = getValues()
+		await submitRegistration(data)
+	}, [trigger, getValues, submitRegistration])
 
 	const validateLogo = useCallback(() => {
 		const logoFiles = watch('logoUrl')
@@ -168,12 +194,11 @@ export const useRegisterCompany = () => {
 	)
 
 	return {
-		handleSubmit,
-		onSubmit,
+		handleStep0Submit,
+		handleStep1Submit,
 		isSubmitting,
 		step,
 		setStep,
-		hasMounted,
 		register,
 		control,
 		watch,

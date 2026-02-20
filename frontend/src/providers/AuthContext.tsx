@@ -121,15 +121,18 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 					(Cookies.get(AUTH.AUTH_STATUS) === 'true' ||
 						!!Cookies.get(AUTH.TOKEN))
 				const isAuthenticated = !!session || !!hasBackendAuth
-				if (!user && isAuthenticated) {
-					if (pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS) return undefined
+				const isPublicAuthRoute =
+					pathname === ROUTES.PUBLIC.AUTH.REGISTER ||
+					pathname === ROUTES.PUBLIC.AUTH.LOGIN ||
+					pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS
+				if (!user && isAuthenticated && !isPublicAuthRoute) {
 					initApiSubdomain()
 					return getCurrentUser()
 						.then((current) =>
 							initializeAuth(current.data, current.data.role as UserRole),
 						)
 						.catch(() => {
-							if (pathname !== ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS) clearAuth()
+							if (!isPublicAuthRoute) clearAuth()
 						})
 				}
 				if (!isAuthenticated && user) clearAuth()

@@ -1,7 +1,7 @@
 'use client'
 
-import { ApiSubdomainInitializer } from '@/components/init/ApiSubdomainInitializer'
 import { AlertDisplay } from '@/components/container/AlertContainer'
+import { ApiSubdomainInitializer } from '@/components/init/ApiSubdomainInitializer'
 import { AUTH } from '@/constants/auth.constant'
 import { AlertProvider, useAlert } from '@/providers/AlertContext'
 import { AuthProvider } from '@/providers/AuthContext'
