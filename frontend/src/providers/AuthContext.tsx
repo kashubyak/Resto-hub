@@ -1,7 +1,6 @@
 'use client'
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
-import { getSupabaseClient } from '@/lib/supabase/client'
 import { usePathname } from 'next/navigation'
 import {
 	login as loginRequest,
@@ -113,35 +112,26 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 			}
 		}
 
-		void getSupabaseClient()
-			.auth.getSession()
-			.then(({ data: { session } }) => {
-				const hasBackendAuth =
-					typeof window !== 'undefined' &&
-					(Cookies.get(AUTH.AUTH_STATUS) === 'true' ||
-						!!Cookies.get(AUTH.TOKEN))
-				const isAuthenticated = !!session || !!hasBackendAuth
-				const isPublicAuthRoute =
-					pathname === ROUTES.PUBLIC.AUTH.REGISTER ||
-					pathname === ROUTES.PUBLIC.AUTH.LOGIN ||
-					pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS
-				if (isPublicAuthRoute && !hasBackendAuth) clearAuth()
-				if (!user && isAuthenticated && !isPublicAuthRoute) {
-					initApiSubdomain()
-					return getCurrentUser()
-						.then((current) =>
-							initializeAuth(current.data, current.data.role as UserRole),
-						)
-						.catch(() => {
-							if (!isPublicAuthRoute) clearAuth()
-						})
-				}
-				if (!isAuthenticated && user) clearAuth()
-				return undefined
-			})
-			.catch(() => {
-				clearAuth()
-			})
+		const hasBackendAuth =
+			typeof window !== 'undefined' &&
+			(Cookies.get(AUTH.AUTH_STATUS) === 'true' || !!Cookies.get(AUTH.TOKEN))
+		const isPublicAuthRoute =
+			pathname === ROUTES.PUBLIC.AUTH.REGISTER ||
+			pathname === ROUTES.PUBLIC.AUTH.LOGIN ||
+			pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS
+
+		if (isPublicAuthRoute && !hasBackendAuth) clearAuth()
+		if (!hasBackendAuth && user) clearAuth()
+		if (!user && hasBackendAuth && !isPublicAuthRoute) {
+			initApiSubdomain()
+			void getCurrentUser()
+				.then((current) =>
+					initializeAuth(current.data, current.data.role as UserRole),
+				)
+				.catch(() => {
+					// 401 etc. handled by interceptor via handleSessionInvalid
+				})
+		}
 	}, [hydrated, user, pathname, clearAuth, setPendingAlert])
 
 	const contextValue = useMemo(

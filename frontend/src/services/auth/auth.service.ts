@@ -15,41 +15,20 @@ import api, {
 export const login = async (
 	data: ILoginRequest,
 ): Promise<ApiResponse<ILoginResponse>> => {
-	try {
-		const hostnameSubdomain = getSubdomainFromHostname()
-		const subdomain = data.subdomain || hostnameSubdomain
+	const hostnameSubdomain = getSubdomainFromHostname()
+	const subdomain = data.subdomain || hostnameSubdomain
 
-		setApiSubdomain(subdomain)
+	setApiSubdomain(subdomain)
 
-		const supabase = getSupabaseClient()
-		const { data: authData, error } = await supabase.auth.signInWithPassword({
-			email: data.email,
-			password: data.password,
-		})
-
-		if (error) throw error
-		if (!authData.session)
-			throw new Error('Login succeeded but no session returned')
-
-		const response = await api.post<ILoginResponse>(API_URL.AUTH.LOGIN, data, {
+	const response = await api.post<ILoginResponse>(
+		API_URL.AUTH.LOGIN,
+		{ email: data.email, password: data.password, subdomain },
+		{
 			withCredentials: true,
 			...(data.subdomain && { headers: { 'X-Subdomain': data.subdomain } }),
-		})
-		return response
-	} catch (err: unknown) {
-		const axiosErr = err as {
-			response?: unknown
-			message?: string
-			config?: { url?: string }
-		}
-		console.error('[auth.service] login failed', {
-			message: axiosErr?.message ?? (err as Error)?.message,
-			response: axiosErr?.response,
-			url: axiosErr?.config?.url,
-			err,
-		})
-		throw err
-	}
+		},
+	)
+	return response
 }
 
 export const logout = async (): Promise<ApiResponse<ILogoutResponse>> => {

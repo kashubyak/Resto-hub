@@ -1,6 +1,5 @@
 import { API_URL } from '@/config/api'
 import { AUTH } from '@/constants/auth.constant'
-import { ROUTES } from '@/constants/pages.constant'
 import {
 	completeNetworkRequest,
 	failNetworkRequest,
@@ -12,7 +11,7 @@ import { useAlertStore } from '@/store/alert.store'
 import type { CustomAxiosRequestConfig } from '@/types/axios.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import type { AxiosProgressEvent } from 'axios'
-import { clearAuth } from '../auth-helpers'
+import { handleSessionInvalid } from '../auth-helpers'
 import { getRetryAfter, parseBackendError } from '../errorHandler'
 import Cookies from 'js-cookie'
 import {
@@ -40,15 +39,15 @@ api.interceptors.request.use(async (config) => {
 
 	if (typeof window !== 'undefined') {
 		try {
-			const {
-				data: { session },
-			} = await getSupabaseClient().auth.getSession()
-			if (session?.access_token) {
-				config.headers.Authorization = `Bearer ${session.access_token}`
-			}
-			if (!config.headers.Authorization) {
-				const token = Cookies.get(AUTH.TOKEN)
-				if (token) config.headers.Authorization = `Bearer ${token}`
+			const token = Cookies.get(AUTH.TOKEN)
+			if (token) {
+				config.headers.Authorization = `Bearer ${token}`
+			} else {
+				const {
+					data: { session },
+				} = await getSupabaseClient().auth.getSession()
+				if (session?.access_token)
+					config.headers.Authorization = `Bearer ${session.access_token}`
 			}
 		} catch {}
 	}
@@ -97,69 +96,34 @@ api.interceptors.response.use(
 			setIsRefreshing(true)
 
 			try {
-				// Try backend refresh first (valid when auth is cookie-only, e.g. subdomain)
-				const backendRefreshRes = await api.post<{
-					success: boolean
-					token?: string
-				}>(API_URL.AUTH.REFRESH, {}, { withCredentials: true })
-				if (
-					backendRefreshRes?.status >= 200 &&
-					backendRefreshRes?.status < 300
-				) {
-					processQueue(null, null)
-					originalRequest.headers = originalRequest.headers || {}
-					originalRequest.headers['X-Request-ID'] = startNetworkRequest(
-						originalRequest.url || 'retry',
-					)
-					return api(originalRequest)
-				}
-			} catch {
-				// Backend refresh failed, try Supabase refresh below
-			}
-
-			try {
-				const {
-					data: { session },
-				} = await getSupabaseClient().auth.refreshSession()
-
-				if (session?.access_token) {
-					processQueue(null, null)
-
-					originalRequest.headers = originalRequest.headers || {}
-					originalRequest.headers.Authorization = `Bearer ${session.access_token}`
-					originalRequest.headers['X-Request-ID'] = startNetworkRequest(
-						originalRequest.url || 'retry',
-					)
-
-					return api(originalRequest)
-				}
-
-				throw new Error('Session refresh failed')
-			} catch (err) {
-				processQueue(err, null)
-
-				if (typeof window !== 'undefined') {
-					clearAuth()
-					try {
-						getSupabaseClient().auth.signOut()
-					} catch {}
-
-					const currentPath = window.location.pathname
-					const loginUrl = `${ROUTES.PUBLIC.AUTH.LOGIN}?redirect=${encodeURIComponent(
-						currentPath,
-					)}`
-
-					if (!sessionStorage.getItem(AUTH.SESSION_EXPIRED_SHOWN_KEY)) {
-						useAlertStore.getState().setPendingAlert({
-							severity: 'warning',
-							text: AUTH.SESSION_EXPIRED_MESSAGE,
-						})
+				try {
+					const backendRefreshRes = await api.post<{
+						success: boolean
+						token?: string
+					}>(API_URL.AUTH.REFRESH, {}, { withCredentials: true })
+					if (
+						backendRefreshRes?.status >= 200 &&
+						backendRefreshRes?.status < 300
+					) {
+						processQueue(null, null)
+						originalRequest.headers = originalRequest.headers || {}
+						originalRequest.headers['X-Request-ID'] =
+							startNetworkRequest(originalRequest.url || 'retry')
+						return api(originalRequest)
 					}
-
-					window.location.href = loginUrl
+				} catch {
+					// backend refresh failed
 				}
 
-				return Promise.reject(err)
+				processQueue(new Error('Session refresh failed'), null)
+				if (typeof window !== 'undefined') {
+					handleSessionInvalid({
+						showExpiredAlert: !sessionStorage.getItem(
+							AUTH.SESSION_EXPIRED_SHOWN_KEY,
+						),
+					})
+				}
+				return Promise.reject(error)
 			} finally {
 				setIsRefreshing(false)
 			}
@@ -202,32 +166,7 @@ api.interceptors.response.use(
 			})
 		}
 
-		const err = error as {
-			config?: { url?: string; method?: string }
-			response?: { status?: number; data?: unknown }
-			message?: string
-			code?: string
-			stack?: string
-		}
-		const logPayload: Record<string, unknown> = {
-			url: originalRequest?.url ?? err?.config?.url,
-			method: originalRequest?.method ?? err?.config?.method,
-			status: err?.response?.status,
-			message: err?.message,
-			code: err?.code,
-		}
-		if (err?.response?.data !== undefined)
-			logPayload.responseData = err.response.data
-		const hasAny = Object.keys(logPayload).some(
-			(k) => logPayload[k] !== undefined,
-		)
-		if (!hasAny) {
-			logPayload.raw = String(error)
-			if (error && typeof (error as Error).stack === 'string')
-				logPayload.stack = (error as Error).stack
-		}
 		if (error.response?.status === 401) return Promise.reject(error)
-		console.error('[interceptor] request failed', logPayload)
 		return Promise.reject(error)
 	},
 )
