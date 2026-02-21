@@ -1,7 +1,12 @@
+import BusinessIcon from '@mui/icons-material/Business'
 import CategoryIcon from '@mui/icons-material/Category'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
 import type { ComponentType } from 'react'
+
+export const SIDEBAR_SUBTITLE = 'Admin Panel'
+
+export const DEFAULT_COMPANY_ICON = BusinessIcon
 
 export enum UserRole {
 	ADMIN = 'ADMIN',

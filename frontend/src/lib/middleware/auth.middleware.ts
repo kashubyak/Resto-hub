@@ -39,7 +39,8 @@ export async function authMiddleware(
 	if (isPublicRoute(pathname)) return NextResponse.next()
 
 	const isAuthenticated =
-		request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true'
+		request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true' ||
+		!!request.cookies.get(AUTH.TOKEN)?.value
 	if (isAuthRoute(pathname))
 		return isAuthenticated ? redirectToHome(request) : NextResponse.next()
 
@@ -88,6 +89,9 @@ function handleSessionExpired(
 	currentPath: string,
 	hadAuth: boolean,
 ): NextResponse {
+	const hasAccessToken = !!request.cookies.get(AUTH.TOKEN)?.value
+	if (hasAccessToken) return NextResponse.next()
+
 	const response = redirectToLogin(request, currentPath)
 	if (hadAuth) {
 		response.cookies.set(

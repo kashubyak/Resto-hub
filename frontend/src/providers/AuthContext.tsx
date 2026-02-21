@@ -125,6 +125,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 					pathname === ROUTES.PUBLIC.AUTH.REGISTER ||
 					pathname === ROUTES.PUBLIC.AUTH.LOGIN ||
 					pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS
+				if (isPublicAuthRoute && !hasBackendAuth) clearAuth()
 				if (!user && isAuthenticated && !isPublicAuthRoute) {
 					initApiSubdomain()
 					return getCurrentUser()

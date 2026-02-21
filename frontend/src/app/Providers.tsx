@@ -5,6 +5,7 @@ import { ApiSubdomainInitializer } from '@/components/init/ApiSubdomainInitializ
 import { AUTH } from '@/constants/auth.constant'
 import { AlertProvider, useAlert } from '@/providers/AlertContext'
 import { AuthProvider } from '@/providers/AuthContext'
+import { ThemeProvider } from '@/providers/ThemeContext'
 import { useAlertStore } from '@/store/alert.store'
 import { setGlobalAlertFunction } from '@/utils/api'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -47,14 +48,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
 	return (
 		<QueryClientProvider client={queryClientRef.current}>
-			<AlertProvider>
-				<AuthProvider>
-					<ApiSubdomainInitializer />
-					<AlertInitializer />
-					{children}
-					<AlertDisplay />
-				</AuthProvider>
-			</AlertProvider>
+			<ThemeProvider>
+				<AlertProvider>
+					<AuthProvider>
+						<ApiSubdomainInitializer />
+						<AlertInitializer />
+						{children}
+						<AlertDisplay />
+					</AuthProvider>
+				</AlertProvider>
+			</ThemeProvider>
 		</QueryClientProvider>
 	)
 }

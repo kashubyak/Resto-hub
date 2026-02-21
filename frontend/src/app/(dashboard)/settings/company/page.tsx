@@ -10,7 +10,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser'
 export default function CompanySettingsPage() {
 	const { user } = useCurrentUser()
 	const { company, subdomain, companyUrl, copied, handleCopy } =
-		useCompanySettings(user?.companyId)
+		useCompanySettings(!!user)
 
 	return (
 		<SafeRender title="Loading Company Settings..." showNetworkProgress>

@@ -85,6 +85,46 @@
 	}
 }
 
+/* Class-based dark theme for ThemeProvider toggle */
+html.dark {
+	--background: #000000;
+	--background-rgb: 0, 0, 0;
+	--foreground: #fafafa;
+	--card: #0a0a0a;
+	--card-foreground: #fafafa;
+	--popover: #0a0a0a;
+	--popover-foreground: #fafafa;
+	--primary: #a78bfa;
+	--primary-foreground: #000000;
+	--primary-hover: #c4b5fd;
+	--secondary: #171717;
+	--secondary-foreground: #a3a3a3;
+	--secondary-hover: #262626;
+	--muted: #0a0a0a;
+	--muted-hover: #171717;
+	--muted-foreground: #737373;
+	--accent: #171717;
+	--accent-foreground: #fafafa;
+	--destructive: #f87171;
+	--destructive-foreground: #000000;
+	--destructive-hover: #fca5a5;
+	--success: #4ade80;
+	--success-hover: #86efac;
+	--warning: #fbbf24;
+	--warning-hover: #fcd34d;
+	--warning-foreground: #0a0a0a;
+	--info: #22d3ee;
+	--info-hover: #67e8f9;
+	--info-foreground: #0a0a0a;
+	--border: #171717;
+	--input: #0a0a0a;
+	--input-background: #0a0a0a;
+	--ring: #a78bfa;
+	--stable-light: #fff;
+	--active-item: #262626;
+	--shadow: rgba(0, 0, 0, 0.7);
+}
+
 @keyframes float {
 	0%,
 	100% {
@@ -104,12 +144,52 @@
 	}
 }
 
+@keyframes sparkle {
+	0%, 100% {
+		transform: rotate(0deg) scale(1);
+		opacity: 1;
+	}
+	25% {
+		transform: rotate(-5deg) scale(1.05);
+		opacity: 0.9;
+	}
+	50% {
+		transform: rotate(5deg) scale(1.1);
+		opacity: 1;
+	}
+	75% {
+		transform: rotate(-3deg) scale(1.05);
+		opacity: 0.95;
+	}
+}
+
+@keyframes pulse-smooth {
+	0%, 100% {
+		transform: scale(1);
+		opacity: 0.5;
+	}
+	50% {
+		transform: scale(1.2);
+		opacity: 0.8;
+	}
+}
+
 .animate-float {
 	animation: float 6s ease-in-out infinite;
 }
 
+.animate-sparkle {
+	animation: sparkle 3s ease-in-out infinite;
+}
+
+.animate-pulse-smooth {
+	animation: pulse-smooth 3s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-	.animate-float {
+	.animate-float,
+	.animate-sparkle,
+	.animate-pulse-smooth {
 		animation: none;
 	}
 }
@@ -362,5 +442,30 @@ html {
 	}
 	.hover\:bg-input\/80:hover {
 		background-color: color-mix(in oklab, var(--input) 80%, transparent);
+	}
+	.bg-popover {
+		background-color: var(--popover);
+	}
+	.text-popover-foreground {
+		color: var(--popover-foreground);
+	}
+	.from-primary {
+		--tw-gradient-from: var(--primary);
+		--tw-gradient-to: color-mix(in oklab, var(--primary) 0%, transparent);
+	}
+	.to-primary-hover {
+		--tw-gradient-to: var(--primary-hover);
+	}
+	.to-transparent {
+		--tw-gradient-to: transparent;
+	}
+	.shadow-primary\/25 {
+		box-shadow: 0 25px 50px -12px color-mix(in oklab, var(--primary) 25%, transparent);
+	}
+	.group:hover .group-hover\:from-primary\/20 {
+		--tw-gradient-from: color-mix(in oklab, var(--primary) 20%, transparent);
+	}
+	.group:hover .group-hover\:to-primary\/10 {
+		--tw-gradient-to: color-mix(in oklab, var(--primary) 10%, transparent);
 	}
 }
