@@ -7,8 +7,8 @@ import {
 	ArrowRight,
 	FolderTree,
 	Sparkles,
-	UtensilsCrossed,
 	Users,
+	UtensilsCrossed,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -28,7 +28,6 @@ export default function DashboardPage() {
 									<div className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-br from-primary to-transparent flex items-center justify-center shadow-2xl shadow-primary/25 animate-float">
 										<Sparkles className="w-12 h-12 sm:w-16 sm:h-16 text-white animate-sparkle" />
 									</div>
-									<div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary/20 animate-pulse-smooth" />
 									<div
 										className="absolute -bottom-2 -left-2 w-8 h-8 rounded-full bg-primary/10 animate-pulse-smooth"
 										style={{ animationDelay: '1s' }}

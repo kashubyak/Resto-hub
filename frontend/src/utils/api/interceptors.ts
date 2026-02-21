@@ -23,6 +23,9 @@ import {
 import { api } from './axiosInstances'
 import { getGlobalShowAlert } from './globalAlert'
 
+const MAX_REFRESH_ATTEMPTS = 3
+const REFRESH_RETRY_DELAY_MS = 500
+
 api.interceptors.request.use(async (config) => {
 	const requestId = startNetworkRequest(config.url || 'unknown')
 	config.headers['X-Request-ID'] = requestId
@@ -96,23 +99,24 @@ api.interceptors.response.use(
 			setIsRefreshing(true)
 
 			try {
-				try {
-					const backendRefreshRes = await api.post<{
-						success: boolean
-						token?: string
-					}>(API_URL.AUTH.REFRESH, {}, { withCredentials: true })
-					if (
-						backendRefreshRes?.status >= 200 &&
-						backendRefreshRes?.status < 300
-					) {
-						processQueue(null, null)
-						originalRequest.headers = originalRequest.headers || {}
-						originalRequest.headers['X-Request-ID'] =
-							startNetworkRequest(originalRequest.url || 'retry')
-						return api(originalRequest)
+				for (let attempt = 0; attempt < MAX_REFRESH_ATTEMPTS; attempt++) {
+					if (attempt > 0)
+						await new Promise((r) => setTimeout(r, REFRESH_RETRY_DELAY_MS))
+					try {
+						const res = await api.post<{
+							success: boolean
+							token?: string
+						}>(API_URL.AUTH.REFRESH, {}, { withCredentials: true })
+						if (res.status >= 200 && res.status < 300) {
+							processQueue(null, null)
+							originalRequest.headers = originalRequest.headers || {}
+							originalRequest.headers['X-Request-ID'] =
+								startNetworkRequest(originalRequest.url || 'retry')
+							return api(originalRequest)
+						}
+					} catch {
+						// attempt failed, will retry or fall through
 					}
-				} catch {
-					// backend refresh failed
 				}
 
 				processQueue(new Error('Session refresh failed'), null)

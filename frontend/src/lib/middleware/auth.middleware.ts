@@ -49,6 +49,8 @@ export async function authMiddleware(
 	return handleTokenRefresh(request, pathname)
 }
 
+const REFRESH_RETRY_DELAY_MS = 400
+
 async function handleTokenRefresh(
 	request: NextRequest,
 	pathname: string,
@@ -56,7 +58,12 @@ async function handleTokenRefresh(
 	const hadAuth =
 		request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true' ||
 		request.cookies.has('jid')
-	const refreshResult = await refreshAccessToken(request)
+	let refreshResult = await refreshAccessToken(request)
+
+	if (!refreshResult.success) {
+		await new Promise((r) => setTimeout(r, REFRESH_RETRY_DELAY_MS))
+		refreshResult = await refreshAccessToken(request)
+	}
 
 	if (refreshResult.success) {
 		if (refreshResult.user) {
