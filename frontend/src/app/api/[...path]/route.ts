@@ -1,6 +1,6 @@
+import { type NextRequest, NextResponse } from 'next/server'
 import http from 'node:http'
 import https from 'node:https'
-import { type NextRequest, NextResponse } from 'next/server'
 import { parseSetCookie } from 'set-cookie-parser'
 
 const backendUrl = process.env.BACKEND_URL ?? 'http://localhost:3000'

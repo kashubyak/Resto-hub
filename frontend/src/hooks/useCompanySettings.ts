@@ -2,8 +2,8 @@ import { useAlert } from '@/providers/AlertContext'
 import { getCompany } from '@/services/company/company.service'
 import type { IAxiosError } from '@/types/error.interface'
 import { getCompanyUrl, getSubdomainFromHostname } from '@/utils/api'
-import { useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useCallback } from 'react'
 import { useCopyToClipboard } from './useCopyToClipboard'
 
 const COMPANY_QUERY_KEY = ['company'] as const

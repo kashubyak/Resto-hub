@@ -2,27 +2,27 @@
 
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import {
-	DEFAULT_COMPANY_ICON,
-	SIDEBAR_SUBTITLE,
+    DEFAULT_COMPANY_ICON,
+    SIDEBAR_SUBTITLE,
 } from '@/constants/pages.constant'
 import { useCompanySettings } from '@/hooks/useCompanySettings'
 import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { useAuth } from '@/providers/AuthContext'
 import {
-	ChevronsLeft,
-	ChevronsRight,
-	LogOut,
-	Moon,
-	MoreVertical,
-	Search,
-	Settings,
-	Sun,
-	X,
+    ChevronsLeft,
+    ChevronsRight,
+    LogOut,
+    Moon,
+    MoreVertical,
+    Search,
+    Settings,
+    Sun,
+    X,
 } from 'lucide-react'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 
 interface SidebarProps {
 	isCollapsed: boolean
