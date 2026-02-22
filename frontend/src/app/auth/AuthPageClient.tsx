@@ -11,7 +11,8 @@ const Login = dynamic(
 )
 
 const RegisterCompany = dynamic(
-	() => import('./RegisterCompany').then((m) => ({ default: m.RegisterCompany })),
+	() =>
+		import('./RegisterCompany').then((m) => ({ default: m.RegisterCompany })),
 	{ ssr: false, loading: () => <AuthPageLoadingFallback /> },
 )
 

@@ -22,7 +22,7 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 
 interface SidebarProps {
 	isCollapsed: boolean
@@ -31,7 +31,7 @@ interface SidebarProps {
 	onMobileClose: () => void
 }
 
-export function Sidebar({
+const SidebarComponent = function Sidebar({
 	isCollapsed,
 	onToggle,
 	isMobileOpen,
@@ -49,17 +49,16 @@ export function Sidebar({
 	const userName = user?.name ?? ''
 	const userEmail = user?.email ?? ''
 	const userAvatarUrl = user?.avatarUrl ?? null
-	const userAvatarFallback =
-		userName ? userName.charAt(0).toUpperCase() : '?'
+	const userAvatarFallback = userName ? userName.charAt(0).toUpperCase() : '?'
 	const DefaultCompanyIcon = DEFAULT_COMPANY_ICON
 
 	const isMobile = isMobileOpen
 	const effectiveCollapsed = isMobile ? false : isCollapsed
 
-	const handleLogout = () => {
+	const handleLogout = useCallback(() => {
 		setShowUserMenu(false)
 		logout()
-	}
+	}, [logout])
 
 	return (
 		<>
@@ -172,9 +171,7 @@ export function Sidebar({
 									type="text"
 									placeholder="Search..."
 									value={mobileSearchQuery}
-									onChange={(e) =>
-										setMobileSearchQuery(e.target.value)
-									}
+									onChange={(e) => setMobileSearchQuery(e.target.value)}
 									className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none min-w-0"
 								/>
 							</div>
@@ -192,12 +189,8 @@ export function Sidebar({
 									<div
 										key={route.path}
 										className="relative"
-										onMouseEnter={() =>
-											setHoveredItem(route.path)
-										}
-										onMouseLeave={() =>
-											setHoveredItem(null)
-										}
+										onMouseEnter={() => setHoveredItem(route.path)}
+										onMouseLeave={() => setHoveredItem(null)}
 									>
 										<Link
 											href={route.path}
@@ -248,9 +241,7 @@ export function Sidebar({
 								<div className="relative group">
 									<button
 										type="button"
-										onClick={() =>
-											setShowUserMenu(!showUserMenu)
-										}
+										onClick={() => setShowUserMenu(!showUserMenu)}
 										className="w-12 h-12 mx-auto rounded-xl hover:bg-input transition-all duration-300 flex items-center justify-center relative"
 									>
 										<div
@@ -280,9 +271,7 @@ export function Sidebar({
 							) : (
 								<button
 									type="button"
-									onClick={() =>
-										setShowUserMenu(!showUserMenu)
-									}
+									onClick={() => setShowUserMenu(!showUserMenu)}
 									className="w-full h-12 flex items-center rounded-xl overflow-hidden hover:bg-input transition-all duration-300"
 								>
 									<div className="flex items-center justify-center flex-shrink-0 w-12 h-12">
@@ -326,8 +315,7 @@ export function Sidebar({
 										className="fixed inset-0 z-40"
 										onClick={() => setShowUserMenu(false)}
 										onKeyDown={(e) =>
-											e.key === 'Escape' &&
-											setShowUserMenu(false)
+											e.key === 'Escape' && setShowUserMenu(false)
 										}
 										role="button"
 										tabIndex={0}
@@ -345,9 +333,7 @@ export function Sidebar({
 										<div className="py-1">
 											<button
 												type="button"
-												onClick={() =>
-													setShowUserMenu(false)
-												}
+												onClick={() => setShowUserMenu(false)}
 												className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left"
 											>
 												<Settings className="w-4 h-4 text-muted-foreground" />
@@ -359,9 +345,7 @@ export function Sidebar({
 												<div className="flex items-center gap-3">
 													<Sun className="w-4 h-4 text-muted-foreground dark:hidden" />
 													<Moon className="w-4 h-4 text-muted-foreground hidden dark:block" />
-													<span className="text-sm text-foreground">
-														Theme
-													</span>
+													<span className="text-sm text-foreground">Theme</span>
 												</div>
 												<ThemeToggle variant="inline" />
 											</div>
@@ -373,9 +357,7 @@ export function Sidebar({
 												className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
 											>
 												<LogOut className="w-4 h-4" />
-												<span className="text-sm font-medium">
-													Logout
-												</span>
+												<span className="text-sm font-medium">Logout</span>
 											</button>
 										</div>
 									</div>
@@ -388,8 +370,7 @@ export function Sidebar({
 										className="fixed inset-0 z-40"
 										onClick={() => setShowUserMenu(false)}
 										onKeyDown={(e) =>
-											e.key === 'Escape' &&
-											setShowUserMenu(false)
+											e.key === 'Escape' && setShowUserMenu(false)
 										}
 										role="button"
 										tabIndex={0}
@@ -407,9 +388,7 @@ export function Sidebar({
 										<div className="py-1">
 											<button
 												type="button"
-												onClick={() =>
-													setShowUserMenu(false)
-												}
+												onClick={() => setShowUserMenu(false)}
 												className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left"
 											>
 												<Settings className="w-4 h-4 text-muted-foreground" />
@@ -421,9 +400,7 @@ export function Sidebar({
 												<div className="flex items-center gap-3">
 													<Sun className="w-4 h-4 text-muted-foreground dark:hidden" />
 													<Moon className="w-4 h-4 text-muted-foreground hidden dark:block" />
-													<span className="text-sm text-foreground">
-														Theme
-													</span>
+													<span className="text-sm text-foreground">Theme</span>
 												</div>
 												<ThemeToggle variant="inline" />
 											</div>
@@ -435,9 +412,7 @@ export function Sidebar({
 												className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
 											>
 												<LogOut className="w-4 h-4" />
-												<span className="text-sm font-medium">
-													Logout
-												</span>
+												<span className="text-sm font-medium">Logout</span>
 											</button>
 										</div>
 									</div>
@@ -450,3 +425,5 @@ export function Sidebar({
 		</>
 	)
 }
+
+export const Sidebar = memo(SidebarComponent)

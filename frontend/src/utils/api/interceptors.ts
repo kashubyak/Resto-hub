@@ -110,8 +110,9 @@ api.interceptors.response.use(
 						if (res.status >= 200 && res.status < 300) {
 							processQueue(null, null)
 							originalRequest.headers = originalRequest.headers || {}
-							originalRequest.headers['X-Request-ID'] =
-								startNetworkRequest(originalRequest.url || 'retry')
+							originalRequest.headers['X-Request-ID'] = startNetworkRequest(
+								originalRequest.url || 'retry',
+							)
 							return api(originalRequest)
 						}
 					} catch {

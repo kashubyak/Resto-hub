@@ -2,15 +2,25 @@
 
 import { Sidebar } from '@/components/elements/SideBar'
 import { Bell, Menu, Search } from 'lucide-react'
-import { useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 
 interface DashboardLayoutProps {
 	children: React.ReactNode
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+const DashboardLayoutComponent = function DashboardLayout({
+	children,
+}: DashboardLayoutProps) {
 	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+
+	const handleToggleSidebar = useCallback(() => {
+		setIsSidebarCollapsed((prev) => !prev)
+	}, [])
+
+	const handleCloseMobileSidebar = useCallback(() => {
+		setIsMobileSidebarOpen(false)
+	}, [])
 
 	return (
 		<div className="min-h-screen w-full bg-background relative overflow-hidden">
@@ -42,9 +52,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
 			<Sidebar
 				isCollapsed={isSidebarCollapsed}
-				onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+				onToggle={handleToggleSidebar}
 				isMobileOpen={isMobileSidebarOpen}
-				onMobileClose={() => setIsMobileSidebarOpen(false)}
+				onMobileClose={handleCloseMobileSidebar}
 			/>
 
 			<div
@@ -93,3 +103,5 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 		</div>
 	)
 }
+
+export const DashboardLayout = memo(DashboardLayoutComponent)

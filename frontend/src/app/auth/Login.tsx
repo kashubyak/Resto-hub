@@ -146,7 +146,8 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 						Sign in to continue
 					</p>
 					<p className="text-sm text-muted-foreground mt-2">
-						Company: <span className="font-medium text-foreground">{hostSubdomain}</span>
+						Company:{' '}
+						<span className="font-medium text-foreground">{hostSubdomain}</span>
 						{' · '}
 						<Link
 							href={changeCompanyUrl}

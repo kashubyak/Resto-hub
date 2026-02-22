@@ -44,7 +44,20 @@ const AlertInitializer = () => {
 
 export function Providers({ children }: { children: React.ReactNode }) {
 	const queryClientRef = useRef<QueryClient>(null)
-	if (!queryClientRef.current) queryClientRef.current = new QueryClient()
+	if (!queryClientRef.current) {
+		queryClientRef.current = new QueryClient({
+			defaultOptions: {
+				queries: {
+					staleTime: 60_000,
+					gcTime: 10 * 60_000,
+					refetchOnWindowFocus: false,
+					refetchOnMount: true,
+					refetchOnReconnect: true,
+					retry: 1,
+				},
+			},
+		})
+	}
 
 	return (
 		<QueryClientProvider client={queryClientRef.current}>

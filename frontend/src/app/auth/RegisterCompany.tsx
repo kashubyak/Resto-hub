@@ -25,11 +25,7 @@ import { Building2, Lock, Mail, User } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { memo, useCallback, useState } from 'react'
-import {
-	type Control,
-	type RegisterOptions,
-	useWatch,
-} from 'react-hook-form'
+import { type Control, type RegisterOptions, useWatch } from 'react-hook-form'
 
 const Map = dynamic(
 	() => import('@/components/auth/Map').then((m) => ({ default: m.Map })),
@@ -94,10 +90,7 @@ const RegisterCompanyComponent = () => {
 		[handleImageData],
 	)
 
-	const onTogglePassword = useCallback(
-		() => setShowPassword((s) => !s),
-		[],
-	)
+	const onTogglePassword = useCallback(() => setShowPassword((s) => !s), [])
 	const onToggleConfirmPassword = useCallback(
 		() => setShowConfirmPassword((s) => !s),
 		[],

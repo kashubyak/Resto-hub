@@ -15,8 +15,7 @@ export default async function RegisterSuccessPage({
 	const params = await searchParams
 	const subdomain = params.subdomain ?? ''
 	const cookieStore = await cookies()
-	const isAuthenticated =
-		cookieStore.get(AUTH.AUTH_STATUS)?.value === 'true'
+	const isAuthenticated = cookieStore.get(AUTH.AUTH_STATUS)?.value === 'true'
 	return (
 		<RegisterCompanySuccess
 			subdomain={subdomain}

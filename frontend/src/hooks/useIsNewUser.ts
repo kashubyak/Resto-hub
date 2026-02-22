@@ -5,7 +5,7 @@ import { getCategoriesService } from '@/services/category/get-categories.service
 import { getAllDishes } from '@/services/dish/get-dishes.service'
 import { useQueries } from '@tanstack/react-query'
 
-const IS_NEW_USER_QUERY_KEY = ['dashboard', 'isNewUser'] as const
+export const IS_NEW_USER_QUERY_KEY = ['dashboard', 'isNewUser'] as const
 
 export function useIsNewUser() {
 	const { user } = useAuth()
@@ -20,6 +20,8 @@ export function useIsNewUser() {
 				},
 				enabled: !!user,
 				staleTime: 60_000,
+				refetchOnWindowFocus: false, // Prevent refetch on tab switch
+				gcTime: 5 * 60_000, // Keep cache for 5 minutes
 			},
 			{
 				queryKey: [...IS_NEW_USER_QUERY_KEY, 'categories'],
@@ -29,6 +31,8 @@ export function useIsNewUser() {
 				},
 				enabled: !!user,
 				staleTime: 60_000,
+				refetchOnWindowFocus: false,
+				gcTime: 5 * 60_000,
 			},
 		],
 	})
