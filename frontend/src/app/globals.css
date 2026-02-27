@@ -410,6 +410,12 @@ html {
 	.hover\:bg-info:hover {
 		background-color: var(--info-hover);
 	}
+	.hover\:bg-accent:hover {
+		background-color: var(--accent);
+	}
+	.hover\:border-primary:hover {
+		border-color: var(--primary);
+	}
 	.bg-primary\/10 {
 		background-color: color-mix(in oklab, var(--primary) 10%, transparent);
 	}
@@ -541,4 +547,10 @@ html {
 			var(--tw-gradient-to, var(--primary-hover))
 		);
 	}
+}
+
+/* Clear Filters button hover (DishNoResultsEmptyState) */
+.clear-filters-btn:hover {
+	background-color: var(--accent);
+	border-color: var(--primary);
 }

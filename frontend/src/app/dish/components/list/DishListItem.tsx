@@ -19,8 +19,6 @@ const DishListItemComponent = ({ dish }: DishListItemProps) => (
 					fill
 					className="object-cover group-hover:scale-110 transition-transform duration-500"
 					sizes="(max-width: 640px) 100vw, 256px"
-					placeholder="blur"
-					blurDataURL="/placeholder.png"
 				/>
 			</div>
 

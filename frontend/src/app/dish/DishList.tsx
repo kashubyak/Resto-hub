@@ -1,5 +1,6 @@
 'use client'
 
+import { DishNoResultsEmptyState } from '@/app/dish/DishNoResultsEmptyState'
 import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
 import type { FilterValues } from '@/types/filter.interface'
@@ -14,12 +15,16 @@ interface DishListProps {
 	searchQuery?: string
 	filters?: FilterValues
 	viewMode: ViewMode
+	onClearSearchAndFilters?: () => void
+	onCreateDish?: () => void
 }
 
 const DishListComponent: React.FC<DishListProps> = ({
 	searchQuery = '',
 	filters = {},
 	viewMode,
+	onClearSearchAndFilters,
+	onCreateDish,
 }) => {
 	const {
 		allDishes,
@@ -76,7 +81,13 @@ const DishListComponent: React.FC<DishListProps> = ({
 		)
 
 	if (!allDishes.length)
-		return (
+		return onClearSearchAndFilters && onCreateDish ? (
+			<DishNoResultsEmptyState
+				hasSearchOrFilters={!!(searchQuery || hasActiveFilters)}
+				onClearFilters={onClearSearchAndFilters}
+				onCreateDish={onCreateDish}
+			/>
+		) : (
 			<NotFound
 				icon="🍽️"
 				title="No Dishes Available"

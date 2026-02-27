@@ -1,16 +1,10 @@
 'use client'
 
-import { BooleanFilter } from '@/components/elements/Filters/BooleanFilter'
+import { DishFilterPanel } from '@/app/dish/components/DishFilterPanel'
 import { dishFilters } from '@/components/elements/Filters/dish.filters'
-import { RangeFilter } from '@/components/elements/Filters/RangeFilter'
-import { SelectFilter } from '@/components/elements/Filters/SelectFilter'
 import { ROUTES } from '@/constants/pages.constant'
 import { useDishes } from '@/hooks/useDishes'
-import type {
-	FilterConfig,
-	FilterValue,
-	FilterValues,
-} from '@/types/filter.interface'
+import type { FilterValue, FilterValues } from '@/types/filter.interface'
 import { Plus, Search, SlidersHorizontal, UtensilsCrossed } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -53,42 +47,10 @@ export default function DishesPage() {
 
 	const handleClearFilters = useCallback(() => setFilters({}), [])
 
-	const renderFilter = useCallback(
-		(config: FilterConfig) => {
-			switch (config.type) {
-				case 'range':
-					return (
-						<RangeFilter
-							key={config.key}
-							config={config}
-							values={filters}
-							onChange={handleFilterChange}
-						/>
-					)
-				case 'boolean':
-					return (
-						<BooleanFilter
-							key={config.key}
-							config={config}
-							values={filters}
-							onChange={handleFilterChange}
-						/>
-					)
-				case 'select':
-					return (
-						<SelectFilter
-							key={config.key}
-							config={config}
-							values={filters}
-							onChange={handleFilterChange}
-						/>
-					)
-				default:
-					return null
-			}
-		},
-		[filters, handleFilterChange],
-	)
+	const handleClearSearchAndFilters = useCallback(() => {
+		setLocalSearch('')
+		setFilters({})
+	}, [])
 
 	return (
 		<div className="max-w-7xl mx-auto space-y-6">
@@ -145,7 +107,7 @@ export default function DishesPage() {
 						<button
 							type="button"
 							onClick={() => setIsFilterOpen(!isFilterOpen)}
-							className={`flex items-center justify-center gap-2 px-5 h-12 rounded-xl border-2 font-medium transition-all duration-300 hover:-translate-y-0.5 ${
+							className={`flex items-center justify-center gap-2 px-5 h-12 rounded-xl border-2 font-medium transition-all duration-300 hover:-translate-y-0.5 relative ${
 								isFilterOpen
 									? 'bg-primary text-white border-primary shadow-lg shadow-primary/25'
 									: 'bg-card text-foreground border-border hover:border-primary hover:text-primary hover:shadow-lg hover:shadow-primary/10'
@@ -153,34 +115,35 @@ export default function DishesPage() {
 						>
 							<SlidersHorizontal className="w-5 h-5" />
 							<span className="hidden sm:inline">Filters</span>
+							{Object.keys(filters).some(
+								(k) =>
+									filters[k] !== undefined &&
+									filters[k] !== null &&
+									filters[k] !== '',
+							) && (
+								<span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+									!
+								</span>
+							)}
 						</button>
 					</div>
 
-					{/* Inline Filter Panel */}
+					{/* Filter Panel (Redesign style) */}
 					{isFilterOpen && (
-						<div className="bg-card border-2 border-border rounded-xl p-6 animate-in fade-in-0 slide-in-from-top-2 duration-300">
-							<div className="flex items-center justify-between mb-4">
-								<h3 className="text-lg font-semibold text-foreground">
-									Filters
-								</h3>
-								<button
-									type="button"
-									onClick={handleClearFilters}
-									className="text-sm text-primary hover:underline font-medium"
-								>
-									Clear all
-								</button>
-							</div>
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-								{dishFilters.map(renderFilter)}
-							</div>
-						</div>
+						<DishFilterPanel
+							filters={filters}
+							filterConfig={dishFilters}
+							onChange={handleFilterChange}
+							onClearAll={handleClearFilters}
+						/>
 					)}
 
 					<DishList
 						searchQuery={searchQuery}
 						filters={filters}
 						viewMode={viewMode}
+						onClearSearchAndFilters={handleClearSearchAndFilters}
+						onCreateDish={handleNavigateToCreate}
 					/>
 				</>
 			)}

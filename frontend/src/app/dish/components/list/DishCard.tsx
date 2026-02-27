@@ -18,8 +18,6 @@ const DishCardComponent = ({ dish }: DishCardProps) => (
 				fill
 				className="object-cover group-hover:scale-110 transition-transform duration-500"
 				sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-				placeholder="blur"
-				blurDataURL="/placeholder.png"
 			/>
 			<div className="absolute top-3 right-3 z-10">
 				<span
