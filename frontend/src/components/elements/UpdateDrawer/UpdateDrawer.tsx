@@ -8,12 +8,8 @@ import { PricingCategorySection } from '@/app/dish/components/modal/PricingCateg
 import { useUpdateDish } from '@/hooks/useUpdateDish'
 import type { IDish } from '@/types/dish.interface'
 import type { UpdateSectionConfig } from '@/types/update-field.interface'
-import CloseIcon from '@mui/icons-material/Close'
-import EditIcon from '@mui/icons-material/Edit'
-import RestartAltIcon from '@mui/icons-material/RestartAlt'
-import { Drawer, IconButton } from '@mui/material'
-import { memo, useCallback } from 'react'
-import { Button } from '../../ui/Button'
+import { Edit, RotateCcw, X } from 'lucide-react'
+import { memo, useCallback, useEffect } from 'react'
 
 interface UpdateDrawerProps {
 	open: boolean
@@ -22,33 +18,6 @@ interface UpdateDrawerProps {
 	sections: UpdateSectionConfig[]
 	dishData?: IDish
 	isLoading?: boolean
-}
-
-const drawerSx = {
-	'& .MuiDrawer-paper': {
-		width: {
-			xs: '100%',
-			sm: '400px',
-			md: '33.333%',
-		},
-		maxWidth: '500px',
-		backgroundColor: 'var(--background)',
-		color: 'var(--foreground)',
-		padding: 0,
-		boxShadow: '-4px 0 20px var(--shadow)',
-	},
-	'& .MuiBackdrop-root': {
-		backgroundColor: 'rgba(var(--background-rgb), 0.3)',
-		backdropFilter: 'blur(8px)',
-	},
-}
-
-const iconButtonSx = {
-	color: 'var(--muted-foreground)',
-	'&:hover': {
-		color: 'var(--foreground)',
-		backgroundColor: 'var(--muted-hover)',
-	},
 }
 
 const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
@@ -71,6 +40,14 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 		clearErrors,
 		trigger,
 	} = useUpdateDish(dishData, onClose)
+
+	useEffect(() => {
+		if (open) document.body.style.overflow = 'hidden'
+		else document.body.style.overflow = ''
+		return () => {
+			document.body.style.overflow = ''
+		}
+	}, [open])
 
 	const handleReset = useCallback(() => {
 		if (dishData) {
@@ -125,6 +102,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 							errors={errors}
 							setError={setError}
 							clearErrors={clearErrors}
+							mode="update"
 						/>
 					)
 				case 'nutritional':
@@ -161,51 +139,73 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 		],
 	)
 
+	if (!open) return null
+
 	return (
-		<Drawer anchor="right" open={open} onClose={onClose} sx={drawerSx}>
-			<form onSubmit={handleFormSubmit} className="flex flex-col h-full">
-				<div className="flex items-center justify-between p-4 border-b border-border">
-					<h2 className="text-xl font-bold flex items-center gap-2">
-						<EditIcon />
-						{title}
-					</h2>
-					<IconButton
-						onClick={onClose}
-						size="small"
-						aria-label="close drawer"
-						sx={iconButtonSx}
-					>
-						<CloseIcon />
-					</IconButton>
-				</div>
-
-				<div className="flex-1 overflow-y-auto p-4">
-					<div className="space-y-6">{sections.map(renderSection)}</div>
-				</div>
-
-				<div className="p-4 border-t border-border space-y-2">
-					<div className="flex justify-between gap-2">
-						<Button
-							type="button"
-							onClick={onClose}
-							text="Cancel"
-							disabled={isLoading}
-						/>
-						<Button
-							type="submit"
-							text="Update dish"
-							disabled={isLoading || !isDirty}
-						/>
+		<div className="fixed inset-0 z-50 flex items-start justify-end">
+			<button
+				type="button"
+				aria-label="Close drawer"
+				onClick={onClose}
+				className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in-0 duration-300"
+			/>
+			<div className="relative w-full sm:w-[480px] md:w-[560px] h-full bg-card shadow-2xl flex flex-col animate-in slide-in-from-right-10 duration-300">
+				<div className="sticky top-0 z-10 bg-card border-b-2 border-border px-6 py-4 flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+							<Edit className="w-5 h-5 text-primary" />
+						</div>
+						<h2 className="text-xl font-bold text-foreground">{title}</h2>
 					</div>
-					{isDirty && (
-						<Button type="button" onClick={handleReset} disabled={isLoading}>
-							<RestartAltIcon fontSize="small" />
-							Reset to Initial
-						</Button>
-					)}
+					<button
+						type="button"
+						onClick={onClose}
+						aria-label="Close drawer"
+						className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-accent transition-colors"
+					>
+						<X className="w-5 h-5 text-muted-foreground" />
+					</button>
 				</div>
-			</form>
-		</Drawer>
+
+				<form
+					onSubmit={handleFormSubmit}
+					className="flex-1 overflow-y-auto flex flex-col min-h-0"
+				>
+					<div className="p-6 space-y-6">{sections.map(renderSection)}</div>
+
+					<div className="sticky bottom-0 bg-card border-t-2 border-border px-6 py-4 flex flex-col gap-3">
+						<div className="flex gap-3">
+							<button
+								type="button"
+								onClick={onClose}
+								disabled={isLoading}
+								className="flex-1 h-11 bg-background hover:bg-accent text-foreground border-2 border-border rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
+							>
+								Cancel
+							</button>
+							<button
+								type="submit"
+								disabled={isLoading || !isDirty}
+								className="flex-1 h-11 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+							>
+								Update dish
+							</button>
+						</div>
+						{isDirty && (
+							<button
+								type="button"
+								onClick={handleReset}
+								disabled={isLoading}
+								className="h-11 w-full bg-background hover:bg-accent text-foreground border-2 border-border rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+							>
+								<RotateCcw className="w-4 h-4" />
+								Reset to Initial
+							</button>
+						)}
+					</div>
+				</form>
+			</div>
+		</div>
 	)
 }
 

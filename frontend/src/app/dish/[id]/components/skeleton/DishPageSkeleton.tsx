@@ -1,3 +1,4 @@
+import { Skeleton } from '@mui/material'
 import { DishActionsSkeleton } from './DishActionsSkeleton'
 import { DishDetailsSkeleton } from './DishDetailsSkeleton'
 import { DishDownInfoSkeleton } from './DishDownInfoSkeleton'
