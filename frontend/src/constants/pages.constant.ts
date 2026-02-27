@@ -1,7 +1,8 @@
 import BusinessIcon from '@mui/icons-material/Business'
-import CategoryIcon from '@mui/icons-material/Category'
-import DashboardIcon from '@mui/icons-material/Dashboard'
-import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
+import {
+	Folder,
+	LayoutDashboard, UtensilsCrossed
+} from "lucide-react"
 import type { ComponentType } from 'react'
 
 export const SIDEBAR_SUBTITLE = 'Admin Panel'
@@ -103,19 +104,19 @@ export const ALL_ROUTES: IRouteConfig[] = [
 	{
 		path: ROUTES.PRIVATE.SHARED.DASHBOARD,
 		name: 'Dashboard',
-		icon: DashboardIcon,
+		icon: LayoutDashboard,
 		roles: ADMIN_COOK_WAITER_ROLES,
 	},
 	{
 		path: ROUTES.PRIVATE.ADMIN.DISH,
 		name: 'Dishes',
-		icon: RestaurantMenuIcon,
+		icon: UtensilsCrossed,
 		roles: ADMIN_ROLES,
 	},
 	{
 		path: ROUTES.PRIVATE.ADMIN.CATEGORY,
 		name: 'Categories',
-		icon: CategoryIcon,
+		icon: Folder,
 		roles: ADMIN_ROLES,
 	},
 ]
