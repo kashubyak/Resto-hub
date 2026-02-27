@@ -5,6 +5,7 @@ import api from '@/utils/api'
 
 export interface IUpdateCategoryPayload {
 	name?: string
+	icon?: string
 }
 
 export const updateCategoryService = async (

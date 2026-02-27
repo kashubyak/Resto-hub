@@ -4,6 +4,7 @@ import type { IDish } from './dish.interface'
 export interface ICategory {
 	id: number
 	name: string
+	icon: string
 	createdAt: string
 	updatedAt: string
 }
@@ -25,6 +26,7 @@ export interface IGetAllCategoriesParams {
 
 export interface ICategoryFormValues {
 	name: string
+	icon: string
 }
 
 export interface ICreateCategoryResponse {

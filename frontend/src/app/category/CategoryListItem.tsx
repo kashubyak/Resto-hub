@@ -4,6 +4,7 @@ import { CategoryEmptyState } from '@/app/category/components/CategoryEmptyState
 import { CategoryNoResults } from '@/app/category/components/CategoryNoResults'
 import { NotFound } from '@/components/ui/NotFound'
 import { useCategories } from '@/hooks/useCategories'
+import type { ICategoryWithDishes } from '@/types/category.interface'
 import type { FilterValues } from '@/types/filter.interface'
 import { memo, useCallback, useEffect, useRef } from 'react'
 import { CategoryCard } from './components/list/CategoryCard'
@@ -23,6 +24,8 @@ interface CategoryListItemProps {
 	searchQuery?: string
 	filters?: FilterValues
 	onOpenCreateModal?: () => void
+	onEditClick?: (category: ICategoryWithDishes) => void
+	onDeleteClick?: (category: ICategoryWithDishes) => void
 	onClearSearch?: () => void
 }
 
@@ -30,6 +33,8 @@ const CategoryListItemComponent = ({
 	searchQuery = '',
 	filters = {},
 	onOpenCreateModal,
+	onEditClick,
+	onDeleteClick,
 	onClearSearch,
 }: CategoryListItemProps) => {
 	const {
@@ -124,6 +129,8 @@ const CategoryListItemComponent = ({
 						key={category.id}
 						category={category}
 						refetchCategories={refetchCategories}
+						onEditClick={onEditClick}
+						onDeleteClick={onDeleteClick}
 					/>
 				))}
 			</div>
