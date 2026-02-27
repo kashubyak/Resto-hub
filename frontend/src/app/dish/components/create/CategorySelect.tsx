@@ -5,6 +5,21 @@ import type { ICategory } from '@/types/category.interface'
 import { Check, ChevronDown, Search } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
+const GRADIENTS = [
+	'from-green-500/10 to-emerald-500/10',
+	'from-orange-500/10 to-red-500/10',
+	'from-pink-500/10 to-rose-500/10',
+	'from-blue-500/10 to-cyan-500/10',
+	'from-lime-500/10 to-green-500/10',
+	'from-amber-500/10 to-yellow-500/10',
+	'from-purple-500/10 to-pink-500/10',
+	'from-teal-500/10 to-blue-500/10',
+] as const
+
+function getGradientById(id: number) {
+	return GRADIENTS[id % GRADIENTS.length]
+}
+
 type CategorySelectProps = {
 	value: number | null
 	onChange: (value: number | null) => void
@@ -46,7 +61,7 @@ export function CategorySelect({ value, onChange, error }: CategorySelectProps) 
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
-				className={`w-full h-14 px-4 bg-background border-2 rounded-xl text-left flex items-center justify-between transition-all duration-200 ${
+				className={`w-full h-14 px-4 bg-background border-2 rounded-xl text-left flex items-center gap-3 transition-all duration-200 ${
 					error
 						? 'border-red-500'
 						: isOpen
@@ -54,15 +69,24 @@ export function CategorySelect({ value, onChange, error }: CategorySelectProps) 
 							: 'border-border hover:border-primary/50'
 				}`}
 			>
+				{selectedCategory && (
+					<div
+						className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getGradientById(selectedCategory.id)} flex items-center justify-center text-lg shrink-0`}
+					>
+						{selectedCategory.icon || selectedCategory.name.charAt(0)}
+					</div>
+				)}
 				{selectedCategory ? (
-					<span className="text-foreground font-medium">
+					<span className="text-foreground font-medium flex-1 text-left">
 						{selectedCategory.name}
 					</span>
 				) : (
-					<span className="text-muted-foreground">Select category</span>
+					<span className="text-muted-foreground flex-1 text-left">
+						Select category
+					</span>
 				)}
 				<ChevronDown
-					className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${
+					className={`w-5 h-5 text-muted-foreground transition-transform duration-200 shrink-0 ${
 						isOpen ? 'rotate-180' : ''
 					}`}
 				/>
@@ -112,8 +136,10 @@ export function CategorySelect({ value, onChange, error }: CategorySelectProps) 
 										value === cat.id ? 'bg-accent' : ''
 									}`}
 								>
-									<div className="w-10 h-10 rounded-lg bg-gradient-primary-soft flex items-center justify-center text-lg font-medium text-primary group-hover:scale-110 transition-transform">
-										{cat.name.charAt(0)}
+									<div
+										className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getGradientById(cat.id)} flex items-center justify-center text-xl group-hover:scale-110 transition-transform`}
+									>
+										{cat.icon || cat.name.charAt(0)}
 									</div>
 									<span className="flex-1 text-left text-sm font-medium text-foreground">
 										{cat.name}

@@ -69,6 +69,7 @@ export interface IGetAllDishesParams {
 	minPrice?: number
 	maxPrice?: number
 	available?: boolean
+	categoryId?: number
 	sortBy?: string
 	order?: 'asc' | 'desc'
 }

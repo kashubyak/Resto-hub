@@ -3,7 +3,7 @@
 import { ROUTES } from '@/constants/pages.constant'
 import type { ICategoryWithDishes } from '@/types/category.interface'
 import { Edit, Folder, MoreVertical, Tag, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { memo, useCallback, useState } from 'react'
 
 const GRADIENTS = [
@@ -51,6 +51,7 @@ const CategoryCardComponent = ({
 	onEditClick,
 	onDeleteClick,
 }: CategoryCardProps) => {
+	const router = useRouter()
 	const [menuOpen, setMenuOpen] = useState(false)
 
 	const dishCount = category.dishes?.length ?? 0
@@ -66,6 +67,11 @@ const CategoryCardComponent = ({
 		setMenuOpen(false)
 		if (onDeleteClick) onDeleteClick(category)
 	}, [category, onDeleteClick])
+
+	const handleViewDishes = useCallback(() => {
+		sessionStorage.setItem('dishCategoryFilter', String(category.id))
+		router.push(ROUTES.PRIVATE.ADMIN.DISH)
+	}, [category.id, router])
 
 	return (
 		<div className="group bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300">
@@ -148,13 +154,14 @@ const CategoryCardComponent = ({
 					</span>
 				</div>
 
-				<Link
-					href={ROUTES.PRIVATE.ADMIN.DISH}
+				<button
+					type="button"
+					onClick={handleViewDishes}
 					className="w-full h-10 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2"
 				>
 					<Folder className="w-4 h-4" />
 					<span>View Dishes</span>
-				</Link>
+				</button>
 			</div>
 		</div>
 	)

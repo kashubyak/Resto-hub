@@ -29,12 +29,24 @@ export default function DishesPage() {
 		allDishes.length === 0
 
 	useEffect(() => {
+		const categoryIdFromStorage = sessionStorage.getItem('dishCategoryFilter')
+		if (categoryIdFromStorage) {
+			const categoryId = Number(categoryIdFromStorage)
+			if (!isNaN(categoryId)) {
+				setFilters((prev) => ({ ...prev, categoryId }))
+				sessionStorage.removeItem('dishCategoryFilter')
+			}
+		}
+	}, [])
+
+	useEffect(() => {
 		if (debounceRef.current) clearTimeout(debounceRef.current)
 		debounceRef.current = setTimeout(() => setSearchQuery(localSearch), 500)
 		return () => {
 			if (debounceRef.current) clearTimeout(debounceRef.current)
 		}
 	}, [localSearch])
+
 
 	const handleNavigateToCreate = useCallback(
 		() => router.push(ROUTES.PRIVATE.ADMIN.DISH_CREATE),
@@ -45,7 +57,9 @@ export default function DishesPage() {
 		setFilters((prev) => ({ ...prev, [key]: value }))
 	}, [])
 
-	const handleClearFilters = useCallback(() => setFilters({}), [])
+	const handleClearFilters = useCallback(() => {
+		setFilters({})
+	}, [])
 
 	const handleClearSearchAndFilters = useCallback(() => {
 		setLocalSearch('')

@@ -1,7 +1,9 @@
 'use client'
 
+import { CategoryFilter } from '@/components/elements/Filters/CategoryFilter'
 import { RangeFilter } from '@/components/elements/Filters/RangeFilter'
 import { SelectFilter } from '@/components/elements/Filters/SelectFilter'
+import { useCategories } from '@/hooks/useCategories'
 import type {
 	FilterConfig,
 	FilterValue,
@@ -25,6 +27,7 @@ const DishFilterPanelComponent: React.FC<DishFilterPanelProps> = ({
 	onChange,
 	onClearAll,
 }) => {
+	const { allCategories } = useCategories()
 	const hasActiveFilters = useMemo(
 		() =>
 			Object.entries(filters).some(
@@ -36,6 +39,15 @@ const DishFilterPanelComponent: React.FC<DishFilterPanelProps> = ({
 
 	const renderFilter = useCallback(
 		(config: FilterConfig) => {
+			if (config.key === 'categoryId') {
+				return (
+					<CategoryFilter
+						key={config.key}
+						values={filters}
+						onChange={onChange}
+					/>
+				)
+			}
 			switch (config.type) {
 				case 'range':
 					return (
@@ -101,9 +113,20 @@ const DishFilterPanelComponent: React.FC<DishFilterPanelProps> = ({
 					})
 				}
 			}
+			if (config.key === 'categoryId') {
+				const value = filters.categoryId
+				if (value !== undefined && value !== null && value !== '') {
+					const category = allCategories.find((c) => c.id === Number(value))
+					const categoryName = category?.name || `ID: ${value}`
+					tags.push({
+						label: `Category: ${categoryName}`,
+						onRemove: () => onChange('categoryId', undefined),
+					})
+				}
+			}
 		}
 		return tags
-	}, [filterConfig, filters, onChange])
+	}, [filterConfig, filters, onChange, allCategories])
 
 	return (
 		<div className="bg-card border-2 border-border rounded-2xl overflow-hidden animate-in fade-in-0 slide-in-from-top-2 duration-300">

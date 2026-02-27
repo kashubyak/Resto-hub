@@ -35,6 +35,7 @@ export class DishRepository {
 			minPrice,
 			maxPrice,
 			available,
+			categoryId,
 			sortBy = 'createdAt',
 			order = 'desc',
 			page = 1,
@@ -44,6 +45,7 @@ export class DishRepository {
 		const where: IDishWhereInput = { companyId }
 		if (search) where.name = { contains: search, mode: 'insensitive' }
 		if (available !== undefined) where.available = available
+		if (categoryId !== undefined) where.categoryId = categoryId
 		if (minPrice !== undefined || maxPrice !== undefined) {
 			where.price = {}
 			if (minPrice !== undefined) where.price.gte = minPrice

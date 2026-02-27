@@ -28,6 +28,7 @@ export const getAllDishes = async (
 			minPrice: params?.minPrice,
 			maxPrice: params?.maxPrice,
 			available: params?.available,
+			categoryId: params?.categoryId,
 			sortBy,
 			order,
 		}).filter(

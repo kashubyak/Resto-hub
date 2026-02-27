@@ -2,6 +2,13 @@ import type { FilterConfig } from '@/types/filter.interface'
 
 export const dishFilters: FilterConfig[] = [
 	{
+		type: 'select',
+		key: 'categoryId',
+		label: 'Category',
+		placeholder: 'All categories',
+		options: [],
+	},
+	{
 		type: 'range',
 		key: 'price',
 		label: 'Price Range',
