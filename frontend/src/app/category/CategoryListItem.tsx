@@ -1,28 +1,36 @@
 'use client'
 
+import { CategoryEmptyState } from '@/app/category/components/CategoryEmptyState'
+import { CategoryNoResults } from '@/app/category/components/CategoryNoResults'
 import { NotFound } from '@/components/ui/NotFound'
-import { ViewModeToggle, type ViewMode } from '@/components/ui/ViewModeToggle'
 import { useCategories } from '@/hooks/useCategories'
 import type { FilterValues } from '@/types/filter.interface'
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef } from 'react'
 import { CategoryCard } from './components/list/CategoryCard'
-import { CategoryRowItem } from './components/list/CategoryRowItem'
 
 const CardSkeleton = () => (
-	<div className="h-[200px] bg-muted/50 border border-border rounded-xl animate-pulse" />
-)
-const RowSkeleton = () => (
-	<div className="h-[80px] bg-muted/50 border border-border rounded-lg animate-pulse" />
+	<div className="bg-card border-2 border-border rounded-2xl overflow-hidden">
+		<div className="h-32 bg-muted/50 animate-pulse" />
+		<div className="p-4 space-y-3">
+			<div className="h-5 bg-muted/50 rounded animate-pulse w-3/4" />
+			<div className="h-4 bg-muted/50 rounded animate-pulse w-1/2" />
+			<div className="h-10 bg-muted/50 rounded-lg animate-pulse" />
+		</div>
+	</div>
 )
 
 interface CategoryListItemProps {
 	searchQuery?: string
 	filters?: FilterValues
+	onOpenCreateModal?: () => void
+	onClearSearch?: () => void
 }
 
 const CategoryListItemComponent = ({
 	searchQuery = '',
 	filters = {},
+	onOpenCreateModal,
+	onClearSearch,
 }: CategoryListItemProps) => {
 	const {
 		allCategories,
@@ -31,9 +39,9 @@ const CategoryListItemComponent = ({
 		isFetchingNextPage,
 		isLoading,
 		isError,
+		refetchCategories,
 	} = useCategories(searchQuery, filters)
 
-	const [viewMode, setViewMode] = useState<ViewMode>('grid')
 	const loaderRef = useRef<HTMLDivElement | null>(null)
 
 	const handleIntersection = useCallback(
@@ -44,36 +52,28 @@ const CategoryListItemComponent = ({
 	)
 
 	useEffect(() => {
+		if (!allCategories.length) return
 		const observer = new IntersectionObserver(handleIntersection, {
 			threshold: 1.0,
 		})
-		if (loaderRef.current) observer.observe(loaderRef.current)
+		const el = loaderRef.current
+		if (el) observer.observe(el)
 		return () => observer.disconnect()
-	}, [handleIntersection])
+	}, [handleIntersection, allCategories.length])
 
 	const hasActiveFilters = Object.keys(filters).length > 0
 
 	if (isLoading) {
 		return (
 			<div className="p-3 sm:p-6">
-				<div className="flex justify-between items-center mb-6">
+				<div className="mb-6">
 					<h2 className="text-2xl font-bold">Categories</h2>
-					<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 				</div>
-
-				{viewMode === 'grid' ? (
-					<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-						{[...Array(8)].map((_, i) => (
-							<CardSkeleton key={i} />
-						))}
-					</div>
-				) : (
-					<div className="space-y-3">
-						{[...Array(8)].map((_, i) => (
-							<RowSkeleton key={i} />
-						))}
-					</div>
-				)}
+				<div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+					{[...Array(8)].map((_, i) => (
+						<CardSkeleton key={i} />
+					))}
+				</div>
 			</div>
 		)
 	}
@@ -87,22 +87,28 @@ const CategoryListItemComponent = ({
 			/>
 		)
 
-	if (!allCategories.length)
+	if (!allCategories.length) {
+		const hasSearchOrFilters = !!searchQuery || hasActiveFilters
+		if (!hasSearchOrFilters && onOpenCreateModal)
+			return <CategoryEmptyState onCreateClick={onOpenCreateModal} />
+		if (hasSearchOrFilters && onClearSearch)
+			return <CategoryNoResults onClearSearch={onClearSearch} />
 		return (
 			<NotFound
 				icon="📁"
 				title="No Categories Available"
 				message={
-					searchQuery || hasActiveFilters
+					hasSearchOrFilters
 						? `No categories found matching your ${searchQuery ? 'search' : 'filters'}`
 						: 'Looks like there are no categories yet.'
 				}
 			/>
 		)
+	}
 
 	return (
 		<div className="p-3 sm:p-6">
-			<div className="flex justify-between items-center mb-6">
+			<div className="mb-6">
 				<h2 className="text-2xl font-bold">
 					Categories
 					<span className="text-base font-normal text-muted-foreground ml-2">
@@ -110,38 +116,23 @@ const CategoryListItemComponent = ({
 						{allCategories.length === 1 ? 'item' : 'items'})
 					</span>
 				</h2>
-				<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 			</div>
 
-			{viewMode === 'grid' ? (
-				<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{allCategories.map((category) => (
-						<CategoryCard key={category.id} category={category} />
-					))}
-				</div>
-			) : (
-				<div className="space-y-3">
-					{allCategories.map((category) => (
-						<CategoryRowItem key={category.id} category={category} />
-					))}
-				</div>
-			)}
+			<div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+				{allCategories.map((category) => (
+					<CategoryCard
+						key={category.id}
+						category={category}
+						refetchCategories={refetchCategories}
+					/>
+				))}
+			</div>
 
 			{isFetchingNextPage && (
-				<div
-					className={`mt-4 ${
-						viewMode === 'grid'
-							? 'grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-							: 'space-y-3'
-					}`}
-				>
-					{[...Array(4)].map((_, i) =>
-						viewMode === 'grid' ? (
-							<CardSkeleton key={i} />
-						) : (
-							<RowSkeleton key={i} />
-						),
-					)}
+				<div className="mt-4 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+					{[...Array(4)].map((_, i) => (
+						<CardSkeleton key={i} />
+					))}
 				</div>
 			)}
 

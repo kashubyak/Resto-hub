@@ -21,7 +21,7 @@ function DishEmptyStateComponent({ onAddManual, onImport }: DishEmptyStateProps)
 									'linear-gradient(to bottom right, var(--primary), rgba(0, 0, 0, 0))',
 							}}
 						>
-							<ChefHat className="w-12 h-12 sm:w-16 sm:h-16 text-primary-foreground animate-sparkle" />
+							<ChefHat className="w-12 h-12 sm:w-16 sm:h-16 text-white animate-sparkle" />
 						</div>
 						<div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary/20 animate-pulse-smooth" />
 						<div

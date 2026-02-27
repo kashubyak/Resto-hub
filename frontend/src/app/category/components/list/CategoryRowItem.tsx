@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/Button'
+import { ROUTES } from '@/constants/pages.constant'
 import type { ICategoryWithDishes } from '@/types/category.interface'
 import Link from 'next/link'
 import { memo } from 'react'
@@ -46,7 +47,7 @@ const CategoryRowItemComponent = ({ category }: CategoryRowItemProps) => {
 			</div>
 
 			<div className="flex items-center">
-				<Link href={`/category/${category.id}`}>
+				<Link href={ROUTES.PRIVATE.ADMIN.CATEGORY_ID(category.id)}>
 					<Button text="View Details" className="whitespace-nowrap" />
 				</Link>
 			</div>
