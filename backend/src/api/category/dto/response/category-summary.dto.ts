@@ -9,6 +9,9 @@ export class BaseCategoryDto {
 	name!: string
 
 	@ApiProperty()
+	icon!: string
+
+	@ApiProperty()
 	createdAt!: Date
 
 	@ApiProperty()

@@ -6,9 +6,11 @@ export interface ICategoryWithDishes extends Category {
 
 export interface ICategoryCreateInput {
 	name: string
+	icon: string
 	companyId: number
 }
 
 export interface ICategoryUpdateInput {
 	name?: string
+	icon?: string
 }
