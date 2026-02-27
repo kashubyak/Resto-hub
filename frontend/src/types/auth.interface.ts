@@ -65,4 +65,5 @@ export interface IAuthContext {
 		options?: { skipGetCurrentUser?: boolean },
 	) => Promise<void>
 	logout: () => void
+	isFetchingUser?: boolean
 }

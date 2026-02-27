@@ -10,7 +10,22 @@ import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, Search, Tag, X } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
+const GRADIENTS = [
+	'from-green-500/10 to-emerald-500/10',
+	'from-orange-500/10 to-red-500/10',
+	'from-pink-500/10 to-rose-500/10',
+	'from-blue-500/10 to-cyan-500/10',
+	'from-lime-500/10 to-green-500/10',
+	'from-amber-500/10 to-yellow-500/10',
+	'from-purple-500/10 to-pink-500/10',
+	'from-teal-500/10 to-blue-500/10',
+] as const
+
+function getGradientByIndex(index: number) {
+	return GRADIENTS[index % GRADIENTS.length]
+}
 
 interface AssignCategoryModalProps {
 	open: boolean
@@ -30,6 +45,17 @@ export function AssignCategoryModal({
 	const queryClient = useQueryClient()
 	const { showSuccess, showError } = useAlert()
 	const [search, setSearch] = useState('')
+
+	useEffect(() => {
+		if (open) {
+			document.body.style.overflow = 'hidden'
+		} else {
+			document.body.style.overflow = ''
+		}
+		return () => {
+			document.body.style.overflow = ''
+		}
+	}, [open])
 
 	const { data: categoriesResponse, isLoading: isLoadingCategories } = useQuery({
 		queryKey: ['categories', 'assign', search],
@@ -119,7 +145,7 @@ export function AssignCategoryModal({
 						</div>
 					) : (
 						<div className="grid grid-cols-2 gap-3">
-							{categories.map((cat) => (
+							{categories.map((cat, index) => (
 								<button
 									key={cat.id}
 									type="button"
@@ -127,8 +153,8 @@ export function AssignCategoryModal({
 									disabled={assignMutation.isPending}
 									className="group relative p-4 bg-background hover:bg-accent border-2 border-border hover:border-primary rounded-xl transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
 								>
-									<div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
-										{cat.name.charAt(0).toUpperCase()}
+									<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getGradientByIndex(index)} flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform`}>
+										{cat.icon || '🍴'}
 									</div>
 									<p className="text-sm font-semibold text-foreground mb-1">
 										{cat.name}

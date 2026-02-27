@@ -1,8 +1,10 @@
 import BusinessIcon from '@mui/icons-material/Business'
 import {
 	Folder,
-	LayoutDashboard, UtensilsCrossed
-} from "lucide-react"
+	LayoutDashboard,
+	LayoutGrid,
+	UtensilsCrossed,
+} from 'lucide-react'
 import type { ComponentType } from 'react'
 
 export const SIDEBAR_SUBTITLE = 'Admin Panel'
@@ -55,6 +57,9 @@ export const ROUTES = {
 			CATEGORY: '/category',
 			CATEGORY_ID: (id: number | string) =>
 				`${ROUTES.PRIVATE.ADMIN.CATEGORY}/${id}`,
+			TABLE: '/table',
+			TABLE_ID: (id: number | string) =>
+				`${ROUTES.PRIVATE.ADMIN.TABLE}/${id}`,
 		},
 		COOK: {},
 		WAITER: {},
@@ -87,6 +92,7 @@ export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
 		ROUTES.PRIVATE.ADMIN.DISH,
 		ROUTES.PRIVATE.ADMIN.DISH_CREATE,
 		ROUTES.PRIVATE.ADMIN.CATEGORY,
+		ROUTES.PRIVATE.ADMIN.TABLE,
 	],
 	[UserRole.COOK]: [...SHARED_ROUTES],
 	[UserRole.WAITER]: [...SHARED_ROUTES],
@@ -117,6 +123,12 @@ export const ALL_ROUTES: IRouteConfig[] = [
 		path: ROUTES.PRIVATE.ADMIN.CATEGORY,
 		name: 'Categories',
 		icon: Folder,
+		roles: ADMIN_ROLES,
+	},
+	{
+		path: ROUTES.PRIVATE.ADMIN.TABLE,
+		name: 'Tables',
+		icon: LayoutGrid,
 		roles: ADMIN_ROLES,
 	},
 ]

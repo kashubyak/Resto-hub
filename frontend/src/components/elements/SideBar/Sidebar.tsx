@@ -180,7 +180,12 @@ const SidebarComponent = function Sidebar({
 
 					<nav className="flex-1 overflow-y-auto py-6 px-3">
 						<div className="space-y-1">
-							{routes.map((route) => {
+							{routes.length === 0 ? (
+								<div className="px-3 py-4 text-sm text-muted-foreground text-center">
+									No routes available
+								</div>
+							) : (
+								routes.map((route) => {
 								const Icon = route.icon
 								const isActive = pathname === route.path
 								const isHovered = hoveredItem === route.path
@@ -229,7 +234,7 @@ const SidebarComponent = function Sidebar({
 										)}
 									</div>
 								)
-							})}
+							}))}
 						</div>
 					</nav>
 

@@ -144,10 +144,18 @@ export default function CategoryPage() {
 	const sortByConfig = categoryFilters.find((f) => f.key === 'sortBy')
 	const hasDishesConfig = categoryFilters.find((f) => f.key === 'hasDishes')
 
+	const isEmpty =
+		!isLoadingCategories &&
+		allCategories.length === 0 &&
+		!searchQuery &&
+		Object.keys(filters).length === 0
+
 	return (
 		<div className="max-w-7xl mx-auto space-y-6">
-			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+			{!isEmpty && (
+				<>
+					{/* Header */}
+					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 				<div>
 					<h1 className="text-2xl sm:text-3xl font-semibold text-foreground flex items-center gap-3">
 						<Folder className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
@@ -312,6 +320,8 @@ export default function CategoryPage() {
 					</div>
 				</div>
 			)}
+			</>
+			)}
 
 			<CategoryModal
 				isOpen={isCreateModalOpen}
@@ -327,7 +337,7 @@ export default function CategoryPage() {
 				onSubmit={handleEditCategory}
 				mode="edit"
 				initialName={selectedCategory?.name}
-				initialIcon={selectedCategory?.icon}
+				initialEmoji={selectedCategory?.icon}
 				isLoading={isLoading}
 			/>
 

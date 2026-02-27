@@ -9,10 +9,11 @@ import { SidebarSkeleton } from './skeleton/SidebarSkeleton'
 type Props = { children: React.ReactNode }
 
 export const SidebarShell = memo(({ children }: Props) => {
-	const { user } = useAuth()
+	const { user, isAuth, isFetchingUser } = useAuth()
 	const hydrated = useAuthStore((state) => state.hydrated)
 
-	const showSkeleton = !hydrated || !user
+	const showSkeleton =
+		!hydrated || (!user && (isFetchingUser || !isAuth))
 
 	if (showSkeleton)
 		return (

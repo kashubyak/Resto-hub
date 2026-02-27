@@ -4,7 +4,7 @@ import { ROUTES } from '@/constants/pages.constant'
 import type { ICategoryWithDishes } from '@/types/category.interface'
 import { Edit, Folder, MoreVertical, Tag, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useRef, useState } from 'react'
 
 const GRADIENTS = [
 	'from-green-500/10 to-emerald-500/10',
@@ -40,19 +40,20 @@ function getCategoryEmoji(name: string) {
 
 interface CategoryCardProps {
 	category: ICategoryWithDishes
-	refetchCategories: () => void
+	refetchCategories?: () => void
 	onEditClick?: (category: ICategoryWithDishes) => void
 	onDeleteClick?: (category: ICategoryWithDishes) => void
 }
 
 const CategoryCardComponent = ({
 	category,
-	refetchCategories,
+	refetchCategories: _refetchCategories,
 	onEditClick,
 	onDeleteClick,
 }: CategoryCardProps) => {
 	const router = useRouter()
 	const [menuOpen, setMenuOpen] = useState(false)
+	const cardRef = useRef<HTMLDivElement>(null)
 
 	const dishCount = category.dishes?.length ?? 0
 	const gradient = getRandomGradient()
@@ -73,8 +74,14 @@ const CategoryCardComponent = ({
 		router.push(ROUTES.PRIVATE.ADMIN.DISH)
 	}, [category.id, router])
 
+	const handleBackdropClick = useCallback((e: React.MouseEvent) => {
+		if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+			setMenuOpen(false)
+		}
+	}, [])
+
 	return (
-		<div className="group bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300">
+		<div ref={cardRef} className="group bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300">
 			<div
 				className={`relative h-32 bg-gradient-to-br ${gradient} flex items-center justify-center border-b-2 border-border`}
 			>
@@ -100,7 +107,7 @@ const CategoryCardComponent = ({
 							<>
 								<div
 									className="fixed inset-0 z-40"
-									onClick={() => setMenuOpen(false)}
+									onClick={handleBackdropClick}
 									aria-hidden
 								/>
 								<div
