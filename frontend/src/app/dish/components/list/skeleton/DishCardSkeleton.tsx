@@ -2,120 +2,81 @@ import { Skeleton } from '@mui/material'
 import { memo } from 'react'
 
 const DishCardSkeletonComponent = () => (
-	<div className="bg-background border border-border rounded-md shadow-sm flex flex-col overflow-hidden h-full">
-		<Skeleton
-			variant="rectangular"
-			width="100%"
-			height={250}
-			sx={{ bgcolor: 'var(--muted)' }}
-		/>
+	<div className="bg-card border-2 border-border rounded-2xl overflow-hidden flex flex-col">
+		<div className="relative aspect-square bg-background overflow-hidden">
+			<Skeleton
+				variant="rectangular"
+				width="100%"
+				height="100%"
+				sx={{ bgcolor: 'var(--muted)' }}
+			/>
+		</div>
 
-		<div className="p-5 flex flex-col flex-grow">
-			<div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
-				<div className="flex-grow space-y-2">
+		<div className="p-4 space-y-3">
+			<div className="flex items-start justify-between gap-2">
+				<div className="flex-1 min-w-0 space-y-1">
 					<Skeleton
 						variant="text"
 						width="70%"
-						height={28}
+						height={22}
 						sx={{ bgcolor: 'var(--muted)' }}
 					/>
 					<Skeleton
 						variant="text"
 						width="100%"
-						height={20}
-						sx={{ bgcolor: 'var(--muted)' }}
-					/>
-					<Skeleton
-						variant="text"
-						width="85%"
-						height={20}
-						sx={{ bgcolor: 'var(--muted)' }}
-					/>
-				</div>
-
-				<div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0">
-					<Skeleton
-						variant="text"
-						width={80}
-						height={36}
-						sx={{ bgcolor: 'var(--muted)' }}
-					/>
-					<div className="flex flex-wrap gap-2">
-						<Skeleton
-							variant="rounded"
-							width={80}
-							height={24}
-							sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
-						/>
-						<Skeleton
-							variant="rounded"
-							width={70}
-							height={24}
-							sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
-						/>
-					</div>
-				</div>
-			</div>
-
-			<div className="grid grid-cols-2 gap-3 mb-4">
-				<div className="flex flex-col space-y-1">
-					<Skeleton
-						variant="text"
-						width={60}
 						height={16}
 						sx={{ bgcolor: 'var(--muted)' }}
 					/>
-					<Skeleton
-						variant="text"
-						width={50}
-						height={20}
-						sx={{ bgcolor: 'var(--muted)' }}
-					/>
 				</div>
-				<div className="flex flex-col space-y-1">
-					<Skeleton
-						variant="text"
-						width={60}
-						height={16}
-						sx={{ bgcolor: 'var(--muted)' }}
-					/>
-					<Skeleton
-						variant="text"
-						width={70}
-						height={20}
-						sx={{ bgcolor: 'var(--muted)' }}
-					/>
-				</div>
-			</div>
-
-			<div className="mb-4">
 				<Skeleton
 					variant="text"
-					width={100}
-					height={16}
-					sx={{ bgcolor: 'var(--muted)', mb: 1 }}
+					width={56}
+					height={28}
+					sx={{ bgcolor: 'var(--muted)', flexShrink: 0 }}
 				/>
-				<div className="flex flex-wrap gap-1">
+			</div>
+
+			<div className="flex items-center gap-4">
+				<Skeleton
+					variant="rounded"
+					width={48}
+					height={14}
+					sx={{ bgcolor: 'var(--muted)' }}
+				/>
+				<Skeleton
+					variant="rounded"
+					width={56}
+					height={14}
+					sx={{ bgcolor: 'var(--muted)' }}
+				/>
+			</div>
+
+			<div className="space-y-1.5">
+				<Skeleton
+					variant="text"
+					width={80}
+					height={12}
+					sx={{ bgcolor: 'var(--muted)' }}
+				/>
+				<div className="flex flex-wrap gap-1.5">
 					{[1, 2, 3].map((i) => (
 						<Skeleton
 							key={i}
 							variant="rounded"
-							width={80}
-							height={28}
-							sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
+							width={60}
+							height={24}
+							sx={{ bgcolor: 'var(--muted)', borderRadius: '6px' }}
 						/>
 					))}
 				</div>
 			</div>
 
-			<div className="mt-auto">
-				<Skeleton
-					variant="rounded"
-					width="100%"
-					height={40}
-					sx={{ bgcolor: 'var(--muted)' }}
-				/>
-			</div>
+			<Skeleton
+				variant="rounded"
+				width="100%"
+				height={40}
+				sx={{ bgcolor: 'var(--muted)', borderRadius: '8px' }}
+			/>
 		</div>
 	</div>
 )

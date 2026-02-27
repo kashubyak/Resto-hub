@@ -3,11 +3,8 @@
 import { NotFound } from '@/components/ui/NotFound'
 import { useDishes } from '@/hooks/useDishes'
 import type { FilterValues } from '@/types/filter.interface'
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
-import {
-	ViewModeToggle,
-	type ViewMode,
-} from '../../components/ui/ViewModeToggle'
+import { memo, useCallback, useEffect, useRef } from 'react'
+import type { ViewMode } from '@/components/ui/ViewModeToggle'
 import { DishCard } from './components/list/DishCard'
 import { DishListItem } from './components/list/DishListItem'
 import { DishCardSkeleton } from './components/list/skeleton/DishCardSkeleton'
@@ -16,11 +13,13 @@ import { DishListItemSkeleton } from './components/list/skeleton/DishListItemSke
 interface DishListProps {
 	searchQuery?: string
 	filters?: FilterValues
+	viewMode: ViewMode
 }
 
 const DishListComponent: React.FC<DishListProps> = ({
 	searchQuery = '',
 	filters = {},
+	viewMode,
 }) => {
 	const {
 		allDishes,
@@ -31,12 +30,12 @@ const DishListComponent: React.FC<DishListProps> = ({
 		isError,
 	} = useDishes(undefined, searchQuery, filters)
 
-	const [viewMode, setViewMode] = useState<ViewMode>('grid')
 	const loaderRef = useRef<HTMLDivElement | null>(null)
 
 	const handleIntersection = useCallback(
 		(entries: IntersectionObserverEntry[]) => {
-			if (entries[0].isIntersecting && hasNextPage) fetchNextPage()
+			const entry = entries[0]
+			if (entry?.isIntersecting && hasNextPage) fetchNextPage()
 		},
 		[fetchNextPage, hasNextPage],
 	)
@@ -52,28 +51,17 @@ const DishListComponent: React.FC<DishListProps> = ({
 	const hasActiveFilters = Object.keys(filters).length > 0
 
 	if (isLoading) {
-		return (
-			<div className="p-3 sm:p-6">
-				<div className="flex justify-between items-center mb-6">
-					<h2 className="text-2xl font-bold">Dish List</h2>
-					<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
-				</div>
-
-				{viewMode === 'grid' ? (
-					<div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-center">
-						{[...Array(6)].map((_, i) => (
-							<div key={i} className="max-w-[600px] w-full">
-								<DishCardSkeleton />
-							</div>
-						))}
-					</div>
-				) : (
-					<div className="space-y-3">
-						{[...Array(6)].map((_, i) => (
-							<DishListItemSkeleton key={i} />
-						))}
-					</div>
-				)}
+		return viewMode === 'grid' ? (
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+				{[...Array(8)].map((_, i) => (
+					<DishCardSkeleton key={i} />
+				))}
+			</div>
+		) : (
+			<div className="space-y-4">
+				{[...Array(6)].map((_, i) => (
+					<DishListItemSkeleton key={i} />
+				))}
 			</div>
 		)
 	}
@@ -101,27 +89,15 @@ const DishListComponent: React.FC<DishListProps> = ({
 		)
 
 	return (
-		<div className="p-3 sm:p-6">
-			<div className="flex justify-between items-center mb-6">
-				<h2 className="text-2xl font-bold">
-					Dish List
-					<span className="text-base font-normal text-muted-foreground ml-2">
-						({allDishes.length} {allDishes.length === 1 ? 'item' : 'items'})
-					</span>
-				</h2>
-				<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
-			</div>
-
+		<>
 			{viewMode === 'grid' ? (
-				<div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-center">
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
 					{allDishes.map((dish) => (
-						<div key={dish.id} className="max-w-[600px] w-full">
-							<DishCard dish={dish} />
-						</div>
+						<DishCard key={dish.id} dish={dish} />
 					))}
 				</div>
 			) : (
-				<div className="space-y-3">
+				<div className="space-y-4">
 					{allDishes.map((dish) => (
 						<DishListItem key={dish.id} dish={dish} />
 					))}
@@ -131,15 +107,13 @@ const DishListComponent: React.FC<DishListProps> = ({
 			{isFetchingNextPage && (
 				<>
 					{viewMode === 'grid' ? (
-						<div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-center mt-3">
-							{[...Array(3)].map((_, i) => (
-								<div key={i} className="max-w-[600px] w-full">
-									<DishCardSkeleton />
-								</div>
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
+							{[...Array(4)].map((_, i) => (
+								<DishCardSkeleton key={i} />
 							))}
 						</div>
 					) : (
-						<div className="space-y-3 mt-3">
+						<div className="space-y-4 mt-4">
 							{[...Array(3)].map((_, i) => (
 								<DishListItemSkeleton key={i} />
 							))}
@@ -149,7 +123,7 @@ const DishListComponent: React.FC<DishListProps> = ({
 			)}
 
 			<div ref={loaderRef} className="h-1" />
-		</div>
+		</>
 	)
 }
 

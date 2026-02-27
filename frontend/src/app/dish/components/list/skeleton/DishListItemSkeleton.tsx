@@ -2,74 +2,131 @@ import { Skeleton } from '@mui/material'
 import { memo } from 'react'
 
 const DishListItemSkeletonComponent = () => (
-	<div className="bg-background border border-border rounded-md shadow-sm hover:shadow-lg transition-all duration-300 p-4 flex flex-col sm:flex-row gap-4">
-		<Skeleton
-			variant="rounded"
-			width={150}
-			height={100}
-			sx={{
-				bgcolor: 'var(--muted)',
-				flexShrink: 0,
-			}}
-		/>
-
-		<div className="flex-grow flex flex-col justify-between">
-			<div>
+	<div className="bg-card border-2 border-border rounded-2xl overflow-hidden">
+		<div className="flex flex-col sm:flex-row">
+			<div className="relative w-full sm:w-64 h-48 sm:aspect-square bg-background overflow-hidden flex-shrink-0">
 				<Skeleton
-					variant="text"
-					width="60%"
-					height={28}
-					sx={{ bgcolor: 'var(--muted)', mb: 1 }}
-				/>
-				<Skeleton
-					variant="text"
+					variant="rectangular"
 					width="100%"
-					height={20}
-					sx={{ bgcolor: 'var(--muted)' }}
-				/>
-				<Skeleton
-					variant="text"
-					width="90%"
-					height={20}
+					height="100%"
 					sx={{ bgcolor: 'var(--muted)' }}
 				/>
 			</div>
 
-			<div className="flex flex-wrap gap-2 mt-3">
-				<Skeleton
-					variant="rounded"
-					width={70}
-					height={24}
-					sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
-				/>
-				<Skeleton
-					variant="rounded"
-					width={80}
-					height={24}
-					sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
-				/>
-				<Skeleton
-					variant="rounded"
-					width={90}
-					height={24}
-					sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
-				/>
-			</div>
-		</div>
+			<div className="flex-1 p-5 sm:p-6 flex flex-col">
+				<div className="flex items-start justify-between gap-4 mb-3">
+					<div className="flex-1 min-w-0 space-y-1">
+						<Skeleton
+							variant="text"
+							width="60%"
+							height={26}
+							sx={{ bgcolor: 'var(--muted)' }}
+						/>
+						<Skeleton
+							variant="text"
+							width="100%"
+							height={16}
+							sx={{ bgcolor: 'var(--muted)' }}
+						/>
+						<Skeleton
+							variant="text"
+							width="80%"
+							height={16}
+							sx={{ bgcolor: 'var(--muted)' }}
+						/>
+					</div>
+					<div className="flex items-center gap-3 flex-shrink-0">
+						<Skeleton
+							variant="text"
+							width={64}
+							height={32}
+							sx={{ bgcolor: 'var(--muted)' }}
+						/>
+						<Skeleton
+							variant="rounded"
+							width={88}
+							height={28}
+							sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
+						/>
+					</div>
+				</div>
 
-		<div className="flex flex-col items-end justify-between gap-2 flex-shrink-0">
-			<Skeleton
-				variant="text"
-				width={80}
-				height={36}
-				sx={{ bgcolor: 'var(--muted)' }}
-			/>
-			<Skeleton
-				variant="rounded"
-				width={120}
-				height={40}
-				sx={{ bgcolor: 'var(--muted)' }}
-			/>
+				<div className="flex items-center gap-6 mb-3">
+					<div className="flex items-center gap-1.5">
+						<Skeleton
+							variant="rounded"
+							width={28}
+							height={28}
+							sx={{ bgcolor: 'var(--muted)', borderRadius: '8px' }}
+						/>
+						<div className="space-y-1">
+							<Skeleton
+								variant="text"
+								width={40}
+								height={12}
+								sx={{ bgcolor: 'var(--muted)' }}
+							/>
+							<Skeleton
+								variant="text"
+								width={36}
+								height={18}
+								sx={{ bgcolor: 'var(--muted)' }}
+							/>
+						</div>
+					</div>
+					<div className="flex items-center gap-1.5">
+						<Skeleton
+							variant="rounded"
+							width={28}
+							height={28}
+							sx={{ bgcolor: 'var(--muted)', borderRadius: '8px' }}
+						/>
+						<div className="space-y-1">
+							<Skeleton
+								variant="text"
+								width={44}
+								height={12}
+								sx={{ bgcolor: 'var(--muted)' }}
+							/>
+							<Skeleton
+								variant="text"
+								width={48}
+								height={18}
+								sx={{ bgcolor: 'var(--muted)' }}
+							/>
+						</div>
+					</div>
+				</div>
+
+				<div className="space-y-2 mb-4">
+					<Skeleton
+						variant="text"
+						width={80}
+						height={12}
+						sx={{ bgcolor: 'var(--muted)' }}
+					/>
+					<div className="flex flex-wrap gap-2">
+						{[1, 2, 3, 4].map((i) => (
+							<Skeleton
+								key={i}
+								variant="rounded"
+								width={56}
+								height={28}
+								sx={{ bgcolor: 'var(--muted)', borderRadius: '6px' }}
+							/>
+						))}
+					</div>
+				</div>
+
+				<div className="mt-auto">
+					<Skeleton
+						variant="rounded"
+						width="100%"
+						height={40}
+						sx={{ bgcolor: 'var(--muted)', borderRadius: '8px' }}
+					/>
+				</div>
+			</div>
 		</div>
 	</div>
 )

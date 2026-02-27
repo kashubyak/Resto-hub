@@ -1,8 +1,8 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
 import { ROUTES } from '@/constants/pages.constant'
 import type { IDish } from '@/types/dish.interface'
+import { Eye, Flame, Scale } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { memo } from 'react'
@@ -10,104 +10,101 @@ import { memo } from 'react'
 type DishListItemProps = { dish: IDish }
 
 const DishListItemComponent = ({ dish }: DishListItemProps) => (
-	<div className="bg-background border border-border rounded-md shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group">
-		<div className="flex flex-col md:flex-row">
-			<div className="relative w-full md:w-72 lg:w-80 flex-shrink-0">
+	<div className="group bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
+		<div className="flex flex-col sm:flex-row">
+			<div className="relative w-full sm:w-64 h-48 sm:h-auto sm:aspect-square bg-background overflow-hidden flex-shrink-0">
 				<Image
 					src={dish.imageUrl}
 					alt={dish.name}
-					width={800}
-					height={450}
-					className="w-full h-48 md:h-full object-cover"
-					sizes="(max-width: 768px) 100vw, 320px"
-					priority
+					fill
+					className="object-cover group-hover:scale-110 transition-transform duration-500"
+					sizes="(max-width: 640px) 100vw, 256px"
 					placeholder="blur"
 					blurDataURL="/placeholder.png"
 				/>
 			</div>
 
-			<div className="p-3 sm:p-4 md:p-5 flex flex-col flex-grow justify-between min-w-0">
-				<div className="flex flex-col gap-2 sm:gap-3 mb-3 sm:mb-4">
-					<div className="flex items-start justify-between gap-2 sm:gap-3">
-						<h3 className="text-base sm:text-lg font-semibold text-foreground line-clamp-2 flex-grow min-w-0">
+			<div className="flex-1 p-5 sm:p-6 flex flex-col">
+				<div className="flex items-start justify-between gap-4 mb-3">
+					<div className="flex-1 min-w-0">
+						<h3 className="text-xl font-semibold text-foreground mb-1">
 							{dish.name}
 						</h3>
-						<span className="text-lg sm:text-xl md:text-2xl font-bold text-primary whitespace-nowrap flex-shrink-0">
+						<p className="text-sm text-muted-foreground line-clamp-2">
+							{dish.description}
+						</p>
+					</div>
+					<div className="flex items-center gap-3 flex-shrink-0">
+						<span className="text-2xl font-bold text-primary">
 							${dish.price}
 						</span>
-					</div>
-
-					<p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-						{dish.description}
-					</p>
-
-					<div className="flex flex-wrap gap-1.5 sm:gap-2">
 						<span
-							className={`px-2 py-0.5 sm:py-1 stable-light  text-xs font-medium rounded-full ${
-								dish.available ? 'bg-success' : 'bg-destructive'
+							className={`px-3 py-1 rounded-full text-xs font-semibold ${
+								dish.available ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
 							}`}
 						>
 							{dish.available ? 'Available' : 'Unavailable'}
 						</span>
-						{dish.category && (
-							<span className="px-2 py-0.5 sm:py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full">
-								{dish.category.name}
-							</span>
-						)}
 					</div>
 				</div>
 
-				<div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4 text-xs">
-					<div className="flex flex-col">
-						<span className="text-muted-foreground uppercase tracking-wide">
-							Weight
-						</span>
-						<span className="text-foreground font-medium mt-0.5 sm:mt-1">
-							{dish.weightGr ? `${dish.weightGr}g` : '—'}
-						</span>
-					</div>
-					<div className="flex flex-col">
-						<span className="text-muted-foreground uppercase tracking-wide">
-							Calories
-						</span>
-						<span className="text-foreground font-medium mt-0.5 sm:mt-1">
-							{dish.calories ? `${dish.calories} kcal` : '—'}
-						</span>
-					</div>
-				</div>
-
-				<div className="flex flex-col md:flex-row md:items-end gap-2 sm:gap-3 md:gap-4">
-					{dish.ingredients?.length > 0 && (
-						<div className="flex-grow min-w-0">
-							<span className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5 sm:mb-2 block">
-								Ingredients
-							</span>
-							<div className="flex flex-wrap gap-1">
-								{dish.ingredients.slice(0, 3).map((ingredient, i) => (
-									<span
-										key={i}
-										className="px-2 py-0.5 sm:py-1 text-xs active-item text-foreground rounded-full"
-									>
-										{ingredient}
-									</span>
-								))}
-								{dish.ingredients.length > 3 && (
-									<span className="px-2 py-0.5 sm:py-1 text-xs active-item text-foreground rounded-full">
-										+{dish.ingredients.length - 3} more
-									</span>
-								)}
-							</div>
+				<div className="flex items-center gap-6 text-sm text-muted-foreground mb-3">
+					<div className="flex items-center gap-1.5">
+						<div className="w-7 h-7 rounded-lg bg-background flex items-center justify-center">
+							<Scale className="w-4 h-4" />
 						</div>
-					)}
-
-					<div className="flex-shrink-0 w-full md:w-auto">
-						<Link href={ROUTES.PRIVATE.ADMIN.DISH_ID(dish.id)}>
-							<Button
-								className="w-full md:w-auto hover:bg-primary text-sm"
-								text="View Details"
-							/>
-						</Link>
+						<div>
+							<span className="text-xs uppercase tracking-wide block">
+								Weight
+							</span>
+							<span className="font-medium text-foreground">
+								{dish.weightGr != null ? `${dish.weightGr}g` : '—'}
+							</span>
+						</div>
 					</div>
+					<div className="flex items-center gap-1.5">
+						<div className="w-7 h-7 rounded-lg bg-background flex items-center justify-center">
+							<Flame className="w-4 h-4" />
+						</div>
+						<div>
+							<span className="text-xs uppercase tracking-wide block">
+								Calories
+							</span>
+							<span className="font-medium text-foreground">
+								{dish.calories != null ? `${dish.calories} kcal` : '—'}
+							</span>
+						</div>
+					</div>
+				</div>
+
+				{dish.ingredients?.length > 0 && (
+					<div className="space-y-2 mb-4">
+						<span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+							Ingredients
+						</span>
+						<div className="flex flex-wrap gap-2">
+							{dish.ingredients.map((ingredient, idx) => (
+								<span
+									key={idx}
+									className="px-2.5 py-1 bg-background border border-border rounded-md text-xs text-foreground"
+								>
+									{ingredient}
+								</span>
+							))}
+						</div>
+					</div>
+				)}
+
+				<div className="flex gap-2 mt-auto">
+					<Link href={ROUTES.PRIVATE.ADMIN.DISH_ID(dish.id)} className="flex-1">
+						<button
+							type="button"
+							className="w-full h-10 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2"
+						>
+							<Eye className="w-4 h-4" />
+							<span>View Details</span>
+						</button>
+					</Link>
 				</div>
 			</div>
 		</div>
