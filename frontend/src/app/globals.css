@@ -329,8 +329,14 @@ html {
 	.text-primary-foreground {
 		color: var(--primary-foreground);
 	}
+	.text-primary-foreground\/80 {
+		color: color-mix(in oklab, var(--primary-foreground) 80%, transparent);
+	}
 	.text-white {
 		color: #ffffff;
+	}
+	.text-white\/80 {
+		color: rgba(255, 255, 255, 0.8);
 	}
 	.bg-secondary {
 		background-color: var(--secondary);
@@ -368,6 +374,9 @@ html {
 	.focus\:ring-primary:focus {
 		box-shadow: 0 0 0 2px var(--primary);
 	}
+	.border-primary {
+		border-color: var(--primary);
+	}
 	.focus\:border-primary:focus {
 		border-color: var(--primary);
 	}
@@ -403,6 +412,12 @@ html {
 	}
 	.bg-primary\/10 {
 		background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+	}
+	.bg-primary\/20 {
+		background-color: color-mix(in oklab, var(--primary) 20%, transparent);
+	}
+	.bg-primary\/30 {
+		background-color: color-mix(in oklab, var(--primary) 30%, transparent);
 	}
 	.bg-primary\/5 {
 		background-color: color-mix(in oklab, var(--primary) 5%, transparent);
@@ -459,6 +474,27 @@ html {
 	.to-transparent {
 		--tw-gradient-to: transparent;
 	}
+	.from-primary\/10 {
+		--tw-gradient-from: color-mix(in oklab, var(--primary) 10%, transparent);
+		--tw-gradient-to: color-mix(in oklab, var(--primary) 10%, transparent);
+	}
+	.to-primary\/5 {
+		--tw-gradient-to: color-mix(in oklab, var(--primary) 5%, transparent);
+	}
+	.from-primary\/20 {
+		--tw-gradient-from: color-mix(in oklab, var(--primary) 20%, transparent);
+		--tw-gradient-to: color-mix(in oklab, var(--primary) 20%, transparent);
+	}
+	.to-primary\/10 {
+		--tw-gradient-to: color-mix(in oklab, var(--primary) 10%, transparent);
+	}
+	.from-success {
+		--tw-gradient-from: var(--success);
+		--tw-gradient-to: var(--success);
+	}
+	.to-success-hover {
+		--tw-gradient-to: var(--success-hover);
+	}
 	.shadow-primary\/25 {
 		box-shadow: 0 25px 50px -12px color-mix(in oklab, var(--primary) 25%, transparent);
 	}
@@ -467,5 +503,42 @@ html {
 	}
 	.group:hover .group-hover\:to-primary\/10 {
 		--tw-gradient-to: color-mix(in oklab, var(--primary) 10%, transparent);
+	}
+	/* Gradient backgrounds using CSS variables (Figma-style) */
+	.bg-gradient-primary {
+		background-image: linear-gradient(
+			to bottom right,
+			var(--primary),
+			var(--primary-hover)
+		);
+	}
+	.bg-gradient-primary-soft {
+		background-image: linear-gradient(
+			to bottom right,
+			color-mix(in oklab, var(--primary) 10%, transparent),
+			color-mix(in oklab, var(--primary) 5%, transparent)
+		);
+	}
+	.bg-gradient-primary-soft-hover:hover,
+	.group:hover .group-hover\:bg-gradient-primary-soft-hover {
+		background-image: linear-gradient(
+			to bottom right,
+			color-mix(in oklab, var(--primary) 20%, transparent),
+			color-mix(in oklab, var(--primary) 10%, transparent)
+		);
+	}
+	.bg-gradient-success {
+		background-image: linear-gradient(
+			to bottom right,
+			var(--success),
+			var(--success-hover)
+		);
+	}
+	.bg-gradient-to-b {
+		background-image: linear-gradient(
+			to bottom,
+			var(--tw-gradient-from, var(--primary)),
+			var(--tw-gradient-to, var(--primary-hover))
+		);
 	}
 }

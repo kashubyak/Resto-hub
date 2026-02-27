@@ -49,6 +49,7 @@ export const ROUTES = {
 		},
 		ADMIN: {
 			DISH: '/dish',
+			DISH_CREATE: '/dish/create',
 			DISH_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.DISH}/${id}`,
 			CATEGORY: '/category',
 			CATEGORY_ID: (id: number | string) =>
@@ -83,6 +84,7 @@ export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
 	[UserRole.ADMIN]: [
 		...SHARED_ROUTES,
 		ROUTES.PRIVATE.ADMIN.DISH,
+		ROUTES.PRIVATE.ADMIN.DISH_CREATE,
 		ROUTES.PRIVATE.ADMIN.CATEGORY,
 	],
 	[UserRole.COOK]: [...SHARED_ROUTES],

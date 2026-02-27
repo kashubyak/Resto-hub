@@ -4,15 +4,16 @@ import { dishFilters } from '@/components/elements/Filters/dish.filters'
 import { FilterDrawer } from '@/components/elements/Filters/FilterDrawer'
 import { Button } from '@/components/ui/Button'
 import { SearchInput } from '@/components/ui/SearchInput'
-import type { FilterValues } from '@/types/filter.interface'
+import { ROUTES } from '@/constants/pages.constant'
 import { useDishes } from '@/hooks/useDishes'
+import type { FilterValues } from '@/types/filter.interface'
+import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { DishEmptyState } from './DishEmptyState'
 import { DishList } from './DishList'
-import { DishModal } from './DishModal'
 
 export default function DishesPage() {
-	const [isModalOpen, setIsModalOpen] = useState(false)
+	const router = useRouter()
 	const [searchQuery, setSearchQuery] = useState('')
 	const [filters, setFilters] = useState<FilterValues>({})
 
@@ -23,8 +24,10 @@ export default function DishesPage() {
 		!isLoading &&
 		allDishes.length === 0
 
-	const handleModalOpen = useCallback(() => setIsModalOpen(true), [])
-	const handleModalClose = useCallback(() => setIsModalOpen(false), [])
+	const handleNavigateToCreate = useCallback(
+		() => router.push(ROUTES.PRIVATE.ADMIN.DISH_CREATE),
+		[router],
+	)
 
 	const handleFilterApply = useCallback(
 		(values: FilterValues) => setFilters(values),
@@ -36,10 +39,7 @@ export default function DishesPage() {
 	return (
 		<div className="max-w-7xl mx-auto">
 			{isEmpty ? (
-				<>
-					<DishEmptyState onAddManual={handleModalOpen} />
-					<DishModal open={isModalOpen} onClose={handleModalClose} />
-				</>
+				<DishEmptyState onAddManual={handleNavigateToCreate} />
 			) : (
 				<>
 					<div className="p-4 sm:p-6 border-b border-border bg-background">
@@ -48,7 +48,7 @@ export default function DishesPage() {
 								<Button
 									type="button"
 									text="Create new dish"
-									onClick={handleModalOpen}
+									onClick={handleNavigateToCreate}
 									className="!mt-0 w-full sm:w-auto px-6 py-2.5 h-[42px] whitespace-nowrap rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
 								/>
 							</div>
@@ -72,8 +72,6 @@ export default function DishesPage() {
 								</div>
 							</div>
 						</div>
-
-						<DishModal open={isModalOpen} onClose={handleModalClose} />
 					</div>
 
 					<DishList searchQuery={searchQuery} filters={filters} />

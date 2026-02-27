@@ -18,10 +18,10 @@ function DishEmptyStateComponent({ onAddManual, onImport }: DishEmptyStateProps)
 							className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/25 animate-float"
 							style={{
 								background:
-									'linear-gradient(to bottom right, var(--primary), transparent)',
+									'linear-gradient(to bottom right, var(--primary), rgba(0, 0, 0, 0))',
 							}}
 						>
-							<ChefHat className="w-12 h-12 sm:w-16 sm:h-16 text-white animate-sparkle" />
+							<ChefHat className="w-12 h-12 sm:w-16 sm:h-16 text-primary-foreground animate-sparkle" />
 						</div>
 						<div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary/20 animate-pulse-smooth" />
 						<div
@@ -48,11 +48,11 @@ function DishEmptyStateComponent({ onAddManual, onImport }: DishEmptyStateProps)
 						className="group border-2 border-primary rounded-2xl p-6 sm:p-7 hover:shadow-2xl hover:shadow-primary/25 hover:-translate-y-1 transition-all duration-300 text-left"
 						style={{
 							background:
-								'linear-gradient(to bottom right, var(--primary), transparent)',
+								'linear-gradient(to bottom right, var(--primary), rgba(0, 0, 0, 0))',
 						}}
 					>
 						<div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-							<div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-white/30 transition-all duration-300">
+							<div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/20 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary/30 transition-all duration-300">
 								<Plus className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
 							</div>
 							<h3 className="text-base sm:text-lg font-semibold text-white mb-2">
