@@ -1,3 +1,12 @@
+import { CalendarDays, Clock, Hash, Tag } from 'lucide-react'
+
+const dateFormat = (date: string) =>
+	new Date(date).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	})
+
 export const DishDetails = ({
 	id,
 	categoryId,
@@ -10,38 +19,44 @@ export const DishDetails = ({
 	updatedAt: string
 }) => {
 	return (
-		<div className="space-y-3 pt-4">
-			<h3 className="text-lg font-semibold text-foreground">Details</h3>
-			<div className="space-y-2 text-sm">
-				<div className="flex justify-between">
-					<span className="text-muted-foreground">Dish ID</span>
-					<span className="font-medium text-foreground">#{id}</span>
+		<>
+			<h3 className="text-sm font-semibold text-foreground">Information</h3>
+			<div className="space-y-2.5">
+				<div className="flex items-center justify-between text-sm">
+					<div className="flex items-center gap-2 text-muted-foreground">
+						<Hash className="w-3.5 h-3.5" />
+						<span>Dish ID</span>
+					</div>
+					<span className="font-semibold text-foreground">#{id}</span>
 				</div>
-				<div className="flex justify-between">
-					<span className="text-muted-foreground">Category ID</span>
-					<span className="font-medium text-foreground">#{categoryId}</span>
-				</div>
-				<div className="flex justify-between">
-					<span className="text-muted-foreground">Created</span>
-					<span className="font-medium text-foreground">
-						{new Date(createdAt).toLocaleDateString('en-US', {
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric',
-						})}
+				<div className="flex items-center justify-between text-sm">
+					<div className="flex items-center gap-2 text-muted-foreground">
+						<Tag className="w-3.5 h-3.5" />
+						<span>Category ID</span>
+					</div>
+					<span className="font-semibold text-foreground">
+						{categoryId != null ? `#${categoryId}` : '—'}
 					</span>
 				</div>
-				<div className="flex justify-between">
-					<span className="text-muted-foreground">Last Updated</span>
-					<span className="font-medium text-foreground">
-						{new Date(updatedAt).toLocaleDateString('en-US', {
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric',
-						})}
+				<div className="flex items-center justify-between text-sm">
+					<div className="flex items-center gap-2 text-muted-foreground">
+						<CalendarDays className="w-3.5 h-3.5" />
+						<span>Created</span>
+					</div>
+					<span className="font-semibold text-foreground">
+						{dateFormat(createdAt)}
+					</span>
+				</div>
+				<div className="flex items-center justify-between text-sm">
+					<div className="flex items-center gap-2 text-muted-foreground">
+						<Clock className="w-3.5 h-3.5" />
+						<span>Last Updated</span>
+					</div>
+					<span className="font-semibold text-foreground">
+						{dateFormat(updatedAt)}
 					</span>
 				</div>
 			</div>
-		</div>
+		</>
 	)
 }

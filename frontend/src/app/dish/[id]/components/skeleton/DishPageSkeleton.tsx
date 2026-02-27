@@ -6,18 +6,38 @@ import { DishTopInfoSkeleton } from './DishTopInfoSkeleton'
 
 export const DishPageSkeleton = () => {
 	return (
-		<div className="min-h-screen bg-background p-3 lg:p-4">
-			<div className="flex flex-col lg:grid lg:grid-cols-3">
-				<DishImageSkeleton />
-				<div className="lg:col-span-1 flex flex-col">
-					<div className="flex-grow px-4 lg:px-6 lg:pr-0 py-2 space-y-6">
-						<DishTopInfoSkeleton />
-						<div className="space-y-6">
+		<div className="min-h-screen bg-background">
+			<div className="max-w-[2000px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
+				{/* Compact header */}
+				<div className="flex items-center gap-3 mb-4">
+					<Skeleton
+						variant="rounded"
+						width={40}
+						height={40}
+						sx={{ bgcolor: 'var(--muted)', borderRadius: '12px' }}
+					/>
+					<Skeleton
+						variant="text"
+						width={120}
+						height={28}
+						sx={{ bgcolor: 'var(--muted)' }}
+					/>
+				</div>
+
+				<div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+					<DishImageSkeleton />
+					<div className="lg:col-span-5 xl:col-span-4 space-y-4 pb-4 lg:pb-8">
+						<div className="bg-card border-2 border-border rounded-2xl p-5 space-y-4">
+							<DishTopInfoSkeleton />
 							<DishDownInfoSkeleton />
+						</div>
+						<div className="bg-card border-2 border-border rounded-2xl p-5 space-y-3">
 							<DishDetailsSkeleton />
 						</div>
+						<div className="bg-card border-2 border-border rounded-2xl p-5 space-y-3">
+							<DishActionsSkeleton />
+						</div>
 					</div>
-					<DishActionsSkeleton />
 				</div>
 			</div>
 		</div>

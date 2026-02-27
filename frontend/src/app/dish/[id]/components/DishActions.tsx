@@ -2,68 +2,99 @@
 
 import { dishUpdateConfig } from '@/components/elements/UpdateDrawer/dish.update-config'
 import { UpdateDrawer } from '@/components/elements/UpdateDrawer/UpdateDrawer'
-import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { ROUTES } from '@/constants/pages.constant'
 import { useDishes } from '@/hooks/useDishes'
-import { Category, Delete, Edit, RemoveCircle } from '@mui/icons-material'
+import { Edit, Tag, Trash2, XCircle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 
 export const DishActions = ({ id }: { id: number }) => {
+	const router = useRouter()
 	const { deleteDishMutation, deleteCategoryFromDishMutation, dishQuery } =
 		useDishes(id)
-	const [openConfirm, setOpenConfirm] = useState({
-		deleteDish: false,
-		removeCategory: false,
-	})
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 	const [updateDrawerOpen, setUpdateDrawerOpen] = useState(false)
+	const [openRemoveCategoryConfirm, setOpenRemoveCategoryConfirm] =
+		useState(false)
 
 	const openUpdateDrawer = useCallback(() => setUpdateDrawerOpen(true), [])
 	const closeUpdateDrawer = useCallback(() => setUpdateDrawerOpen(false), [])
 
+	const handleDeleteConfirm = useCallback(() => {
+		deleteDishMutation.mutate(id, {
+			onSuccess: () => {
+				setShowDeleteConfirm(false)
+				router.push(ROUTES.PRIVATE.ADMIN.DISH)
+			},
+		})
+	}, [id, deleteDishMutation, router])
+
 	return (
 		<>
-			<div className="px-4 lg:px-6 lg:pr-0 py-6 bg-muted/30">
-				<div className="space-y-4">
-					<h3 className="text-base font-semibold text-foreground mb-4">
-						Actions
-					</h3>
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
-						<Button
-							className="h-10 inline-flex items-center justify-center font-semibold"
-							onClick={openUpdateDrawer}
-						>
-							<Edit className="w-4 h-4 mr-2" />
-							Update Dish
-						</Button>
-						<Button
-							className="h-10 inline-flex items-center justify-center font-semibold"
-							onClick={() => {}}
-						>
-							<Category className="w-4 h-4 mr-2" />
-							Assign Category
-						</Button>
-						<Button
-							className="h-10 inline-flex items-center justify-center font-semibold"
-							onClick={() =>
-								setOpenConfirm((prev) => ({ ...prev, removeCategory: true }))
-							}
-							disabled={deleteCategoryFromDishMutation.isPending}
-						>
-							<RemoveCircle className="w-4 h-4 mr-2" />
-							Remove Category
-						</Button>
-						<Button
-							className="h-10 inline-flex items-center justify-center font-semibold bg-destructive hover:bg-destructive"
-							onClick={() =>
-								setOpenConfirm((prev) => ({ ...prev, deleteDish: true }))
-							}
-							disabled={deleteDishMutation.isPending}
-						>
-							<Delete className="w-4 h-4 mr-2" />
-							{deleteDishMutation.isPending ? 'Deleting...' : 'Delete Dish'}
-						</Button>
+			<h3 className="text-sm font-semibold text-foreground">Actions</h3>
+			<div className="space-y-2.5">
+				<button
+					type="button"
+					onClick={openUpdateDrawer}
+					className="h-11 w-full rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-white border-2 border-primary/20 hover:border-primary font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2"
+				>
+					<Edit className="w-4 h-4" />
+					Update Dish
+				</button>
+				<button
+					type="button"
+					onClick={() => {}}
+					className="h-11 w-full rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-white border-2 border-primary/20 hover:border-primary font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2"
+				>
+					<Tag className="w-4 h-4" />
+					Assign Category
+				</button>
+				<button
+					type="button"
+					onClick={() => setOpenRemoveCategoryConfirm(true)}
+					disabled={deleteCategoryFromDishMutation.isPending}
+					className="h-11 w-full rounded-xl bg-background hover:bg-accent text-foreground border-2 border-border hover:border-primary font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+				>
+					<XCircle className="w-4 h-4" />
+					Remove Category
+				</button>
+
+				{!showDeleteConfirm ? (
+					<button
+						type="button"
+						onClick={() => setShowDeleteConfirm(true)}
+						disabled={deleteDishMutation.isPending}
+						className="h-11 w-full rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border-2 border-red-500/20 hover:border-red-500 font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						<Trash2 className="w-4 h-4" />
+						{deleteDishMutation.isPending ? 'Deleting...' : 'Delete Dish'}
+					</button>
+				) : (
+					<div className="space-y-2 p-3 bg-red-500/5 border-2 border-red-500/20 rounded-xl">
+						<p className="text-sm font-medium text-foreground text-center">
+							Delete this dish permanently?
+						</p>
+						<div className="grid grid-cols-2 gap-2">
+							<button
+								type="button"
+								onClick={() => setShowDeleteConfirm(false)}
+								className="h-9 bg-background hover:bg-accent text-foreground border border-border rounded-lg font-medium text-sm transition-all"
+							>
+								Cancel
+							</button>
+							<button
+								type="button"
+								onClick={handleDeleteConfirm}
+								disabled={deleteDishMutation.isPending}
+								className="h-9 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+							>
+								<Trash2 className="w-3.5 h-3.5" />
+								Confirm
+							</button>
+						</div>
 					</div>
-				</div>
+				)}
 			</div>
 
 			<UpdateDrawer
@@ -76,25 +107,13 @@ export const DishActions = ({ id }: { id: number }) => {
 			/>
 
 			<ConfirmDialog
-				open={openConfirm.deleteDish}
-				onClose={() =>
-					setOpenConfirm((prev) => ({ ...prev, deleteDish: false }))
-				}
-				onConfirm={() => deleteDishMutation.mutate(id)}
-				title="⚠️ Delete Dish"
-				message="Are you sure you want to delete this dish?"
-				confirmText="Delete"
-				cancelText="Cancel"
-				type="destructive"
-			/>
-
-			<ConfirmDialog
-				open={openConfirm.removeCategory}
-				onClose={() =>
-					setOpenConfirm((prev) => ({ ...prev, removeCategory: false }))
-				}
-				onConfirm={() => deleteCategoryFromDishMutation.mutate(id)}
-				title="⚠️ Remove Category"
+				open={openRemoveCategoryConfirm}
+				onClose={() => setOpenRemoveCategoryConfirm(false)}
+				onConfirm={() => {
+					deleteCategoryFromDishMutation.mutate(id)
+					setOpenRemoveCategoryConfirm(false)
+				}}
+				title="Remove Category"
 				message="Do you really want to remove this category from the dish?"
 				confirmText="Remove"
 				cancelText="Cancel"
