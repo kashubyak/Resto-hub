@@ -5,7 +5,9 @@ import { FilterDrawer } from '@/components/elements/Filters/FilterDrawer'
 import { Button } from '@/components/ui/Button'
 import { SearchInput } from '@/components/ui/SearchInput'
 import type { FilterValues } from '@/types/filter.interface'
+import { useDishes } from '@/hooks/useDishes'
 import { useCallback, useState } from 'react'
+import { DishEmptyState } from './DishEmptyState'
 import { DishList } from './DishList'
 import { DishModal } from './DishModal'
 
@@ -13,6 +15,13 @@ export default function DishesPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [searchQuery, setSearchQuery] = useState('')
 	const [filters, setFilters] = useState<FilterValues>({})
+
+	const { allDishes, isLoading } = useDishes(undefined, searchQuery, filters)
+	const isEmpty =
+		!searchQuery &&
+		Object.keys(filters).length === 0 &&
+		!isLoading &&
+		allDishes.length === 0
 
 	const handleModalOpen = useCallback(() => setIsModalOpen(true), [])
 	const handleModalClose = useCallback(() => setIsModalOpen(false), [])
@@ -25,42 +34,51 @@ export default function DishesPage() {
 	const handleSearch = useCallback((value: string) => setSearchQuery(value), [])
 
 	return (
-		<div>
-			<div className="p-4 sm:p-6 border-b border-border bg-background">
-				<div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-stretch sm:items-center">
-					<div className="sm:flex-shrink-0">
-						<Button
-							type="button"
-							text="Create new dish"
-							onClick={handleModalOpen}
-							className="!mt-0 w-full sm:w-auto px-6 py-2.5 h-[42px] whitespace-nowrap rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-						/>
+		<div className="max-w-7xl mx-auto">
+			{isEmpty ? (
+				<>
+					<DishEmptyState onAddManual={handleModalOpen} />
+					<DishModal open={isModalOpen} onClose={handleModalClose} />
+				</>
+			) : (
+				<>
+					<div className="p-4 sm:p-6 border-b border-border bg-background">
+						<div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-stretch sm:items-center">
+							<div className="sm:flex-shrink-0">
+								<Button
+									type="button"
+									text="Create new dish"
+									onClick={handleModalOpen}
+									className="!mt-0 w-full sm:w-auto px-6 py-2.5 h-[42px] whitespace-nowrap rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+								/>
+							</div>
+
+							<div className="flex-1 flex items-center gap-2 sm:gap-3 min-w-0">
+								<div className="flex-1 min-w-0">
+									<SearchInput
+										onSearch={handleSearch}
+										placeholder="Search dishes..."
+										debounceMs={500}
+										className="w-full"
+									/>
+								</div>
+								<div className="flex-shrink-0">
+									<FilterDrawer
+										filters={dishFilters}
+										initialValues={filters}
+										onApply={handleFilterApply}
+										onReset={handleFilterReset}
+									/>
+								</div>
+							</div>
+						</div>
+
+						<DishModal open={isModalOpen} onClose={handleModalClose} />
 					</div>
 
-					<div className="flex-1 flex items-center gap-2 sm:gap-3 min-w-0">
-						<div className="flex-1 min-w-0">
-							<SearchInput
-								onSearch={handleSearch}
-								placeholder="Search dishes..."
-								debounceMs={500}
-								className="w-full"
-							/>
-						</div>
-						<div className="flex-shrink-0">
-							<FilterDrawer
-								filters={dishFilters}
-								initialValues={filters}
-								onApply={handleFilterApply}
-								onReset={handleFilterReset}
-							/>
-						</div>
-					</div>
-				</div>
-
-				<DishModal open={isModalOpen} onClose={handleModalClose} />
-			</div>
-
-			<DishList searchQuery={searchQuery} filters={filters} />
+					<DishList searchQuery={searchQuery} filters={filters} />
+				</>
+			)}
 		</div>
 	)
 }
