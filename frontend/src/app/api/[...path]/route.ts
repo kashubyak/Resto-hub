@@ -1,5 +1,3 @@
-'use client'
-
 import { type NextRequest, NextResponse } from 'next/server'
 import http from 'node:http'
 import https from 'node:https'

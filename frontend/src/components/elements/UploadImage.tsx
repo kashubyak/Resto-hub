@@ -25,12 +25,15 @@ export const UploadImage = memo(
 	}: UploadImageProps) => {
 		const [isDraggingOver, setIsDraggingOver] = useState(false)
 
-		const registerValue = register ?? {
-			name: '',
-			ref: () => null,
-			onChange: () => {},
-			onBlur: () => {},
-		}
+		const registerValue = useMemo(() => {
+			if (register) return register
+			return {
+				name: '',
+				ref: () => null,
+				onChange: async () => {},
+				onBlur: async () => {},
+			} as UseFormRegisterReturn
+		}, [register])
 		const {
 			preview,
 			inputRef,
