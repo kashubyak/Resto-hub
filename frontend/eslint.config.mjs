@@ -1,7 +1,7 @@
 import { FlatCompat } from "@eslint/eslintrc";
 import prettierConfig from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
-import { dirname } from "path";
+import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,6 +14,12 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+    files: ["**/*.ts", "**/*.tsx"],
+    languageOptions: {
+      parserOptions: {
+        project: join(__dirname, "tsconfig.json"),
+      },
+    },
     rules: {
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-unused-vars": [
@@ -52,6 +58,24 @@ const eslintConfig = [
       "@stylistic/object-curly-spacing": "off",
       "bracket-spacing": "off",
       "@typescript-eslint/bracket-spacing": "off",
+    },
+    plugins: {
+      prettier: prettierPlugin,
+    },
+  },
+  {
+    rules: {
+      "prettier/prettier": [
+        "error",
+        {
+          singleQuote: true,
+          trailingComma: "all",
+          tabWidth: 2,
+          useTabs: true,
+          semi: false,
+          bracketSpacing: true,
+        },
+      ],
     },
     plugins: {
       prettier: prettierPlugin,
