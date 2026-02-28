@@ -11,8 +11,9 @@ const AUTH_STATUS_COOKIE = 'is_authenticated'
 function corsHeaders(origin: string | null): Record<string, string> {
 	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
 	const escapedDomain = rootDomain.replace(/\./g, '\\.')
+	// Allow: https://resto-hub.me, https://*.resto-hub.me, http://localhost:3001, etc.
 	const allowedOriginPattern = new RegExp(
-		`^https?://([^.]+\\.)?${escapedDomain}(:\\d+)?$`,
+		`^https?://(\\*\\.)?${escapedDomain}(:\\d+)?$`,
 	)
 	const allowOrigin =
 		origin && allowedOriginPattern.test(origin)
@@ -92,6 +93,8 @@ function proxy(
 								const sameSite = isProd ? ('strict' as const) : ('lax' as const)
 								const rootDomain =
 									process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+								const isLocalDomain =
+									rootDomain === 'localhost' || rootDomain === 'lvh.me'
 								const cookieOptions = (maxAge: number, httpOnly: boolean) => {
 									const opts: {
 										path: string
@@ -107,7 +110,7 @@ function proxy(
 										sameSite,
 										maxAge,
 									}
-									if (rootDomain !== 'localhost') opts.domain = `.${rootDomain}`
+									if (!isLocalDomain) opts.domain = `.${rootDomain}`
 									return opts
 								}
 

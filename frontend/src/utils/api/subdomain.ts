@@ -9,12 +9,19 @@ export function getSubdomainFromHost(host: string): string | null {
 	if (!hostname) return null
 	if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) return null
 	if (hostname === 'localhost' || hostname.endsWith('.localhost')) return null
-	const parts = hostname.split('.')
-	const subdomain = parts[0]
-	if (!subdomain) return null
-	const reserved = ['www', 'api', 'lvh']
-	if (reserved.includes(subdomain.toLowerCase())) return null
-	return subdomain
+
+	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+
+	if (hostname === rootDomain) return null
+	if (hostname.endsWith(`.${rootDomain}`)) {
+		const subdomain = hostname.slice(0, -(rootDomain.length + 1))
+		if (!subdomain) return null
+		const reserved = ['www', 'api', 'lvh']
+		if (reserved.includes(subdomain.toLowerCase())) return null
+		return subdomain
+	}
+
+	return null
 }
 
 export function getSubdomainFromHostname(): string | null {
@@ -24,24 +31,36 @@ export function getSubdomainFromHostname(): string | null {
 	if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) return null
 	if (hostname === 'localhost' || hostname.endsWith('.localhost')) return null
 
-	const parts = hostname.split('.')
-	const subdomain = parts[0]
-	if (!subdomain) return null
-	const reserved = ['www', 'api', 'lvh']
-	if (reserved.includes(subdomain.toLowerCase())) return null
-	return subdomain
+	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+
+	if (hostname === rootDomain) return null
+	if (hostname.endsWith(`.${rootDomain}`)) {
+		const subdomain = hostname.slice(0, -(rootDomain.length + 1))
+		if (!subdomain) return null
+		const reserved = ['www', 'api', 'lvh']
+		if (reserved.includes(subdomain.toLowerCase())) return null
+		return subdomain
+	}
+
+	return null
 }
 
 export function getRootAppUrl(): string {
 	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
-	const useHttpAndPort = rootDomain === 'localhost' || rootDomain === 'lvh.me'
+	const isLocalDomain = rootDomain === 'localhost' || rootDomain === 'lvh.me'
+
 	if (typeof window !== 'undefined') {
-		const port = window.location.port || '3001'
-		return useHttpAndPort
-			? `http://${rootDomain}:${port}`
-			: `https://${rootDomain}`
+		if (isLocalDomain) {
+			const port = window.location.port || '3001'
+			return `http://${rootDomain}:${port}`
+		}
+		return `https://${rootDomain}`
 	}
-	return useHttpAndPort ? `http://${rootDomain}:3001` : `https://${rootDomain}`
+
+	if (isLocalDomain) {
+		return `http://${rootDomain}:3001`
+	}
+	return `https://${rootDomain}`
 }
 
 export function setApiSubdomain(subdomain?: string | null): void {
@@ -98,14 +117,18 @@ export const initApiFromCookies = initApiSubdomain
 
 export function getCompanyUrl(subdomain: string): string {
 	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
-	const useHttpAndPort = rootDomain === 'localhost' || rootDomain === 'lvh.me'
+	const isLocalDomain = rootDomain === 'localhost' || rootDomain === 'lvh.me'
+
 	if (typeof window !== 'undefined') {
-		const port = window.location.port || '3001'
-		return useHttpAndPort
-			? `http://${subdomain}.${rootDomain}:${port}`
-			: `https://${subdomain}.${rootDomain}`
+		if (isLocalDomain) {
+			const port = window.location.port || '3001'
+			return `http://${subdomain}.${rootDomain}:${port}`
+		}
+		return `https://${subdomain}.${rootDomain}`
 	}
-	return useHttpAndPort
-		? `http://${subdomain}.${rootDomain}:3001`
-		: `https://${subdomain}.${rootDomain}`
+
+	if (isLocalDomain) {
+		return `http://${subdomain}.${rootDomain}:3001`
+	}
+	return `https://${subdomain}.${rootDomain}`
 }
