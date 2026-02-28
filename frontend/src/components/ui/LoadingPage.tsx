@@ -1,4 +1,9 @@
-import { Box, CircularProgress, LinearProgress, Typography } from '@mui/material'
+import {
+	Box,
+	CircularProgress,
+	LinearProgress,
+	Typography,
+} from '@mui/material'
 import { memo, useMemo } from 'react'
 
 interface ILoadingPageProps {
@@ -9,7 +14,10 @@ interface ILoadingPageProps {
 
 export const LoadingPage = memo<ILoadingPageProps>(
 	({ progress, title = 'Loading...', overlay = true }) => {
-		const hasProgress = useMemo(() => progress !== undefined && progress > 0, [progress])
+		const hasProgress = useMemo(
+			() => progress !== undefined && progress > 0,
+			[progress],
+		)
 
 		const progressRounded = useMemo(
 			() => (progress ? Math.round(progress) : 0),
@@ -84,30 +92,30 @@ export const LoadingPage = memo<ILoadingPageProps>(
 
 		const content = (
 			<Box
-				display='flex'
-				flexDirection='column'
-				alignItems='center'
+				display="flex"
+				flexDirection="column"
+				alignItems="center"
 				gap={2}
 				sx={contentBoxSx}
 			>
 				{hasProgress ? (
 					<>
-						<Typography variant='body2' sx={titleSx}>
+						<Typography variant="body2" sx={titleSx}>
 							{title}
 						</Typography>
 						<LinearProgress
-							variant='determinate'
+							variant="determinate"
 							value={progress}
 							sx={linearProgressSx}
 						/>
-						<Typography variant='caption' sx={captionSx}>
+						<Typography variant="caption" sx={captionSx}>
 							{progressRounded}%
 						</Typography>
 					</>
 				) : (
 					<>
 						<CircularProgress sx={circularProgressSx} />
-						<Typography variant='body2' sx={titleSx}>
+						<Typography variant="body2" sx={titleSx}>
 							{title}
 						</Typography>
 					</>

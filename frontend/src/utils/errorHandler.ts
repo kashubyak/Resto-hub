@@ -20,7 +20,9 @@ export const getRetryAfter = (error: IAxiosError): number | null => {
 	if (!headers) return null
 
 	const retryAfter =
-		headers['retry-after'] || headers['Retry-After'] || headers['x-ratelimit-reset']
+		headers['retry-after'] ||
+		headers['Retry-After'] ||
+		headers['x-ratelimit-reset']
 
 	if (!retryAfter) return null
 
@@ -41,7 +43,8 @@ export const parseBackendError = (error: IAxiosError): string[] => {
 		if (error.code === 'NETWORK_ERROR')
 			return ['Network error. Please check your internet connection.']
 
-		if (error.code === 'ECONNABORTED') return ['Request timeout. Please try again.']
+		if (error.code === 'ECONNABORTED')
+			return ['Request timeout. Please try again.']
 		return ['An unexpected error occurred. Please try again.']
 	}
 
@@ -49,12 +52,13 @@ export const parseBackendError = (error: IAxiosError): string[] => {
 
 	if (data?.message) {
 		if (Array.isArray(data.message))
-			return data.message.filter(msg => typeof msg === 'string')
+			return data.message.filter((msg) => typeof msg === 'string')
 		if (typeof data.message === 'string') return [data.message]
 	}
 
 	const status = error.response.status
-	const defaultMessage = ERROR_MESSAGES[status] || 'An unknown error has occurred'
+	const defaultMessage =
+		ERROR_MESSAGES[status] || 'An unknown error has occurred'
 	return [defaultMessage]
 }
 

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/Input'
 import type { IDishFormValues } from '@/types/dish.interface'
 import AddIcon from '@mui/icons-material/Add'
 import { IconButton, useMediaQuery, useTheme } from '@mui/material'
+import { GripVertical, Plus, X } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import {
 	Controller,
@@ -19,6 +20,7 @@ type IngredientsSectionProps = {
 	errors: FieldErrors<IDishFormValues>
 	setError: UseFormSetError<IDishFormValues>
 	clearErrors: UseFormClearErrors<IDishFormValues>
+	mode?: 'create' | 'update'
 }
 
 export const IngredientsSection = ({
@@ -26,6 +28,7 @@ export const IngredientsSection = ({
 	errors,
 	setError,
 	clearErrors,
+	mode = 'create',
 }: IngredientsSectionProps) => {
 	const [inputValue, setInputValue] = useState('')
 	const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
@@ -71,8 +74,12 @@ export const IngredientsSection = ({
 	)
 
 	const handleDelete = useCallback(
-		(ingredient: string, value: string[], onChange: (newValue: string[]) => void) => {
-			const updated = value.filter(i => i !== ingredient)
+		(
+			ingredient: string,
+			value: string[],
+			onChange: (newValue: string[]) => void,
+		) => {
+			const updated = value.filter((i) => i !== ingredient)
 			onChange(updated)
 
 			if (updated.length === 0)
@@ -136,6 +143,7 @@ export const IngredientsSection = ({
 
 			const newIngredients = [...value]
 			const draggedItem = newIngredients[draggedIndex]
+			if (draggedItem == null) return
 
 			newIngredients.splice(draggedIndex, 1)
 			newIngredients.splice(dropIndex, 0, draggedItem)
@@ -150,6 +158,95 @@ export const IngredientsSection = ({
 
 	if (!control) return null
 
+	if (mode === 'update') {
+		return (
+			<div className="space-y-4">
+				<Controller
+					name="ingredients"
+					control={control}
+					defaultValue={[]}
+					rules={{
+						required: 'At least one ingredient is required',
+						validate: (value) =>
+							value.length > 0 || 'At least one ingredient is required',
+					}}
+					render={({ field: { value, onChange } }) => (
+						<>
+							<div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+								<span className="text-base" aria-hidden>
+									🥕
+								</span>
+								Ingredients ({value.length})
+							</div>
+
+							<div className="flex gap-2">
+								<input
+									type="text"
+									value={inputValue}
+									onChange={(e) => setInputValue(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter') {
+											e.preventDefault()
+											handleAdd(value, onChange)
+										}
+									}}
+									placeholder="Add ingredient..."
+									className="flex-1 h-10 px-3 bg-background border-2 border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-muted-foreground"
+								/>
+								<button
+									type="button"
+									onClick={() => handleAdd(value, onChange)}
+									disabled={!inputValue.trim()}
+									className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									<Plus className="w-4 h-4" />
+								</button>
+							</div>
+
+							{errors.ingredients?.message && (
+								<span className="text-sm text-[var(--destructive)]">
+									{errors.ingredients.message}
+								</span>
+							)}
+
+							{value.length > 0 && (
+								<div className="space-y-2">
+									{value.map((ingredient, index) => (
+										<div
+											key={`${ingredient}-${index}`}
+											draggable
+											onDragStart={(e) => handleDragStart(e, index)}
+											onDragOver={handleDragOver}
+											onDragEnd={handleDragEnd}
+											onDragEnter={(e) => handleDragEnter(e, index)}
+											onDragLeave={handleDragLeave}
+											onDrop={(e) => handleDrop(e, index, value, onChange)}
+											className={`group flex items-center gap-2 px-3 py-2 bg-background border-2 border-border rounded-lg cursor-move hover:border-primary transition-all ${
+												draggedIndex === index ? 'opacity-50 scale-95' : ''
+											}`}
+										>
+											<GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+											<span className="flex-1 text-sm font-medium text-foreground">
+												{ingredient}
+											</span>
+											<button
+												type="button"
+												onClick={() => handleDelete(ingredient, value, onChange)}
+												className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
+											>
+												<X className="w-4 h-4" />
+											</button>
+										</div>
+									))}
+								</div>
+							)}
+						</>
+					)}
+				/>
+			</div>
+		)
+	}
+
 	return (
 		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
 			<h3
@@ -161,25 +258,26 @@ export const IngredientsSection = ({
 			</h3>
 
 			<Controller
-				name='ingredients'
+				name="ingredients"
 				control={control}
 				defaultValue={[]}
 				rules={{
 					required: 'At least one ingredient is required',
-					validate: value => value.length > 0 || 'At least one ingredient is required',
+					validate: (value) =>
+						value.length > 0 || 'At least one ingredient is required',
 				}}
 				render={({ field: { value, onChange } }) => (
-					<div className='w-full'>
+					<div className="w-full">
 						<div
 							className={`flex ${isFullScreen ? 'flex-col gap-2' : 'gap-2 items-start'}`}
 						>
-							<div className='flex-1'>
+							<div className="flex-1">
 								<Input
-									label='Add ingredient'
+									label="Add ingredient"
 									value={inputValue}
 									error={errors.ingredients?.message as string}
-									onChange={e => setInputValue(e.target.value)}
-									onKeyDown={e => {
+									onChange={(e) => setInputValue(e.target.value)}
+									onKeyDown={(e) => {
 										if (e.key === 'Enter') {
 											e.preventDefault()
 											handleAdd(value, onChange)
@@ -204,11 +302,15 @@ export const IngredientsSection = ({
 								}}
 							>
 								<AddIcon />
-								{isFullScreen && <span className='ml-2 text-sm'>Add Ingredient</span>}
+								{isFullScreen && (
+									<span className="ml-2 text-sm">Add Ingredient</span>
+								)}
 							</IconButton>
 						</div>
 
-						<div className={`flex flex-wrap gap-2 ${isFullScreen ? 'mt-2' : 'mt-3'}`}>
+						<div
+							className={`flex flex-wrap gap-2 ${isFullScreen ? 'mt-2' : 'mt-3'}`}
+						>
 							{value.map((ingredient, idx) => (
 								<IngredientChip
 									key={`${ingredient}-${idx}`}
@@ -222,7 +324,7 @@ export const IngredientsSection = ({
 									onDragOver={handleDragOver}
 									onDragEnter={handleDragEnter}
 									onDragLeave={handleDragLeave}
-									onDrop={e => handleDrop(e, idx, value, onChange)}
+									onDrop={(e) => handleDrop(e, idx, value, onChange)}
 									onDelete={() => handleDelete(ingredient, value, onChange)}
 								/>
 							))}

@@ -22,7 +22,7 @@ export class PrismaService
       },
       log:
         process.env.NODE_ENV === 'development'
-          ? ['query', 'error', 'warn']
+          ? ['error', 'warn']
           : process.env.NODE_ENV === 'test'
           ? []
           : ['error'],

@@ -2,7 +2,10 @@
 
 import { Input } from '@/components/ui/Input'
 import type { IDishFormValues } from '@/types/dish.interface'
-import { priceValidation, VALID_NUMBER_PATTERN } from '@/validation/dish.validation'
+import {
+	priceValidation,
+	VALID_NUMBER_PATTERN,
+} from '@/validation/dish.validation'
 import { memo, useCallback } from 'react'
 import { Controller, type Control, type UseFormRegister } from 'react-hook-form'
 
@@ -20,16 +23,17 @@ const PriceInputFunction = ({
 	trigger,
 }: PriceInputProps) => {
 	const handlePriceChange = useCallback(
-		(onChange: (value: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
-			let value = e.target.value
+		(onChange: (value: string) => void) =>
+			(e: React.ChangeEvent<HTMLInputElement>) => {
+				let value = e.target.value
 
-			if (value === '') {
-				onChange('')
-				return
-			}
-			value = value.replace(',', '.')
-			if (VALID_NUMBER_PATTERN.test(value)) onChange(value)
-		},
+				if (value === '') {
+					onChange('')
+					return
+				}
+				value = value.replace(',', '.')
+				if (VALID_NUMBER_PATTERN.test(value)) onChange(value)
+			},
 		[],
 	)
 
@@ -39,20 +43,22 @@ const PriceInputFunction = ({
 
 	return (
 		<Controller
-			name='price'
+			name="price"
 			control={control}
 			rules={priceValidation}
 			render={({ field, fieldState }) => {
 				const displayValue =
-					typeof field.value === 'number' ? field.value.toString() : field.value ?? ''
+					typeof field.value === 'number'
+						? field.value.toString()
+						: (field.value ?? '')
 
 				return (
 					<Input
 						{...(mode === 'create' && register
 							? { name: field.name, ref: field.ref }
 							: {})}
-						label='Price ($)'
-						type='text'
+						label="Price ($)"
+						type="text"
 						value={displayValue}
 						error={fieldState.error?.message}
 						onChange={handlePriceChange(field.onChange)}

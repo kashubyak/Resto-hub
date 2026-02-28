@@ -3,9 +3,15 @@
 import { Input } from '@/components/ui/Input'
 import type { IDishFormValues } from '@/types/dish.interface'
 import { dishNameValidation } from '@/validation/dish.validation'
+import { Tag } from 'lucide-react'
 import { useMediaQuery, useTheme } from '@mui/material'
 import { useMemo } from 'react'
-import type { Control, FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form'
+import type {
+	Control,
+	FieldErrors,
+	UseFormRegister,
+	UseFormWatch,
+} from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 
 type BasicInformationSectionProps = {
@@ -35,6 +41,81 @@ export const BasicInformationSection = ({
 
 	const descriptionLength = descriptionValue.length
 
+	if (mode === 'update' && control) {
+		const inputClass =
+			'w-full h-11 px-3 bg-background border-2 border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all'
+		const labelClass = 'text-xs font-medium text-muted-foreground'
+		return (
+			<div className="space-y-4">
+				<div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+					<Tag className="w-4 h-4 text-primary" />
+					Basic Information
+				</div>
+
+				<div className="space-y-1">
+					<label className={labelClass}>Dish Name</label>
+					<Controller
+						name="name"
+						control={control}
+						rules={dishNameValidation}
+						render={({ field }) => (
+							<input
+								{...field}
+								type="text"
+								className={inputClass}
+							/>
+						)}
+					/>
+					{errors.name?.message && (
+						<span className="text-sm text-[var(--destructive)]">
+							{errors.name.message}
+						</span>
+					)}
+				</div>
+
+				<div className="space-y-1">
+					<label className={`${labelClass} flex items-center justify-between`}>
+						<span>Dish Description</span>
+						<span>
+							{descriptionLength} / {maxDescriptionLength}
+						</span>
+					</label>
+					<Controller
+						name="description"
+						control={control}
+						rules={{
+							required: 'Dish description is required',
+							validate: {
+								minLength: (v) =>
+									v.trim().length >= 5 ||
+									'Description must be at least 5 characters',
+								maxLength: (v) =>
+									v.trim().length <= maxDescriptionLength ||
+									`Description can be at most ${maxDescriptionLength} characters`,
+								noOnlySpaces: (v) =>
+									v.trim().length > 0 ||
+									'Description cannot be only spaces',
+							},
+						}}
+						render={({ field }) => (
+							<textarea
+								{...field}
+								rows={4}
+								maxLength={maxDescriptionLength}
+								className="w-full px-3 py-2 bg-background border-2 border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+							/>
+						)}
+					/>
+					{errors.description?.message && (
+						<span className="text-sm text-[var(--destructive)]">
+							{errors.description.message}
+						</span>
+					)}
+				</div>
+			</div>
+		)
+	}
+
 	return (
 		<div className={isFullScreen ? 'mb-4' : 'mb-6'}>
 			<h3
@@ -44,42 +125,47 @@ export const BasicInformationSection = ({
 			>
 				📝 Basic Information
 			</h3>
-			<div className='grid grid-cols-1 gap-4'>
+			<div className="grid grid-cols-1 gap-4">
 				{mode === 'create' && register ? (
 					<Input
 						register={register('name', dishNameValidation)}
-						label='Dish Name'
+						label="Dish Name"
 						error={errors.name?.message}
 					/>
 				) : (
 					control && (
 						<Controller
-							name='name'
+							name="name"
 							control={control}
 							rules={dishNameValidation}
 							render={({ field }) => (
-								<Input {...field} label='Dish Name' error={errors.name?.message} />
+								<Input
+									{...field}
+									label="Dish Name"
+									error={errors.name?.message}
+								/>
 							)}
 						/>
 					)
 				)}
 
-				<div className='relative'>
+				<div className="relative">
 					{mode === 'create' && register ? (
 						<Input
 							register={register('description', {
 								required: 'Dish description is required',
 								validate: {
-									minLength: v =>
-										v.trim().length >= 5 || 'Description must be at least 5 characters',
-									maxLength: v =>
+									minLength: (v) =>
+										v.trim().length >= 5 ||
+										'Description must be at least 5 characters',
+									maxLength: (v) =>
 										v.trim().length <= maxDescriptionLength ||
 										`Description can be at most ${maxDescriptionLength} characters`,
-									noOnlySpaces: v =>
+									noOnlySpaces: (v) =>
 										v.trim().length > 0 || 'Description cannot be only spaces',
 								},
 							})}
-							label='Dish Description'
+							label="Dish Description"
 							error={errors.description?.message}
 							multiline
 							rows={isFullScreen ? 3 : 4}
@@ -87,24 +173,26 @@ export const BasicInformationSection = ({
 					) : (
 						control && (
 							<Controller
-								name='description'
+								name="description"
 								control={control}
 								rules={{
 									required: 'Dish description is required',
 									validate: {
-										minLength: v =>
-											v.trim().length >= 5 || 'Description must be at least 5 characters',
-										maxLength: v =>
+										minLength: (v) =>
+											v.trim().length >= 5 ||
+											'Description must be at least 5 characters',
+										maxLength: (v) =>
 											v.trim().length <= maxDescriptionLength ||
 											`Description can be at most ${maxDescriptionLength} characters`,
-										noOnlySpaces: v =>
-											v.trim().length > 0 || 'Description cannot be only spaces',
+										noOnlySpaces: (v) =>
+											v.trim().length > 0 ||
+											'Description cannot be only spaces',
 									},
 								}}
 								render={({ field }) => (
 									<Input
 										{...field}
-										label='Dish Description'
+										label="Dish Description"
 										error={errors.description?.message}
 										multiline
 										rows={isFullScreen ? 3 : 4}
@@ -114,7 +202,7 @@ export const BasicInformationSection = ({
 						)
 					)}
 
-					<p className='text-xs text-secondary-foreground mt-1 text-right'>
+					<p className="text-xs text-secondary-foreground mt-1 text-right">
 						{descriptionLength} / {maxDescriptionLength}
 					</p>
 				</div>

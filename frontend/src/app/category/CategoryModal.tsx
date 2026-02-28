@@ -1,156 +1,240 @@
-'use client'
+import { ChevronDown, ChevronUp, Loader2, X } from "lucide-react";
+import { memo, useEffect, useState } from "react";
 
-import { Button } from '@/components/ui/Button'
-import { useCategoryModal } from '@/hooks/useCategoryModal'
-import CloseIcon from '@mui/icons-material/Close'
-import {
-	Dialog,
-	DialogActions,
-	DialogContent,
-	DialogTitle,
-	IconButton,
-	TextField,
-	useMediaQuery,
-	useTheme,
-} from '@mui/material'
-import { useCallback, useMemo } from 'react'
+const ALL_EMOJI_OPTIONS = [
+	"🍎", "🍏", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓",
+	"🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝",
+	"🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌶️", "🫑",
+	"🌽", "🥕", "🫒", "🧄", "🧅", "🥔", "🍠", "🫘",
+	"🥐", "🥖", "🫓", "🥨", "🥯", "🥞", "🧇", "🧀",
+	"🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕", "🌭",
+	"🥪", "🌮", "🌯", "🫔", "🥙", "🧆", "🥚", "🍳",
+	"🥘", "🍲", "🫕", "🥣", "🥗", "🍿", "🧈", "🧂",
+	"🍱", "🍘", "🍙", "🍚", "🍛", "🍜", "🍝", "🍠",
+	"🍢", "🍣", "🍤", "🍥", "🥮", "🍡", "🥟", "🥠",
+	"🥡", "🦀", "🦞", "🦐", "🦑", "🦪", "🍦", "🍧",
+	"🍨", "🍩", "🍪", "🎂", "🍰", "🧁", "🥧", "🍫",
+	"🍬", "🍭", "🍮", "🍯", "🍼", "🥛", "☕", "🫖",
+	"🍵", "🍶", "🍾", "🍷", "🍸", "🍹", "🍺", "🍻",
+	"🥂", "🥃", "🫗", "🥤", "🧋", "🧃", "🧉", "🧊",
+	"🍴", "🥄", "🔪", "🫙", "🏺", "🍽️", "🥢", "🥡",
+] as const;
 
-type CategoryModalProps = {
-	open: boolean
-	onClose: () => void
+const INITIAL_DISPLAY_COUNT = 40;
+
+interface CategoryModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onSubmit: (name: string, icon: string) => void;
+	mode: "create" | "edit";
+	initialName?: string;
+	initialEmoji?: string;
+	isLoading?: boolean;
 }
 
-const textFieldSx = {
-	'& .MuiOutlinedInput-root': {
-		backgroundColor: 'var(--input)',
-		color: 'var(--foreground)',
-		borderRadius: '8px',
-		'& fieldset': { borderColor: 'var(--border)' },
-		'&:hover fieldset': { borderColor: 'var(--primary)' },
-		'&.Mui-focused fieldset': { borderColor: 'var(--primary)', borderWidth: '1px' },
-	},
-	'& .MuiInputLabel-root': { color: 'var(--muted-foreground)' },
-	'& .MuiInputLabel-root.Mui-focused': { color: 'var(--primary)' },
-	'& .MuiInputBase-input': { color: 'var(--foreground)' },
-}
+const CategoryModalComponent = ({
+	isOpen,
+	onClose,
+	onSubmit,
+	mode,
+	initialName = "",
+	initialEmoji = "🍴",
+	isLoading = false,
+}: CategoryModalProps) => {
+	const [name, setName] = useState(initialName);
+	const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji);
+	const [error, setError] = useState("");
+	const [showAllEmojis, setShowAllEmojis] = useState(false);
 
-export const CategoryModal = ({ open, onClose }: CategoryModalProps) => {
-	const { onSubmit, register, errors, handleSubmit, isSubmitting } =
-		useCategoryModal(onClose)
+	const displayedEmojis = showAllEmojis
+		? ALL_EMOJI_OPTIONS
+		: ALL_EMOJI_OPTIONS.slice(0, INITIAL_DISPLAY_COUNT);
 
-	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+	useEffect(() => {
+		if (isOpen) {
+			setName(initialName);
+			setSelectedEmoji(initialEmoji || "🍴");
+			setError("");
+			setShowAllEmojis(false);
+		}
+	}, [isOpen, initialName, initialEmoji]);
 
-	const safeClose = useCallback(() => {
-		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
-		onClose()
-	}, [onClose])
+	useEffect(() => {
+		if (isOpen) {
+			document.body.style.overflow = 'hidden'
+		} else {
+			document.body.style.overflow = ''
+		}
+		return () => {
+			document.body.style.overflow = ''
+		}
+	}, [isOpen]);
 
-	const paperSx = useMemo(
-		() => ({
-			width: isMobile ? '100vw' : '500px',
-			maxWidth: '100%',
-			margin: isMobile ? 0 : 32,
-			borderRadius: isMobile ? 0 : '16px',
-			backgroundColor: 'var(--secondary)',
-			color: 'var(--foreground)',
-			display: 'flex',
-			flexDirection: 'column',
-		}),
-		[isMobile],
-	)
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+
+		if (!name.trim()) {
+			setError("Category name is required");
+			return;
+		}
+
+		if (name.trim().length < 2) {
+			setError("Category name must be at least 2 characters");
+			return;
+		}
+
+		onSubmit(name.trim(), selectedEmoji);
+	};
+
+	const handleClose = () => {
+		if (!isLoading) onClose();
+	};
+
+	if (!isOpen) return null;
 
 	return (
-		<Dialog
-			open={open}
-			onClose={safeClose}
-			fullWidth
-			fullScreen={isMobile}
-			maxWidth={false}
-			PaperProps={{ sx: paperSx }}
-			sx={{
-				'& .MuiBackdrop-root': {
-					backdropFilter: 'blur(8px)',
-					backgroundColor: 'rgba(var(--background-rgb), 0.3)',
-				},
-			}}
-		>
-			<DialogTitle
-				sx={{
-					fontSize: isMobile ? '1.25rem' : '1.5rem',
-					fontWeight: 'bold',
-					color: 'var(--stable-light)',
-					borderBottom: '1px solid var(--border)',
-					padding: isMobile ? '1rem' : '1.5rem 2rem',
-					background: 'linear-gradient(135deg, var(--primary) 0%, var(--muted) 90%)',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between',
-				}}
-			>
-				<span>📁 New Category</span>
-				<IconButton onClick={safeClose} sx={{ color: 'var(--stable-light)' }}>
-					<CloseIcon />
-				</IconButton>
-			</DialogTitle>
+		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+			{/* Backdrop */}
+			<div
+				className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in-0 duration-200"
+				onClick={handleClose}
+			/>
 
-			<form onSubmit={handleSubmit(onSubmit)} className='flex flex-col flex-1'>
-				<DialogContent
-					sx={{
-						padding: isMobile ? '1.5rem 1rem' : '2rem',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: 3,
-					}}
-				>
-					<div className='space-y-1'>
-						<TextField
-							fullWidth
-							label='Category Name'
-							error={!!errors.name}
-							helperText={errors.name?.message}
-							variant='outlined'
-							sx={textFieldSx}
-							{...register('name', {
-								required: 'Name is required',
-								minLength: {
-									value: 3,
-									message: 'Name must be at least 3 characters',
-								},
-								maxLength: {
-									value: 50,
-									message: 'Name cannot exceed 50 characters',
-								},
-							})}
-						/>
+			{/* Modal */}
+			<div className="relative w-full max-w-xl bg-card border border-border rounded-2xl shadow-2xl animate-in zoom-in-95 fade-in-0 slide-in-from-bottom-4 duration-300 max-h-[85vh] flex flex-col">
+				{/* Header */}
+				<div className="flex items-center justify-between px-6 py-5 border-b border-border flex-shrink-0">
+					<div className="flex items-center gap-3">
+						<div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">
+							{selectedEmoji}
+						</div>
+						<h2 className="text-xl font-bold text-foreground">
+							{mode === "create" ? "Create New Category" : "Edit Category"}
+						</h2>
 					</div>
-				</DialogContent>
 
-				<DialogActions
-					sx={{
-						padding: isMobile ? '1rem' : '1.5rem 2rem',
-						gap: isMobile ? '0.5rem' : '1rem',
-						borderTop: '1px solid var(--border)',
-						flexDirection: isMobile ? 'column-reverse' : 'row',
-					}}
-				>
-					<Button
-						type='button'
-						text='Cancel'
-						onClick={safeClose}
-						className={`bg-transparent border border-border text-foreground hover:bg-muted ${
-							isMobile ? 'w-full' : ''
-						}`}
-					/>
-					<Button
-						type='submit'
-						text={isSubmitting ? 'Creating...' : 'Create'}
-						className={`${
-							isMobile ? 'w-full' : 'w-auto px-4 py-2'
-						} bg-success text-foreground hover:bg-success`}
-					/>
-				</DialogActions>
-			</form>
-		</Dialog>
-	)
-}
+					<button
+						onClick={handleClose}
+						disabled={isLoading}
+						className="w-9 h-9 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						<X className="w-5 h-5" />
+					</button>
+				</div>
+
+				{/* Content */}
+				<form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+					<div className="p-6 space-y-5">
+						{/* Category Name */}
+						<div className="space-y-2">
+							<label htmlFor="category-name" className="text-sm font-semibold text-foreground">
+								Category Name
+								<span className="text-red-500 ml-1">*</span>
+							</label>
+							<input
+								id="category-name"
+								type="text"
+								value={name}
+								onChange={(e) => {
+									setName(e.target.value);
+									setError("");
+								}}
+								placeholder="e.g., Appetizers, Main Courses, Desserts..."
+								disabled={isLoading}
+								className={`w-full h-11 px-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${error
+										? "border-red-500 focus:ring-red-500/20"
+										: "border-border focus:ring-primary/20 focus:border-primary"
+									}`}
+								autoFocus
+							/>
+							{error && (
+								<p className="text-sm text-red-500 animate-in fade-in-0 slide-in-from-top-1 duration-200">
+									{error}
+								</p>
+							)}
+						</div>
+
+						{/* Emoji Picker */}
+						<div className="space-y-3">
+							<label className="text-sm font-semibold text-foreground">
+								Choose Icon
+							</label>
+							<div className="space-y-3">
+								<div className="grid grid-cols-8 gap-2">
+									{displayedEmojis.map((emoji) => (
+										<button
+											key={emoji}
+											type="button"
+											onClick={() => setSelectedEmoji(emoji)}
+											disabled={isLoading}
+											className={`aspect-square rounded-lg text-2xl flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed ${selectedEmoji === emoji
+													? "bg-primary scale-105 shadow-md"
+													: "bg-accent hover:bg-accent/80 hover:scale-105"
+												}`}
+										>
+											{emoji}
+										</button>
+									))}
+								</div>
+
+								{ALL_EMOJI_OPTIONS.length > INITIAL_DISPLAY_COUNT && (
+									<button
+										type="button"
+										onClick={() => setShowAllEmojis(!showAllEmojis)}
+										disabled={isLoading}
+										className="w-full h-10 bg-accent hover:bg-accent/80 border border-border rounded-lg text-foreground text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+									>
+										{showAllEmojis ? (
+											<>
+												<ChevronUp className="w-4 h-4" />
+												<span>Show Less</span>
+											</>
+										) : (
+											<>
+												<ChevronDown className="w-4 h-4" />
+												<span>
+													Show More ({ALL_EMOJI_OPTIONS.length - INITIAL_DISPLAY_COUNT} more)
+												</span>
+											</>
+										)}
+									</button>
+								)}
+							</div>
+						</div>
+					</div>
+				</form>
+
+				{/* Footer Actions */}
+				<div className="flex-shrink-0 px-6 py-5 border-t border-border">
+					<div className="flex gap-3">
+						<button
+							type="button"
+							onClick={handleClose}
+							disabled={isLoading}
+							className="flex-1 h-11 bg-accent hover:bg-accent/80 text-foreground rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							Cancel
+						</button>
+						<button
+							type="submit"
+							onClick={handleSubmit}
+							disabled={isLoading}
+							className="flex-1 h-11 bg-primary hover:bg-primary-hover text-primary-foreground rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+						>
+							{isLoading ? (
+								<>
+									<Loader2 className="w-4 h-4 animate-spin" />
+									<span>{mode === "create" ? "Creating..." : "Saving..."}</span>
+								</>
+							) : (
+								<span>{mode === "create" ? "Create Category" : "Save Changes"}</span>
+							)}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export const CategoryModal = memo(CategoryModalComponent);

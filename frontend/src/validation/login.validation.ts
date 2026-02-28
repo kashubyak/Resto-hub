@@ -5,9 +5,12 @@ export const emailValidation = {
 			const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 			return emailRegex.test(value) || 'Please enter a valid email address'
 		},
-		minLength: (value: string) => value.length >= 5 || 'Email address is too short',
-		maxLength: (value: string) => value.length <= 254 || 'Email address is too long',
-		noConsecutiveDots: (value: string) => !/\.{2,}/.test(value) || 'Invalid email format',
+		minLength: (value: string) =>
+			value.length >= 5 || 'Email address is too short',
+		maxLength: (value: string) =>
+			value.length <= 254 || 'Email address is too long',
+		noConsecutiveDots: (value: string) =>
+			!/\.{2,}/.test(value) || 'Invalid email format',
 		validLocalPart: (value: string) => {
 			const localPart = value.split('@')[0]
 			return (
@@ -28,9 +31,12 @@ export const emailValidation = {
 				'Invalid email format'
 			)
 		},
-		noSpaces: (value: string) => !/\s/.test(value) || 'Email cannot contain spaces',
-		startsCorrectly: (value: string) => !/^[.\-_]/.test(value) || 'Invalid email format',
-		endsCorrectly: (value: string) => !/[.\-_]@/.test(value) || 'Invalid email format',
+		noSpaces: (value: string) =>
+			!/\s/.test(value) || 'Email cannot contain spaces',
+		startsCorrectly: (value: string) =>
+			!/^[.\-_]/.test(value) || 'Invalid email format',
+		endsCorrectly: (value: string) =>
+			!/[.\-_]@/.test(value) || 'Invalid email format',
 		validCharacters: (value: string) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+$/.test(value) ||
 			'Email contains invalid characters',
@@ -49,9 +55,11 @@ export const passwordValidation = {
 			value.length >= 8 || 'Password must be at least 8 characters long',
 		maxLength: (value: string) => value.length <= 128 || 'Password is too long',
 		hasUppercase: (value: string) =>
-			/[A-Z]/.test(value) || 'Password must contain at least one uppercase letter',
+			/[A-Z]/.test(value) ||
+			'Password must contain at least one uppercase letter',
 		hasLowercase: (value: string) =>
-			/[a-z]/.test(value) || 'Password must contain at least one lowercase letter',
+			/[a-z]/.test(value) ||
+			'Password must contain at least one lowercase letter',
 		hasNumber: (value: string) =>
 			/\d/.test(value) || 'Password must contain at least one number',
 		hasSpecialChar: (value: string) =>
@@ -60,6 +68,7 @@ export const passwordValidation = {
 		validCharacters: (value: string) =>
 			/^[A-Za-z\d@$!%*?&]+$/.test(value) ||
 			'Password can only contain letters, numbers, and special characters (@$!%*?&)',
-		noSpaces: (value: string) => !/\s/.test(value) || 'Password cannot contain spaces',
+		noSpaces: (value: string) =>
+			!/\s/.test(value) || 'Password cannot contain spaces',
 	},
 }

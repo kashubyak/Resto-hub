@@ -10,4 +10,9 @@ export class CreateCategoryDto {
 		message: 'name must be longer than or equal to 3 characters',
 	})
 	name!: string
+
+	@ApiProperty()
+	@IsString()
+	@IsNotEmpty()
+	icon!: string
 }

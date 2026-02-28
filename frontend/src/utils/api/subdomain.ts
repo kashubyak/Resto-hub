@@ -1,34 +1,47 @@
+import { ROUTES } from '@/constants/pages.constant'
 import { useAlertStore } from '@/store/alert.store'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '../errorHandler'
 import { api } from './axiosInstances'
 
+export function getSubdomainFromHost(host: string): string | null {
+	const hostname = (host.split(':')[0] ?? '').trim()
+	if (!hostname) return null
+	if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) return null
+	if (hostname === 'localhost' || hostname.endsWith('.localhost')) return null
+	const parts = hostname.split('.')
+	const subdomain = parts[0]
+	if (!subdomain) return null
+	const reserved = ['www', 'api', 'lvh']
+	if (reserved.includes(subdomain.toLowerCase())) return null
+	return subdomain
+}
+
 export function getSubdomainFromHostname(): string | null {
 	if (typeof window === 'undefined') return null
 
 	const hostname = window.location.hostname
-	if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname))
-		return null
-
+	if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) return null
+	if (hostname === 'localhost' || hostname.endsWith('.localhost')) return null
 
 	const parts = hostname.split('.')
-
-	if (hostname.includes('localhost')) {
-		if (parts.length === 1) return null
-
-		const subdomain = parts[0]
-		if (!subdomain) return null
-		const reserved = ['www', 'api']
-		if (reserved.includes(subdomain.toLowerCase())) return null
-		return subdomain
-	}
-
 	const subdomain = parts[0]
 	if (!subdomain) return null
-	const reserved = ['www', 'api']
+	const reserved = ['www', 'api', 'lvh']
 	if (reserved.includes(subdomain.toLowerCase())) return null
-
 	return subdomain
+}
+
+export function getRootAppUrl(): string {
+	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+	const useHttpAndPort = rootDomain === 'localhost' || rootDomain === 'lvh.me'
+	if (typeof window !== 'undefined') {
+		const port = window.location.port || '3001'
+		return useHttpAndPort
+			? `http://${rootDomain}:${port}`
+			: `https://${rootDomain}`
+	}
+	return useHttpAndPort ? `http://${rootDomain}:3001` : `https://${rootDomain}`
 }
 
 export function setApiSubdomain(subdomain?: string | null): void {
@@ -39,6 +52,12 @@ export function setApiSubdomain(subdomain?: string | null): void {
 
 	if (!actualSubdomain) {
 		api.defaults.baseURL = apiBase
+		return
+	}
+
+	// Same-origin BFF: on client with subdomain, use Next.js /api so cookies work
+	if (typeof window !== 'undefined') {
+		api.defaults.baseURL = window.location.origin + '/api'
 		return
 	}
 
@@ -57,6 +76,18 @@ export function setApiSubdomain(subdomain?: string | null): void {
 }
 
 export function initApiSubdomain(): void {
+	if (typeof window !== 'undefined') {
+		const pathname = window.location.pathname ?? ''
+		if (
+			pathname === ROUTES.PUBLIC.AUTH.REGISTER ||
+			pathname === ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS
+		) {
+			api.defaults.baseURL = getRootAppUrl() + '/api'
+			api.defaults.withCredentials = true
+			return
+		}
+	}
+
 	const subdomainFromHostname = getSubdomainFromHostname()
 	const subdomain = subdomainFromHostname
 
@@ -68,13 +99,14 @@ export const initApiFromCookies = initApiSubdomain
 
 export function getCompanyUrl(subdomain: string): string {
 	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+	const useHttpAndPort = rootDomain === 'localhost' || rootDomain === 'lvh.me'
 	if (typeof window !== 'undefined') {
 		const port = window.location.port || '3001'
-		return rootDomain === 'localhost'
+		return useHttpAndPort
 			? `http://${subdomain}.${rootDomain}:${port}`
 			: `https://${subdomain}.${rootDomain}`
 	}
-	return rootDomain === 'localhost'
+	return useHttpAndPort
 		? `http://${subdomain}.${rootDomain}:3001`
 		: `https://${subdomain}.${rootDomain}`
 }

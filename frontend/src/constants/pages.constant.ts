@@ -1,7 +1,15 @@
-import CategoryIcon from '@mui/icons-material/Category'
-import DashboardIcon from '@mui/icons-material/Dashboard'
-import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu'
+import BusinessIcon from '@mui/icons-material/Business'
+import {
+	Folder,
+	LayoutDashboard,
+	LayoutGrid,
+	UtensilsCrossed,
+} from 'lucide-react'
 import type { ComponentType } from 'react'
+
+export const SIDEBAR_SUBTITLE = 'Admin Panel'
+
+export const DEFAULT_COMPANY_ICON = BusinessIcon
 
 export enum UserRole {
 	ADMIN = 'ADMIN',
@@ -22,6 +30,7 @@ export const ROUTES = {
 			ROOT: '/auth',
 			LOGIN: '/auth/login',
 			REGISTER: '/auth/register',
+			REGISTER_SUCCESS: '/auth/register-success',
 		} as const,
 		STATIC: {
 			ROOT: '/_next',
@@ -43,9 +52,14 @@ export const ROUTES = {
 		},
 		ADMIN: {
 			DISH: '/dish',
+			DISH_CREATE: '/dish/create',
 			DISH_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.DISH}/${id}`,
 			CATEGORY: '/category',
-			CATEGORY_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.CATEGORY}/${id}`,
+			CATEGORY_ID: (id: number | string) =>
+				`${ROUTES.PRIVATE.ADMIN.CATEGORY}/${id}`,
+			TABLE: '/table',
+			TABLE_ID: (id: number | string) =>
+				`${ROUTES.PRIVATE.ADMIN.TABLE}/${id}`,
 		},
 		COOK: {},
 		WAITER: {},
@@ -55,6 +69,7 @@ export const ROUTES = {
 export const PUBLIC_ROUTES_LIST: string[] = [
 	ROUTES.PUBLIC.AUTH.LOGIN,
 	ROUTES.PUBLIC.AUTH.REGISTER,
+	ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS,
 	ROUTES.PUBLIC.STATIC.ROOT,
 	ROUTES.PUBLIC.API_PUBLIC,
 	ROUTES.PUBLIC.STATIC.FAVICON,
@@ -75,7 +90,9 @@ export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
 	[UserRole.ADMIN]: [
 		...SHARED_ROUTES,
 		ROUTES.PRIVATE.ADMIN.DISH,
+		ROUTES.PRIVATE.ADMIN.DISH_CREATE,
 		ROUTES.PRIVATE.ADMIN.CATEGORY,
+		ROUTES.PRIVATE.ADMIN.TABLE,
 	],
 	[UserRole.COOK]: [...SHARED_ROUTES],
 	[UserRole.WAITER]: [...SHARED_ROUTES],
@@ -93,19 +110,25 @@ export const ALL_ROUTES: IRouteConfig[] = [
 	{
 		path: ROUTES.PRIVATE.SHARED.DASHBOARD,
 		name: 'Dashboard',
-		icon: DashboardIcon,
+		icon: LayoutDashboard,
 		roles: ADMIN_COOK_WAITER_ROLES,
 	},
 	{
 		path: ROUTES.PRIVATE.ADMIN.DISH,
 		name: 'Dishes',
-		icon: RestaurantMenuIcon,
+		icon: UtensilsCrossed,
 		roles: ADMIN_ROLES,
 	},
 	{
 		path: ROUTES.PRIVATE.ADMIN.CATEGORY,
 		name: 'Categories',
-		icon: CategoryIcon,
+		icon: Folder,
+		roles: ADMIN_ROLES,
+	},
+	{
+		path: ROUTES.PRIVATE.ADMIN.TABLE,
+		name: 'Tables',
+		icon: LayoutGrid,
 		roles: ADMIN_ROLES,
 	},
 ]

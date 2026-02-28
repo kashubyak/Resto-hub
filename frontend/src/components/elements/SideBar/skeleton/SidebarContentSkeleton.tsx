@@ -10,15 +10,15 @@ interface SidebarContentSkeletonProps {
 }
 
 const MobileHeaderSkeleton = memo(() => (
-	<div className='flex items-center justify-between border-b border-border p-2'>
+	<div className="flex items-center justify-between border-b border-border p-2">
 		<Skeleton
-			variant='rounded'
+			variant="rounded"
 			width={40}
 			height={40}
 			sx={{ bgcolor: 'var(--active-item)', borderRadius: '6px' }}
 		/>
 		<Skeleton
-			variant='rounded'
+			variant="rounded"
 			width={40}
 			height={40}
 			sx={{ bgcolor: 'var(--active-item)', borderRadius: '8px' }}
@@ -30,7 +30,7 @@ MobileHeaderSkeleton.displayName = 'MobileHeaderSkeleton'
 export const SidebarContentSkeleton = memo(
 	({ mode, collapsed }: SidebarContentSkeletonProps) => {
 		return (
-			<div className='flex flex-col h-full justify-between'>
+			<div className="flex flex-col h-full justify-between">
 				<div>
 					{mode === 'desktop' ? (
 						<SidebarHeaderSkeleton collapsed={collapsed} />

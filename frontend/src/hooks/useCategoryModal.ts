@@ -5,13 +5,16 @@ import { createCategory } from '@/services/category/create-category.service'
 import type { ICategoryFormValues } from '@/types/category.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
+import { useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useCategories } from './useCategories'
+import { IS_NEW_USER_QUERY_KEY } from './useIsNewUser'
 
 export const useCategoryModal = (onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
 	const { refetchCategories } = useCategories()
+	const queryClient = useQueryClient()
 
 	const {
 		register,
@@ -22,6 +25,7 @@ export const useCategoryModal = (onClose: () => void) => {
 		mode: 'onChange',
 		defaultValues: {
 			name: '',
+			icon: '🍴',
 		},
 	})
 
@@ -30,10 +34,13 @@ export const useCategoryModal = (onClose: () => void) => {
 			try {
 				const response = await createCategory({
 					name: data.name.trim(),
+					icon: data.icon,
 				})
 				if (response.status === 201) {
 					showSuccess('Category created successfully')
 					refetchCategories()
+					// Invalidate newUser queries so user is no longer considered new
+					queryClient.invalidateQueries({ queryKey: IS_NEW_USER_QUERY_KEY })
 					reset()
 					onClose()
 				}
@@ -41,7 +48,7 @@ export const useCategoryModal = (onClose: () => void) => {
 				showError(parseBackendError(err as IAxiosError).join('\n'))
 			}
 		},
-		[showSuccess, showError, refetchCategories, reset, onClose],
+		[showSuccess, showError, refetchCategories, queryClient, reset, onClose],
 	)
 
 	return {

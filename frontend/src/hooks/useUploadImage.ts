@@ -11,7 +11,10 @@ type UseUploadImageParams = {
 	onDataChange?: (preview: string | null, file: File | null) => void
 }
 
-const createFileFromBase64 = (base64: string, fileName: string = 'image.jpg'): File => {
+const createFileFromBase64 = (
+	base64: string,
+	fileName: string = 'image.jpg',
+): File => {
 	const arr = base64.split(',')
 	const match = arr[0]?.match(/:(.*?);/)
 	const mime = match?.[1] ?? 'image/jpeg'
@@ -180,7 +183,16 @@ export const useUploadImage = ({
 		input.addEventListener('change', handleChange)
 
 		return () => input.removeEventListener('change', handleChange)
-	}, [handleFile])
+	}, [handleFile, preview])
+
+	const clearPreview = useCallback(() => {
+		setPreview(null)
+		onDataChange?.(null, null)
+		if (inputRef.current) {
+			inputRef.current.value = ''
+			inputRef.current.files = null
+		}
+	}, [onDataChange])
 
 	return {
 		preview,
@@ -188,6 +200,7 @@ export const useUploadImage = ({
 		inputRef,
 		handleDrop,
 		preventDefaults,
+		clearPreview,
 		ref,
 		...restRegister,
 	}

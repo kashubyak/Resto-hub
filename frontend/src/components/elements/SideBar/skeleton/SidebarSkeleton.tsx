@@ -5,9 +5,9 @@ import { SidebarContentSkeleton } from './SidebarContentSkeleton'
 
 const MobileOverlay = memo(({ onClose }: { onClose: () => void }) => (
 	<div
-		className='absolute inset-0 bg-background opacity-50'
+		className="absolute inset-0 bg-background opacity-50"
 		onClick={onClose}
-		aria-hidden='true'
+		aria-hidden="true"
 	/>
 ))
 MobileOverlay.displayName = 'MobileOverlay'
@@ -19,7 +19,7 @@ const DesktopSidebarSkeleton = memo(({ collapsed }: { collapsed: boolean }) => (
 			collapsed ? 'w-16 bg-background' : 'w-56 bg-secondary',
 		)}
 	>
-		<SidebarContentSkeleton mode='desktop' collapsed={collapsed} />
+		<SidebarContentSkeleton mode="desktop" collapsed={collapsed} />
 	</aside>
 ))
 DesktopSidebarSkeleton.displayName = 'DesktopSidebarSkeleton'
@@ -32,17 +32,20 @@ const MobileSidebarSkeleton = memo(
 				isOpen ? 'translate-x-0' : '-translate-x-full',
 			)}
 		>
-			<SidebarContentSkeleton mode='mobile' collapsed={collapsed && !isOpen} />
+			<SidebarContentSkeleton mode="mobile" collapsed={collapsed && !isOpen} />
 		</aside>
 	),
 )
 MobileSidebarSkeleton.displayName = 'MobileSidebarSkeleton'
 
 export const SidebarSkeleton = memo(() => {
-	const mobileOpen = useSidebarStore(state => state.mobileOpen)
-	const collapsed = useSidebarStore(state => state.collapsed)
-	const setMobileOpen = useSidebarStore(state => state.setMobileOpen)
-	const handleMobileClose = useCallback(() => setMobileOpen(false), [setMobileOpen])
+	const mobileOpen = useSidebarStore((state) => state.mobileOpen)
+	const collapsed = useSidebarStore((state) => state.collapsed)
+	const setMobileOpen = useSidebarStore((state) => state.setMobileOpen)
+	const handleMobileClose = useCallback(
+		() => setMobileOpen(false),
+		[setMobileOpen],
+	)
 
 	return (
 		<>

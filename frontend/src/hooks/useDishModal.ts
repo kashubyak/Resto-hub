@@ -3,13 +3,16 @@ import { createDish } from '@/services/dish/create-dish.service'
 import type { IDishFormValues } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
+import { useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDishes } from './useDishes'
+import { IS_NEW_USER_QUERY_KEY } from './useIsNewUser'
 
 export const useDishModal = (onClose: () => void) => {
 	const { showError, showSuccess } = useAlert()
 	const { refetchDishes } = useDishes()
+	const queryClient = useQueryClient()
 
 	const {
 		register,
@@ -39,13 +42,17 @@ export const useDishModal = (onClose: () => void) => {
 
 				if (data.categoryId != null)
 					formData.append('categoryId', data.categoryId.toString())
-				data.ingredients.forEach(ingredient =>
+				data.ingredients.forEach((ingredient) =>
 					formData.append('ingredients', ingredient.trim()),
 				)
 
-				if (data.weightGr != null) formData.append('weightGr', data.weightGr.toString())
-				if (data.calories != null) formData.append('calories', data.calories.toString())
-				formData.append('imageUrl', data.imageUrl[0])
+				if (data.weightGr != null)
+					formData.append('weightGr', data.weightGr.toString())
+				if (data.calories != null)
+					formData.append('calories', data.calories.toString())
+				if (data.imageUrl?.[0]) {
+					formData.append('imageUrl', data.imageUrl[0])
+				}
 				formData.append('available', data.available.toString())
 
 				const response = await createDish(formData, { _hideGlobalError: true })
@@ -53,6 +60,7 @@ export const useDishModal = (onClose: () => void) => {
 				if (response.status === 201) {
 					showSuccess('Dish created successfully')
 					refetchDishes()
+					queryClient.invalidateQueries({ queryKey: IS_NEW_USER_QUERY_KEY })
 					reset()
 					onClose()
 				}
@@ -60,7 +68,7 @@ export const useDishModal = (onClose: () => void) => {
 				showError(parseBackendError(err as IAxiosError).join('\n'))
 			}
 		},
-		[showSuccess, showError, refetchDishes, reset, onClose],
+		[showSuccess, showError, refetchDishes, queryClient, reset, onClose],
 	)
 
 	return {

@@ -13,7 +13,7 @@ export const createCategory = async (
 ): Promise<ApiResponse<ICreateCategoryResponse>> => {
 	const response = await api.post<ICreateCategoryResponse>(
 		API_URL.CATEGORY.CREATE,
-		data,
+		{ name: data.name, icon: data.icon },
 		config,
 	)
 	return response

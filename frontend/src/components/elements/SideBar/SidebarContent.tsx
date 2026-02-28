@@ -15,9 +15,9 @@ interface ISidebarContentProps {
 }
 
 const MobileHeader = memo(({ onClose }: { onClose: () => void }) => (
-	<div className='flex items-center justify-between border-b border-border p-2'>
-		<div className='w-10 h-10 flex items-center justify-center'>
-			<ViewableImage src='/Resto-Hub.png' alt='Logo' width={40} height={40} />
+	<div className="flex items-center justify-between border-b border-border p-2">
+		<div className="w-10 h-10 flex items-center justify-center">
+			<ViewableImage src="/Resto-Hub.png" alt="Logo" width={40} height={40} />
 		</div>
 		<button
 			onClick={onClose}
@@ -25,7 +25,7 @@ const MobileHeader = memo(({ onClose }: { onClose: () => void }) => (
 				'p-2 rounded-lg hover:bg-secondary',
 				'transition-colors duration-200',
 			)}
-			aria-label='Close menu'
+			aria-label="Close menu"
 		>
 			<CloseIcon />
 		</button>
@@ -33,24 +33,29 @@ const MobileHeader = memo(({ onClose }: { onClose: () => void }) => (
 ))
 MobileHeader.displayName = 'MobileHeader'
 
-export const SidebarContent = memo(({ mode, collapsed }: ISidebarContentProps) => {
-	const setMobileOpen = useSidebarStore(state => state.setMobileOpen)
-	const handleMobileClose = useCallback(() => setMobileOpen(false), [setMobileOpen])
+export const SidebarContent = memo(
+	({ mode, collapsed }: ISidebarContentProps) => {
+		const setMobileOpen = useSidebarStore((state) => state.setMobileOpen)
+		const handleMobileClose = useCallback(
+			() => setMobileOpen(false),
+			[setMobileOpen],
+		)
 
-	return (
-		<div className='flex flex-col h-full justify-between'>
-			<div>
-				{mode === 'desktop' ? (
-					<SidebarHeader />
-				) : (
-					<MobileHeader onClose={handleMobileClose} />
-				)}
+		return (
+			<div className="flex flex-col h-full justify-between">
+				<div>
+					{mode === 'desktop' ? (
+						<SidebarHeader />
+					) : (
+						<MobileHeader onClose={handleMobileClose} />
+					)}
 
-				<SidebarNav collapsed={collapsed} />
+					<SidebarNav collapsed={collapsed} />
+				</div>
+				<SideBarUser collapsed={collapsed} />
 			</div>
-			<SideBarUser collapsed={collapsed} />
-		</div>
-	)
-})
+		)
+	},
+)
 
 SidebarContent.displayName = 'SidebarContent'

@@ -15,21 +15,77 @@ import { Controller, type Control } from 'react-hook-form'
 
 type AvailabilityRadioProps = {
 	control: Control<IDishFormValues>
+	variant?: 'default' | 'cards'
 }
 
-const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
+const AvailabilityRadioFunction = ({
+	control,
+	variant = 'default',
+}: AvailabilityRadioProps) => {
 	const theme = useTheme()
 	const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
 	return (
 		<Controller
-			name='available'
+			name="available"
 			control={control}
 			defaultValue={true}
-			render={({ field: { value, onChange } }) => (
-				<FormControl component='fieldset'>
+			render={({ field: { value, onChange } }) =>
+				variant === 'cards' ? (
+					<div className="grid grid-cols-2 gap-3">
+						<label className="relative cursor-pointer">
+							<input
+								type="radio"
+								checked={value === true}
+								onChange={() => onChange(true)}
+								className="sr-only peer"
+							/>
+							<div className="h-11 flex items-center justify-center gap-2 px-3 rounded-lg border-2 border-border bg-background peer-checked:border-green-500 peer-checked:bg-green-500/5 transition-all">
+								<div
+									className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+										value === true
+											? 'border-green-500 bg-green-500'
+											: 'border-border'
+									}`}
+								>
+									{value === true && (
+										<div className="w-2 h-2 rounded-full bg-white" />
+									)}
+								</div>
+								<span className="text-sm font-medium text-foreground">
+									Available
+								</span>
+							</div>
+						</label>
+						<label className="relative cursor-pointer">
+							<input
+								type="radio"
+								checked={value === false}
+								onChange={() => onChange(false)}
+								className="sr-only peer"
+							/>
+							<div className="h-11 flex items-center justify-center gap-2 px-3 rounded-lg border-2 border-border bg-background peer-checked:border-red-500 peer-checked:bg-red-500/5 transition-all">
+								<div
+									className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+										value === false
+											? 'border-red-500 bg-red-500'
+											: 'border-border'
+									}`}
+								>
+									{value === false && (
+										<div className="w-2 h-2 rounded-full bg-white" />
+									)}
+								</div>
+								<span className="text-sm font-medium text-foreground">
+									Unavailable
+								</span>
+							</div>
+						</label>
+					</div>
+				) : (
+					<FormControl component="fieldset">
 					<FormLabel
-						component='legend'
+						component="legend"
 						sx={{
 							color: 'var(--foreground)',
 							fontSize: '1rem',
@@ -45,7 +101,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 					</FormLabel>
 					<RadioGroup
 						value={String(value)}
-						onChange={e => onChange(e.target.value === 'true')}
+						onChange={(e) => onChange(e.target.value === 'true')}
 						row={!isFullScreen}
 						sx={{
 							gap: isFullScreen ? '0.5rem' : '1rem',
@@ -53,7 +109,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 						}}
 					>
 						<FormControlLabel
-							value='true'
+							value="true"
 							control={
 								<Radio
 									sx={{
@@ -68,7 +124,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 									}}
 								/>
 							}
-							label='Available'
+							label="Available"
 							sx={{
 								'& .MuiFormControlLabel-label': {
 									color: 'var(--foreground)',
@@ -79,7 +135,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 							}}
 						/>
 						<FormControlLabel
-							value='false'
+							value="false"
 							control={
 								<Radio
 									sx={{
@@ -94,7 +150,7 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 									}}
 								/>
 							}
-							label='Not Available'
+							label="Not Available"
 							sx={{
 								'& .MuiFormControlLabel-label': {
 									color: 'var(--foreground)',
@@ -106,7 +162,8 @@ const AvailabilityRadioFunction = ({ control }: AvailabilityRadioProps) => {
 						/>
 					</RadioGroup>
 				</FormControl>
-			)}
+				)
+			}
 		/>
 	)
 }

@@ -18,7 +18,9 @@ const FETCH_OPTIONS_BASE = {
 	credentials: 'include' as RequestCredentials,
 }
 
-export async function refreshAccessToken(request: NextRequest): Promise<IRefreshResult> {
+export async function refreshAccessToken(
+	request: NextRequest,
+): Promise<IRefreshResult> {
 	try {
 		const cookie = request.headers.get('cookie')
 
@@ -30,9 +32,13 @@ export async function refreshAccessToken(request: NextRequest): Promise<IRefresh
 			},
 		})
 
-		if (!response.ok) return { success: false, error: `HTTP ${response.status}` }
+		if (!response.ok)
+			return { success: false, error: `HTTP ${response.status}` }
 
-		const data = (await response.json()) as { success: boolean; user?: { id: number; role: string } }
+		const data = (await response.json()) as {
+			success: boolean
+			user?: { id: number; role: string }
+		}
 
 		if (!data.success) return { success: false, error: 'Refresh failed' }
 

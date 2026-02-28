@@ -1,8 +1,11 @@
 'use client'
 
 import { AlertDisplay } from '@/components/container/AlertContainer'
+import { ApiSubdomainInitializer } from '@/components/init/ApiSubdomainInitializer'
+import { AUTH } from '@/constants/auth.constant'
 import { AlertProvider, useAlert } from '@/providers/AlertContext'
 import { AuthProvider } from '@/providers/AuthContext'
+import { ThemeProvider } from '@/providers/ThemeContext'
 import { useAlertStore } from '@/store/alert.store'
 import { setGlobalAlertFunction } from '@/utils/api'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -21,13 +24,19 @@ const AlertInitializer = () => {
 
 	useEffect(() => {
 		const pending = useAlertStore.getState().consumePendingAlert()
-		if (pending)
+		if (pending) {
+			if (
+				pending.text === AUTH.SESSION_EXPIRED_MESSAGE &&
+				typeof window !== 'undefined'
+			)
+				sessionStorage.setItem(AUTH.SESSION_EXPIRED_SHOWN_KEY, '1')
 			showAlert({
 				severity: pending.severity,
 				text: pending.text,
 				duration: pending.duration,
 				retryAfter: pending.retryAfter,
 			})
+		}
 	}, [showAlert])
 
 	return null
@@ -35,17 +44,33 @@ const AlertInitializer = () => {
 
 export function Providers({ children }: { children: React.ReactNode }) {
 	const queryClientRef = useRef<QueryClient>(null)
-	if (!queryClientRef.current) queryClientRef.current = new QueryClient()
+	if (!queryClientRef.current) {
+		queryClientRef.current = new QueryClient({
+			defaultOptions: {
+				queries: {
+					staleTime: 60_000,
+					gcTime: 10 * 60_000,
+					refetchOnWindowFocus: false,
+					refetchOnMount: true,
+					refetchOnReconnect: true,
+					retry: 1,
+				},
+			},
+		})
+	}
 
 	return (
 		<QueryClientProvider client={queryClientRef.current}>
-			<AlertProvider>
-				<AuthProvider>
-					<AlertInitializer />
-					{children}
-					<AlertDisplay />
-				</AuthProvider>
-			</AlertProvider>
+			<ThemeProvider>
+				<AlertProvider>
+					<AuthProvider>
+						<ApiSubdomainInitializer />
+						<AlertInitializer />
+						{children}
+						<AlertDisplay />
+					</AuthProvider>
+				</AlertProvider>
+			</ThemeProvider>
 		</QueryClientProvider>
 	)
 }

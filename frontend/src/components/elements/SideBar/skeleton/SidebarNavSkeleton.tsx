@@ -7,15 +7,15 @@ interface SidebarNavSkeletonProps {
 }
 
 const NavItemSkeleton = memo(({ collapsed }: { collapsed: boolean }) => (
-	<div className='flex items-center rounded-lg px-3 py-2'>
+	<div className="flex items-center rounded-lg px-3 py-2">
 		<Skeleton
-			variant='rounded'
+			variant="rounded"
 			width={24}
 			height={24}
 			sx={{ bgcolor: 'var(--active-item)', borderRadius: '4px' }}
 		/>
 		<Skeleton
-			variant='text'
+			variant="text"
 			width={120}
 			height={20}
 			sx={{
@@ -33,7 +33,7 @@ NavItemSkeleton.displayName = 'NavItemSkeleton'
 export const SidebarNavSkeleton = memo(
 	({ collapsed, itemsCount = 6 }: SidebarNavSkeletonProps) => {
 		return (
-			<nav className='flex-1 p-2 space-y-1'>
+			<nav className="flex-1 p-2 space-y-1">
 				{[...Array(itemsCount)].map((_, i) => (
 					<NavItemSkeleton key={i} collapsed={collapsed} />
 				))}

@@ -2,49 +2,46 @@ import { Skeleton } from '@mui/material'
 
 export const DishTopInfoSkeleton = () => {
 	return (
-		<div className='space-y-3'>
-			<Skeleton variant='text' width='80%' height={48} sx={{ bgcolor: 'var(--muted)' }} />
-			<Skeleton
-				variant='text'
-				width='50%'
-				height={48}
-				sx={{ bgcolor: 'var(--muted)', display: { xs: 'none', lg: 'block' } }}
-			/>
-
-			<Skeleton variant='text' width={120} height={48} sx={{ bgcolor: 'var(--muted)' }} />
-
-			<div className='flex items-center gap-3 flex-wrap'>
+		<div className="space-y-4">
+			<div className="space-y-2">
+				<div className="flex items-start justify-between gap-3">
+					<Skeleton
+						variant="text"
+						width="70%"
+						height={32}
+						sx={{ bgcolor: 'var(--muted)' }}
+					/>
+					<Skeleton
+						variant="rounded"
+						width={100}
+						height={28}
+						sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
+					/>
+				</div>
 				<Skeleton
-					variant='rounded'
-					width={90}
-					height={26}
-					sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
-				/>
-				<Skeleton
-					variant='rounded'
+					variant="text"
 					width={80}
-					height={26}
-					sx={{ bgcolor: 'var(--muted)', borderRadius: '9999px' }}
+					height={36}
+					sx={{ bgcolor: 'var(--muted)' }}
 				/>
 			</div>
-
-			<div className='space-y-2 pt-1'>
+			<div className="space-y-2 pt-2 border-t border-border">
 				<Skeleton
-					variant='text'
-					width='100%'
-					height={24}
+					variant="text"
+					width="100%"
+					height={16}
 					sx={{ bgcolor: 'var(--muted)' }}
 				/>
 				<Skeleton
-					variant='text'
-					width='95%'
-					height={24}
+					variant="text"
+					width="95%"
+					height={16}
 					sx={{ bgcolor: 'var(--muted)' }}
 				/>
 				<Skeleton
-					variant='text'
-					width='85%'
-					height={24}
+					variant="text"
+					width="60%"
+					height={16}
 					sx={{ bgcolor: 'var(--muted)' }}
 				/>
 			</div>

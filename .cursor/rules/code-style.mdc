@@ -1,0 +1,24 @@
+---
+description: Code style — no console.*, single-line if without braces
+alwaysApply: true
+---
+
+# Code style
+
+## No console in code
+
+Do **not** write `console.log`, `console.error`, `console.warn`, `console.info`, `console.debug` or any other `console.*` in source code.
+
+Remove or replace with proper logging/error handling if needed.
+
+## Single-line if without braces
+
+When an `if` (or `else if`) has only one statement and fits on one line, write it **without** curly braces.
+
+- **Good:** `if (x) return`
+- **Good:** `if (!ok) throw new Error('fail')`
+- **Good:** `if (condition) doSomething()`
+- **Bad:** `if (x) { return }`
+- **Bad:** `if (!ok) { throw new Error('fail') }`
+
+Use braces when the body has multiple statements or spans more than one line.

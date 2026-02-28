@@ -7,23 +7,23 @@ interface SideBarUserSkeletonProps {
 
 const ExpandedUserSkeleton = memo(() => (
 	<>
-		<div className='flex items-center gap-2 overflow-hidden flex-1'>
+		<div className="flex items-center gap-2 overflow-hidden flex-1">
 			<Skeleton
-				variant='rounded'
+				variant="rounded"
 				width={40}
 				height={40}
 				sx={{ bgcolor: 'var(--active-item)', borderRadius: '6px' }}
 			/>
-			<div className='flex flex-col gap-1 min-w-0 flex-1'>
+			<div className="flex flex-col gap-1 min-w-0 flex-1">
 				<Skeleton
-					variant='text'
-					width='80%'
+					variant="text"
+					width="80%"
 					height={16}
 					sx={{ bgcolor: 'var(--active-item)' }}
 				/>
 				<Skeleton
-					variant='text'
-					width='60%'
+					variant="text"
+					width="60%"
 					height={14}
 					sx={{ bgcolor: 'var(--active-item)' }}
 				/>
@@ -31,7 +31,7 @@ const ExpandedUserSkeleton = memo(() => (
 		</div>
 
 		<Skeleton
-			variant='rounded'
+			variant="rounded"
 			width={40}
 			height={40}
 			sx={{ bgcolor: 'var(--active-item)', borderRadius: '8px' }}
@@ -42,7 +42,7 @@ ExpandedUserSkeleton.displayName = 'ExpandedUserSkeleton'
 
 const CollapsedUserSkeleton = memo(() => (
 	<Skeleton
-		variant='rounded'
+		variant="rounded"
 		width={48}
 		height={40}
 		sx={{ bgcolor: 'var(--active-item)', borderRadius: '8px' }}
@@ -50,12 +50,14 @@ const CollapsedUserSkeleton = memo(() => (
 ))
 CollapsedUserSkeleton.displayName = 'CollapsedUserSkeleton'
 
-export const SideBarUserSkeleton = memo(({ collapsed }: SideBarUserSkeletonProps) => {
-	return (
-		<div className='p-2 border-t border-border flex items-center justify-between'>
-			{!collapsed ? <ExpandedUserSkeleton /> : <CollapsedUserSkeleton />}
-		</div>
-	)
-})
+export const SideBarUserSkeleton = memo(
+	({ collapsed }: SideBarUserSkeletonProps) => {
+		return (
+			<div className="p-2 border-t border-border flex items-center justify-between">
+				{!collapsed ? <ExpandedUserSkeleton /> : <CollapsedUserSkeleton />}
+			</div>
+		)
+	},
+)
 
 SideBarUserSkeleton.displayName = 'SideBarUserSkeleton'

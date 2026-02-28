@@ -1,7 +1,10 @@
 import { API_URL } from '@/config/api'
 import type { ApiResponse } from '@/types/api.interface'
 import type { IServerSideRequestConfig } from '@/types/axios.interface'
-import type { IDishListResponse, IGetAllDishesParams } from '@/types/dish.interface'
+import type {
+	IDishListResponse,
+	IGetAllDishesParams,
+} from '@/types/dish.interface'
 import api from '@/utils/api'
 
 export const getAllDishes = async (
@@ -25,9 +28,12 @@ export const getAllDishes = async (
 			minPrice: params?.minPrice,
 			maxPrice: params?.maxPrice,
 			available: params?.available,
+			categoryId: params?.categoryId,
 			sortBy,
 			order,
-		}).filter(([, value]) => value !== undefined && value !== null && value !== ''),
+		}).filter(
+			([, value]) => value !== undefined && value !== null && value !== '',
+		),
 	)
 
 	const response = await api.get<IDishListResponse>(API_URL.DISH.ROOT, {
