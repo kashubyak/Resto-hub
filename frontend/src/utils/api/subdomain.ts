@@ -4,6 +4,8 @@ import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '../errorHandler'
 import { api } from './axiosInstances'
 
+const reserved = ['www', 'api', 'lvh', 'resto-hub']
+
 export function getSubdomainFromHost(host: string): string | null {
 	const hostname = (host.split(':')[0] ?? '').trim()
 	if (!hostname) return null
@@ -16,7 +18,6 @@ export function getSubdomainFromHost(host: string): string | null {
 	if (hostname.endsWith(`.${rootDomain}`)) {
 		const subdomain = hostname.slice(0, -(rootDomain.length + 1))
 		if (!subdomain) return null
-		const reserved = ['www', 'api', 'lvh']
 		if (reserved.includes(subdomain.toLowerCase())) return null
 		return subdomain
 	}
@@ -37,7 +38,6 @@ export function getSubdomainFromHostname(): string | null {
 	if (hostname.endsWith(`.${rootDomain}`)) {
 		const subdomain = hostname.slice(0, -(rootDomain.length + 1))
 		if (!subdomain) return null
-		const reserved = ['www', 'api', 'lvh']
 		if (reserved.includes(subdomain.toLowerCase())) return null
 		return subdomain
 	}
