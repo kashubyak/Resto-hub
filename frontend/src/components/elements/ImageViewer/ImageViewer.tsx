@@ -119,169 +119,171 @@ const ZoomIndicator = memo(({ zoom }: { zoom: number }) => (
 ))
 ZoomIndicator.displayName = 'ZoomIndicator'
 
-export const ImageViewer = memo(({ open, onClose, src, alt }: ImageViewerProps) => {
-	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+export const ImageViewer = memo(
+	({ open, onClose, src, alt }: ImageViewerProps) => {
+		const theme = useTheme()
+		const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-	const {
-		zoom,
-		isFullscreen,
-		position,
-		isDragging,
-		containerRef,
-		imageBoxRef,
-		handleZoomIn,
-		handleZoomOut,
-		handleFullscreen,
-		handleClose,
-		handleBackdropClick,
-		handleMouseDown,
-		handleMouseMove,
-		handleMouseUp,
-		handleTouchStart,
-		handleTouchMove,
-		handleTouchEnd,
-		handleDoubleClick,
-		getCursor,
-	} = useImageViewer({ open, onClose })
+		const {
+			zoom,
+			isFullscreen,
+			position,
+			isDragging,
+			containerRef,
+			imageBoxRef,
+			handleZoomIn,
+			handleZoomOut,
+			handleFullscreen,
+			handleClose,
+			handleBackdropClick,
+			handleMouseDown,
+			handleMouseMove,
+			handleMouseUp,
+			handleTouchStart,
+			handleTouchMove,
+			handleTouchEnd,
+			handleDoubleClick,
+			getCursor,
+		} = useImageViewer({ open, onClose })
 
-	const paperProps = useMemo(
-		() => ({
-			sx: {
-				backgroundColor: 'rgba(0, 0, 0, 0.95)',
-				boxShadow: 'none',
-				position: 'fixed' as const,
-				top: 0,
-				left: 0,
-				right: 0,
-				bottom: 0,
-				zIndex: 9999,
-				margin: 0,
-				borderRadius: 0,
-			},
-		}),
-		[],
-	)
-
-	const backdropProps = useMemo(
-		() => ({
-			backdrop: {
+		const paperProps = useMemo(
+			() => ({
 				sx: {
-					backgroundColor: 'rgba(0, 0, 0, 0.9)',
-					zIndex: 9998,
+					backgroundColor: 'rgba(0, 0, 0, 0.95)',
+					boxShadow: 'none',
+					position: 'fixed' as const,
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					zIndex: 9999,
+					margin: 0,
+					borderRadius: 0,
 				},
-			},
-		}),
-		[],
-	)
+			}),
+			[],
+		)
 
-	const contentStyles = useMemo(
-		() => ({
-			p: 0,
-			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'center',
-			position: 'relative' as const,
-			overflow: 'hidden',
-			backgroundColor: 'rgba(0, 0, 0, 0.9)',
-			width: '100vw',
-			height: '100vh',
-			margin: 0,
-			cursor: getCursor(),
-			userSelect: 'none' as const,
-		}),
-		[getCursor],
-	)
+		const backdropProps = useMemo(
+			() => ({
+				backdrop: {
+					sx: {
+						backgroundColor: 'rgba(0, 0, 0, 0.9)',
+						zIndex: 9998,
+					},
+				},
+			}),
+			[],
+		)
 
-	const imageBoxStyles = useMemo(
-		() => ({
-			position: 'relative' as const,
-			maxWidth: '90vw',
-			maxHeight: '90vh',
-			transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
-				position.y / zoom
-			}px)`,
-			transition: isDragging ? 'none' : 'transform 0.2s ease-in-out',
-			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'center',
-		}),
-		[zoom, position.x, position.y, isDragging],
-	)
+		const contentStyles = useMemo(
+			() => ({
+				p: 0,
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				position: 'relative' as const,
+				overflow: 'hidden',
+				backgroundColor: 'rgba(0, 0, 0, 0.9)',
+				width: '100vw',
+				height: '100vh',
+				margin: 0,
+				cursor: getCursor(),
+				userSelect: 'none' as const,
+			}),
+			[getCursor],
+		)
 
-	const imageStyles = useMemo(
-		() => ({
-			width: 'auto',
-			height: 'auto',
-			maxWidth: '90vw',
-			maxHeight: '90vh',
-			objectFit: 'contain' as const,
-			pointerEvents: 'none' as const,
-		}),
-		[],
-	)
+		const imageBoxStyles = useMemo(
+			() => ({
+				position: 'relative' as const,
+				maxWidth: '90vw',
+				maxHeight: '90vh',
+				transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
+					position.y / zoom
+				}px)`,
+				transition: isDragging ? 'none' : 'transform 0.2s ease-in-out',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+			}),
+			[zoom, position.x, position.y, isDragging],
+		)
 
-	if (!src) return null
+		const imageStyles = useMemo(
+			() => ({
+				width: 'auto',
+				height: 'auto',
+				maxWidth: '90vw',
+				maxHeight: '90vh',
+				objectFit: 'contain' as const,
+				pointerEvents: 'none' as const,
+			}),
+			[],
+		)
 
-	return (
-		<Portal>
-			<Dialog
-				open={open}
-				onClose={handleClose}
-				maxWidth={false}
-				fullWidth
-				fullScreen
-				disablePortal={false}
-				keepMounted={false}
-				PaperProps={paperProps}
-				TransitionComponent={Zoom}
-				transitionDuration={300}
-				slotProps={backdropProps}
-			>
-				<DialogContent
-					ref={containerRef}
-					sx={contentStyles}
-					onClick={handleBackdropClick}
-					onMouseMove={handleMouseMove}
-					onMouseUp={handleMouseUp}
-					onTouchMove={handleTouchMove}
-					onTouchEnd={handleTouchEnd}
+		if (!src) return null
+
+		return (
+			<Portal>
+				<Dialog
+					open={open}
+					onClose={handleClose}
+					maxWidth={false}
+					fullWidth
+					fullScreen
+					disablePortal={false}
+					keepMounted={false}
+					PaperProps={paperProps}
+					TransitionComponent={Zoom}
+					transitionDuration={300}
+					slotProps={backdropProps}
 				>
-					<ControlPanel
-						zoom={zoom}
-						isMobile={isMobile}
-						isFullscreen={isFullscreen}
-						onZoomIn={handleZoomIn}
-						onZoomOut={handleZoomOut}
-						onFullscreen={handleFullscreen}
-						onClose={handleClose}
-					/>
-
-					<Box
-						ref={imageBoxRef}
-						sx={imageBoxStyles}
-						onMouseDown={handleMouseDown}
-						onTouchStart={handleTouchStart}
-						onDoubleClick={handleDoubleClick}
+					<DialogContent
+						ref={containerRef}
+						sx={contentStyles}
+						onClick={handleBackdropClick}
+						onMouseMove={handleMouseMove}
+						onMouseUp={handleMouseUp}
+						onTouchMove={handleTouchMove}
+						onTouchEnd={handleTouchEnd}
 					>
-						<Image
-							src={src}
-							alt={alt}
-							width={0}
-							height={0}
-							sizes='90vw'
-							style={imageStyles}
-							quality={100}
-							priority
-							draggable={false}
+						<ControlPanel
+							zoom={zoom}
+							isMobile={isMobile}
+							isFullscreen={isFullscreen}
+							onZoomIn={handleZoomIn}
+							onZoomOut={handleZoomOut}
+							onFullscreen={handleFullscreen}
+							onClose={handleClose}
 						/>
-					</Box>
 
-					{isMobile && zoom !== 1 && <ZoomIndicator zoom={zoom} />}
-				</DialogContent>
-			</Dialog>
-		</Portal>
-	)
-})
+						<Box
+							ref={imageBoxRef}
+							sx={imageBoxStyles}
+							onMouseDown={handleMouseDown}
+							onTouchStart={handleTouchStart}
+							onDoubleClick={handleDoubleClick}
+						>
+							<Image
+								src={src}
+								alt={alt}
+								width={0}
+								height={0}
+								sizes="90vw"
+								style={imageStyles}
+								quality={100}
+								priority
+								draggable={false}
+							/>
+						</Box>
+
+						{isMobile && zoom !== 1 && <ZoomIndicator zoom={zoom} />}
+					</DialogContent>
+				</Dialog>
+			</Portal>
+		)
+	},
+)
 
 ImageViewer.displayName = 'ImageViewer'

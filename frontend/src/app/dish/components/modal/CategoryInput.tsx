@@ -13,7 +13,7 @@ type CategoryInputProps = {
 const CategoryInputFunction = ({ control }: CategoryInputProps) => {
 	return (
 		<Controller
-			name='categoryId'
+			name="categoryId"
 			control={control}
 			rules={categoryIdValidation}
 			render={({ field, fieldState }) => (

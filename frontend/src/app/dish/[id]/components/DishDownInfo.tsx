@@ -1,4 +1,4 @@
-import { Restaurant } from '@mui/icons-material'
+import { Flame, Scale } from 'lucide-react'
 
 export const DishDownInfo = ({
 	weightGr,
@@ -11,36 +11,39 @@ export const DishDownInfo = ({
 }) => {
 	return (
 		<>
-			<div className='grid grid-cols-2 gap-4'>
-				<div className='text-center'>
-					<div className='text-2xl font-bold text-foreground mb-1'>
-						{weightGr ? `${weightGr}g` : '—'}
+			<div className="grid grid-cols-2 gap-3 pt-2">
+				<div className="bg-background rounded-xl p-3 border-2 border-border">
+					<div className="flex items-center gap-2 mb-1">
+						<Scale className="w-4 h-4 text-primary" />
+						<span className="text-xs text-muted-foreground font-medium">
+							Weight
+						</span>
 					</div>
-					<div className='text-xs text-muted-foreground uppercase tracking-wider'>
-						Weight
-					</div>
+					<p className="text-xl font-bold text-foreground">
+						{weightGr != null ? `${weightGr}g` : '—'}
+					</p>
 				</div>
-				<div className='text-center'>
-					<div className='text-2xl font-bold text-foreground mb-1'>
-						{calories ? `${calories}` : '—'}
+				<div className="bg-background rounded-xl p-3 border-2 border-border">
+					<div className="flex items-center gap-2 mb-1">
+						<Flame className="w-4 h-4 text-primary" />
+						<span className="text-xs text-muted-foreground font-medium">
+							Calories
+						</span>
 					</div>
-					<div className='text-xs text-muted-foreground uppercase tracking-wider'>
-						Calories
-					</div>
+					<p className="text-xl font-bold text-foreground">
+						{calories != null ? `${calories} kcal` : '—'}
+					</p>
 				</div>
 			</div>
 
 			{ingredients && ingredients.length > 0 && (
-				<div className='space-y-3'>
-					<h3 className='text-lg font-semibold text-foreground flex items-center'>
-						<Restaurant className='w-4 h-4 mr-2 text-primary' />
-						Ingredients
-					</h3>
-					<div className='flex flex-wrap gap-2'>
+				<div className="space-y-2 pt-2 border-t border-border">
+					<h3 className="text-sm font-semibold text-foreground">Ingredients</h3>
+					<div className="flex flex-wrap gap-1.5">
 						{ingredients.map((ingredient, index) => (
 							<span
 								key={index}
-								className='px-3 py-1 active-item text-foreground rounded-full text-sm font-medium hover:bg-muted/80 transition-colors'
+								className="px-2.5 py-1 bg-background border border-border rounded-lg text-xs font-medium text-foreground"
 							>
 								{ingredient}
 							</span>

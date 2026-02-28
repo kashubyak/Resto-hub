@@ -1,0 +1,49 @@
+---
+description: SOLID, file structure, reuse, and constants — single source of truth for routes and API
+alwaysApply: true
+---
+
+# Architecture and code style
+
+## SOLID
+
+- **S — Single responsibility:** One module/class/function does one thing. E.g. a hook handles one flow; a component renders one UI concern.
+- **O — Open/closed:** Prefer extending via composition and props over modifying existing files. Add new features in new components/hooks that use existing ones, not by editing core logic everywhere.
+- **L — Liskov substitution:** Subtypes (e.g. components that implement a shared interface) must be usable where the base type is expected without breaking behavior.
+- **I — Interface segregation:** Narrow props/interfaces: don’t force callers to pass unused fields. Split large interfaces into smaller, focused ones when a component needs only a subset.
+- **D — Dependency inversion:** Depend on abstractions (types, interfaces, dependency injection) rather than concrete implementations. E.g. components receive `register` from react-hook-form, not a specific form instance.
+
+## File structure and splitting
+
+- **Do not over-split:** Avoid many tiny files (e.g. one 5-line style file, or one component per 10-line function). Prefer a single file that groups related pieces (e.g. two related components or a component + its types in one file).
+- **Split when:**
+  - A file grows beyond ~250–400 lines and has several distinct responsibilities.
+  - A logical unit is reused in multiple places and deserves its own module.
+  - A domain boundary is clear (e.g. auth vs dashboard vs API layer).
+- **Group by feature/domain:** Keep routes, components, hooks, and utils for one feature close (e.g. `auth/`, `dish/`). Co-locate when it helps readability; avoid a single “components” dump with dozens of unrelated files.
+- **Naming:** Files and folders use PascalCase for components/pages, camelCase for utilities/hooks, kebab-case only if the project already uses it consistently elsewhere.
+
+## Reuse
+
+- **Extract when the same pattern appears at least twice:** Repeated UI (inputs, buttons, cards, form fields) or logic (validation, formatting, API calls) should be moved into a shared component, hook, or util and reused.
+- **Reusable UI:** If two or more screens use the same kind of field (e.g. text input with label, error, icon), use one shared component (e.g. `AuthTextField`, `AuthPasswordField`) in one file rather than copying markup.
+- **No duplicate constants or magic strings:** Repeated strings (routes, API paths, message keys) go into constants (see below). Copy-paste of the same string in multiple places is not allowed.
+- **Shared logic:** Repeated async flows, validation rules, or form logic belong in hooks or shared functions, not duplicated in each page.
+
+## Constants — single source of truth
+
+- **Client routes (frontend):** All route paths come from constants. Use the existing route constants (e.g. `ROUTES.PUBLIC.AUTH.LOGIN`, `ROUTES.PRIVATE.SHARED.DASHBOARD`) from the project’s route constant file. Do not hardcode paths like `'/auth/login'` or `'/'` in components or redirects.
+- **API URLs (frontend):** All backend endpoints are taken from the API config/constants (e.g. `API_URL.AUTH.LOGIN`, `API_URL.AUTH.REGISTER`). No raw URLs or string concatenation for API paths in services or components.
+- **Where to define:**
+  - **Frontend:** Routes and route lists → `constants/pages.constant.ts` (or the project’s equivalent). API base paths and endpoint paths → `config/api.ts` (or the project’s API config). Other app-wide literals (roles, statuses, limits) → `constants/` or a dedicated constant file.
+  - **Backend:** Route paths, error messages, and shared literals in constants or config modules; controllers and services import from there.
+- **Adding a new route or API path:** Add the new path to the corresponding constant/config file first; then use that constant everywhere (links, redirects, `fetch`/axios, middleware).
+- **Format:** Use a single object (e.g. `ROUTES`, `API_URL`) with nested structure and `as const` where appropriate. For dynamic segments use functions (e.g. `ID: (id: number) => \`${BASE}/${id}\``) and keep the base in the same constant object.
+
+## Summary checklist
+
+- [ ] New UI pattern used in 2+ places → extract to shared component (or add to existing shared file).
+- [ ] New route or API path → add to ROUTES / API_URL (or backend constants), then use only that constant.
+- [ ] No `console.*` in source (see code-style rule).
+- [ ] No magic strings for paths or API endpoints.
+- [ ] Files stay focused; avoid both microscopic one-liner modules and giant 500+ line catch-all files.

@@ -7,7 +7,10 @@ import { memo, useCallback, useMemo } from 'react'
 interface RangeFilterProps {
 	config: RangeFilterConfig
 	values: Record<string, string | number | boolean | undefined | null>
-	onChange: (key: string, value: string | number | boolean | undefined | null) => void
+	onChange: (
+		key: string,
+		value: string | number | boolean | undefined | null,
+	) => void
 }
 
 const textFieldSx = {
@@ -43,13 +46,19 @@ const RangeFilterComponent: React.FC<RangeFilterProps> = ({
 
 	const handleMinChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) =>
-			onChange(config.minKey, e.target.value ? Number(e.target.value) : undefined),
+			onChange(
+				config.minKey,
+				e.target.value ? Number(e.target.value) : undefined,
+			),
 		[config.minKey, onChange],
 	)
 
 	const handleMaxChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) =>
-			onChange(config.maxKey, e.target.value ? Number(e.target.value) : undefined),
+			onChange(
+				config.maxKey,
+				e.target.value ? Number(e.target.value) : undefined,
+			),
 		[config.maxKey, onChange],
 	)
 
@@ -62,39 +71,49 @@ const RangeFilterComponent: React.FC<RangeFilterProps> = ({
 		[config.min, config.max, config.step],
 	)
 
-	const minPlaceholder = useMemo(() => `Min ${config.suffix || ''}`, [config.suffix])
-	const maxPlaceholder = useMemo(() => `Max ${config.suffix || ''}`, [config.suffix])
+	const minPlaceholder = useMemo(
+		() => `Min ${config.suffix || ''}`,
+		[config.suffix],
+	)
+	const maxPlaceholder = useMemo(
+		() => `Max ${config.suffix || ''}`,
+		[config.suffix],
+	)
 
 	return (
-		<div className='space-y-2'>
-			<label className='block text-sm font-medium text-foreground'>{config.label}</label>
-			<div className='flex items-center gap-3'>
+		<div className="space-y-2">
+			<label className="block text-sm font-medium text-foreground">
+				{config.label}
+			</label>
+			<div className="flex items-center gap-3">
 				<TextField
 					fullWidth
-					type='number'
+					type="number"
 					value={minValue}
 					onChange={handleMinChange}
 					placeholder={minPlaceholder}
-					size='small'
+					size="small"
 					disabled={config.disabled}
 					inputProps={inputProps}
 					sx={textFieldSx}
 				/>
-				<span className='text-muted-foreground'>—</span>
+				<span className="text-muted-foreground">—</span>
 				<TextField
 					fullWidth
-					type='number'
+					type="number"
 					value={maxValue}
 					onChange={handleMaxChange}
 					placeholder={maxPlaceholder}
-					size='small'
+					size="small"
 					disabled={config.disabled}
 					inputProps={inputProps}
 					sx={textFieldSx}
 				/>
 			</div>
 			{config.prefix && (
-				<p className='text-xs text-muted-foreground'>Values in {config.prefix}</p>
+				<p className="text-xs text-muted-foreground">
+					Values in {config.prefix}
+				</p>
 			)}
 		</div>
 	)

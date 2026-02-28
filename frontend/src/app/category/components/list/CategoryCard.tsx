@@ -1,54 +1,174 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
 import { ROUTES } from '@/constants/pages.constant'
 import type { ICategoryWithDishes } from '@/types/category.interface'
-import Link from 'next/link'
-import { memo } from 'react'
+import { Edit, Folder, MoreVertical, Tag, Trash2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { memo, useCallback, useRef, useState } from 'react'
+
+const GRADIENTS = [
+	'from-green-500/10 to-emerald-500/10',
+	'from-orange-500/10 to-red-500/10',
+	'from-pink-500/10 to-rose-500/10',
+	'from-blue-500/10 to-cyan-500/10',
+	'from-lime-500/10 to-green-500/10',
+	'from-amber-500/10 to-yellow-500/10',
+	'from-purple-500/10 to-pink-500/10',
+	'from-teal-500/10 to-blue-500/10',
+] as const
+
+function getRandomGradient() {
+	return GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)]
+}
+
+function getCategoryEmoji(name: string) {
+	const lower = name.toLowerCase()
+	if (lower.includes('appetizer') || lower.includes('starter')) return '🥗'
+	if (lower.includes('main') || lower.includes('entree')) return '🍽️'
+	if (lower.includes('dessert') || lower.includes('sweet')) return '🍰'
+	if (lower.includes('beverage') || lower.includes('drink')) return '🥤'
+	if (lower.includes('salad')) return '🥙'
+	if (lower.includes('soup')) return '🍲'
+	if (lower.includes('pizza')) return '🍕'
+	if (lower.includes('burger')) return '🍔'
+	if (lower.includes('sushi')) return '🍣'
+	if (lower.includes('pasta')) return '🍝'
+	if (lower.includes('breakfast')) return '🍳'
+	if (lower.includes('seafood') || lower.includes('fish')) return '🐟'
+	return '🍴'
+}
 
 interface CategoryCardProps {
 	category: ICategoryWithDishes
+	refetchCategories?: () => void
+	onEditClick?: (category: ICategoryWithDishes) => void
+	onDeleteClick?: (category: ICategoryWithDishes) => void
 }
 
-const CategoryCardComponent = ({ category }: CategoryCardProps) => {
-	const dishCount = category.dishes?.length || 0
+const CategoryCardComponent = ({
+	category,
+	refetchCategories: _refetchCategories,
+	onEditClick,
+	onDeleteClick,
+}: CategoryCardProps) => {
+	const router = useRouter()
+	const [menuOpen, setMenuOpen] = useState(false)
+	const cardRef = useRef<HTMLDivElement>(null)
+
+	const dishCount = category.dishes?.length ?? 0
+	const gradient = getRandomGradient()
+	const emoji = category.icon || getCategoryEmoji(category.name)
+
+	const handleEdit = useCallback(() => {
+		setMenuOpen(false)
+		if (onEditClick) onEditClick(category)
+	}, [category, onEditClick])
+
+	const handleDelete = useCallback(() => {
+		setMenuOpen(false)
+		if (onDeleteClick) onDeleteClick(category)
+	}, [category, onDeleteClick])
+
+	const handleViewDishes = useCallback(() => {
+		sessionStorage.setItem('dishCategoryFilter', String(category.id))
+		router.push(ROUTES.PRIVATE.ADMIN.DISH)
+	}, [category.id, router])
+
+	const handleBackdropClick = useCallback((e: React.MouseEvent) => {
+		if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+			setMenuOpen(false)
+		}
+	}, [])
 
 	return (
-		<div className='flex flex-col bg-background border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 h-full group'>
-			<div className='flex justify-between items-start mb-4'>
-				<div className='bg-primary/10 text-primary p-2 rounded-lg'>
-					<svg className='w-6 h-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							strokeWidth={1.5}
-							d='M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z'
-						/>
-					</svg>
-				</div>
-				<span className='text-[10px] text-muted-foreground bg-muted px-2 py-1 rounded uppercase tracking-wider font-medium'>
-					ID: {category.id}
+		<div ref={cardRef} className="group bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300">
+			<div
+				className={`relative h-32 bg-gradient-to-br ${gradient} flex items-center justify-center border-b-2 border-border`}
+			>
+				<span className="text-6xl group-hover:scale-110 transition-transform duration-300">
+					{emoji}
 				</span>
+
+				<div className="absolute top-3 right-3">
+					<div className="relative">
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation()
+								setMenuOpen((o) => !o)
+							}}
+							className="w-8 h-8 rounded-lg bg-card/90 backdrop-blur-sm hover:bg-card border border-border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+							aria-label="Category actions"
+						>
+							<MoreVertical className="w-4 h-4 text-muted-foreground" />
+						</button>
+
+						{menuOpen && (
+							<>
+								<div
+									className="fixed inset-0 z-40"
+									onClick={handleBackdropClick}
+									aria-hidden
+								/>
+								<div
+									className="absolute top-full right-0 mt-2 w-48 bg-popover border border-border rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200"
+									onClick={(e) => e.stopPropagation()}
+								>
+									<div className="py-1">
+										<button
+											type="button"
+											onClick={handleEdit}
+											className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left"
+										>
+											<Edit className="w-4 h-4 text-muted-foreground" />
+											<span className="text-sm text-foreground">Edit Category</span>
+										</button>
+										<button
+											type="button"
+											onClick={handleDelete}
+											className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
+										>
+											<Trash2 className="w-4 h-4" />
+											<span className="text-sm font-medium">Delete Category</span>
+										</button>
+									</div>
+								</div>
+							</>
+						)}
+					</div>
+				</div>
 			</div>
 
-			<h3
-				className='font-bold text-xl mb-2 text-foreground truncate'
-				title={category.name}
-			>
-				{category.name}
-			</h3>
+			<div className="p-4 space-y-3">
+				<div>
+					<h3 className="text-lg font-semibold text-foreground truncate">
+						{category.name}
+					</h3>
+					<p className="text-sm text-muted-foreground">
+						Created{' '}
+						{new Date(category.createdAt).toLocaleDateString('en-US', {
+							month: 'short',
+							day: 'numeric',
+							year: 'numeric',
+						})}
+					</p>
+				</div>
 
-			<p className='text-sm text-muted-foreground mb-6'>
-				{dishCount} {dishCount === 1 ? 'dish' : 'dishes'}
-			</p>
+				<div className="flex items-center gap-2 py-2 px-3 bg-background rounded-lg border border-border">
+					<Tag className="w-4 h-4 text-primary" />
+					<span className="text-sm font-medium text-foreground">
+						{dishCount} {dishCount === 1 ? 'dish' : 'dishes'}
+					</span>
+				</div>
 
-			<div className='mt-auto'>
-				<Link
-					href={ROUTES.PRIVATE.ADMIN.CATEGORY_ID(category.id)}
-					className='w-full block'
+				<button
+					type="button"
+					onClick={handleViewDishes}
+					className="w-full h-10 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2"
 				>
-					<Button text='View Details' className='w-full' />
-				</Link>
+					<Folder className="w-4 h-4" />
+					<span>View Dishes</span>
+				</button>
 			</div>
 		</div>
 	)

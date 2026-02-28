@@ -1,6 +1,10 @@
 'use client'
 
-import type { FilterConfig, FilterValue, FilterValues } from '@/types/filter.interface'
+import type {
+	FilterConfig,
+	FilterValue,
+	FilterValues,
+} from '@/types/filter.interface'
 import CloseIcon from '@mui/icons-material/Close'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
@@ -59,7 +63,7 @@ const FilterDrawerComponent: React.FC<FilterDrawerProps> = ({
 	const handleClose = useCallback(() => setIsOpen(false), [])
 
 	const handleChange = useCallback((key: string, value: FilterValue) => {
-		setFilterValues(prev => ({
+		setFilterValues((prev) => ({
 			...prev,
 			[key]: value,
 		}))
@@ -120,13 +124,13 @@ const FilterDrawerComponent: React.FC<FilterDrawerProps> = ({
 	const hasActiveFilters = useMemo(
 		() =>
 			Object.values(filterValues).some(
-				value => value !== undefined && value !== null && value !== '',
+				(value) => value !== undefined && value !== null && value !== '',
 			),
 		[filterValues],
 	)
 
 	const activeFiltersCount = useMemo(
-		() => Object.keys(filterValues).filter(key => filterValues[key]).length,
+		() => Object.keys(filterValues).filter((key) => filterValues[key]).length,
 		[filterValues],
 	)
 
@@ -140,47 +144,51 @@ const FilterDrawerComponent: React.FC<FilterDrawerProps> = ({
 
 	return (
 		<>
-			<IconButton onClick={handleOpen} aria-label='open filters' sx={iconButtonDynamicSx}>
+			<IconButton
+				onClick={handleOpen}
+				aria-label="open filters"
+				sx={iconButtonDynamicSx}
+			>
 				<FilterListIcon />
 				{hasActiveFilters && (
-					<span className='absolute top-1 right-1 w-2 h-2 bg-primary rounded-full' />
+					<span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
 				)}
 			</IconButton>
 
-			<Drawer anchor='right' open={isOpen} onClose={handleClose} sx={drawerSx}>
-				<div className='flex flex-col h-full'>
-					<div className='flex items-center justify-between p-4 border-b border-border'>
-						<h2 className='text-xl font-bold flex items-center gap-2'>
+			<Drawer anchor="right" open={isOpen} onClose={handleClose} sx={drawerSx}>
+				<div className="flex flex-col h-full">
+					<div className="flex items-center justify-between p-4 border-b border-border">
+						<h2 className="text-xl font-bold flex items-center gap-2">
 							<FilterListIcon />
 							Filters
 							{hasActiveFilters && (
-								<span className='text-sm font-normal text-primary'>
+								<span className="text-sm font-normal text-primary">
 									({activeFiltersCount})
 								</span>
 							)}
 						</h2>
 						<IconButton
 							onClick={handleClose}
-							size='small'
-							aria-label='close filters'
+							size="small"
+							aria-label="close filters"
 							sx={iconButtonSx}
 						>
 							<CloseIcon />
 						</IconButton>
 					</div>
 
-					<div className='flex-1 overflow-y-auto p-4'>
-						<div className='space-y-6'>{filters.map(renderFilter)}</div>
+					<div className="flex-1 overflow-y-auto p-4">
+						<div className="space-y-6">{filters.map(renderFilter)}</div>
 					</div>
 
-					<div className='p-4 border-t border-border space-y-2'>
-						<div className='flex justify-between gap-2'>
-							<Button onClick={handleClose} text='Cancel' />
-							<Button onClick={handleApply} text='Apply Filters' />
+					<div className="p-4 border-t border-border space-y-2">
+						<div className="flex justify-between gap-2">
+							<Button onClick={handleClose} text="Cancel" />
+							<Button onClick={handleApply} text="Apply Filters" />
 						</div>
 						{hasActiveFilters && (
 							<Button onClick={handleReset}>
-								<RestartAltIcon fontSize='small' />
+								<RestartAltIcon fontSize="small" />
 								Reset Filters
 							</Button>
 						)}

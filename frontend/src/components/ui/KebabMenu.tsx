@@ -36,7 +36,7 @@ const MenuItem = memo<{
 	}, [item, onItemClick])
 
 	if (item.isDivider) {
-		return <div className='my-1 border-t border-border' />
+		return <div className="my-1 border-t border-border" />
 	}
 
 	return (
@@ -48,7 +48,7 @@ const MenuItem = memo<{
 			}`}
 		>
 			<span>{item.label}</span>
-			{item.icon && <span className='ml-2 text-foreground'>{item.icon}</span>}
+			{item.icon && <span className="ml-2 text-foreground">{item.icon}</span>}
 		</button>
 	)
 })
@@ -78,8 +78,8 @@ export const KebabMenu = memo<IKebabMenuProps>(
 					left: `${position.left}px`,
 				}}
 			>
-				<div className='p-1.5'>
-					{items.map(item => (
+				<div className="p-1.5">
+					{items.map((item) => (
 						<MenuItem key={item.id} item={item} onItemClick={handleItemClick} />
 					))}
 				</div>

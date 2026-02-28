@@ -38,4 +38,13 @@ export class FilterDishDto extends BasePaginationQueryDto {
 	@IsOptional()
 	@IsIn(['name', 'price', 'createdAt'])
 	sortBy?: 'name' | 'price' | 'createdAt'
+
+	@ApiPropertyOptional({
+		description: 'Filter dishes by category ID',
+		example: 1,
+	})
+	@IsOptional()
+	@Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+	@IsNumber({}, { message: 'categoryId must be a number' })
+	categoryId?: number
 }

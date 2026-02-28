@@ -18,8 +18,11 @@ export const pushToQueue = (
 	failedQueue.push({ resolve, reject })
 }
 
-export const processQueue = (error: unknown, token: string | null = null): void => {
-	failedQueue.forEach(prom => {
+export const processQueue = (
+	error: unknown,
+	token: string | null = null,
+): void => {
+	failedQueue.forEach((prom) => {
 		if (error) prom.reject(error)
 		else prom.resolve(token)
 	})

@@ -11,11 +11,11 @@ interface ISidebarState {
 	toggleCollapsed: () => void
 }
 
-export const useSidebarStore = create<ISidebarState>(set => ({
+export const useSidebarStore = create<ISidebarState>((set) => ({
 	mobileOpen: false,
 	collapsed: false,
-	setMobileOpen: value => set({ mobileOpen: value }),
-	setCollapsed: value => set({ collapsed: value }),
-	toggleMobileOpen: () => set(state => ({ mobileOpen: !state.mobileOpen })),
-	toggleCollapsed: () => set(state => ({ collapsed: !state.collapsed })),
+	setMobileOpen: (value) => set({ mobileOpen: value }),
+	setCollapsed: (value) => set({ collapsed: value }),
+	toggleMobileOpen: () => set((state) => ({ mobileOpen: !state.mobileOpen })),
+	toggleCollapsed: () => set((state) => ({ collapsed: !state.collapsed })),
 }))

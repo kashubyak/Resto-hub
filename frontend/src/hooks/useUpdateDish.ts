@@ -20,7 +20,10 @@ const toNumber = (
 	return undefined
 }
 
-export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) => {
+export const useUpdateDish = (
+	dishData: IDish | undefined,
+	onClose: () => void,
+) => {
 	const { showError, showSuccess } = useAlert()
 	const { refetchDishes, updateDishCache } = useDishes()
 	const queryClient = useQueryClient()
@@ -78,12 +81,16 @@ export const useUpdateDish = (dishData: IDish | undefined, onClose: () => void) 
 				}
 
 				if (dirtyFields.name) changedData.name = formData.name
-				if (dirtyFields.description) changedData.description = formData.description
+				if (dirtyFields.description)
+					changedData.description = formData.description
 				if (dirtyFields.price) changedData.price = toNumber(formData.price)
 				if (dirtyFields.categoryId) changedData.categoryId = formData.categoryId
-				if (dirtyFields.ingredients) changedData.ingredients = formData.ingredients
-				if (dirtyFields.weightGr) changedData.weightGr = toNumber(formData.weightGr)
-				if (dirtyFields.calories) changedData.calories = toNumber(formData.calories)
+				if (dirtyFields.ingredients)
+					changedData.ingredients = formData.ingredients
+				if (dirtyFields.weightGr)
+					changedData.weightGr = toNumber(formData.weightGr)
+				if (dirtyFields.calories)
+					changedData.calories = toNumber(formData.calories)
 				if (dirtyFields.available !== undefined)
 					changedData.available = formData.available
 				if (dirtyFields.imageUrl) changedData.imageUrl = formData.imageUrl

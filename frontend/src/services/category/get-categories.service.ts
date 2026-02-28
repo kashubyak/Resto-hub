@@ -28,7 +28,9 @@ export const getCategoriesService = async (
 			hasDishes: params?.hasDishes,
 			sortBy,
 			order,
-		}).filter(([, value]) => value !== undefined && value !== null && value !== ''),
+		}).filter(
+			([, value]) => value !== undefined && value !== null && value !== '',
+		),
 	)
 
 	const response = await api.get(API_URL.CATEGORY.ROOT, {

@@ -19,14 +19,20 @@ export const metadata: Metadata = {
 			{ url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
 			{ url: '/favicon.ico' },
 		],
-		apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+		apple: [
+			{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+		],
 	},
 	manifest: '/site.webmanifest',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+	children,
+}: {
+	children: React.ReactNode
+}) {
 	return (
-		<html lang='en'>
+		<html lang="en">
 			<body className={`${geistSans.variable} antialiased`}>
 				<Providers>{children}</Providers>
 			</body>

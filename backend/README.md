@@ -39,7 +39,7 @@ DATABASE_DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.
 # Application settings
 PORT=3000
 NODE_ENV=development
-ALLOWED_ORIGINS=http://localhost:3001
+ALLOWED_ORIGINS=http://lvh.me:3001
 
 # JWT Configuration
 JWT_TOKEN_SECRET=your_jwt_access_secret
