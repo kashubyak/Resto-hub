@@ -27,7 +27,7 @@ const MAX_REFRESH_ATTEMPTS = 3
 const REFRESH_RETRY_DELAY_MS = 500
 
 api.interceptors.request.use(async (config) => {
-	const requestId = startNetworkRequest(config.url || 'unknown')
+	const requestId = startNetworkRequest(config.url ?? 'unknown')
 	config.headers['X-Request-ID'] = requestId
 
 	config.onDownloadProgress = (event: AxiosProgressEvent) => {
@@ -86,9 +86,9 @@ api.interceptors.response.use(
 					pushToQueue(resolve, reject)
 				})
 					.then(() => {
-						originalRequest.headers = originalRequest.headers || {}
+						originalRequest.headers = originalRequest.headers ?? {}
 						originalRequest.headers['X-Request-ID'] = startNetworkRequest(
-							originalRequest.url || 'retry',
+							originalRequest.url ?? 'retry',
 						)
 						return api(originalRequest)
 					})
@@ -109,9 +109,9 @@ api.interceptors.response.use(
 						}>(API_URL.AUTH.REFRESH, {}, { withCredentials: true })
 						if (res.status >= 200 && res.status < 300) {
 							processQueue(null, null)
-							originalRequest.headers = originalRequest.headers || {}
+							originalRequest.headers = originalRequest.headers ?? {}
 							originalRequest.headers['X-Request-ID'] = startNetworkRequest(
-								originalRequest.url || 'retry',
+								originalRequest.url ?? 'retry',
 							)
 							return api(originalRequest)
 						}

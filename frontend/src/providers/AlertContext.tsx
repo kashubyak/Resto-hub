@@ -129,7 +129,7 @@ export const AlertProvider = memo<{ children: React.ReactNode }>(
 							id,
 							duration: (alert.retryAfter + 1) * 1000,
 						}
-						startTimer(id, newAlert.duration!)
+						if (newAlert.duration) startTimer(id, newAlert.duration)
 						return [...prev, newAlert]
 					}
 
@@ -154,7 +154,7 @@ export const AlertProvider = memo<{ children: React.ReactNode }>(
 						id,
 						duration: alert.duration ?? DEFAULT_DURATION_ALERT,
 					}
-					startTimer(id, newAlert.duration!)
+					if (newAlert.duration) startTimer(id, newAlert.duration)
 					return [...prev, newAlert]
 				})
 			},
@@ -205,7 +205,7 @@ export const AlertProvider = memo<{ children: React.ReactNode }>(
 			(retryAfter: number, message?: string) => {
 				showAlert({
 					severity: 'error',
-					text: message || 'Too many requests',
+					text: message ?? 'Too many requests',
 					retryAfter,
 				})
 			},

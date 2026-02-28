@@ -15,7 +15,7 @@ import {
 } from 'react-hook-form'
 import { IngredientChip } from './IngredientChip'
 
-type IngredientsSectionProps = {
+interface IngredientsSectionProps {
 	control?: Control<IDishFormValues>
 	errors: FieldErrors<IDishFormValues>
 	setError: UseFormSetError<IDishFormValues>
@@ -231,7 +231,9 @@ export const IngredientsSection = ({
 											</span>
 											<button
 												type="button"
-												onClick={() => handleDelete(ingredient, value, onChange)}
+												onClick={() =>
+													handleDelete(ingredient, value, onChange)
+												}
 												className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
 											>
 												<X className="w-4 h-4" />

@@ -1,9 +1,10 @@
 'use client'
 import { AUTH } from '@/constants/auth.constant'
-import { ROUTES, UserRole } from '@/constants/pages.constant'
+import type { UserRole } from '@/constants/pages.constant'
+import { ROUTES } from '@/constants/pages.constant'
 import {
-    login as loginRequest,
-    logout as logoutRequest,
+	login as loginRequest,
+	logout as logoutRequest,
 } from '@/services/auth/auth.service'
 import { getCurrentUser } from '@/services/user/user.service'
 import { useAlertStore } from '@/store/alert.store'
@@ -15,22 +16,22 @@ import { initializeAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
 import { usePathname } from 'next/navigation'
 import {
-    createContext,
-    memo,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-    type ReactNode,
+	createContext,
+	memo,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type ReactNode,
 } from 'react'
 
 const AuthContext = createContext<IAuthContext>({
 	user: null,
 	isAuth: false,
-	login: async () => {},
-	logout: async () => {},
+	login: () => Promise.resolve(),
+	logout: () => void Promise.resolve(),
 	isFetchingUser: false,
 })
 
@@ -76,10 +77,10 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 				}
 
 				const currentUser = await getCurrentUser()
-				initializeAuth(currentUser.data, currentUser.data.role as UserRole)
+				initializeAuth(currentUser.data, currentUser.data.role)
 			}
 		},
-		[setUserRole],
+		[setUserRole, setIsAuth, setUser],
 	)
 
 	const logout = useCallback(async () => {
@@ -109,13 +110,17 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 		if (isFetchingUser) return
 		setIsFetchingUser(true)
 
-		for (let attempt = 0; attempt < GET_CURRENT_USER_RETRY_ATTEMPTS; attempt++) {
+		for (
+			let attempt = 0;
+			attempt < GET_CURRENT_USER_RETRY_ATTEMPTS;
+			attempt++
+		) {
 			if (attempt > 0)
 				await new Promise((r) => setTimeout(r, GET_CURRENT_USER_RETRY_DELAY_MS))
 
 			try {
 				const current = await getCurrentUser()
-				initializeAuth(current.data, current.data.role as UserRole)
+				initializeAuth(current.data, current.data.role)
 				setIsFetchingUser(false)
 				return
 			} catch (err) {
@@ -156,8 +161,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 		const checkBackendAuth = () => {
 			return (
 				typeof window !== 'undefined' &&
-				(Cookies.get(AUTH.AUTH_STATUS) === 'true' ||
-					!!Cookies.get(AUTH.TOKEN))
+				(Cookies.get(AUTH.AUTH_STATUS) === 'true' || !!Cookies.get(AUTH.TOKEN))
 			)
 		}
 

@@ -20,13 +20,17 @@ function getGradientById(id: number) {
 	return GRADIENTS[id % GRADIENTS.length]
 }
 
-type CategorySelectProps = {
+interface CategorySelectProps {
 	value: number | null
 	onChange: (value: number | null) => void
 	error?: string
 }
 
-export function CategorySelect({ value, onChange, error }: CategorySelectProps) {
+export function CategorySelect({
+	value,
+	onChange,
+	error,
+}: CategorySelectProps) {
 	const [isOpen, setIsOpen] = useState(false)
 	const [search, setSearch] = useState('')
 	const dropdownRef = useRef<HTMLDivElement>(null)

@@ -226,7 +226,9 @@ export function TableModal({
 									<span>{mode === 'create' ? 'Creating...' : 'Saving...'}</span>
 								</>
 							) : (
-								<span>{mode === 'create' ? 'Create Table' : 'Save Changes'}</span>
+								<span>
+									{mode === 'create' ? 'Create Table' : 'Save Changes'}
+								</span>
 							)}
 						</button>
 					</div>

@@ -42,7 +42,7 @@ export default function CompanySettingsPage() {
 							</p>
 						</div>
 
-						{(company || subdomain) && (
+						{(company ?? subdomain) && (
 							<div className="mt-6 pt-6 border-t border-gray-200">
 								<h2 className="text-lg font-semibold text-gray-900 mb-4">
 									Company Information

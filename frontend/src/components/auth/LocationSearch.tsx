@@ -48,28 +48,30 @@ const LocationSearchComponent = ({
 			clearTimeout(searchTimeoutRef.current)
 		}
 
-		searchTimeoutRef.current = setTimeout(async () => {
-			abortControllerRef.current?.abort()
-			abortControllerRef.current = new AbortController()
-			const signal = abortControllerRef.current.signal
+		searchTimeoutRef.current = setTimeout(() => {
+			void (async () => {
+				abortControllerRef.current?.abort()
+				abortControllerRef.current = new AbortController()
+				const signal = abortControllerRef.current.signal
 
-			setLoading(true)
-			try {
-				const response = await fetch(
-					`/api/geocode/search?q=${encodeURIComponent(query)}`,
-					{ signal },
-				)
-				if (!response.ok) throw new Error(`Search error: ${response.status}`)
+				setLoading(true)
+				try {
+					const response = await fetch(
+						`/api/geocode/search?q=${encodeURIComponent(query)}`,
+						{ signal },
+					)
+					if (!response.ok) throw new Error(`Search error: ${response.status}`)
 
-				const data = await response.json()
-				setResults(Array.isArray(data) ? data : [])
-				setShowDropdown(true)
-			} catch (err) {
-				if (err instanceof Error && err.name === 'AbortError') return
-				setResults([])
-			} finally {
-				setLoading(false)
-			}
+					const data = await response.json()
+					setResults(Array.isArray(data) ? data : [])
+					setShowDropdown(true)
+				} catch (err) {
+					if (err instanceof Error && err.name === 'AbortError') return
+					setResults([])
+				} finally {
+					setLoading(false)
+				}
+			})()
 		}, 500)
 
 		return () => {
@@ -111,8 +113,8 @@ const LocationSearchComponent = ({
 
 	const getLocationLabel = (result: LocationResult) => {
 		const city =
-			result.address.city || result.address.town || result.address.village || ''
-		const country = result.address.country || ''
+			result.address.city ?? result.address.town ?? result.address.village ?? ''
+		const country = result.address.country ?? ''
 		if (city && country) {
 			return { primary: city, secondary: country }
 		}

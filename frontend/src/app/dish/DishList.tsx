@@ -40,7 +40,7 @@ const DishListComponent: React.FC<DishListProps> = ({
 	const handleIntersection = useCallback(
 		(entries: IntersectionObserverEntry[]) => {
 			const entry = entries[0]
-			if (entry?.isIntersecting && hasNextPage) fetchNextPage()
+			if (entry?.isIntersecting && hasNextPage) void fetchNextPage()
 		},
 		[fetchNextPage, hasNextPage],
 	)

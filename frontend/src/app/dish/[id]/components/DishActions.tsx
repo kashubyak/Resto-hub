@@ -22,8 +22,10 @@ export const DishActions = ({ id }: { id: number }) => {
 	} = useDishes(id)
 	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false)
 	const [updateDrawerOpen, setUpdateDrawerOpen] = useState(false)
-	const [isRemoveCategoryModalOpen, setRemoveCategoryModalOpen] = useState(false)
-	const [isAssignCategoryModalOpen, setAssignCategoryModalOpen] = useState(false)
+	const [isRemoveCategoryModalOpen, setRemoveCategoryModalOpen] =
+		useState(false)
+	const [isAssignCategoryModalOpen, setAssignCategoryModalOpen] =
+		useState(false)
 
 	const openUpdateDrawer = useCallback(() => setUpdateDrawerOpen(true), [])
 	const closeUpdateDrawer = useCallback(() => setUpdateDrawerOpen(false), [])
@@ -31,7 +33,7 @@ export const DishActions = ({ id }: { id: number }) => {
 	const handleAssigned = useCallback(
 		(data: IDish) => {
 			updateDishCache(queryClient, data)
-			queryClient.invalidateQueries({
+			void queryClient.invalidateQueries({
 				queryKey: [DISHES_QUERY_KEY.DETAIL, id],
 			})
 			setAssignCategoryModalOpen(false)

@@ -86,7 +86,10 @@ const CategoryFilterComponent: React.FC<CategoryFilterProps> = ({
 
 	const handleChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) =>
-			onChange('categoryId', e.target.value ? Number(e.target.value) : undefined),
+			onChange(
+				'categoryId',
+				e.target.value ? Number(e.target.value) : undefined,
+			),
 		[onChange],
 	)
 

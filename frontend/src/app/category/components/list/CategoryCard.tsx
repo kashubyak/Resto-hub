@@ -81,7 +81,10 @@ const CategoryCardComponent = ({
 	}, [])
 
 	return (
-		<div ref={cardRef} className="group bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300">
+		<div
+			ref={cardRef}
+			className="group bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300"
+		>
 			<div
 				className={`relative h-32 bg-gradient-to-br ${gradient} flex items-center justify-center border-b-2 border-border`}
 			>
@@ -121,7 +124,9 @@ const CategoryCardComponent = ({
 											className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left"
 										>
 											<Edit className="w-4 h-4 text-muted-foreground" />
-											<span className="text-sm text-foreground">Edit Category</span>
+											<span className="text-sm text-foreground">
+												Edit Category
+											</span>
 										</button>
 										<button
 											type="button"
@@ -129,7 +134,9 @@ const CategoryCardComponent = ({
 											className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
 										>
 											<Trash2 className="w-4 h-4" />
-											<span className="text-sm font-medium">Delete Category</span>
+											<span className="text-sm font-medium">
+												Delete Category
+											</span>
 										</button>
 									</div>
 								</div>

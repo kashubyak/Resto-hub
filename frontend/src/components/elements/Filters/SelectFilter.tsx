@@ -94,7 +94,7 @@ const SelectFilterComponent: React.FC<SelectFilterProps> = ({
 	const emptyMenuItem = useMemo(
 		() => (
 			<MenuItem value="">
-				<em>{config.placeholder || 'None'}</em>
+				<em>{config.placeholder ?? 'None'}</em>
 			</MenuItem>
 		),
 		[config.placeholder],

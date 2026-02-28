@@ -8,7 +8,10 @@ interface DishEmptyStateProps {
 	onImport?: () => void
 }
 
-function DishEmptyStateComponent({ onAddManual, onImport }: DishEmptyStateProps) {
+function DishEmptyStateComponent({
+	onAddManual,
+	onImport,
+}: DishEmptyStateProps) {
 	return (
 		<div className="flex items-center justify-center min-h-[calc(100vh-12rem)]">
 			<div className="w-full max-w-3xl text-center space-y-8 px-4">
@@ -36,8 +39,8 @@ function DishEmptyStateComponent({ onAddManual, onImport }: DishEmptyStateProps)
 						Your Menu Awaits! 🍽️
 					</h1>
 					<p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
-						Start building your restaurant's menu by adding your first dishes.
-						You can create them manually or import from a file.
+						Start building your restaurant&apos;s menu by adding your first
+						dishes. You can create them manually or import from a file.
 					</p>
 				</div>
 
@@ -94,7 +97,9 @@ function DishEmptyStateComponent({ onAddManual, onImport }: DishEmptyStateProps)
 				<div className="pt-6 space-y-4">
 					<div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 border border-primary/20 rounded-full text-sm text-muted-foreground">
 						<Sparkles className="w-4 h-4 text-primary" />
-						<span>Pro tip: Organize dishes with categories for better navigation</span>
+						<span>
+							Pro tip: Organize dishes with categories for better navigation
+						</span>
 					</div>
 
 					<p className="text-xs sm:text-sm text-muted-foreground">

@@ -1,13 +1,13 @@
-import { Loader2, X, XCircle } from "lucide-react";
-import { useEffect } from "react";
-import type { IDish } from '@/types/dish.interface';
+import { Loader2, X, XCircle } from 'lucide-react'
+import { useEffect } from 'react'
+import type { IDish } from '@/types/dish.interface'
 
 interface RemoveCategoryModalProps {
-	open: boolean;
-	onClose: () => void;
-	dish?: IDish;
-	onConfirm: () => void;
-	isPending: boolean;
+	open: boolean
+	onClose: () => void
+	dish?: IDish
+	onConfirm: () => void
+	isPending: boolean
 }
 
 export function RemoveCategoryModal({
@@ -28,7 +28,7 @@ export function RemoveCategoryModal({
 		}
 	}, [open])
 
-	if (!open) return null;
+	if (!open) return null
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -47,7 +47,9 @@ export function RemoveCategoryModal({
 							<XCircle className="w-5 h-5 text-amber-500" />
 						</div>
 						<div>
-							<h2 className="text-xl font-bold text-foreground">Remove Category</h2>
+							<h2 className="text-xl font-bold text-foreground">
+								Remove Category
+							</h2>
 							<p className="text-xs text-muted-foreground mt-0.5">
 								This dish will become uncategorized
 							</p>
@@ -112,5 +114,5 @@ export function RemoveCategoryModal({
 				</div>
 			</div>
 		</div>
-	);
+	)
 }

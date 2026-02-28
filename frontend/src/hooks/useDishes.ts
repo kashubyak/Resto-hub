@@ -12,12 +12,12 @@ import type { IAxiosError } from '@/types/error.interface'
 import type { FilterValues } from '@/types/filter.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import {
-	QueryClient,
 	useInfiniteQuery,
 	useMutation,
 	useQuery,
 	useQueryClient,
 	type InfiniteData,
+	type QueryClient,
 } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
@@ -30,7 +30,7 @@ export const useDishes = (
 	const queryClient = useQueryClient()
 	const router = useRouter()
 	const { showSuccess, showError } = useAlert()
-	const normalizedSearchQuery = searchQuery?.trim() || undefined
+	const normalizedSearchQuery = searchQuery?.trim() ?? undefined
 	const filterKey = useMemo(() => {
 		if (!filters || Object.keys(filters).length === 0) return 'no-filters'
 		return JSON.stringify(filters)
@@ -88,7 +88,8 @@ export const useDishes = (
 	const dishQuery = useQuery<IDish, Error>({
 		queryKey: [DISHES_QUERY_KEY.DETAIL, dishId],
 		queryFn: async () => {
-			const response = await getDish(dishId!)
+			if (!dishId) throw new Error('Dish ID is required')
+			const response = await getDish(dishId)
 			return response.data
 		},
 		enabled: !!dishId,
@@ -98,7 +99,7 @@ export const useDishes = (
 
 	const handleDeleteDishSuccess = useCallback(() => {
 		showSuccess('Dish deleted successfully')
-		queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
+		void queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY.ALL] })
 		router.push(ROUTES.PRIVATE.ADMIN.DISH)
 	}, [showSuccess, queryClient, router])
 

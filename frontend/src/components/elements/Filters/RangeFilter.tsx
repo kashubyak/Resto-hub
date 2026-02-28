@@ -66,17 +66,17 @@ const RangeFilterComponent: React.FC<RangeFilterProps> = ({
 		() => ({
 			min: config.min,
 			max: config.max,
-			step: config.step || 1,
+			step: config.step ?? 1,
 		}),
 		[config.min, config.max, config.step],
 	)
 
 	const minPlaceholder = useMemo(
-		() => `Min ${config.suffix || ''}`,
+		() => `Min ${config.suffix ?? ''}`,
 		[config.suffix],
 	)
 	const maxPlaceholder = useMemo(
-		() => `Max ${config.suffix || ''}`,
+		() => `Max ${config.suffix ?? ''}`,
 		[config.suffix],
 	)
 

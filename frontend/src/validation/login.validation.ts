@@ -14,7 +14,7 @@ export const emailValidation = {
 		validLocalPart: (value: string) => {
 			const localPart = value.split('@')[0]
 			return (
-				(localPart && localPart.length <= 64 && localPart.length >= 1) ||
+				(localPart && localPart.length <= 64 && localPart.length >= 1) ??
 				'Invalid email format'
 			)
 		},
@@ -27,7 +27,7 @@ export const emailValidation = {
 					domain.includes('.') &&
 					!domain.startsWith('.') &&
 					!domain.endsWith('.') &&
-					domain.length >= 4) ||
+					domain.length >= 4) ??
 				'Invalid email format'
 			)
 		},

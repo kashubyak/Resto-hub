@@ -12,8 +12,7 @@ import { useCallback, useMemo } from 'react'
 
 export const useCategories = (searchQuery?: string, filters?: FilterValues) => {
 	const queryClient = useQueryClient()
-	// const { showSuccess, showError } = useAlert()
-	const normalizedSearchQuery = searchQuery?.trim() || undefined
+	const normalizedSearchQuery = searchQuery?.trim() ?? undefined
 
 	const filterKey = useMemo(() => {
 		if (!filters || Object.keys(filters).length === 0) return 'no-filters'
@@ -39,7 +38,7 @@ export const useCategories = (searchQuery?: string, filters?: FilterValues) => {
 	})
 
 	const refetchCategories = useCallback(() => {
-		queryClient.invalidateQueries({ queryKey: [CATEGORIES_QUERY_KEY.ALL] })
+		void queryClient.invalidateQueries({ queryKey: [CATEGORIES_QUERY_KEY.ALL] })
 	}, [queryClient])
 
 	const allCategories = useMemo<ICategoryWithDishes[]>(

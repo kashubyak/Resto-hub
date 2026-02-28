@@ -16,7 +16,7 @@ import {
 	type UseFormRegister,
 } from 'react-hook-form'
 
-type NutritionalInfoSectionProps = {
+interface NutritionalInfoSectionProps {
 	register?: UseFormRegister<IDishFormValues>
 	control?: Control<IDishFormValues>
 	errors: FieldErrors<IDishFormValues>

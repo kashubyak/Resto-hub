@@ -13,7 +13,7 @@ export const useUserRoutes = () => {
 	}, [userRole])
 
 	const currentRoute = useMemo(() => {
-		return userRoutes.find((route) => route.path === pathname) || null
+		return userRoutes.find((route) => route.path === pathname) ?? null
 	}, [pathname, userRoutes])
 
 	return {

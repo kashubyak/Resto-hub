@@ -1,5 +1,6 @@
 import { AUTH } from '@/constants/auth.constant'
-import { ROUTES, UserRole } from '@/constants/pages.constant'
+import { ROUTES } from '@/constants/pages.constant'
+import type { UserRole } from '@/constants/pages.constant'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
@@ -14,7 +15,7 @@ export function handleSessionInvalid(options?: {
 
 	clearAuth()
 	try {
-		getSupabaseClient().auth.signOut()
+		void getSupabaseClient().auth.signOut()
 	} catch {
 		// ignore
 	}

@@ -20,8 +20,8 @@ export function useIsNewUser() {
 				},
 				enabled: !!user,
 				staleTime: 60_000,
-				refetchOnWindowFocus: false, // Prevent refetch on tab switch
-				gcTime: 5 * 60_000, // Keep cache for 5 minutes
+				refetchOnWindowFocus: false,
+				gcTime: 5 * 60_000,
 			},
 			{
 				queryKey: [...IS_NEW_USER_QUERY_KEY, 'categories'],

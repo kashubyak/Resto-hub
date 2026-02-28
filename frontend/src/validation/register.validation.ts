@@ -54,7 +54,7 @@ export const subdomainValidation = {
 			)
 		},
 		balanced: (value: string) => {
-			const letters = (value.match(/[a-z]/g) || []).length
+			const letters = value.match(/[a-z]/g)?.length ?? 0
 			return letters >= 2 || 'Subdomain must contain at least 2 letters'
 		},
 	},
@@ -144,22 +144,21 @@ export const emailValidation: {
 		validLocalPart: (value: string | number | FileList) => {
 			if (!asString(value)) return true
 			const localPart = value.split('@')[0]
-			return (
-				(localPart && localPart.length <= 64) || 'Email local part is too long'
-			)
+			return localPart && localPart.length <= 64
+				? true
+				: 'Email local part is too long'
 		},
 		validDomain: (value: string | number | FileList) => {
 			if (!asString(value)) return true
 			const parts = value.split('@')
 			if (parts.length !== 2) return 'Invalid email format'
 			const domain = parts[1]
-			return (
-				(domain &&
-					domain.includes('.') &&
-					!domain.startsWith('.') &&
-					!domain.endsWith('.')) ||
-				'Invalid email domain'
-			)
+			const isValid =
+				domain &&
+				domain.includes('.') &&
+				!domain.startsWith('.') &&
+				!domain.endsWith('.')
+			return isValid ? true : 'Invalid email domain'
 		},
 		noSpaces: (value: string | number | FileList) =>
 			!asString(value) || !/\s/.test(value)

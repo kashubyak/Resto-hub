@@ -1,30 +1,30 @@
-import { AlertTriangle, Loader2, X } from "lucide-react";
-import { memo, useEffect } from "react";
+import { AlertTriangle, Loader2, X } from 'lucide-react'
+import { memo, useEffect } from 'react'
 
 interface DeleteConfirmDialogProps {
-	isOpen: boolean;
-	onClose: () => void;
-	onConfirm: () => void;
-	title?: string;
-	message?: string;
-	categoryName?: string;
-	dishCount?: number;
-	isLoading?: boolean;
+	isOpen: boolean
+	onClose: () => void
+	onConfirm: () => void
+	title?: string
+	message?: string
+	categoryName?: string
+	dishCount?: number
+	isLoading?: boolean
 }
 
 const DeleteConfirmDialogComponent = ({
 	isOpen,
 	onClose,
 	onConfirm,
-	title = "Delete Item",
+	title = 'Delete Item',
 	message,
 	categoryName,
 	dishCount = 0,
 	isLoading = false,
 }: DeleteConfirmDialogProps) => {
 	const handleClose = () => {
-		if (!isLoading) onClose();
-	};
+		if (!isLoading) onClose()
+	}
 
 	useEffect(() => {
 		if (isOpen) {
@@ -37,7 +37,7 @@ const DeleteConfirmDialogComponent = ({
 		}
 	}, [isOpen])
 
-	if (!isOpen) return null;
+	if (!isOpen) return null
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -71,14 +71,17 @@ const DeleteConfirmDialogComponent = ({
 				<div className="p-6 space-y-4">
 					{/* Message */}
 					<p className="text-sm text-foreground">
-						{message ||
+						{message ??
 							(categoryName ? (
 								<>
-									Are you sure you want to delete{" "}
-									<span className="font-semibold">"{categoryName}"</span>?
+									Are you sure you want to delete{' '}
+									<span className="font-semibold">
+										&quot;{categoryName}&quot;
+									</span>
+									?
 								</>
 							) : (
-								"Are you sure you want to delete this item?"
+								'Are you sure you want to delete this item?'
 							))}
 					</p>
 
@@ -88,8 +91,8 @@ const DeleteConfirmDialogComponent = ({
 							<AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
 							<div className="space-y-1">
 								<p className="text-sm font-semibold text-red-600 dark:text-red-400">
-									This category contains {dishCount}{" "}
-									{dishCount === 1 ? "dish" : "dishes"}
+									This category contains {dishCount}{' '}
+									{dishCount === 1 ? 'dish' : 'dishes'}
 								</p>
 								<p className="text-xs text-muted-foreground">
 									Deleting this category will unassign all dishes. The dishes
@@ -104,7 +107,8 @@ const DeleteConfirmDialogComponent = ({
 						<div className="flex items-start gap-3 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
 							<AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
 							<p className="text-xs text-muted-foreground">
-								This action cannot be undone. The item will be permanently deleted.
+								This action cannot be undone. The item will be permanently
+								deleted.
 							</p>
 						</div>
 					)}
@@ -140,7 +144,7 @@ const DeleteConfirmDialogComponent = ({
 				</div>
 			</div>
 		</div>
-	);
-};
+	)
+}
 
-export const DeleteConfirmDialog = memo(DeleteConfirmDialogComponent);
+export const DeleteConfirmDialog = memo(DeleteConfirmDialogComponent)

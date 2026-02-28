@@ -55,7 +55,6 @@ export function setApiSubdomain(subdomain?: string | null): void {
 		return
 	}
 
-	// Same-origin BFF: on client with subdomain, use Next.js /api so cookies work
 	if (typeof window !== 'undefined') {
 		api.defaults.baseURL = window.location.origin + '/api'
 		return

@@ -77,7 +77,9 @@ export function RegisterCompanySuccess({
 							</div>
 							<button
 								type="button"
-								onClick={handleCopy}
+								onClick={() => {
+									void handleCopy()
+								}}
 								className="px-4 sm:px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center gap-2 whitespace-nowrap"
 							>
 								{copied ? (

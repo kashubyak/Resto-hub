@@ -13,15 +13,15 @@ import type {
 } from 'react-hook-form'
 
 type ValueType = string | number | null | undefined
-type FormValues = {
+interface FormValues {
 	[key: string]: ValueType
 }
 
-type FieldProps = ControllerRenderProps<FormValues, string> & {
+interface FieldProps extends ControllerRenderProps<FormValues, string> {
 	value: ValueType
 	onChange: (value: ValueType) => void
 }
-type DropdownCategoryProps = FieldProps & {
+interface DropdownCategoryProps extends FieldProps {
 	fieldState: ControllerFieldState
 }
 

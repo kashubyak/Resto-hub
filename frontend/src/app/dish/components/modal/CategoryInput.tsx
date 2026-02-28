@@ -6,7 +6,7 @@ import { categoryIdValidation } from '@/validation/dish.validation'
 import { memo } from 'react'
 import { Controller, type Control } from 'react-hook-form'
 
-type CategoryInputProps = {
+interface CategoryInputProps {
 	control: Control<IDishFormValues>
 }
 

@@ -3,6 +3,7 @@
 import { CategorySelect } from '@/app/dish/components/create/CategorySelect'
 import { ROUTES } from '@/constants/pages.constant'
 import { useDishModal } from '@/hooks/useDishModal'
+import type { IDishFormValues } from '@/types/dish.interface'
 import {
 	caloriesValidation,
 	dishNameValidation,
@@ -27,10 +28,10 @@ import {
 	Upload,
 	X,
 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { IDishFormValues } from '@/types/dish.interface'
 import { Controller } from 'react-hook-form'
 
 const maxDescriptionLength = 1500
@@ -75,7 +76,7 @@ function CreateDishForm() {
 				})
 				return
 			}
-			onSubmitFromHook(data)
+			void onSubmitFromHook(data)
 		},
 		[onSubmitFromHook, setError],
 	)
@@ -101,11 +102,16 @@ function CreateDishForm() {
 		let completed = 0
 		const total = 6
 		if (watched.name?.trim()) completed++
-		if (watched.price !== undefined && watched.price !== '' && Number(watched.price) > 0)
+		if (
+			watched.price !== undefined &&
+			watched.price !== '' &&
+			Number(watched.price) > 0
+		)
 			completed++
 		if (watched.categoryId != null) completed++
 		if (watched.description?.trim()) completed++
-		if (Array.isArray(watched.ingredients) && watched.ingredients.length > 0) completed++
+		if (Array.isArray(watched.ingredients) && watched.ingredients.length > 0)
+			completed++
 		if (watched.imageUrl?.[0]) completed++
 		return Math.round((completed / total) * 100)
 	}, [
@@ -131,9 +137,12 @@ function CreateDishForm() {
 		if (!file) return null
 		return URL.createObjectURL(file)
 	}, [watched.imageUrl])
-	useEffect(() => () => {
-		if (previewUrl) URL.revokeObjectURL(previewUrl)
-	}, [previewUrl])
+	useEffect(
+		() => () => {
+			if (previewUrl) URL.revokeObjectURL(previewUrl)
+		},
+		[previewUrl],
+	)
 
 	const handleAddIngredient = useCallback(() => {
 		const val = newIngredient.trim()
@@ -179,7 +188,10 @@ function CreateDishForm() {
 		[setValue, setError, clearErrors, watch],
 	)
 
-	const handleDragStart = useCallback((index: number) => setDraggedItem(index), [])
+	const handleDragStart = useCallback(
+		(index: number) => setDraggedItem(index),
+		[],
+	)
 	const handleDragEnd = useCallback(() => setDraggedItem(null), [])
 	const handleDragOver = useCallback(
 		(e: React.DragEvent, index: number) => {
@@ -234,7 +246,7 @@ function CreateDishForm() {
 			</div>
 
 			<div className="max-w-5xl mx-auto">
-					<div className="flex items-center gap-4 mb-6">
+				<div className="flex items-center gap-4 mb-6">
 					<Link
 						href={ROUTES.PRIVATE.ADMIN.DISH}
 						className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-card border border-border hover:border-primary hover:text-primary transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5"
@@ -253,7 +265,9 @@ function CreateDishForm() {
 				</div>
 
 				<form
-					onSubmit={handleSubmit(onSubmit)}
+					onSubmit={(e) => {
+						void handleSubmit(onSubmit)(e)
+					}}
 					className="space-y-6"
 				>
 					{/* Basic Information */}
@@ -368,7 +382,7 @@ function CreateDishForm() {
 												value={
 													typeof field.value === 'number'
 														? String(field.value)
-														: (field.value ?? '') as string
+														: (field.value ?? '')
 												}
 												onChange={handlePriceChange}
 												onFocus={() => setFocusedField('price')}
@@ -582,11 +596,12 @@ function CreateDishForm() {
 						</div>
 
 						{previewUrl ? (
-							<div className="relative group">
-								<img
+							<div className="relative group w-full h-64">
+								<Image
 									src={previewUrl}
 									alt="Uploaded dish"
-									className="w-full h-64 object-cover rounded-2xl"
+									fill
+									className="object-cover rounded-2xl"
 								/>
 								<div className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3">
 									<button
@@ -599,8 +614,7 @@ function CreateDishForm() {
 									<button
 										type="button"
 										onClick={() => {
-											if (fileInputRef.current)
-												fileInputRef.current.value = ''
+											if (fileInputRef.current) fileInputRef.current.value = ''
 											setValue(
 												'imageUrl',
 												new DataTransfer().files as unknown as FileList,

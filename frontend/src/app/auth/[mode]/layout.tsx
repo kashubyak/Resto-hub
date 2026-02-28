@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 
-type Props = { children: React.ReactNode }
+interface Props {
+	children: React.ReactNode
+}
 
 export async function generateMetadata({
 	params,

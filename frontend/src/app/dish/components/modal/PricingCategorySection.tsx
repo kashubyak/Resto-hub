@@ -9,7 +9,7 @@ import { AvailabilityRadio } from './AvailabilityRadio'
 import { CategoryInput } from './CategoryInput'
 import { PriceInput } from './PriceInput'
 
-type PricingCategorySectionProps = {
+interface PricingCategorySectionProps {
 	register?: UseFormRegister<IDishFormValues>
 	control: Control<IDishFormValues>
 	mode?: 'create' | 'update'

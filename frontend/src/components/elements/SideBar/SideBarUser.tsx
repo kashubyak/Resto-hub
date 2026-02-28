@@ -24,7 +24,7 @@ const ExpandedUserView = memo(
 		<>
 			<div className="flex items-center gap-2 overflow-hidden">
 				<ViewableImage
-					src={user?.avatarUrl || '/Resto-Hub.png'}
+					src={user?.avatarUrl ?? '/Resto-Hub.png'}
 					alt="User avatar"
 					width={40}
 					height={40}
@@ -75,7 +75,7 @@ const CollapsedUserView = memo(
 			<span className="relative w-10 h-10 flex items-center justify-center">
 				<span className="absolute inset-0 flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0">
 					<ViewableImage
-						src={user?.avatarUrl || '/Resto-Hub.png'}
+						src={user?.avatarUrl ?? '/Resto-Hub.png'}
 						alt="User avatar"
 						width={40}
 						height={40}

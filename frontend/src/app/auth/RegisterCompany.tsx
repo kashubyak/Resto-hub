@@ -133,8 +133,8 @@ const RegisterCompanyComponent = () => {
 							<form
 								onSubmit={(e) => {
 									e.preventDefault()
-									if (step === 0) handleStep0Submit()
-									else handleStep1Submit()
+									if (step === 0) void handleStep0Submit()
+									else void handleStep1Submit()
 								}}
 								method="post"
 								action="#"
@@ -312,7 +312,9 @@ const RegisterCompanyComponent = () => {
 									{step === 0 ? (
 										<button
 											type="button"
-											onClick={handleStep0Submit}
+											onClick={() => {
+												void handleStep0Submit()
+											}}
 											className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
 										>
 											Continue
@@ -320,7 +322,9 @@ const RegisterCompanyComponent = () => {
 									) : (
 										<button
 											type="button"
-											onClick={handleStep1Submit}
+											onClick={() => {
+												void handleStep1Submit()
+											}}
 											disabled={isSubmitting}
 											className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-60 disabled:pointer-events-none disabled:transform-none"
 										>

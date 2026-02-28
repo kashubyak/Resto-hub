@@ -1,35 +1,147 @@
-import { ChevronDown, ChevronUp, Loader2, X } from "lucide-react";
-import { memo, useEffect, useState } from "react";
+import { ChevronDown, ChevronUp, Loader2, X } from 'lucide-react'
+import { memo, useEffect, useState } from 'react'
 
 const ALL_EMOJI_OPTIONS = [
-	"🍎", "🍏", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓",
-	"🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝",
-	"🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌶️", "🫑",
-	"🌽", "🥕", "🫒", "🧄", "🧅", "🥔", "🍠", "🫘",
-	"🥐", "🥖", "🫓", "🥨", "🥯", "🥞", "🧇", "🧀",
-	"🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕", "🌭",
-	"🥪", "🌮", "🌯", "🫔", "🥙", "🧆", "🥚", "🍳",
-	"🥘", "🍲", "🫕", "🥣", "🥗", "🍿", "🧈", "🧂",
-	"🍱", "🍘", "🍙", "🍚", "🍛", "🍜", "🍝", "🍠",
-	"🍢", "🍣", "🍤", "🍥", "🥮", "🍡", "🥟", "🥠",
-	"🥡", "🦀", "🦞", "🦐", "🦑", "🦪", "🍦", "🍧",
-	"🍨", "🍩", "🍪", "🎂", "🍰", "🧁", "🥧", "🍫",
-	"🍬", "🍭", "🍮", "🍯", "🍼", "🥛", "☕", "🫖",
-	"🍵", "🍶", "🍾", "🍷", "🍸", "🍹", "🍺", "🍻",
-	"🥂", "🥃", "🫗", "🥤", "🧋", "🧃", "🧉", "🧊",
-	"🍴", "🥄", "🔪", "🫙", "🏺", "🍽️", "🥢", "🥡",
-] as const;
+	'🍎',
+	'🍏',
+	'🍊',
+	'🍋',
+	'🍌',
+	'🍉',
+	'🍇',
+	'🍓',
+	'🫐',
+	'🍈',
+	'🍒',
+	'🍑',
+	'🥭',
+	'🍍',
+	'🥥',
+	'🥝',
+	'🍅',
+	'🍆',
+	'🥑',
+	'🥦',
+	'🥬',
+	'🥒',
+	'🌶️',
+	'🫑',
+	'🌽',
+	'🥕',
+	'🫒',
+	'🧄',
+	'🧅',
+	'🥔',
+	'🍠',
+	'🫘',
+	'🥐',
+	'🥖',
+	'🫓',
+	'🥨',
+	'🥯',
+	'🥞',
+	'🧇',
+	'🧀',
+	'🍖',
+	'🍗',
+	'🥩',
+	'🥓',
+	'🍔',
+	'🍟',
+	'🍕',
+	'🌭',
+	'🥪',
+	'🌮',
+	'🌯',
+	'🫔',
+	'🥙',
+	'🧆',
+	'🥚',
+	'🍳',
+	'🥘',
+	'🍲',
+	'🫕',
+	'🥣',
+	'🥗',
+	'🍿',
+	'🧈',
+	'🧂',
+	'🍱',
+	'🍘',
+	'🍙',
+	'🍚',
+	'🍛',
+	'🍜',
+	'🍝',
+	'🍠',
+	'🍢',
+	'🍣',
+	'🍤',
+	'🍥',
+	'🥮',
+	'🍡',
+	'🥟',
+	'🥠',
+	'🥡',
+	'🦀',
+	'🦞',
+	'🦐',
+	'🦑',
+	'🦪',
+	'🍦',
+	'🍧',
+	'🍨',
+	'🍩',
+	'🍪',
+	'🎂',
+	'🍰',
+	'🧁',
+	'🥧',
+	'🍫',
+	'🍬',
+	'🍭',
+	'🍮',
+	'🍯',
+	'🍼',
+	'🥛',
+	'☕',
+	'🫖',
+	'🍵',
+	'🍶',
+	'🍾',
+	'🍷',
+	'🍸',
+	'🍹',
+	'🍺',
+	'🍻',
+	'🥂',
+	'🥃',
+	'🫗',
+	'🥤',
+	'🧋',
+	'🧃',
+	'🧉',
+	'🧊',
+	'🍴',
+	'🥄',
+	'🔪',
+	'🫙',
+	'🏺',
+	'🍽️',
+	'🥢',
+	'🥡',
+] as const
 
-const INITIAL_DISPLAY_COUNT = 40;
+const INITIAL_DISPLAY_COUNT = 40
 
 interface CategoryModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-	onSubmit: (name: string, icon: string) => void;
-	mode: "create" | "edit";
-	initialName?: string;
-	initialEmoji?: string;
-	isLoading?: boolean;
+	isOpen: boolean
+	onClose: () => void
+	onSubmit: (name: string, icon: string) => void
+	mode: 'create' | 'edit'
+	initialName?: string
+	initialEmoji?: string
+	isLoading?: boolean
 }
 
 const CategoryModalComponent = ({
@@ -37,27 +149,27 @@ const CategoryModalComponent = ({
 	onClose,
 	onSubmit,
 	mode,
-	initialName = "",
-	initialEmoji = "🍴",
+	initialName = '',
+	initialEmoji = '🍴',
 	isLoading = false,
 }: CategoryModalProps) => {
-	const [name, setName] = useState(initialName);
-	const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji);
-	const [error, setError] = useState("");
-	const [showAllEmojis, setShowAllEmojis] = useState(false);
+	const [name, setName] = useState(initialName)
+	const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji)
+	const [error, setError] = useState('')
+	const [showAllEmojis, setShowAllEmojis] = useState(false)
 
 	const displayedEmojis = showAllEmojis
 		? ALL_EMOJI_OPTIONS
-		: ALL_EMOJI_OPTIONS.slice(0, INITIAL_DISPLAY_COUNT);
+		: ALL_EMOJI_OPTIONS.slice(0, INITIAL_DISPLAY_COUNT)
 
 	useEffect(() => {
 		if (isOpen) {
-			setName(initialName);
-			setSelectedEmoji(initialEmoji || "🍴");
-			setError("");
-			setShowAllEmojis(false);
+			setName(initialName)
+			setSelectedEmoji(initialEmoji || '🍴')
+			setError('')
+			setShowAllEmojis(false)
 		}
-	}, [isOpen, initialName, initialEmoji]);
+	}, [isOpen, initialName, initialEmoji])
 
 	useEffect(() => {
 		if (isOpen) {
@@ -68,29 +180,29 @@ const CategoryModalComponent = ({
 		return () => {
 			document.body.style.overflow = ''
 		}
-	}, [isOpen]);
+	}, [isOpen])
 
 	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
+		e.preventDefault()
 
 		if (!name.trim()) {
-			setError("Category name is required");
-			return;
+			setError('Category name is required')
+			return
 		}
 
 		if (name.trim().length < 2) {
-			setError("Category name must be at least 2 characters");
-			return;
+			setError('Category name must be at least 2 characters')
+			return
 		}
 
-		onSubmit(name.trim(), selectedEmoji);
-	};
+		onSubmit(name.trim(), selectedEmoji)
+	}
 
 	const handleClose = () => {
-		if (!isLoading) onClose();
-	};
+		if (!isLoading) onClose()
+	}
 
-	if (!isOpen) return null;
+	if (!isOpen) return null
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -109,7 +221,7 @@ const CategoryModalComponent = ({
 							{selectedEmoji}
 						</div>
 						<h2 className="text-xl font-bold text-foreground">
-							{mode === "create" ? "Create New Category" : "Edit Category"}
+							{mode === 'create' ? 'Create New Category' : 'Edit Category'}
 						</h2>
 					</div>
 
@@ -127,7 +239,10 @@ const CategoryModalComponent = ({
 					<div className="p-6 space-y-5">
 						{/* Category Name */}
 						<div className="space-y-2">
-							<label htmlFor="category-name" className="text-sm font-semibold text-foreground">
+							<label
+								htmlFor="category-name"
+								className="text-sm font-semibold text-foreground"
+							>
 								Category Name
 								<span className="text-red-500 ml-1">*</span>
 							</label>
@@ -136,15 +251,16 @@ const CategoryModalComponent = ({
 								type="text"
 								value={name}
 								onChange={(e) => {
-									setName(e.target.value);
-									setError("");
+									setName(e.target.value)
+									setError('')
 								}}
 								placeholder="e.g., Appetizers, Main Courses, Desserts..."
 								disabled={isLoading}
-								className={`w-full h-11 px-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${error
-										? "border-red-500 focus:ring-red-500/20"
-										: "border-border focus:ring-primary/20 focus:border-primary"
-									}`}
+								className={`w-full h-11 px-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+									error
+										? 'border-red-500 focus:ring-red-500/20'
+										: 'border-border focus:ring-primary/20 focus:border-primary'
+								}`}
 								autoFocus
 							/>
 							{error && (
@@ -167,10 +283,11 @@ const CategoryModalComponent = ({
 											type="button"
 											onClick={() => setSelectedEmoji(emoji)}
 											disabled={isLoading}
-											className={`aspect-square rounded-lg text-2xl flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed ${selectedEmoji === emoji
-													? "bg-primary scale-105 shadow-md"
-													: "bg-accent hover:bg-accent/80 hover:scale-105"
-												}`}
+											className={`aspect-square rounded-lg text-2xl flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+												selectedEmoji === emoji
+													? 'bg-primary scale-105 shadow-md'
+													: 'bg-accent hover:bg-accent/80 hover:scale-105'
+											}`}
 										>
 											{emoji}
 										</button>
@@ -193,7 +310,9 @@ const CategoryModalComponent = ({
 											<>
 												<ChevronDown className="w-4 h-4" />
 												<span>
-													Show More ({ALL_EMOJI_OPTIONS.length - INITIAL_DISPLAY_COUNT} more)
+													Show More (
+													{ALL_EMOJI_OPTIONS.length - INITIAL_DISPLAY_COUNT}{' '}
+													more)
 												</span>
 											</>
 										)}
@@ -224,17 +343,19 @@ const CategoryModalComponent = ({
 							{isLoading ? (
 								<>
 									<Loader2 className="w-4 h-4 animate-spin" />
-									<span>{mode === "create" ? "Creating..." : "Saving..."}</span>
+									<span>{mode === 'create' ? 'Creating...' : 'Saving...'}</span>
 								</>
 							) : (
-								<span>{mode === "create" ? "Create Category" : "Save Changes"}</span>
+								<span>
+									{mode === 'create' ? 'Create Category' : 'Save Changes'}
+								</span>
 							)}
 						</button>
 					</div>
 				</div>
 			</div>
 		</div>
-	);
-};
+	)
+}
 
-export const CategoryModal = memo(CategoryModalComponent);
+export const CategoryModal = memo(CategoryModalComponent)

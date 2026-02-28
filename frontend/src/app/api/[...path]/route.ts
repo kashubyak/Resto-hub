@@ -1,3 +1,5 @@
+'use client'
+
 import { type NextRequest, NextResponse } from 'next/server'
 import http from 'node:http'
 import https from 'node:https'
@@ -76,118 +78,120 @@ function proxy(
 							String(reqBody.length)
 					}
 					const client = isHttps ? https : http
-					const req = client.request(options, async (res) => {
-						try {
-							const chunks: Buffer[] = []
-							for await (const chunk of res) chunks.push(chunk)
-							const responseBody = Buffer.concat(chunks)
+					const req = client.request(options, (res) => {
+						void (async () => {
+							try {
+								const chunks: Buffer[] = []
+								for await (const chunk of res) chunks.push(chunk)
+								const responseBody = Buffer.concat(chunks)
 
-							const nextRes = new NextResponse(responseBody, {
-								status: res.statusCode ?? 200,
-								statusText: res.statusMessage,
-							})
-
-							const isProd = process.env.NODE_ENV === 'production'
-							const sameSite = isProd ? ('strict' as const) : ('lax' as const)
-							const rootDomain =
-								process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
-							const cookieOptions = (maxAge: number, httpOnly: boolean) => {
-								const opts: {
-									path: string
-									httpOnly: boolean
-									secure: boolean
-									sameSite: 'strict' | 'lax'
-									maxAge: number
-									domain?: string
-								} = {
-									path: '/',
-									httpOnly,
-									secure: isProd,
-									sameSite,
-									maxAge,
-								}
-								if (rootDomain !== 'localhost') opts.domain = `.${rootDomain}`
-								return opts
-							}
-
-							const raw = res.rawHeaders
-							const setCookieHeaders: string[] = raw
-								? (() => {
-										const out: string[] = []
-										for (let i = 0; i < raw.length; i += 2) {
-											const val = raw[i + 1]
-											if (
-												raw[i]?.toLowerCase() === 'set-cookie' &&
-												typeof val === 'string'
-											)
-												out.push(val)
-										}
-										return out
-									})()
-								: []
-
-							if (setCookieHeaders.length > 0) {
-								const parsedCookies = parseSetCookie(setCookieHeaders, {
-									decodeValues: true,
+								const nextRes = new NextResponse(responseBody, {
+									status: res.statusCode ?? 200,
+									statusText: res.statusMessage,
 								})
-								for (const c of parsedCookies) {
-									const maxAge =
-										c.maxAge ??
-										(c.name === ACCESS_TOKEN_COOKIE
-											? 15 * 60
-											: 7 * 24 * 60 * 60)
-									nextRes.cookies.set(c.name, c.value, {
-										...cookieOptions(maxAge, c.name !== AUTH_STATUS_COOKIE),
-									})
-								}
-							}
 
-							// Fallback: set access_token from body for login/refresh (same-origin)
-							if (
-								res.statusCode === 200 &&
-								(pathStr === 'auth/login' || pathStr === 'auth/refresh')
-							) {
-								try {
-									const data = JSON.parse(responseBody.toString()) as {
-										token?: string
-										success?: boolean
+								const isProd = process.env.NODE_ENV === 'production'
+								const sameSite = isProd ? ('strict' as const) : ('lax' as const)
+								const rootDomain =
+									process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+								const cookieOptions = (maxAge: number, httpOnly: boolean) => {
+									const opts: {
+										path: string
+										httpOnly: boolean
+										secure: boolean
+										sameSite: 'strict' | 'lax'
+										maxAge: number
+										domain?: string
+									} = {
+										path: '/',
+										httpOnly,
+										secure: isProd,
+										sameSite,
+										maxAge,
 									}
-									if (data?.token && data?.success) {
-										nextRes.cookies.set(ACCESS_TOKEN_COOKIE, data.token, {
-											...cookieOptions(15 * 60, true),
+									if (rootDomain !== 'localhost') opts.domain = `.${rootDomain}`
+									return opts
+								}
+
+								const raw = res.rawHeaders
+								const setCookieHeaders: string[] = raw
+									? (() => {
+											const out: string[] = []
+											for (let i = 0; i < raw.length; i += 2) {
+												const val = raw[i + 1]
+												if (
+													raw[i]?.toLowerCase() === 'set-cookie' &&
+													typeof val === 'string'
+												)
+													out.push(val)
+											}
+											return out
+										})()
+									: []
+
+								if (setCookieHeaders.length > 0) {
+									const parsedCookies = parseSetCookie(setCookieHeaders, {
+										decodeValues: true,
+									})
+									for (const c of parsedCookies) {
+										const maxAge =
+											c.maxAge ??
+											(c.name === ACCESS_TOKEN_COOKIE
+												? 15 * 60
+												: 7 * 24 * 60 * 60)
+										nextRes.cookies.set(c.name, c.value, {
+											...cookieOptions(maxAge, c.name !== AUTH_STATUS_COOKIE),
 										})
 									}
-								} catch {
-									// ignore JSON parse errors
 								}
-							}
 
-							const excludeHeaders = ['set-cookie', 'transfer-encoding']
-							res.headers &&
-								Object.entries(res.headers).forEach(([key, value]) => {
-									const lower = key.toLowerCase()
-									if (!excludeHeaders.includes(lower) && value)
-										nextRes.headers.set(
-											key,
-											Array.isArray(value) ? value.join(', ') : value,
-										)
+								if (
+									res.statusCode === 200 &&
+									(pathStr === 'auth/login' || pathStr === 'auth/refresh')
+								) {
+									try {
+										const data = JSON.parse(responseBody.toString()) as {
+											token?: string
+											success?: boolean
+										}
+										if (data?.token && data?.success) {
+											nextRes.cookies.set(ACCESS_TOKEN_COOKIE, data.token, {
+												...cookieOptions(15 * 60, true),
+											})
+										}
+									} catch {
+										// ignore JSON parse errors
+									}
+								}
+
+								const excludeHeaders = ['set-cookie', 'transfer-encoding']
+								if (res.headers) {
+									Object.entries(res.headers).forEach(([key, value]) => {
+										const lower = key.toLowerCase()
+										if (!excludeHeaders.includes(lower) && value)
+											nextRes.headers.set(
+												key,
+												Array.isArray(value) ? value.join(', ') : value,
+											)
+									})
+								}
+
+								const origin = request.headers.get('origin')
+								const cors = corsHeaders(origin)
+								for (const [key, value] of Object.entries(cors)) {
+									nextRes.headers.set(key, value)
+								}
+
+								resolve(nextRes)
+							} catch (err) {
+								console.error('[proxy] error processing response', {
+									path: pathStr,
+									status: res.statusCode,
+									error: err,
 								})
-
-							const origin = request.headers.get('origin')
-							const cors = corsHeaders(origin)
-							for (const [key, value] of Object.entries(cors)) {
-								nextRes.headers.set(key, value)
+								reject(err)
 							}
-
-							resolve(nextRes)
-						} catch (err) {
-							console.error('[proxy] error processing response', {
-								path: pathStr,
-								status: res.statusCode,
-								error: err,
-							})
-							reject(err)
-						}
+						})()
 					})
 					req.on('error', (err) => {
 						console.error('[proxy] request error', {
@@ -208,7 +212,7 @@ function proxy(
 				) {
 					const reader = body.getReader()
 					const bufs: Uint8Array[] = []
-					;(async () => {
+					void (async () => {
 						try {
 							while (true) {
 								const { done, value } = await reader.read()
@@ -282,7 +286,7 @@ export async function DELETE(
 	return proxyWithLogging(request, context.params, undefined)
 }
 
-export async function OPTIONS(request: NextRequest) {
+export function OPTIONS(request: NextRequest) {
 	const origin = request.headers.get('origin')
 	return new NextResponse(null, {
 		status: 204,

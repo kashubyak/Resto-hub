@@ -3,7 +3,7 @@
 import { cn } from '@/utils/cn'
 import { memo, type ReactNode } from 'react'
 
-type ButtonProps = {
+interface ButtonProps {
 	type?: 'submit' | 'button' | 'reset'
 	onClick?: () => void
 	text?: string

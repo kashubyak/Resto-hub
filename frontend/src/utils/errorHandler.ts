@@ -1,4 +1,4 @@
-import type { IApiErrorResponse, IAxiosError } from '@/types/error.interface'
+import type { IAxiosError } from '@/types/error.interface'
 
 const ERROR_MESSAGES: Record<number, string> = {
 	400: 'Bad request',
@@ -20,8 +20,8 @@ export const getRetryAfter = (error: IAxiosError): number | null => {
 	if (!headers) return null
 
 	const retryAfter =
-		headers['retry-after'] ||
-		headers['Retry-After'] ||
+		headers['retry-after'] ??
+		headers['Retry-After'] ??
 		headers['x-ratelimit-reset']
 
 	if (!retryAfter) return null
@@ -48,7 +48,7 @@ export const parseBackendError = (error: IAxiosError): string[] => {
 		return ['An unexpected error occurred. Please try again.']
 	}
 
-	const data = error.response.data as IApiErrorResponse
+	const data = error.response.data
 
 	if (data?.message) {
 		if (Array.isArray(data.message))
@@ -58,13 +58,13 @@ export const parseBackendError = (error: IAxiosError): string[] => {
 
 	const status = error.response.status
 	const defaultMessage =
-		ERROR_MESSAGES[status] || 'An unknown error has occurred'
+		ERROR_MESSAGES[status] ?? 'An unknown error has occurred'
 	return [defaultMessage]
 }
 
 export const getFirstError = (error: IAxiosError): string => {
 	const errors = parseBackendError(error)
-	return errors[0] || 'An unknown error has occurred'
+	return errors[0] ?? 'An unknown error has occurred'
 }
 
 export const getAllErrorsAsString = (error: IAxiosError): string => {

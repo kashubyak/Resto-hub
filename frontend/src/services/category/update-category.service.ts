@@ -12,9 +12,6 @@ export const updateCategoryService = async (
 	id: number,
 	payload: IUpdateCategoryPayload,
 ): Promise<ApiResponse<ICategory>> => {
-	const response = await api.patch<ICategory>(
-		API_URL.CATEGORY.ID(id),
-		payload,
-	)
+	const response = await api.patch<ICategory>(API_URL.CATEGORY.ID(id), payload)
 	return response
 }

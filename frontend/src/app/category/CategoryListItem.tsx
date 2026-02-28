@@ -51,7 +51,7 @@ const CategoryListItemComponent = ({
 
 	const handleIntersection = useCallback(
 		(entries: IntersectionObserverEntry[]) => {
-			if (entries[0]?.isIntersecting && hasNextPage) fetchNextPage()
+			if (entries[0]?.isIntersecting && hasNextPage) void fetchNextPage()
 		},
 		[hasNextPage, fetchNextPage],
 	)

@@ -3,10 +3,11 @@
 import { size_of_image } from '@/constants/share.constant'
 import { useUploadImage } from '@/hooks/useUploadImage'
 import { AlertCircle, Upload, X } from 'lucide-react'
+import Image from 'next/image'
 import { memo, useCallback, useMemo, useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
-type UploadImageProps = {
+interface UploadImageProps {
 	label?: string
 	error?: string
 	register?: UseFormRegisterReturn
@@ -24,6 +25,12 @@ export const UploadImage = memo(
 	}: UploadImageProps) => {
 		const [isDraggingOver, setIsDraggingOver] = useState(false)
 
+		const registerValue = register ?? {
+			name: '',
+			ref: () => null,
+			onChange: () => {},
+			onBlur: () => {},
+		}
 		const {
 			preview,
 			inputRef,
@@ -34,13 +41,13 @@ export const UploadImage = memo(
 			isDragging: _isDragging,
 			...restRegister
 		} = useUploadImage({
-			register: register!,
+			register: registerValue,
 			savedPreview,
 			onDataChange,
 		})
 
 		const currentPreview = useMemo(
-			() => preview || savedPreview || null,
+			() => preview ?? savedPreview ?? null,
 			[preview, savedPreview],
 		)
 
@@ -126,11 +133,12 @@ export const UploadImage = memo(
 				) : (
 					<div className="relative border-2 border-border rounded-xl p-4 bg-muted/20">
 						<div className="flex items-center gap-4">
-							<div className="w-16 h-16 rounded-full overflow-hidden bg-muted flex-shrink-0">
-								<img
+							<div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted flex-shrink-0">
+								<Image
 									src={currentPreview}
 									alt="Preview"
-									className="w-full h-full object-cover"
+									fill
+									className="object-cover"
 								/>
 							</div>
 							<div className="flex-1 min-w-0">

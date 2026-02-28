@@ -1,13 +1,13 @@
-import { AlertTriangle, Loader2, Trash2, X } from "lucide-react";
-import { useEffect } from "react";
-import type { IDish } from '@/types/dish.interface';
+import { AlertTriangle, Loader2, Trash2, X } from 'lucide-react'
+import { useEffect } from 'react'
+import type { IDish } from '@/types/dish.interface'
 
 interface DeleteDishModalProps {
-	open: boolean;
-	onClose: () => void;
-	dish?: IDish;
-	onConfirm: () => void;
-	isPending: boolean;
+	open: boolean
+	onClose: () => void
+	dish?: IDish
+	onConfirm: () => void
+	isPending: boolean
 }
 
 export function DeleteDishModal({
@@ -28,7 +28,7 @@ export function DeleteDishModal({
 		}
 	}, [open])
 
-	if (!open) return null;
+	if (!open) return null
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -67,17 +67,27 @@ export function DeleteDishModal({
 					{dish && (
 						<div className="p-4 bg-background border border-border rounded-xl space-y-2">
 							<div>
-								<p className="text-xs font-medium text-muted-foreground">Dish name</p>
-								<p className="text-sm font-semibold text-foreground">{dish.name}</p>
+								<p className="text-xs font-medium text-muted-foreground">
+									Dish name
+								</p>
+								<p className="text-sm font-semibold text-foreground">
+									{dish.name}
+								</p>
 							</div>
 							<div>
-								<p className="text-xs font-medium text-muted-foreground">Dish ID</p>
+								<p className="text-xs font-medium text-muted-foreground">
+									Dish ID
+								</p>
 								<p className="text-sm text-foreground">{dish.id}</p>
 							</div>
 							{dish.category && (
 								<div>
-									<p className="text-xs font-medium text-muted-foreground">Category</p>
-									<p className="text-sm text-foreground">{dish.category.name}</p>
+									<p className="text-xs font-medium text-muted-foreground">
+										Category
+									</p>
+									<p className="text-sm text-foreground">
+										{dish.category.name}
+									</p>
 								</div>
 							)}
 						</div>
@@ -86,7 +96,8 @@ export function DeleteDishModal({
 					<div className="flex items-start gap-3 p-4 bg-red-500/5 border border-red-500/20 rounded-xl mt-4">
 						<AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
 						<p className="text-xs text-muted-foreground">
-							This dish will be permanently deleted from the system. This action cannot be undone.
+							This dish will be permanently deleted from the system. This action
+							cannot be undone.
 						</p>
 					</div>
 				</div>
@@ -123,5 +134,5 @@ export function DeleteDishModal({
 				</div>
 			</div>
 		</div>
-	);
+	)
 }

@@ -1,4 +1,5 @@
-import { ROLE_ROUTES_MAP, UserRole } from '@/constants/pages.constant'
+import { ROLE_ROUTES_MAP } from '@/constants/pages.constant'
+import type { UserRole } from '@/constants/pages.constant'
 
 export const hasRoleAccess = (
 	userRole: UserRole | string,

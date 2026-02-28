@@ -39,8 +39,9 @@ export const useCategoryModal = (onClose: () => void) => {
 				if (response.status === 201) {
 					showSuccess('Category created successfully')
 					refetchCategories()
-					// Invalidate newUser queries so user is no longer considered new
-					queryClient.invalidateQueries({ queryKey: IS_NEW_USER_QUERY_KEY })
+					void queryClient.invalidateQueries({
+						queryKey: IS_NEW_USER_QUERY_KEY,
+					})
 					reset()
 					onClose()
 				}

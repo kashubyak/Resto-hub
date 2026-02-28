@@ -47,7 +47,6 @@ export default function DishesPage() {
 		}
 	}, [localSearch])
 
-
 	const handleNavigateToCreate = useCallback(
 		() => router.push(ROUTES.PRIVATE.ADMIN.DISH_CREATE),
 		[router],

@@ -45,7 +45,9 @@ export default function DishPage({
 					>
 						<ArrowLeft className="w-5 h-5" />
 					</Link>
-					<h1 className="text-xl font-semibold text-foreground">Dish Details</h1>
+					<h1 className="text-xl font-semibold text-foreground">
+						Dish Details
+					</h1>
 				</div>
 
 				{/* Main Content */}

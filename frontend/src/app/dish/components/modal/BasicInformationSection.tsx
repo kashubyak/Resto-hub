@@ -14,7 +14,7 @@ import type {
 } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 
-type BasicInformationSectionProps = {
+interface BasicInformationSectionProps {
 	register?: UseFormRegister<IDishFormValues>
 	control?: Control<IDishFormValues>
 	errors: FieldErrors<IDishFormValues>
@@ -59,11 +59,7 @@ export const BasicInformationSection = ({
 						control={control}
 						rules={dishNameValidation}
 						render={({ field }) => (
-							<input
-								{...field}
-								type="text"
-								className={inputClass}
-							/>
+							<input {...field} type="text" className={inputClass} />
 						)}
 					/>
 					{errors.name?.message && (
@@ -93,8 +89,7 @@ export const BasicInformationSection = ({
 									v.trim().length <= maxDescriptionLength ||
 									`Description can be at most ${maxDescriptionLength} characters`,
 								noOnlySpaces: (v) =>
-									v.trim().length > 0 ||
-									'Description cannot be only spaces',
+									v.trim().length > 0 || 'Description cannot be only spaces',
 							},
 						}}
 						render={({ field }) => (

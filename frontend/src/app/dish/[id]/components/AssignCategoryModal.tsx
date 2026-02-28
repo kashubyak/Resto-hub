@@ -57,17 +57,19 @@ export function AssignCategoryModal({
 		}
 	}, [open])
 
-	const { data: categoriesResponse, isLoading: isLoadingCategories } = useQuery({
-		queryKey: ['categories', 'assign', search],
-		queryFn: async () => {
-			const res = await getCategoriesService({
-				limit: 50,
-				search: search.trim() || undefined,
-			})
-			return res.data
+	const { data: categoriesResponse, isLoading: isLoadingCategories } = useQuery(
+		{
+			queryKey: ['categories', 'assign', search],
+			queryFn: async () => {
+				const res = await getCategoriesService({
+					limit: 50,
+					search: search.trim() || undefined,
+				})
+				return res.data
+			},
+			enabled: open,
 		},
-		enabled: open,
-	})
+	)
 
 	const assignMutation = useMutation({
 		mutationFn: (categoryId: number) =>
@@ -75,7 +77,7 @@ export function AssignCategoryModal({
 		onSuccess: (response) => {
 			const updatedDish = response.data
 			onAssigned(updatedDish)
-			queryClient.invalidateQueries({
+			void queryClient.invalidateQueries({
 				queryKey: [DISHES_QUERY_KEY.DETAIL, dishId],
 			})
 			showSuccess('Category assigned successfully')
@@ -153,7 +155,9 @@ export function AssignCategoryModal({
 									disabled={assignMutation.isPending}
 									className="group relative p-4 bg-background hover:bg-accent border-2 border-border hover:border-primary rounded-xl transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
 								>
-									<div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getGradientByIndex(index)} flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform`}>
+									<div
+										className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getGradientByIndex(index)} flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform`}
+									>
 										{cat.icon || '🍴'}
 									</div>
 									<p className="text-sm font-semibold text-foreground mb-1">

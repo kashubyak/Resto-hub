@@ -115,11 +115,6 @@ const LockIcon = <Lock className="h-5 w-5 text-muted-foreground" />
 
 const LoginComponent = ({ host = '' }: { host?: string }) => {
 	const searchParams = useSearchParams()
-	const hostSubdomain =
-		(typeof host === 'string' && host ? getSubdomainFromHost(host) : null) ??
-		getSubdomainFromHostname()
-	if (!hostSubdomain) return <LoginSubdomainGate />
-
 	const [showPassword, setShowPassword] = useState(false)
 	const { register, handleSubmit, errors, onSubmit } = useLogin()
 
@@ -129,6 +124,11 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 			`${getRootAppUrl()}${ROUTES.PUBLIC.AUTH.LOGIN}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`,
 		[searchParams],
 	)
+
+	const hostSubdomain =
+		(typeof host === 'string' && host ? getSubdomainFromHost(host) : null) ??
+		getSubdomainFromHostname()
+	if (!hostSubdomain) return <LoginSubdomainGate />
 
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-background px-2 sm:px-4 py-4 sm:py-8 relative overflow-hidden">
@@ -161,7 +161,9 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 				{/* Login Form Card */}
 				<div className="bg-card rounded-xl sm:rounded-3xl shadow-lg border border-border/50 p-4 sm:p-8 backdrop-blur-sm">
 					<form
-						onSubmit={handleSubmit(onSubmit)}
+						onSubmit={(e) => {
+							void handleSubmit(onSubmit)(e)
+						}}
 						method="post"
 						action="#"
 						autoComplete="on"

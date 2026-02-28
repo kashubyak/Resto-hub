@@ -59,8 +59,10 @@ export const useDishModal = (onClose: () => void) => {
 
 				if (response.status === 201) {
 					showSuccess('Dish created successfully')
-					refetchDishes()
-					queryClient.invalidateQueries({ queryKey: IS_NEW_USER_QUERY_KEY })
+					void refetchDishes()
+					void queryClient.invalidateQueries({
+						queryKey: IS_NEW_USER_QUERY_KEY,
+					})
 					reset()
 					onClose()
 				}

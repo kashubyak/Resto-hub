@@ -8,8 +8,6 @@ import type {
 	FilterConfig,
 	FilterValue,
 	FilterValues,
-	RangeFilterConfig,
-	SelectFilterConfig,
 } from '@/types/filter.interface'
 import { SlidersHorizontal, X } from 'lucide-react'
 import { memo, useCallback, useMemo } from 'react'
@@ -31,8 +29,7 @@ const DishFilterPanelComponent: React.FC<DishFilterPanelProps> = ({
 	const hasActiveFilters = useMemo(
 		() =>
 			Object.entries(filters).some(
-				([, value]) =>
-					value !== undefined && value !== null && value !== '',
+				([, value]) => value !== undefined && value !== null && value !== '',
 			),
 		[filters],
 	)
@@ -78,7 +75,7 @@ const DishFilterPanelComponent: React.FC<DishFilterPanelProps> = ({
 		const tags: { label: string; onRemove: () => void }[] = []
 		for (const config of filterConfig) {
 			if (config.type === 'range') {
-				const rangeConfig = config as RangeFilterConfig
+				const rangeConfig = config
 				const min = filters[rangeConfig.minKey]
 				const max = filters[rangeConfig.maxKey]
 				if (
@@ -99,7 +96,7 @@ const DishFilterPanelComponent: React.FC<DishFilterPanelProps> = ({
 			if (config.type === 'select') {
 				const value = filters[config.key]
 				if (value !== undefined && value !== null && value !== '') {
-					const selectConfig = config as SelectFilterConfig
+					const selectConfig = config
 					const option = selectConfig.options.find(
 						(o) => String(o.value) === String(value),
 					)
@@ -117,7 +114,7 @@ const DishFilterPanelComponent: React.FC<DishFilterPanelProps> = ({
 				const value = filters.categoryId
 				if (value !== undefined && value !== null && value !== '') {
 					const category = allCategories.find((c) => c.id === Number(value))
-					const categoryName = category?.name || `ID: ${value}`
+					const categoryName = category?.name ?? `ID: ${value}`
 					tags.push({
 						label: `Category: ${categoryName}`,
 						onRemove: () => onChange('categoryId', undefined),
@@ -154,9 +151,7 @@ const DishFilterPanelComponent: React.FC<DishFilterPanelProps> = ({
 			<div className="p-5">
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 					{filterConfig.map((config) => (
-						<div key={config.key}>
-							{renderFilter(config)}
-						</div>
+						<div key={config.key}>{renderFilter(config)}</div>
 					))}
 				</div>
 

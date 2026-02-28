@@ -12,7 +12,7 @@ export const useCompanySettings = (enabled = true) => {
 	const { showBackendError } = useAlert()
 	const { copy, copied } = useCopyToClipboard()
 
-	const subdomain = getSubdomainFromHostname() || ''
+	const subdomain = getSubdomainFromHostname() ?? ''
 	const companyUrl = subdomain ? getCompanyUrl(subdomain) : ''
 
 	const { data: company = null } = useQuery({
@@ -32,7 +32,7 @@ export const useCompanySettings = (enabled = true) => {
 	})
 
 	const handleCopy = useCallback(() => {
-		if (companyUrl) copy(companyUrl)
+		if (companyUrl) void copy(companyUrl)
 	}, [companyUrl, copy])
 
 	return {

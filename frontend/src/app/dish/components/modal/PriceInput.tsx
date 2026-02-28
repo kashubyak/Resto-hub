@@ -9,7 +9,7 @@ import {
 import { memo, useCallback } from 'react'
 import { Controller, type Control, type UseFormRegister } from 'react-hook-form'
 
-type PriceInputProps = {
+interface PriceInputProps {
 	register?: UseFormRegister<IDishFormValues>
 	control: Control<IDishFormValues>
 	mode?: 'create' | 'update'
@@ -38,7 +38,7 @@ const PriceInputFunction = ({
 	)
 
 	const handleBlur = useCallback(() => {
-		if (mode === 'update') trigger?.('price')
+		if (mode === 'update') void trigger?.('price')
 	}, [mode, trigger])
 
 	return (

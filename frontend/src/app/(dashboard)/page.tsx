@@ -40,7 +40,7 @@ const WelcomeScreen = memo(function WelcomeScreen() {
 						Welcome to Your Dashboard! 🎉
 					</h1>
 					<p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
-						You're all set! Start by adding your first dishes, organizing
+						You&apos;re all set! Start by adding your first dishes, organizing
 						categories, or inviting team members to collaborate.
 					</p>
 				</div>
@@ -135,7 +135,7 @@ const RegularDashboard = memo(function RegularDashboard() {
 					Welcome back! 👋
 				</h1>
 				<p className="text-sm sm:text-base text-muted-foreground">
-					Here's what's happening with your restaurant today.
+					Here&apos;s what&apos;s happening with your restaurant today.
 				</p>
 			</div>
 		</div>

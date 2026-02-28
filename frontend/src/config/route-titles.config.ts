@@ -18,7 +18,8 @@ export const getPageTitle = (
 
 	if (id && typeof id === 'string') {
 		const cacheKey = `${pathname}-${id}`
-		if (titleCache.has(cacheKey)) return titleCache.get(cacheKey)!
+		const cached = titleCache.get(cacheKey)
+		if (cached) return cached
 
 		for (const [route, formatter] of Object.entries(DYNAMIC_ROUTE_TITLES)) {
 			if (pathname.includes(route)) {

@@ -134,8 +134,10 @@ export const useRegisterCompany = () => {
 				formData.append('adminName', data.adminName)
 				formData.append('adminEmail', data.adminEmail)
 				formData.append('adminPassword', data.adminPassword)
-				formData.append('logoUrl', data.logoUrl?.[0] || savedFiles.logo!)
-				formData.append('avatarUrl', data.avatarUrl?.[0] || savedFiles.avatar!)
+				const logoFile = data.logoUrl?.[0] ?? savedFiles.logo
+				const avatarFile = data.avatarUrl?.[0] ?? savedFiles.avatar
+				if (logoFile) formData.append('logoUrl', logoFile)
+				if (avatarFile) formData.append('avatarUrl', avatarFile)
 
 				const response = await registerCompany(formData)
 

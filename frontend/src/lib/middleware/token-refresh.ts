@@ -1,5 +1,5 @@
 import { API_URL } from '@/config/api'
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 
 export interface IRefreshResult {
 	success: boolean

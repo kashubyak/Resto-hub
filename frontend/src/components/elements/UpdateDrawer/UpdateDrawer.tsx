@@ -55,10 +55,10 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 				name: dishData.name,
 				description: dishData.description,
 				price: dishData.price,
-				categoryId: dishData.categoryId || undefined,
+				categoryId: dishData.categoryId ?? undefined,
 				ingredients: dishData.ingredients,
-				weightGr: dishData.weightGr || undefined,
-				calories: dishData.calories || undefined,
+				weightGr: dishData.weightGr ?? undefined,
+				calories: dishData.calories ?? undefined,
 				available: dishData.available,
 			})
 		}
@@ -168,7 +168,9 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 				</div>
 
 				<form
-					onSubmit={handleFormSubmit}
+					onSubmit={(e) => {
+						void handleFormSubmit(e)
+					}}
 					className="flex-1 overflow-y-auto flex flex-col min-h-0"
 				>
 					<div className="p-6 space-y-6">{sections.map(renderSection)}</div>

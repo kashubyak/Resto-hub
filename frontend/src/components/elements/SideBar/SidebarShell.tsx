@@ -6,14 +6,15 @@ import { useAuthStore } from '@/store/auth.store'
 import { memo } from 'react'
 import { SidebarSkeleton } from './skeleton/SidebarSkeleton'
 
-type Props = { children: React.ReactNode }
+interface Props {
+	children: React.ReactNode
+}
 
 export const SidebarShell = memo(({ children }: Props) => {
 	const { user, isAuth, isFetchingUser } = useAuth()
 	const hydrated = useAuthStore((state) => state.hydrated)
 
-	const showSkeleton =
-		!hydrated || (!user && (isFetchingUser || !isAuth))
+	const showSkeleton = !hydrated || (!user && (isFetchingUser ?? !isAuth))
 
 	if (showSkeleton)
 		return (

@@ -7,7 +7,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { memo } from 'react'
 
-type DishCardProps = { dish: IDish }
+interface DishCardProps {
+	dish: IDish
+}
 
 const DishCardComponent = ({ dish }: DishCardProps) => (
 	<div className="group bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300">
@@ -52,9 +54,7 @@ const DishCardComponent = ({ dish }: DishCardProps) => (
 				</div>
 				<div className="flex items-center gap-1">
 					<Flame className="w-3.5 h-3.5" />
-					<span>
-						{dish.calories != null ? `${dish.calories} kcal` : '—'}
-					</span>
+					<span>{dish.calories != null ? `${dish.calories} kcal` : '—'}</span>
 				</div>
 			</div>
 

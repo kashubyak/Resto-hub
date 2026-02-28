@@ -254,7 +254,9 @@ export const ImageViewer = memo(
 							isFullscreen={isFullscreen}
 							onZoomIn={handleZoomIn}
 							onZoomOut={handleZoomOut}
-							onFullscreen={handleFullscreen}
+							onFullscreen={() => {
+								void handleFullscreen()
+							}}
 							onClose={handleClose}
 						/>
 

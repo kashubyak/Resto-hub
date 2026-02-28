@@ -20,7 +20,7 @@ export function Map({ center, marker, onLocationSelect }: MapProps) {
 	useEffect(() => {
 		if (!mapRef.current || mapInstanceRef.current) return
 
-		const defaultCenter: [number, number] = center || [48.3794, 31.1656]
+		const defaultCenter: [number, number] = center ?? [48.3794, 31.1656]
 
 		const map = L.map(mapRef.current, {
 			center: defaultCenter,
@@ -46,7 +46,7 @@ export function Map({ center, marker, onLocationSelect }: MapProps) {
 			map.remove()
 			mapInstanceRef.current = null
 		}
-	}, [])
+	}, [center, theme])
 
 	useEffect(() => {
 		if (!mapInstanceRef.current) return
@@ -103,19 +103,21 @@ export function Map({ center, marker, onLocationSelect }: MapProps) {
 	useEffect(() => {
 		if (!mapInstanceRef.current || !onLocationSelect) return
 
-		const handleClick = async (e: L.LeafletMouseEvent) => {
-			const { lat, lng } = e.latlng
-			try {
-				const response = await fetch(
-					`/api/geocode/reverse?lat=${lat}&lon=${lng}`,
-				)
-				const data = await response.json()
-				const address =
-					data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`
-				onLocationSelect(lat, lng, address)
-			} catch {
-				onLocationSelect(lat, lng, `${lat.toFixed(4)}, ${lng.toFixed(4)}`)
-			}
+		const handleClick = (e: L.LeafletMouseEvent) => {
+			void (async () => {
+				const { lat, lng } = e.latlng
+				try {
+					const response = await fetch(
+						`/api/geocode/reverse?lat=${lat}&lon=${lng}`,
+					)
+					const data = await response.json()
+					const address =
+						data.display_name ?? `${lat.toFixed(4)}, ${lng.toFixed(4)}`
+					onLocationSelect(lat, lng, address)
+				} catch {
+					onLocationSelect(lat, lng, `${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+				}
+			})()
 		}
 
 		mapInstanceRef.current.on('click', handleClick)

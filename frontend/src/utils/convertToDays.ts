@@ -1,9 +1,10 @@
 const conversionCache = new Map<string, number>()
 export const convertToDays = (timeString: string): number => {
-	if (conversionCache.has(timeString)) return conversionCache.get(timeString)!
+	const cached = conversionCache.get(timeString)
+	if (cached !== undefined) return cached
 
 	const match = timeString.match(/^(\d+)([dhms])$/)
-	if (!match || !match[1] || !match[2]) {
+	if (!match?.[1] || !match?.[2]) {
 		conversionCache.set(timeString, 1)
 		return 1
 	}

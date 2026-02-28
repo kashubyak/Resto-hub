@@ -7,7 +7,9 @@ interface CategoryEmptyStateProps {
 	onCreateClick: () => void
 }
 
-const CategoryEmptyStateComponent = ({ onCreateClick }: CategoryEmptyStateProps) => {
+const CategoryEmptyStateComponent = ({
+	onCreateClick,
+}: CategoryEmptyStateProps) => {
 	return (
 		<div className="flex items-center justify-center min-h-[calc(100vh-12rem)]">
 			<div className="w-full max-w-4xl text-center space-y-8 px-4">

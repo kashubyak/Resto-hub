@@ -39,7 +39,8 @@ const TableNoResultsComponent = ({ onClearSearch }: TableNoResultsProps) => {
 						No Tables Found
 					</h3>
 					<p className="text-sm text-muted-foreground max-w-xs mx-auto">
-						No tables match your search. Try a different keyword or clear filters.
+						No tables match your search. Try a different keyword or clear
+						filters.
 					</p>
 				</div>
 				<button

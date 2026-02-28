@@ -55,7 +55,7 @@ export default function TablesPage() {
 		mutationFn: (data: { number: number; seats: number }) =>
 			createTableService(data),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['tables'] })
+			void queryClient.invalidateQueries({ queryKey: ['tables'] })
 			showSuccess('Table created successfully')
 			setIsModalOpen(false)
 			setSelectedTable(null)
@@ -68,7 +68,7 @@ export default function TablesPage() {
 		mutationFn: (data: { id: number; number: number; seats: number }) =>
 			updateTableService(data.id, { number: data.number, seats: data.seats }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['tables'] })
+			void queryClient.invalidateQueries({ queryKey: ['tables'] })
 			showSuccess('Table updated successfully')
 			setIsModalOpen(false)
 			setSelectedTable(null)
@@ -81,7 +81,7 @@ export default function TablesPage() {
 		mutationFn: (data: { id: number; active: boolean }) =>
 			updateTableService(data.id, { active: data.active }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['tables'] })
+			void queryClient.invalidateQueries({ queryKey: ['tables'] })
 			setActiveMenuId(null)
 		},
 		onError: (err) =>
@@ -91,7 +91,7 @@ export default function TablesPage() {
 	const deleteMutation = useMutation({
 		mutationFn: (id: number) => deleteTableService(id),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['tables'] })
+			void queryClient.invalidateQueries({ queryKey: ['tables'] })
 			showSuccess('Table deleted successfully')
 			setIsDeleteDialogOpen(false)
 			setSelectedTable(null)
@@ -237,13 +237,10 @@ export default function TablesPage() {
 	]
 
 	const currentSortLabel =
-		sortOptions.find((opt) => opt.value === sortBy)?.label || 'Sort'
+		sortOptions.find((opt) => opt.value === sortBy)?.label ?? 'Sort'
 
 	const isEmpty =
-		!isLoadingTables &&
-		tables.length === 0 &&
-		!searchQuery &&
-		filter === 'all'
+		!isLoadingTables && tables.length === 0 && !searchQuery && filter === 'all'
 
 	if (isLoadingTables) {
 		return (
@@ -259,46 +256,46 @@ export default function TablesPage() {
 				<TableEmptyState onCreateClick={handleCreateTable} />
 			) : (
 				<div className="space-y-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
-			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-				<div>
-					<h1 className="text-3xl font-bold text-foreground">Tables</h1>
-					<p className="text-sm text-muted-foreground mt-1">
-						Manage your restaurant tables and seating
-					</p>
-				</div>
-				<button
-					onClick={handleCreateTable}
-					className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-primary hover:bg-primary-hover text-primary-foreground rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
-				>
-					<Plus className="w-5 h-5" />
-					<span>Add Table</span>
-				</button>
-			</div>
-
-			{/* Filters & Search */}
-			<div className="flex flex-col lg:flex-row gap-4">
-				{/* Search */}
-				<div className="flex-1">
-					<div className="relative">
-						<Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-						<input
-							type="text"
-							placeholder="Search by table number or seats..."
-							value={localSearch}
-							onChange={(e) => setLocalSearch(e.target.value)}
-							className="w-full h-12 pl-12 pr-4 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
-						/>
-					</div>
-				</div>
-
-				{/* Filter Pills */}
-				<div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
-					{filterOptions.map((option) => (
+					{/* Header */}
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+						<div>
+							<h1 className="text-3xl font-bold text-foreground">Tables</h1>
+							<p className="text-sm text-muted-foreground mt-1">
+								Manage your restaurant tables and seating
+							</p>
+						</div>
 						<button
-							key={option.value}
-							onClick={() => setFilter(option.value as FilterType)}
-							className={`
+							onClick={handleCreateTable}
+							className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-primary hover:bg-primary-hover text-primary-foreground rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+						>
+							<Plus className="w-5 h-5" />
+							<span>Add Table</span>
+						</button>
+					</div>
+
+					{/* Filters & Search */}
+					<div className="flex flex-col lg:flex-row gap-4">
+						{/* Search */}
+						<div className="flex-1">
+							<div className="relative">
+								<Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+								<input
+									type="text"
+									placeholder="Search by table number or seats..."
+									value={localSearch}
+									onChange={(e) => setLocalSearch(e.target.value)}
+									className="w-full h-12 pl-12 pr-4 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+								/>
+							</div>
+						</div>
+
+						{/* Filter Pills */}
+						<div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+							{filterOptions.map((option) => (
+								<button
+									key={option.value}
+									onClick={() => setFilter(option.value as FilterType)}
+									className={`
                 flex items-center gap-2 h-12 px-4 rounded-xl font-medium whitespace-nowrap transition-all
                 ${
 									filter === option.value
@@ -306,10 +303,10 @@ export default function TablesPage() {
 										: 'bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/30'
 								}
               `}
-						>
-							<span>{option.label}</span>
-							<span
-								className={`
+								>
+									<span>{option.label}</span>
+									<span
+										className={`
                 min-w-[24px] h-6 px-2 rounded-md text-xs font-bold flex items-center justify-center
                 ${
 									filter === option.value
@@ -317,43 +314,43 @@ export default function TablesPage() {
 										: 'bg-muted text-muted-foreground'
 								}
               `}
+									>
+										{option.count}
+									</span>
+								</button>
+							))}
+						</div>
+
+						{/* Sort Dropdown */}
+						<div className="relative">
+							<button
+								onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+								className="h-12 pl-4 pr-10 bg-card border border-border rounded-xl text-foreground font-medium hover:border-primary/50 transition-all flex items-center gap-2 min-w-[180px]"
 							>
-								{option.count}
-							</span>
-						</button>
-					))}
-				</div>
+								<ArrowUpDown className="w-4 h-4 text-muted-foreground" />
+								<span className="flex-1 text-left">{currentSortLabel}</span>
+								<ChevronDown
+									className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
+										isSortDropdownOpen ? 'rotate-180' : ''
+									}`}
+								/>
+							</button>
 
-				{/* Sort Dropdown */}
-				<div className="relative">
-					<button
-						onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-						className="h-12 pl-4 pr-10 bg-card border border-border rounded-xl text-foreground font-medium hover:border-primary/50 transition-all flex items-center gap-2 min-w-[180px]"
-					>
-						<ArrowUpDown className="w-4 h-4 text-muted-foreground" />
-						<span className="flex-1 text-left">{currentSortLabel}</span>
-						<ChevronDown
-							className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
-								isSortDropdownOpen ? 'rotate-180' : ''
-							}`}
-						/>
-					</button>
-
-					{isSortDropdownOpen && (
-						<>
-							<div
-								className="fixed inset-0 z-40"
-								onClick={() => setIsSortDropdownOpen(false)}
-							/>
-							<div className="absolute right-0 top-full mt-2 w-56 bg-popover border border-border rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
-								{sortOptions.map((option) => (
-									<button
-										key={option.value}
-										onClick={() => {
-											setSortBy(option.value as SortType)
-											setIsSortDropdownOpen(false)
-										}}
-										className={`
+							{isSortDropdownOpen && (
+								<>
+									<div
+										className="fixed inset-0 z-40"
+										onClick={() => setIsSortDropdownOpen(false)}
+									/>
+									<div className="absolute right-0 top-full mt-2 w-56 bg-popover border border-border rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
+										{sortOptions.map((option) => (
+											<button
+												key={option.value}
+												onClick={() => {
+													setSortBy(option.value as SortType)
+													setIsSortDropdownOpen(false)
+												}}
+												className={`
                       w-full flex items-center gap-3 px-4 py-3 transition-colors text-left
                       ${
 												sortBy === option.value
@@ -361,142 +358,141 @@ export default function TablesPage() {
 													: 'hover:bg-accent text-foreground'
 											}
                     `}
-									>
-										<span className="text-lg">{option.icon}</span>
-										<span className="text-sm font-medium flex-1">
-											{option.label}
-										</span>
-										{sortBy === option.value && (
-											<div className="w-2 h-2 rounded-full bg-primary" />
-										)}
-									</button>
-								))}
-							</div>
-						</>
-					)}
-				</div>
-			</div>
+											>
+												<span className="text-lg">{option.icon}</span>
+												<span className="text-sm font-medium flex-1">
+													{option.label}
+												</span>
+												{sortBy === option.value && (
+													<div className="w-2 h-2 rounded-full bg-primary" />
+												)}
+											</button>
+										))}
+									</div>
+								</>
+							)}
+						</div>
+					</div>
 
-			{/* Tables Grid */}
-			{sortedTables.length === 0 ? (
-				<TableNoResults onClearSearch={handleClearSearch} />
-			) : (
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-					{sortedTables.map((table) => {
-						const status = getTableStatus(table)
-						const isMenuOpen = activeMenuId === table.id
+					{/* Tables Grid */}
+					{sortedTables.length === 0 ? (
+						<TableNoResults onClearSearch={handleClearSearch} />
+					) : (
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+							{sortedTables.map((table) => {
+								const status = getTableStatus(table)
+								const isMenuOpen = activeMenuId === table.id
 
-						return (
-							<div
-								key={table.id}
-								className={`
+								return (
+									<div
+										key={table.id}
+										className={`
                   group relative bg-card border rounded-2xl p-6 transition-all duration-300
                   hover:shadow-xl hover:-translate-y-1
                   ${
-									status === 'available'
-										? 'border-green-500/20 hover:border-green-500/40'
-										: ''
-								}
+										status === 'available'
+											? 'border-green-500/20 hover:border-green-500/40'
+											: ''
+									}
                   ${
-									status === 'occupied'
-										? 'border-red-500/20 hover:border-red-500/40'
-										: ''
-								}
+										status === 'occupied'
+											? 'border-red-500/20 hover:border-red-500/40'
+											: ''
+									}
                 `}
-							>
-								{/* Header with Actions */}
-								<div className="flex items-start justify-between mb-4">
-									<div
-										className={`
+									>
+										{/* Header with Actions */}
+										<div className="flex items-start justify-between mb-4">
+											<div
+												className={`
                     w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-2xl
                     ${status === 'available' ? 'bg-green-500/10 text-green-500' : ''}
                     ${status === 'occupied' ? 'bg-red-500/10 text-red-500' : ''}
                   `}
-									>
-										{table.number}
+											>
+												{table.number}
+											</div>
+
+											{/* Actions Menu */}
+											<div className="relative">
+												<button
+													onClick={() =>
+														setActiveMenuId(isMenuOpen ? null : table.id)
+													}
+													className="w-9 h-9 rounded-lg hover:bg-input flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
+												>
+													<MoreVertical className="w-4 h-4 text-muted-foreground" />
+												</button>
+
+												{isMenuOpen && (
+													<>
+														<div
+															className="fixed inset-0 z-40"
+															onClick={() => setActiveMenuId(null)}
+														/>
+														<div className="absolute right-0 top-full mt-2 w-48 bg-popover border border-border rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
+															<button
+																onClick={() => handleEditTable(table)}
+																className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors text-left"
+															>
+																<Edit2 className="w-4 h-4 text-muted-foreground" />
+																<span className="text-sm font-medium text-foreground">
+																	Edit Table
+																</span>
+															</button>
+															<button
+																onClick={() => handleToggleActive(table)}
+																disabled={toggleActiveMutation.isPending}
+																className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+															>
+																<Power className="w-4 h-4 text-muted-foreground" />
+																<span className="text-sm font-medium text-foreground">
+																	{table.active
+																		? 'Mark as Occupied'
+																		: 'Mark as Available'}
+																</span>
+															</button>
+															<div className="border-t border-border" />
+															<button
+																onClick={() => handleDeleteTable(table)}
+																className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
+															>
+																<Trash2 className="w-4 h-4" />
+																<span className="text-sm font-medium">
+																	Delete Table
+																</span>
+															</button>
+														</div>
+													</>
+												)}
+											</div>
+										</div>
+
+										{/* Table Info */}
+										<div className="space-y-3">
+											<div className="flex items-center gap-2 text-muted-foreground">
+												<Users className="w-4 h-4" />
+												<span className="text-sm font-medium">
+													{table.seats} {table.seats === 1 ? 'Seat' : 'Seats'}
+												</span>
+											</div>
+
+											{/* Status Badge */}
+											<div>{getStatusBadge(status)}</div>
+										</div>
+
+										{/* Footer with timestamp */}
+										<div className="mt-4 pt-4 border-t border-border">
+											<p className="text-xs text-muted-foreground">
+												Updated {new Date(table.updatedAt).toLocaleDateString()}
+											</p>
+										</div>
 									</div>
-
-									{/* Actions Menu */}
-									<div className="relative">
-										<button
-											onClick={() =>
-												setActiveMenuId(isMenuOpen ? null : table.id)
-											}
-											className="w-9 h-9 rounded-lg hover:bg-input flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
-										>
-											<MoreVertical className="w-4 h-4 text-muted-foreground" />
-										</button>
-
-										{isMenuOpen && (
-											<>
-												<div
-													className="fixed inset-0 z-40"
-													onClick={() => setActiveMenuId(null)}
-												/>
-												<div className="absolute right-0 top-full mt-2 w-48 bg-popover border border-border rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
-													<button
-														onClick={() => handleEditTable(table)}
-														className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors text-left"
-													>
-														<Edit2 className="w-4 h-4 text-muted-foreground" />
-														<span className="text-sm font-medium text-foreground">
-															Edit Table
-														</span>
-													</button>
-													<button
-														onClick={() => handleToggleActive(table)}
-														disabled={toggleActiveMutation.isPending}
-														className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
-													>
-														<Power className="w-4 h-4 text-muted-foreground" />
-														<span className="text-sm font-medium text-foreground">
-															{table.active
-																? 'Mark as Occupied'
-																: 'Mark as Available'}
-														</span>
-													</button>
-													<div className="border-t border-border" />
-													<button
-														onClick={() => handleDeleteTable(table)}
-														className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
-													>
-														<Trash2 className="w-4 h-4" />
-														<span className="text-sm font-medium">
-															Delete Table
-														</span>
-													</button>
-												</div>
-											</>
-										)}
-									</div>
-								</div>
-
-								{/* Table Info */}
-								<div className="space-y-3">
-									<div className="flex items-center gap-2 text-muted-foreground">
-										<Users className="w-4 h-4" />
-										<span className="text-sm font-medium">
-											{table.seats} {table.seats === 1 ? 'Seat' : 'Seats'}
-										</span>
-									</div>
-
-									{/* Status Badge */}
-									<div>{getStatusBadge(status)}</div>
-								</div>
-
-								{/* Footer with timestamp */}
-								<div className="mt-4 pt-4 border-t border-border">
-									<p className="text-xs text-muted-foreground">
-										Updated{' '}
-										{new Date(table.updatedAt).toLocaleDateString()}
-									</p>
-								</div>
-							</div>
-						)
-					})}
+								)
+							})}
+						</div>
+					)}
 				</div>
-			)}
-			</div>
 			)}
 
 			{/* Modals */}
@@ -510,9 +506,7 @@ export default function TablesPage() {
 				mode={modalMode}
 				initialNumber={selectedTable?.number}
 				initialSeats={selectedTable?.seats}
-				isLoading={
-					createMutation.isPending || updateMutation.isPending
-				}
+				isLoading={createMutation.isPending || updateMutation.isPending}
 			/>
 
 			<DeleteConfirmDialog

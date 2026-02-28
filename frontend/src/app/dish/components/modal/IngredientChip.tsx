@@ -5,7 +5,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import { Chip } from '@mui/material'
 import { memo } from 'react'
 
-type IngredientChipProps = {
+interface IngredientChipProps {
 	ingredient: string
 	idx: number
 	isFullScreen: boolean

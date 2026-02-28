@@ -58,8 +58,7 @@ export const ROUTES = {
 			CATEGORY_ID: (id: number | string) =>
 				`${ROUTES.PRIVATE.ADMIN.CATEGORY}/${id}`,
 			TABLE: '/table',
-			TABLE_ID: (id: number | string) =>
-				`${ROUTES.PRIVATE.ADMIN.TABLE}/${id}`,
+			TABLE_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.TABLE}/${id}`,
 		},
 		COOK: {},
 		WAITER: {},

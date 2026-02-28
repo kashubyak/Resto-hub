@@ -5,7 +5,7 @@ import { parseBackendError } from '@/utils/errorHandler'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 
-type UseUploadImageParams = {
+interface UseUploadImageParams {
 	register: UseFormRegisterReturn
 	savedPreview?: string | null
 	onDataChange?: (preview: string | null, file: File | null) => void
@@ -39,7 +39,7 @@ export const useUploadImage = ({
 	savedPreview,
 	onDataChange,
 }: UseUploadImageParams) => {
-	const [preview, setPreview] = useState<string | null>(savedPreview || null)
+	const [preview, setPreview] = useState<string | null>(savedPreview ?? null)
 	const [isDragging, setIsDragging] = useState(false)
 	const { showSuccess, showError } = useAlert()
 

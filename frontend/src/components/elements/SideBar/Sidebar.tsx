@@ -2,22 +2,22 @@
 
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import {
-    DEFAULT_COMPANY_ICON,
-    SIDEBAR_SUBTITLE,
+	DEFAULT_COMPANY_ICON,
+	SIDEBAR_SUBTITLE,
 } from '@/constants/pages.constant'
 import { useCompanySettings } from '@/hooks/useCompanySettings'
 import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { useAuth } from '@/providers/AuthContext'
 import {
-    ChevronsLeft,
-    ChevronsRight,
-    LogOut,
-    Moon,
-    MoreVertical,
-    Search,
-    Settings,
-    Sun,
-    X,
+	ChevronsLeft,
+	ChevronsRight,
+	LogOut,
+	Moon,
+	MoreVertical,
+	Search,
+	Settings,
+	Sun,
+	X,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -186,21 +186,21 @@ const SidebarComponent = function Sidebar({
 								</div>
 							) : (
 								routes.map((route) => {
-								const Icon = route.icon
-								const isActive = pathname === route.path
-								const isHovered = hoveredItem === route.path
+									const Icon = route.icon
+									const isActive = pathname === route.path
+									const isHovered = hoveredItem === route.path
 
-								return (
-									<div
-										key={route.path}
-										className="relative"
-										onMouseEnter={() => setHoveredItem(route.path)}
-										onMouseLeave={() => setHoveredItem(null)}
-									>
-										<Link
-											href={route.path}
-											onClick={onMobileClose}
-											className={`
+									return (
+										<div
+											key={route.path}
+											className="relative"
+											onMouseEnter={() => setHoveredItem(route.path)}
+											onMouseLeave={() => setHoveredItem(null)}
+										>
+											<Link
+												href={route.path}
+												onClick={onMobileClose}
+												className={`
                         group flex items-center rounded-xl h-12 relative
                         transition-colors duration-300
                         ${
@@ -210,31 +210,32 @@ const SidebarComponent = function Sidebar({
 												}
                         ${effectiveCollapsed ? 'w-12 mx-auto' : 'w-full'}
                       `}
-										>
-											<div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center [&_.MuiSvgIcon-root]:w-5 [&_.MuiSvgIcon-root]:h-5">
-												<Icon />
-											</div>
-											<div
-												className={`ml-12 flex items-center justify-between flex-1 transition-all duration-300 overflow-hidden ${effectiveCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}
 											>
-												<span className="text-sm font-medium whitespace-nowrap pr-3">
-													{route.name}
-												</span>
-												{isActive && (
-													<div className="w-1.5 h-1.5 rounded-full bg-primary-foreground mr-3 flex-shrink-0" />
-												)}
-											</div>
-										</Link>
+												<div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center [&_.MuiSvgIcon-root]:w-5 [&_.MuiSvgIcon-root]:h-5">
+													<Icon />
+												</div>
+												<div
+													className={`ml-12 flex items-center justify-between flex-1 transition-all duration-300 overflow-hidden ${effectiveCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}
+												>
+													<span className="text-sm font-medium whitespace-nowrap pr-3">
+														{route.name}
+													</span>
+													{isActive && (
+														<div className="w-1.5 h-1.5 rounded-full bg-primary-foreground mr-3 flex-shrink-0" />
+													)}
+												</div>
+											</Link>
 
-										{effectiveCollapsed && isHovered && (
-											<div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 px-3 py-2 bg-popover text-popover-foreground text-sm font-medium rounded-lg shadow-xl border border-border whitespace-nowrap pointer-events-none animate-in fade-in-0 zoom-in-95 duration-200">
-												{route.name}
-												<div className="absolute right-full top-1/2 -translate-y-1/2 -mr-1 w-2 h-2 rotate-45 bg-popover border-l border-b border-border" />
-											</div>
-										)}
-									</div>
-								)
-							}))}
+											{effectiveCollapsed && isHovered && (
+												<div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 px-3 py-2 bg-popover text-popover-foreground text-sm font-medium rounded-lg shadow-xl border border-border whitespace-nowrap pointer-events-none animate-in fade-in-0 zoom-in-95 duration-200">
+													{route.name}
+													<div className="absolute right-full top-1/2 -translate-y-1/2 -mr-1 w-2 h-2 rotate-45 bg-popover border-l border-b border-border" />
+												</div>
+											)}
+										</div>
+									)
+								})
+							)}
 						</div>
 					</nav>
 

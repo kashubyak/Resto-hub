@@ -1,4 +1,4 @@
-import { UserRole } from '@/constants/pages.constant'
+import type { UserRole } from '@/constants/pages.constant'
 import type { IUser } from '@/types/user.interface'
 import { clearAuth } from '@/utils/auth-helpers'
 import { create } from 'zustand'

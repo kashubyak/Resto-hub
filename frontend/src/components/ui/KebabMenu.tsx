@@ -44,7 +44,7 @@ const MenuItem = memo<{
 			onClick={handleClick}
 			disabled={item.disabled}
 			className={`w-full px-3 py-2 text-sm flex items-center justify-between hover:bg-secondary rounded-lg ${
-				item.className || ''
+				item.className ?? ''
 			}`}
 		>
 			<span>{item.label}</span>

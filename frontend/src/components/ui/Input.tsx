@@ -31,7 +31,7 @@ export const Input = memo<InputProps>(
 	}) => {
 		const [showPassword, setShowPassword] = useState(false)
 
-		const finalSize = size || 'medium'
+		const finalSize = size ?? 'medium'
 		const isPasswordField = type === 'password' && !multiline
 
 		const togglePasswordVisibility = useCallback(

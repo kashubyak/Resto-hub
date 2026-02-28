@@ -5,6 +5,7 @@ import { size_of_image } from '@/constants/share.constant'
 import type { IDishFormValues } from '@/types/dish.interface'
 import { imageValidation } from '@/validation/dish.validation'
 import { Image as ImageIcon, Upload } from 'lucide-react'
+import Image from 'next/image'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
 	Controller,
@@ -16,7 +17,7 @@ import {
 	type UseFormRegisterReturn,
 } from 'react-hook-form'
 
-type ImageUploadUpdateContentProps = {
+interface ImageUploadUpdateContentProps {
 	field: ControllerRenderProps<IDishFormValues, 'imageUrl'>
 	currentImageUrl: string | null
 	errorMessage?: string
@@ -39,22 +40,30 @@ const ImageUploadUpdateContent = memo(
 			return currentImageUrl
 		}, [field.value, currentImageUrl])
 
-		useEffect(() => () => {
-			if (objectUrlRef.current) {
-				URL.revokeObjectURL(objectUrlRef.current)
-				objectUrlRef.current = null
-			}
-		}, [])
-
-	const handleInputChange: ChangeHandler = useCallback(async (e) => {
-		const file = (e?.target as HTMLInputElement)?.files?.[0]
-		if (
-			file &&
-			file.type.startsWith('image/') &&
-			file.size <= size_of_image * 1024 * 1024
+		useEffect(
+			() => () => {
+				if (objectUrlRef.current) {
+					URL.revokeObjectURL(objectUrlRef.current)
+					objectUrlRef.current = null
+				}
+			},
+			[],
 		)
-			field.onChange(file)
-	}, [field])
+
+		const handleInputChange: ChangeHandler = useCallback(
+			(e) => {
+				const file = (e?.target as HTMLInputElement)?.files?.[0]
+				if (
+					file &&
+					file.type.startsWith('image/') &&
+					file.size <= size_of_image * 1024 * 1024
+				) {
+					field.onChange(file)
+				}
+				return Promise.resolve()
+			},
+			[field],
+		)
 
 		const handleRemove = useCallback(() => {
 			field.onChange('')
@@ -113,7 +122,9 @@ const ImageUploadUpdateContent = memo(
 						ref={fileInputRef}
 						type="file"
 						accept="image/*"
-						onChange={handleInputChange}
+						onChange={(e) => {
+							void handleInputChange(e)
+						}}
 						className="hidden"
 					/>
 					{errorMessage && (
@@ -127,11 +138,12 @@ const ImageUploadUpdateContent = memo(
 
 		return (
 			<>
-				<div className="relative group">
-					<img
+				<div className="relative group w-full h-48">
+					<Image
 						src={previewUrl ?? ''}
 						alt="Dish"
-						className="w-full h-48 object-cover rounded-xl"
+						fill
+						className="object-cover rounded-xl"
 					/>
 					<div className="absolute inset-0 bg-black/50 rounded-xl opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-3">
 						<button
@@ -154,7 +166,9 @@ const ImageUploadUpdateContent = memo(
 					ref={fileInputRef}
 					type="file"
 					accept="image/*"
-					onChange={handleInputChange}
+					onChange={(e) => {
+						void handleInputChange(e)
+					}}
 					className="hidden"
 				/>
 				{errorMessage && (
@@ -168,7 +182,7 @@ const ImageUploadUpdateContent = memo(
 )
 ImageUploadUpdateContent.displayName = 'ImageUploadUpdateContent'
 
-type ImageUploadSectionProps = {
+interface ImageUploadSectionProps {
 	control?: Control<IDishFormValues> | null
 	register?: UseFormRegister<IDishFormValues>
 	errors?: FieldErrors<IDishFormValues>
@@ -191,7 +205,7 @@ const ImageUploadSectionFunction = ({
 
 	const handleStandaloneChange = useCallback(
 		(preview: string | null, file: File | null) => {
-			if (onChangeOutside) onChangeOutside(file ?? (preview || ''))
+			if (onChangeOutside) onChangeOutside(file ?? preview ?? '')
 		},
 		[onChangeOutside],
 	)
@@ -242,13 +256,17 @@ const ImageUploadSectionFunction = ({
 								preview: string | null,
 								file: File | null,
 							) => {
-								if (file) onChange(file)
-								else onChange(preview || '')
+								if (file) {
+									onChange(file)
+								} else {
+									onChange(preview ?? '')
+								}
 							}
 
-							const handleInputChange: ChangeHandler = async (e) => {
+							const handleInputChange: ChangeHandler = (e) => {
 								const file = (e?.target as HTMLInputElement)?.files?.[0]
 								onChange(file ?? '')
+								return Promise.resolve()
 							}
 
 							return (

@@ -7,7 +7,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { memo } from 'react'
 
-type DishListItemProps = { dish: IDish }
+interface DishListItemProps {
+	dish: IDish
+}
 
 const DishListItemComponent = ({ dish }: DishListItemProps) => (
 	<div className="group bg-card border-2 border-border rounded-2xl overflow-hidden hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
@@ -38,7 +40,9 @@ const DishListItemComponent = ({ dish }: DishListItemProps) => (
 						</span>
 						<span
 							className={`px-3 py-1 rounded-full text-xs font-semibold ${
-								dish.available ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+								dish.available
+									? 'bg-green-500 text-white'
+									: 'bg-red-500 text-white'
 							}`}
 						>
 							{dish.available ? 'Available' : 'Unavailable'}

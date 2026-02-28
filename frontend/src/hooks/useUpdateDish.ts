@@ -62,10 +62,10 @@ export const useUpdateDish = (
 				name: dishData.name,
 				description: dishData.description,
 				price: dishData.price,
-				categoryId: dishData.categoryId || undefined,
+				categoryId: dishData.categoryId ?? undefined,
 				ingredients: dishData.ingredients,
-				weightGr: dishData.weightGr || undefined,
-				calories: dishData.calories || undefined,
+				weightGr: dishData.weightGr ?? undefined,
+				calories: dishData.calories ?? undefined,
 				available: dishData.available,
 			})
 		}
@@ -98,7 +98,7 @@ export const useUpdateDish = (
 				const { data } = await updateDishService(changedData)
 				updateDishCache(queryClient, data)
 				showSuccess('Dish updated successfully')
-				refetchDishes()
+				void refetchDishes()
 				onClose()
 			} catch (err) {
 				showError(parseBackendError(err as IAxiosError).join('\n'))
