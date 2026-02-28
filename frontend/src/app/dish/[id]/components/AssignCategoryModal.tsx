@@ -82,7 +82,7 @@ export function AssignCategoryModal({
 			onClose()
 		},
 		onError: (err) =>
-			showError(parseBackendError(err as IAxiosError).join('\n')),
+			showError(parseBackendError(err as unknown as IAxiosError).join('\n')),
 	})
 
 	const categories: ICategoryWithDishes[] = categoriesResponse?.data ?? []

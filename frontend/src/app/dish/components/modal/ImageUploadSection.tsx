@@ -46,15 +46,15 @@ const ImageUploadUpdateContent = memo(
 			}
 		}, [])
 
-		const handleInputChange: ChangeHandler = useCallback((e) => {
-			const file = (e?.target as HTMLInputElement)?.files?.[0]
-			if (
-				file &&
-				file.type.startsWith('image/') &&
-				file.size <= size_of_image * 1024 * 1024
-			)
-				field.onChange(file)
-		}, [field])
+	const handleInputChange: ChangeHandler = useCallback(async (e) => {
+		const file = (e?.target as HTMLInputElement)?.files?.[0]
+		if (
+			file &&
+			file.type.startsWith('image/') &&
+			file.size <= size_of_image * 1024 * 1024
+		)
+			field.onChange(file)
+	}, [field])
 
 		const handleRemove = useCallback(() => {
 			field.onChange('')

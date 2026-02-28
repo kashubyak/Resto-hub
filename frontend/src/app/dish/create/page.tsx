@@ -188,7 +188,7 @@ function CreateDishForm() {
 			const current = watch('ingredients') ?? []
 			const next = [...current]
 			const [removed] = next.splice(draggedItem, 1)
-			next.splice(index, 0, removed)
+			if (removed) next.splice(index, 0, removed)
 			setValue('ingredients', next)
 			setDraggedItem(index)
 		},

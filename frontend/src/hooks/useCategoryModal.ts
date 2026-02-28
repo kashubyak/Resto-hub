@@ -25,6 +25,7 @@ export const useCategoryModal = (onClose: () => void) => {
 		mode: 'onChange',
 		defaultValues: {
 			name: '',
+			icon: '🍴',
 		},
 	})
 
@@ -33,6 +34,7 @@ export const useCategoryModal = (onClose: () => void) => {
 			try {
 				const response = await createCategory({
 					name: data.name.trim(),
+					icon: data.icon,
 				})
 				if (response.status === 201) {
 					showSuccess('Category created successfully')

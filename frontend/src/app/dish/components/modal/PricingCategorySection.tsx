@@ -63,7 +63,7 @@ const PricingCategorySectionFunction = ({
 			</h3>
 			<div
 				className={`grid ${
-					isFullScreen || mode === 'update'
+					isFullScreen
 						? 'grid-cols-1 gap-4'
 						: 'grid-cols-1 md:grid-cols-2 gap-6'
 				}`}

@@ -18,6 +18,7 @@ export const decodeJWT = (token: string): IJwtPayload | null => {
 		if (parts.length !== 3) return null
 
 		const payload = parts[1]
+		if (!payload) return null
 
 		let paddedPayload = payload
 		for (const [pattern, replacement] of BASE64_REPLACEMENTS)

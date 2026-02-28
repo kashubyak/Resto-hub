@@ -1,10 +1,11 @@
 import { AlertTriangle, Loader2, Trash2, X } from "lucide-react";
 import { useEffect } from "react";
+import type { IDish } from '@/types/dish.interface';
 
 interface DeleteDishModalProps {
 	open: boolean;
 	onClose: () => void;
-	dish?: { id: number; name: string; category?: { name: string } };
+	dish?: IDish;
 	onConfirm: () => void;
 	isPending: boolean;
 }

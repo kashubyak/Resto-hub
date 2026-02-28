@@ -110,6 +110,7 @@ export const useImageViewer = ({ open, onClose }: UseImageViewerProps) => {
 			if (zoom <= 1 || e.touches.length !== 1) return
 
 			const touch = e.touches[0]
+			if (!touch) return
 			setIsDragging(true)
 			setDragStart({ x: touch.clientX, y: touch.clientY })
 			setInitialPosition(position)
@@ -123,6 +124,7 @@ export const useImageViewer = ({ open, onClose }: UseImageViewerProps) => {
 
 			e.preventDefault()
 			const touch = e.touches[0]
+			if (!touch) return
 			const deltaX = touch.clientX - dragStart.x
 			const deltaY = touch.clientY - dragStart.y
 
