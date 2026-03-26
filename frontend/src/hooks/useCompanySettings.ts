@@ -1,12 +1,13 @@
+import { COMPANY_QUERY_KEY } from '@/constants/query-keys.constant'
 import { useAlert } from '@/providers/AlertContext'
-import { getCompany } from '@/services/company/company.service'
+import { getCompanyService } from '@/services/company/get-company.service'
 import type { IAxiosError } from '@/types/error.interface'
 import { getCompanyUrl, getSubdomainFromHostname } from '@/utils/api'
 import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { useCopyToClipboard } from './useCopyToClipboard'
 
-const COMPANY_QUERY_KEY = ['company'] as const
+export const companyQueryKey = [COMPANY_QUERY_KEY.CURRENT] as const
 
 export const useCompanySettings = (enabled = true) => {
 	const { showBackendError } = useAlert()
@@ -16,10 +17,10 @@ export const useCompanySettings = (enabled = true) => {
 	const companyUrl = subdomain ? getCompanyUrl(subdomain) : ''
 
 	const { data: company = null } = useQuery({
-		queryKey: COMPANY_QUERY_KEY,
+		queryKey: companyQueryKey,
 		queryFn: async () => {
 			try {
-				const response = await getCompany()
+				const response = await getCompanyService()
 				return response.data
 			} catch (err) {
 				showBackendError(err as IAxiosError)
@@ -43,5 +44,3 @@ export const useCompanySettings = (enabled = true) => {
 		handleCopy,
 	}
 }
-
-export { COMPANY_QUERY_KEY }

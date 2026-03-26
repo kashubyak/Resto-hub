@@ -3,9 +3,11 @@
 import { SafeRender } from '@/components/container/SafeRender'
 import { Button } from '@/components/ui/Button'
 import { RoleGuard } from '@/components/ui/RoleGuard'
-import { UserRole } from '@/constants/pages.constant'
+import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { useCompanySettings } from '@/hooks/useCompanySettings'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
+import { Building2, ExternalLink, Settings } from 'lucide-react'
+import Link from 'next/link'
 
 export default function CompanySettingsPage() {
 	const { user } = useCurrentUser()
@@ -15,66 +17,96 @@ export default function CompanySettingsPage() {
 	return (
 		<SafeRender title="Loading Company Settings..." showNetworkProgress>
 			<RoleGuard allowedRoles={[UserRole.ADMIN]}>
-				<div className="p-6 max-w-2xl mx-auto">
-					<h1 className="text-2xl font-bold text-gray-900 mb-6">
-						Company Settings
-					</h1>
+				<div className="max-w-7xl mx-auto w-full px-2 sm:px-4 py-4 sm:py-6 space-y-6">
+					<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-semibold text-foreground flex items-center gap-3">
+								<Settings className="w-7 h-7 sm:w-8 sm:h-8 text-primary shrink-0" />
+								Company settings
+							</h1>
+							<p className="text-sm sm:text-base text-muted-foreground mt-1 max-w-xl">
+								Portal link and read-only company details. Edit name, address,
+								logo, and map on the company page.
+							</p>
+						</div>
+						<Link
+							href={ROUTES.PRIVATE.ADMIN.COMPANY}
+							className="inline-flex items-center gap-2 self-start rounded-xl px-4 py-3 text-sm font-medium text-primary bg-primary/10 border border-primary/20 hover:bg-primary/15 hover:border-primary/30 transition-colors"
+						>
+							<Building2 className="w-4 h-4" />
+							<span className="hidden sm:inline">
+								Edit company profile &amp; map
+							</span>
+							<span className="sm:hidden">Edit company</span>
+							<ExternalLink className="w-3.5 h-3.5 opacity-70" />
+						</Link>
+					</div>
 
-					<div className="bg-white rounded-lg shadow-md p-6">
-						<div className="mb-6">
-							<label className="block text-sm font-medium text-gray-700 mb-2">
-								Company Link
+					<div className="bg-card rounded-xl sm:rounded-2xl border border-border/50 shadow-lg p-4 sm:p-6 backdrop-blur-sm space-y-8">
+						<section className="space-y-3">
+							<label className="block text-sm font-medium text-foreground">
+								Company portal link
 							</label>
-							<div className="flex gap-2">
+							<div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
 								<input
 									type="text"
 									value={companyUrl}
 									readOnly
-									className="flex-1 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									className="flex-1 min-w-0 h-12 px-4 rounded-xl border-2 border-border bg-background/80 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
 								/>
-								<Button onClick={handleCopy} type="button" className="w-auto">
+								<Button
+									onClick={handleCopy}
+									type="button"
+									className="w-full sm:w-auto shrink-0 h-12 px-6"
+								>
 									{copied ? 'Copied!' : 'Copy'}
 								</Button>
 							</div>
-							<p className="mt-2 text-sm text-gray-500">
-								Share this link with your team members to access your company
-								portal
+							<p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+								Share this link with your team so they can open your company
+								portal on the right subdomain.
 							</p>
-						</div>
+						</section>
 
-						{(company ?? subdomain) && (
-							<div className="mt-6 pt-6 border-t border-gray-200">
-								<h2 className="text-lg font-semibold text-gray-900 mb-4">
-									Company Information
+						{(company ?? subdomain) ? (
+							<section className="pt-6 sm:pt-8 border-t border-border space-y-4">
+								<h2 className="text-lg font-semibold text-foreground">
+									Company information
 								</h2>
-								<div className="space-y-3">
-									{company?.name && (
-										<div>
-											<label className="text-sm font-medium text-gray-700">
-												Company Name
-											</label>
-											<p className="text-gray-900">{company.name}</p>
+								<div className="grid gap-4 sm:grid-cols-1 sm:max-w-xl">
+									{company?.name ? (
+										<div className="rounded-xl border border-border bg-muted px-4 py-3">
+											<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+												Company name
+											</p>
+											<p className="text-sm sm:text-base text-foreground break-words">
+												{company.name}
+											</p>
 										</div>
-									)}
-									{subdomain && (
-										<div>
-											<label className="text-sm font-medium text-gray-700">
+									) : null}
+									{subdomain ? (
+										<div className="rounded-xl border border-border bg-muted px-4 py-3">
+											<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
 												Subdomain
-											</label>
-											<p className="text-gray-900">{subdomain}</p>
+											</p>
+											<p className="text-sm sm:text-base text-foreground font-mono">
+												{subdomain}
+											</p>
 										</div>
-									)}
-									{company?.address && (
-										<div>
-											<label className="text-sm font-medium text-gray-700">
+									) : null}
+									{company?.address ? (
+										<div className="rounded-xl border border-border bg-muted px-4 py-3 sm:col-span-full">
+											<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
 												Address
-											</label>
-											<p className="text-gray-900">{company.address}</p>
+											</p>
+											<p className="text-sm sm:text-base text-foreground break-words">
+												{company.address}
+											</p>
 										</div>
-									)}
+									) : null}
 								</div>
-							</div>
-						)}
+							</section>
+						) : null}
 					</div>
 				</div>
 			</RoleGuard>

@@ -458,6 +458,18 @@ html {
 	.hover\:bg-destructive\/20:hover {
 		background-color: color-mix(in oklab, var(--destructive) 20%, transparent);
 	}
+	.text-destructive {
+		color: var(--destructive);
+	}
+	.border-destructive\/20 {
+		border-color: color-mix(in oklab, var(--destructive) 20%, transparent);
+	}
+	.shadow-destructive\/20 {
+		box-shadow: 0 20px 25px -5px color-mix(in oklab, var(--destructive) 20%, transparent);
+	}
+	.hover\:shadow-destructive\/20:hover {
+		box-shadow: 0 20px 25px -5px color-mix(in oklab, var(--destructive) 20%, transparent);
+	}
 	.bg-red-500\/5 {
 		background-color: color-mix(in oklab, #ef4444 5%, transparent);
 	}

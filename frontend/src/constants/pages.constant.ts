@@ -1,5 +1,6 @@
 import BusinessIcon from '@mui/icons-material/Business'
 import {
+	Building2,
 	Folder,
 	LayoutDashboard,
 	LayoutGrid,
@@ -59,6 +60,8 @@ export const ROUTES = {
 				`${ROUTES.PRIVATE.ADMIN.CATEGORY}/${id}`,
 			TABLE: '/table',
 			TABLE_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.TABLE}/${id}`,
+			COMPANY: '/company',
+			SETTINGS_COMPANY: '/settings/company',
 		},
 		COOK: {},
 		WAITER: {},
@@ -92,6 +95,8 @@ export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
 		ROUTES.PRIVATE.ADMIN.DISH_CREATE,
 		ROUTES.PRIVATE.ADMIN.CATEGORY,
 		ROUTES.PRIVATE.ADMIN.TABLE,
+		ROUTES.PRIVATE.ADMIN.COMPANY,
+		ROUTES.PRIVATE.ADMIN.SETTINGS_COMPANY,
 	],
 	[UserRole.COOK]: [...SHARED_ROUTES],
 	[UserRole.WAITER]: [...SHARED_ROUTES],
@@ -128,6 +133,12 @@ export const ALL_ROUTES: IRouteConfig[] = [
 		path: ROUTES.PRIVATE.ADMIN.TABLE,
 		name: 'Tables',
 		icon: LayoutGrid,
+		roles: ADMIN_ROLES,
+	},
+	{
+		path: ROUTES.PRIVATE.ADMIN.COMPANY,
+		name: 'Company',
+		icon: Building2,
 		roles: ADMIN_ROLES,
 	},
 ]
