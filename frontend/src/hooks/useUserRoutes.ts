@@ -13,7 +13,13 @@ export const useUserRoutes = () => {
 	}, [userRole])
 
 	const currentRoute = useMemo(() => {
-		return userRoutes.find((route) => route.path === pathname) ?? null
+		return (
+			userRoutes.find((route) => {
+				if (route.path === pathname) return true
+				if (route.path === '/') return false
+				return pathname.startsWith(`${route.path}/`)
+			}) ?? null
+		)
 	}, [pathname, userRoutes])
 
 	return {

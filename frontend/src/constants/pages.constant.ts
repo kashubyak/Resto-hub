@@ -5,6 +5,7 @@ import {
 	LayoutDashboard,
 	LayoutGrid,
 	UtensilsCrossed,
+	Users,
 } from 'lucide-react'
 import type { ComponentType } from 'react'
 
@@ -60,6 +61,8 @@ export const ROUTES = {
 				`${ROUTES.PRIVATE.ADMIN.CATEGORY}/${id}`,
 			TABLE: '/table',
 			TABLE_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.TABLE}/${id}`,
+			USERS: '/users',
+			USERS_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.USERS}/${id}`,
 			COMPANY: '/company',
 			SETTINGS_COMPANY: '/settings/company',
 		},
@@ -95,6 +98,7 @@ export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
 		ROUTES.PRIVATE.ADMIN.DISH_CREATE,
 		ROUTES.PRIVATE.ADMIN.CATEGORY,
 		ROUTES.PRIVATE.ADMIN.TABLE,
+		ROUTES.PRIVATE.ADMIN.USERS,
 		ROUTES.PRIVATE.ADMIN.COMPANY,
 		ROUTES.PRIVATE.ADMIN.SETTINGS_COMPANY,
 	],
@@ -133,6 +137,12 @@ export const ALL_ROUTES: IRouteConfig[] = [
 		path: ROUTES.PRIVATE.ADMIN.TABLE,
 		name: 'Tables',
 		icon: LayoutGrid,
+		roles: ADMIN_ROLES,
+	},
+	{
+		path: ROUTES.PRIVATE.ADMIN.USERS,
+		name: 'Users',
+		icon: Users,
 		roles: ADMIN_ROLES,
 	},
 	{

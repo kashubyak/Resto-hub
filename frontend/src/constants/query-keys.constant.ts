@@ -9,4 +9,10 @@ export const CATEGORIES_QUERY_KEY = {
 export const COMPANY_QUERY_KEY = {
 	CURRENT: 'company',
 } as const
+
+export const USERS_QUERY_KEY = {
+	ALL: 'users',
+	DETAIL: 'user',
+} as const
+
 export const LIMIT = 10

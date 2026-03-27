@@ -64,14 +64,14 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 					if (u) {
 						setIsAuth(true)
 						setUser({
-							id: String(u.id),
+							id: u.id,
 							name: '',
 							email: '',
 							role: u.role as UserRole,
 							avatarUrl: null,
 							createdAt: '',
 							updatedAt: '',
-						} as IUser)
+						})
 					}
 					return
 				}
