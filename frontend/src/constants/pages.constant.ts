@@ -1,6 +1,7 @@
 import BusinessIcon from '@mui/icons-material/Business'
 import {
 	Building2,
+	ClipboardList,
 	Folder,
 	LayoutDashboard,
 	LayoutGrid,
@@ -67,7 +68,12 @@ export const ROUTES = {
 			SETTINGS_COMPANY: '/settings/company',
 		},
 		COOK: {},
-		WAITER: {},
+		WAITER: {
+			ORDERS_WAITER: '/orders-waiter',
+			ORDERS_WAITER_HISTORY: '/orders-waiter/history',
+			ORDERS_WAITER_ID: (id: number | string) =>
+				`${ROUTES.PRIVATE.WAITER.ORDERS_WAITER}/${id}`,
+		},
 	} as const,
 } as const
 
@@ -103,7 +109,11 @@ export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
 		ROUTES.PRIVATE.ADMIN.SETTINGS_COMPANY,
 	],
 	[UserRole.COOK]: [...SHARED_ROUTES],
-	[UserRole.WAITER]: [...SHARED_ROUTES],
+	[UserRole.WAITER]: [
+		...SHARED_ROUTES,
+		ROUTES.PRIVATE.WAITER.ORDERS_WAITER,
+		ROUTES.PRIVATE.WAITER.ORDERS_WAITER_HISTORY,
+	],
 }
 
 const ADMIN_COOK_WAITER_ROLES: UserRole[] = [
@@ -120,6 +130,12 @@ export const ALL_ROUTES: IRouteConfig[] = [
 		name: 'Dashboard',
 		icon: LayoutDashboard,
 		roles: ADMIN_COOK_WAITER_ROLES,
+	},
+	{
+		path: ROUTES.PRIVATE.WAITER.ORDERS_WAITER,
+		name: 'Orders',
+		icon: ClipboardList,
+		roles: [UserRole.WAITER],
 	},
 	{
 		path: ROUTES.PRIVATE.ADMIN.DISH,

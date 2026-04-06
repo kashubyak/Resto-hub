@@ -30,7 +30,7 @@ export class CompanyController {
 	constructor(private readonly companyService: CompanyService) {}
 
 	@Get()
-	@Roles(Role.ADMIN)
+	@Roles(Role.ADMIN, Role.COOK, Role.WAITER)
 	@ApiOperation({ description: 'Get current company info (ADMIN only)' })
 	@ApiOkResponse({ type: CompanyItemDto })
 	getCompany(@CurrentUser('companyId') companyId: number) {

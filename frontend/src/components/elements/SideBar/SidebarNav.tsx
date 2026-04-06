@@ -1,6 +1,7 @@
 'use client'
 
 import { useUserRoutes } from '@/hooks/useUserRoutes'
+import { ROUTES } from '@/constants/pages.constant'
 import { cn } from '@/utils/cn'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -57,7 +58,10 @@ export const SidebarNav = memo(({ collapsed }: ISidebarNavProps) => {
 		() =>
 			routes.map((route) => ({
 				...route,
-				isActive: pathname === route.path,
+				isActive:
+					pathname === route.path ||
+					(route.path !== ROUTES.PRIVATE.SHARED.DASHBOARD &&
+						pathname.startsWith(`${route.path}/`)),
 			})),
 		[routes, pathname],
 	)

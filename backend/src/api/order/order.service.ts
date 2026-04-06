@@ -16,6 +16,10 @@ import {
 	OrderMetric,
 } from './dto/request/order-analytics-query.dto'
 import { OrdersQueryDto } from './dto/request/orders-query.dto'
+import {
+	WaiterMyOrdersQueryDto,
+	WaiterOrdersPhase,
+} from './dto/request/waiter-my-orders-query.dto'
 import { OrderEntity } from './entities/order.entity'
 import { NotificationsGateway } from './gateway/notification.gateway'
 import {
@@ -299,6 +303,72 @@ export class OrderService {
 		if (role === Role.COOK) where.cookId = userId
 
 		const { page = 1, limit = 10, sortBy = 'createdAt', order = 'desc' } = query
+		const skip = (page - 1) * limit
+
+		const [orders, total] = await Promise.all([
+			this.orderRepo.findAll(where, {
+				skip,
+				take: limit,
+				orderBy: { [sortBy]: order },
+			}),
+			this.orderRepo.count(where),
+		])
+
+		const summarizedOrders = orders.map(this.mapSummary)
+
+		return {
+			data: summarizedOrders,
+			total,
+			page,
+			limit,
+			totalPages: Math.ceil(total / limit),
+		}
+	}
+
+	async getWaiterMyOrders(
+		waiterId: number,
+		companyId: number,
+		query: WaiterMyOrdersQueryDto,
+	): Promise<IPaginatedResponse<IOrderSummary>> {
+		const phase = query.phase ?? WaiterOrdersPhase.ACTIVE
+		const {
+			page = 1,
+			limit = 10,
+			sortBy = 'createdAt',
+			order = 'desc',
+			status: statusFilter,
+		} = query
+
+		const activeStatuses = [
+			OrderStatus.PENDING,
+			OrderStatus.IN_PROGRESS,
+			OrderStatus.COMPLETE,
+			OrderStatus.DELIVERED,
+		]
+		const historyStatuses = [OrderStatus.FINISHED, OrderStatus.CANCELED]
+
+		const where: IOrderWhereInput = { companyId, waiterId }
+
+		if (phase === WaiterOrdersPhase.ACTIVE) {
+			if (statusFilter) {
+				const allowedActive = new Set<OrderStatus>(activeStatuses)
+				if (!allowedActive.has(statusFilter))
+					throw new BadRequestException(
+						'Status filter is not valid for active orders',
+					)
+				where.status = statusFilter
+			} else where.status = { in: activeStatuses }
+		} else {
+			if (statusFilter) {
+				const allowedHistory = new Set<OrderStatus>(historyStatuses)
+				if (!allowedHistory.has(statusFilter))
+					throw new BadRequestException(
+						'Status filter is not valid for order history',
+					)
+				where.status = statusFilter
+			} else where.status = { in: historyStatuses }
+		}
+
 		const skip = (page - 1) * limit
 
 		const [orders, total] = await Promise.all([

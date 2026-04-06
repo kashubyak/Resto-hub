@@ -16,3 +16,9 @@ export const USERS_QUERY_KEY = {
 } as const
 
 export const LIMIT = 10
+
+export const ORDER_QUERY_KEY = {
+	LIST_ACTIVE: 'orders-waiter-active',
+	LIST_HISTORY: 'orders-waiter-history',
+	DETAIL: (id: number) => ['order', id] as const,
+} as const

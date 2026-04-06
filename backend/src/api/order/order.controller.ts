@@ -24,6 +24,7 @@ import { Roles } from 'src/common/decorators/roles.decorator'
 import { CreateOrderDto } from './dto/request/create-order.dto'
 import { OrderAnalyticsQueryDto } from './dto/request/order-analytics-query.dto'
 import { OrdersQueryDto } from './dto/request/orders-query.dto'
+import { WaiterMyOrdersQueryDto } from './dto/request/waiter-my-orders-query.dto'
 import { UpdateOrderStatusDto } from './dto/request/update-order-status.dto'
 import { CreateOrderResponseDto } from './dto/response/create-order-response.dto'
 import { OrderAnalyticsResponseDto } from './dto/response/order-analytic-response.dto'
@@ -116,6 +117,24 @@ export class OrderController {
 		@CurrentUser('companyId') companyId: number,
 	) {
 		return this.orderService.getFreeOrders(query, companyId)
+	}
+
+	@Get('waiter/my-orders')
+	@Roles(Role.WAITER)
+	@ApiOperation({
+		description:
+			'Paginated orders for the current waiter: phase=active (default) or history',
+	})
+	@ApiOkResponse({
+		description: 'Paginated list of waiter orders',
+		type: PaginatedOrdersResponseDto,
+	})
+	getWaiterMyOrders(
+		@CurrentUser('id') waiterId: number,
+		@CurrentUser('companyId') companyId: number,
+		@Query() query: WaiterMyOrdersQueryDto,
+	) {
+		return this.orderService.getWaiterMyOrders(waiterId, companyId, query)
 	}
 
 	@Get(':id')

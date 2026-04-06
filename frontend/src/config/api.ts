@@ -40,6 +40,7 @@ export const API_URL = {
 		CREATE: `${BASE_ORDER}/create`,
 		ANALYTICS: `${BASE_ORDER}/analytics`,
 		HISTORY: `${BASE_ORDER}/history`,
+		WAITER_MY_ORDERS: `${BASE_ORDER}/waiter/my-orders`,
 		FREE: `${BASE_ORDER}/free`,
 		ID: (id: number) => `${BASE_ORDER}/${id}`,
 		ASSIGN: (id: number) => `${BASE_ORDER}/${id}/assign`,
