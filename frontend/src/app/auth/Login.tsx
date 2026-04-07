@@ -101,10 +101,7 @@ function LoginSubdomainGate() {
 				</div>
 				<p className="text-center mt-6 text-sm text-muted-foreground">
 					Don&apos;t have an account?{' '}
-					<a
-						href={registerUrl}
-						className="text-primary hover:underline"
-					>
+					<a href={registerUrl} className="text-primary hover:underline">
 						Sign up
 					</a>
 				</p>
@@ -156,10 +153,7 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 						Company:{' '}
 						<span className="font-medium text-foreground">{hostSubdomain}</span>
 						{' · '}
-						<a
-							href={changeCompanyUrl}
-							className="text-primary hover:underline"
-						>
+						<a href={changeCompanyUrl} className="text-primary hover:underline">
 							Change
 						</a>
 					</p>
