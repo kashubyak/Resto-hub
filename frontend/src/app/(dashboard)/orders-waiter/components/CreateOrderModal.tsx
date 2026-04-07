@@ -47,7 +47,10 @@ async function loadAllAvailableDishes(): Promise<IDish[]> {
 	return collected
 }
 
-export function CreateOrderModal({ onClose, onSuccess }: ICreateOrderModalProps) {
+export function CreateOrderModal({
+	onClose,
+	onSuccess,
+}: ICreateOrderModalProps) {
 	const { showError } = useAlert()
 	const [dishes, setDishes] = useState<IDish[]>([])
 	const [tables, setTables] = useState<ITable[]>([])
@@ -162,7 +165,9 @@ export function CreateOrderModal({ onClose, onSuccess }: ICreateOrderModalProps)
 		0,
 	)
 
-	const canSubmit = Boolean(selectedTable && orderItems.length > 0 && !submitting)
+	const canSubmit = Boolean(
+		selectedTable && orderItems.length > 0 && !submitting,
+	)
 
 	const selectedTableNumber = tables.find((t) => t.id === selectedTable)?.number
 
@@ -207,7 +212,9 @@ export function CreateOrderModal({ onClose, onSuccess }: ICreateOrderModalProps)
 						<div className="flex-1 flex flex-col overflow-hidden border-b lg:border-b-0 lg:border-r border-border min-h-0">
 							<div className="px-4 sm:px-6 py-4 border-b border-border shrink-0">
 								<div className="flex items-center justify-between mb-2">
-									<label className="text-sm text-foreground">Select Table *</label>
+									<label className="text-sm text-foreground">
+										Select Table *
+									</label>
 									{selectedTableNumber != null && (
 										<span className="text-xs text-muted-foreground">
 											Table {selectedTableNumber} selected
@@ -265,7 +272,9 @@ export function CreateOrderModal({ onClose, onSuccess }: ICreateOrderModalProps)
 							<div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 min-h-0">
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 									{filteredDishes.map((dish) => {
-										const inCart = orderItems.find((item) => item.dishId === dish.id)
+										const inCart = orderItems.find(
+											(item) => item.dishId === dish.id,
+										)
 
 										return (
 											<button
@@ -304,7 +313,9 @@ export function CreateOrderModal({ onClose, onSuccess }: ICreateOrderModalProps)
 								<div className="flex items-center justify-between gap-2">
 									<div className="flex items-center gap-2">
 										<ShoppingCart className="w-5 h-5 text-primary" />
-										<h3 className="text-foreground font-semibold">Order Items</h3>
+										<h3 className="text-foreground font-semibold">
+											Order Items
+										</h3>
 										{orderItems.length > 0 && (
 											<span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-gradient-primary text-primary-foreground text-xs font-bold">
 												{orderItems.length}
@@ -394,7 +405,9 @@ export function CreateOrderModal({ onClose, onSuccess }: ICreateOrderModalProps)
 													<textarea
 														placeholder="E.g., no onions, extra sauce, well-done, allergies..."
 														value={item.notes}
-														onChange={(e) => updateNotes(item.dishId, e.target.value)}
+														onChange={(e) =>
+															updateNotes(item.dishId, e.target.value)
+														}
 														rows={2}
 														className="w-full px-3 py-2 rounded-lg bg-input border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-background transition-all resize-none"
 													/>

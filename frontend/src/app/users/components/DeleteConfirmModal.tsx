@@ -46,7 +46,10 @@ export const DeleteConfirmModal = ({
 							<div className="p-2 bg-red-500/10 rounded-lg">
 								<AlertTriangle className="w-5 h-5 text-red-500" />
 							</div>
-							<h2 id="delete-user-title" className="text-xl font-bold text-foreground">
+							<h2
+								id="delete-user-title"
+								className="text-xl font-bold text-foreground"
+							>
 								{title}
 							</h2>
 						</div>
@@ -70,8 +73,8 @@ export const DeleteConfirmModal = ({
 						) : null}
 						<div className="p-4 bg-accent rounded-xl">
 							<p className="text-sm text-muted-foreground">
-								This action cannot be undone. All data associated with this user will
-								be permanently deleted.
+								This action cannot be undone. All data associated with this user
+								will be permanently deleted.
 							</p>
 						</div>
 					</div>

@@ -10,7 +10,6 @@ import { getCurrentUser } from '@/services/user/user.service'
 import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILoginRequest } from '@/types/auth.interface'
-import type { IUser } from '@/types/user.interface'
 import { initApiSubdomain } from '@/utils/api'
 import { initializeAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
@@ -72,6 +71,11 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 							createdAt: '',
 							updatedAt: '',
 						})
+						if (typeof window !== 'undefined')
+							Cookies.set(AUTH.USER_ROLE, u.role, {
+								path: '/',
+								sameSite: 'lax',
+							})
 					}
 					return
 				}

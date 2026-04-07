@@ -118,3 +118,69 @@ export interface IGetFreeOrdersParams {
 	tableId?: number
 	search?: string
 }
+
+export type OrderGroupBy =
+	| 'day'
+	| 'month'
+	| 'dish'
+	| 'category'
+	| 'waiter'
+	| 'cook'
+	| 'table'
+
+export type OrderMetric = 'revenue' | 'count' | 'quantity'
+
+export interface IOrderAnalyticsTrendPoint {
+	date: string
+	value: number
+}
+
+export interface IOrderAnalyticsGroupInfo {
+	id?: number
+	name?: string
+	category?: string
+	categoryId?: number
+}
+
+export interface IOrderAnalyticsRow {
+	group: string
+	groupInfo: IOrderAnalyticsGroupInfo
+	value: number
+	count: number
+	quantity: number
+	revenue: number
+	avgRevenuePerOrder: number
+	avgItemsPerOrder: number
+	percentageOfTotalRevenue: number
+	maxRevenueInDay: number
+	minRevenueInDay: number
+	peakDay: string | null
+	troughDay: string | null
+	trend: IOrderAnalyticsTrendPoint[]
+}
+
+export interface IGetOrderAnalyticsParams {
+	groupBy?: OrderGroupBy
+	metric?: OrderMetric
+	from?: string
+	to?: string
+	dishIds?: number[]
+	categoryIds?: number[]
+	waiterIds?: number[]
+	cookIds?: number[]
+	tableIds?: number[]
+}
+
+export interface IGetAdminAllOrdersParams {
+	page?: number
+	limit?: number
+	search?: string
+	order?: 'asc' | 'desc'
+	status?: OrderStatus
+	from?: string
+	to?: string
+	waiterId?: number
+	cookId?: number
+	tableId?: number
+	sortBy?: 'createdAt'
+}

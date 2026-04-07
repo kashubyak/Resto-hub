@@ -30,6 +30,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal'
+import { UserOrderActivity } from './components/UserOrderActivity'
 import {
 	formatUserDateLong,
 	getUserInitials,
@@ -58,7 +59,12 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 	const { showError, showSuccess } = useAlert()
 	const { user: authUser } = useAuth()
 	const setAuthUser = useAuthStore((state) => state.setUser)
-	const { userQuery } = useUsers(idValid ? numericId : undefined, undefined, undefined, true)
+	const { userQuery } = useUsers(
+		idValid ? numericId : undefined,
+		undefined,
+		undefined,
+		true,
+	)
 
 	const [isEditing, setIsEditing] = useState(false)
 	const [isSaving, setIsSaving] = useState(false)
@@ -118,13 +124,17 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 			body.append('email', formData.email.trim())
 			if (
 				u.role !== UserRole.ADMIN &&
-				(formData.role === UserRole.COOK || formData.role === UserRole.WAITER) &&
+				(formData.role === UserRole.COOK ||
+					formData.role === UserRole.WAITER) &&
 				formData.role !== u.role
 			)
 				body.append('role', formData.role)
 			if (avatarFile) body.append('avatarUrl', avatarFile)
 			const { data: updated } = await updateUser(u.id, body)
-			void queryClient.setQueryData<IUser>([USERS_QUERY_KEY.DETAIL, u.id], updated)
+			void queryClient.setQueryData<IUser>(
+				[USERS_QUERY_KEY.DETAIL, u.id],
+				updated,
+			)
 			void queryClient.invalidateQueries({ queryKey: [USERS_QUERY_KEY.ALL] })
 			clearAvatarDraft()
 			setIsEditing(false)
@@ -216,7 +226,9 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 	const authId = normalizeUserId(authUser?.id)
 	const rowId = normalizeUserId(u.id)
 	const isSelf = authId != null && rowId != null && authId === rowId
-	const displayAvatarSrc = isEditing ? (avatarPreview ?? u.avatarUrl) : u.avatarUrl
+	const displayAvatarSrc = isEditing
+		? (avatarPreview ?? u.avatarUrl)
+		: u.avatarUrl
 
 	return (
 		<div className="max-w-7xl mx-auto space-y-6">
@@ -230,7 +242,9 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 				</Link>
 				<div className="flex-1 min-w-0">
 					<div className="flex items-center gap-3 flex-wrap">
-						<h1 className="text-2xl sm:text-3xl font-bold text-foreground">User Details</h1>
+						<h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+							User Details
+						</h1>
 						{isSelf ? (
 							<span className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-lg text-sm font-semibold">
 								<Crown className="w-4 h-4" />
@@ -295,7 +309,9 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 											placeholder="Enter name"
 										/>
 									) : (
-										<h2 className="text-2xl font-bold text-foreground">{u.name}</h2>
+										<h2 className="text-2xl font-bold text-foreground">
+											{u.name}
+										</h2>
 									)}
 									{errors.name ? (
 										<p className="mt-1 text-xs text-red-500">{errors.name}</p>
@@ -392,7 +408,9 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 									<Mail className="w-5 h-5 text-primary" />
 								</div>
 								<div className="flex-1 min-w-0">
-									<p className="text-xs text-muted-foreground mb-1">Email Address</p>
+									<p className="text-xs text-muted-foreground mb-1">
+										Email Address
+									</p>
 									{isEditing ? (
 										<>
 											<input
@@ -407,11 +425,15 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 												placeholder="Enter email"
 											/>
 											{errors.email ? (
-												<p className="mt-1 text-xs text-red-500">{errors.email}</p>
+												<p className="mt-1 text-xs text-red-500">
+													{errors.email}
+												</p>
 											) : null}
 										</>
 									) : (
-										<p className="text-foreground font-medium truncate">{u.email}</p>
+										<p className="text-foreground font-medium truncate">
+											{u.email}
+										</p>
 									)}
 								</div>
 							</div>
@@ -431,17 +453,18 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 					</div>
 
 					<div className="bg-card rounded-2xl border border-border p-6">
-						<h3 className="text-lg font-semibold text-foreground mb-4">Activity</h3>
-						<div className="text-center py-12 text-muted-foreground">
-							<p>Activity tracking will be added here</p>
-							<p className="text-sm mt-1">Coming soon...</p>
-						</div>
+						<h3 className="text-lg font-semibold text-foreground mb-4">
+							Activity
+						</h3>
+						<UserOrderActivity user={u} />
 					</div>
 				</div>
 
 				<div className="space-y-6">
 					<div className="bg-card rounded-2xl border border-border p-6">
-						<h3 className="text-lg font-semibold text-foreground mb-4">Information</h3>
+						<h3 className="text-lg font-semibold text-foreground mb-4">
+							Information
+						</h3>
 						<div className="space-y-4">
 							<div className="flex items-start gap-3">
 								<div className="p-2 bg-accent rounded-lg mt-1">
@@ -449,7 +472,9 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 								</div>
 								<div className="flex-1">
 									<p className="text-xs text-muted-foreground mb-1">Created</p>
-									<p className="text-sm text-foreground">{formatUserDateLong(u.createdAt)}</p>
+									<p className="text-sm text-foreground">
+										{formatUserDateLong(u.createdAt)}
+									</p>
 								</div>
 							</div>
 							<div className="flex items-start gap-3">
@@ -457,15 +482,21 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 									<Calendar className="w-4 h-4 text-primary" />
 								</div>
 								<div className="flex-1">
-									<p className="text-xs text-muted-foreground mb-1">Last Updated</p>
-									<p className="text-sm text-foreground">{formatUserDateLong(u.updatedAt)}</p>
+									<p className="text-xs text-muted-foreground mb-1">
+										Last Updated
+									</p>
+									<p className="text-sm text-foreground">
+										{formatUserDateLong(u.updatedAt)}
+									</p>
 								</div>
 							</div>
 						</div>
 					</div>
 
 					<div className="bg-card rounded-2xl border border-border p-6">
-						<h3 className="text-lg font-semibold text-foreground mb-4">Actions</h3>
+						<h3 className="text-lg font-semibold text-foreground mb-4">
+							Actions
+						</h3>
 						<div className="space-y-3">
 							{!isEditing ? (
 								<button

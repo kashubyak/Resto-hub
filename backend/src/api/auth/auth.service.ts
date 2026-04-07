@@ -20,6 +20,7 @@ import { ICompanyRegistrationFiles } from './interfaces/file-upload.interface'
 const ACCESS_TOKEN_COOKIE = 'access_token'
 const REFRESH_TOKEN_COOKIE = 'jid'
 const AUTH_STATUS_COOKIE = 'is_authenticated'
+const USER_ROLE_COOKIE = 'user_role'
 
 function parseExpiryToSeconds(value: string | undefined): number {
 	if (!value || typeof value !== 'string') return 0
@@ -172,6 +173,7 @@ export class AuthService {
 		this.setAuthCookies(res, {
 			accessToken: data.session.access_token,
 			refreshToken: data.session.refresh_token ?? undefined,
+			userRole: user.role,
 		})
 
 		return {
@@ -208,6 +210,7 @@ export class AuthService {
 		this.setAuthCookies(res, {
 			accessToken: data.session.access_token,
 			refreshToken: data.session.refresh_token ?? undefined,
+			userRole: user.role,
 		})
 
 		return {
@@ -222,6 +225,7 @@ export class AuthService {
 		res.clearCookie(ACCESS_TOKEN_COOKIE, clearOptions)
 		res.clearCookie(REFRESH_TOKEN_COOKIE, clearOptions)
 		res.clearCookie(AUTH_STATUS_COOKIE, { ...clearOptions, httpOnly: false })
+		res.clearCookie(USER_ROLE_COOKIE, { ...clearOptions, httpOnly: false })
 		return { message: 'Logged out successfully' }
 	}
 
@@ -250,7 +254,7 @@ export class AuthService {
 
 	private setAuthCookies(
 		res: Response,
-		payload: { accessToken: string; refreshToken?: string },
+		payload: { accessToken: string; refreshToken?: string; userRole: Role },
 	): void {
 		const accessTtlSec = parseExpiryToSeconds(this.config.get('JWT_EXPIRES_IN'))
 		const refreshTtlSec = parseExpiryToSeconds(
@@ -270,6 +274,10 @@ export class AuthService {
 			})
 		res.cookie(AUTH_STATUS_COOKIE, 'true', {
 			...this.getBaseCookieOptions(refreshTtlSec),
+			httpOnly: false,
+		})
+		res.cookie(USER_ROLE_COOKIE, payload.userRole, {
+			...this.getBaseCookieOptions(accessTtlSec),
 			httpOnly: false,
 		})
 	}

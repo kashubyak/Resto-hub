@@ -6,14 +6,7 @@ import { ROUTES } from '@/constants/pages.constant'
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
 import { getWaiterMyOrdersService } from '@/services/order/get-waiter-my-orders.service'
 import type { IOrderSummary, OrderStatus } from '@/types/order.interface'
-import {
-	Clock,
-	Filter,
-	History,
-	Loader2,
-	Plus,
-	Search,
-} from 'lucide-react'
+import { Clock, Filter, History, Loader2, Plus, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
@@ -49,7 +42,8 @@ export default function OrdersWaiterPage() {
 		if (!q) return orders
 		return orders.filter((o: IOrderSummary) => {
 			if (String(o.id).includes(q)) return true
-			if (o.table?.number != null && String(o.table.number).includes(q)) return true
+			if (o.table?.number != null && String(o.table.number).includes(q))
+				return true
 			return o.orderItems.some(
 				(i) =>
 					i.dish.name.toLowerCase().includes(q) ||
@@ -111,9 +105,7 @@ export default function OrdersWaiterPage() {
 						Manage and track your current orders
 						{!loading &&
 							filteredOrders.length > 0 &&
-							filteredOrders.some((o) =>
-								o.orderItems.some((i) => i.notes),
-							) && (
+							filteredOrders.some((o) => o.orderItems.some((i) => i.notes)) && (
 								<span className="ml-2 text-warning">
 									•{' '}
 									{
@@ -133,7 +125,9 @@ export default function OrdersWaiterPage() {
 						className="flex items-center gap-2 px-4 h-10 rounded-xl bg-card border border-border hover:bg-input transition-colors"
 					>
 						<History className="w-4 h-4 text-muted-foreground" />
-						<span className="text-sm text-foreground hidden sm:inline">History</span>
+						<span className="text-sm text-foreground hidden sm:inline">
+							History
+						</span>
 					</Link>
 					<button
 						type="button"
@@ -295,7 +289,10 @@ export default function OrdersWaiterPage() {
 									</p>
 									<div className="space-y-1.5">
 										{order.orderItems.slice(0, 2).map((item, idx) => (
-											<div key={`${order.id}-item-${idx}`} className="space-y-0.5">
+											<div
+												key={`${order.id}-item-${idx}`}
+												className="space-y-0.5"
+											>
 												<div className="flex justify-between text-xs">
 													<span className="text-foreground truncate">
 														{item.quantity}x {item.dish?.name}
@@ -306,7 +303,9 @@ export default function OrdersWaiterPage() {
 												</div>
 												{item.notes && (
 													<div className="flex items-start gap-1 pl-1">
-														<span className="text-[10px] text-warning shrink-0">⚠</span>
+														<span className="text-[10px] text-warning shrink-0">
+															⚠
+														</span>
 														<span className="text-[10px] text-warning italic truncate">
 															{item.notes}
 														</span>

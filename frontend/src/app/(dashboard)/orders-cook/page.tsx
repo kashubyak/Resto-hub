@@ -29,7 +29,8 @@ function filterOrdersBySearch(orders: IOrderSummary[], searchQuery: string) {
 	if (!q) return orders
 	return orders.filter((o) => {
 		if (String(o.id).includes(q)) return true
-		if (o.table?.number != null && String(o.table.number).includes(q)) return true
+		if (o.table?.number != null && String(o.table.number).includes(q))
+			return true
 		return o.orderItems.some(
 			(i) =>
 				i.dish.name.toLowerCase().includes(q) ||
@@ -91,7 +92,9 @@ export default function OrdersCookPage() {
 	const loading = freeLoading || myLoading
 
 	const invalidateCookLists = () => {
-		void queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY.LIST_COOK_FREE] })
+		void queryClient.invalidateQueries({
+			queryKey: [ORDER_QUERY_KEY.LIST_COOK_FREE],
+		})
 		void queryClient.invalidateQueries({
 			queryKey: [ORDER_QUERY_KEY.LIST_COOK_ACTIVE],
 		})
@@ -187,7 +190,10 @@ export default function OrdersCookPage() {
 		const config = orderStatusConfig[order.status]
 		const StatusIcon = config.icon
 
-		const handleActionClick = (e: React.MouseEvent, type: 'take' | 'complete') => {
+		const handleActionClick = (
+			e: React.MouseEvent,
+			type: 'take' | 'complete',
+		) => {
 			e.preventDefault()
 			e.stopPropagation()
 			openConfirmModal(type, order.id, `#${order.id}`)
@@ -205,7 +211,9 @@ export default function OrdersCookPage() {
 				<div className="flex items-start justify-between mb-3">
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center gap-2 mb-1">
-							<h3 className="text-foreground font-semibold">Order #{order.id}</h3>
+							<h3 className="text-foreground font-semibold">
+								Order #{order.id}
+							</h3>
 						</div>
 						<p className="text-xs text-muted-foreground">
 							Table {order.table?.number}
@@ -240,7 +248,8 @@ export default function OrdersCookPage() {
 
 				<div className="mb-3 pb-3 border-b border-border">
 					<p className="text-xs text-muted-foreground mb-2">
-						{order.orderItems.length} item{order.orderItems.length !== 1 ? 's' : ''}
+						{order.orderItems.length} item
+						{order.orderItems.length !== 1 ? 's' : ''}
 					</p>
 					<div className="space-y-1.5">
 						{order.orderItems.slice(0, 2).map((item, idx) => (
@@ -255,7 +264,9 @@ export default function OrdersCookPage() {
 								</div>
 								{item.notes && (
 									<div className="flex items-start gap-1 pl-1">
-										<span className="text-[10px] text-warning flex-shrink-0">⚠</span>
+										<span className="text-[10px] text-warning flex-shrink-0">
+											⚠
+										</span>
 										<span className="text-[10px] text-warning italic truncate">
 											{item.notes}
 										</span>
@@ -328,7 +339,9 @@ export default function OrdersCookPage() {
 						className="flex items-center gap-2 px-4 h-10 rounded-xl bg-card border border-border hover:bg-input transition-colors"
 					>
 						<History className="w-4 h-4 text-muted-foreground" />
-						<span className="text-sm text-foreground hidden sm:inline">History</span>
+						<span className="text-sm text-foreground hidden sm:inline">
+							History
+						</span>
 					</Link>
 				</div>
 			</div>
@@ -367,7 +380,9 @@ export default function OrdersCookPage() {
 								const cfg = status !== 'ALL' ? orderStatusConfig[status] : null
 								const StatusIcon = cfg?.icon
 								const label =
-									status === 'ALL' ? 'All My Orders' : orderStatusConfig[status].label
+									status === 'ALL'
+										? 'All My Orders'
+										: orderStatusConfig[status].label
 
 								return (
 									<button

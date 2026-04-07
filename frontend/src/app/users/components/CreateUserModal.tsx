@@ -14,7 +14,11 @@ interface CreateUserModalProps {
 	onSuccess: () => void
 }
 
-export const CreateUserModal = ({ isOpen, onClose, onSuccess }: CreateUserModalProps) => {
+export const CreateUserModal = ({
+	isOpen,
+	onClose,
+	onSuccess,
+}: CreateUserModalProps) => {
 	const { showError, showSuccess } = useAlert()
 	const [formData, setFormData] = useState({
 		name: '',
@@ -58,7 +62,10 @@ export const CreateUserModal = ({ isOpen, onClose, onSuccess }: CreateUserModalP
 			return
 		}
 		if (file.size > 5 * 1024 * 1024) {
-			setErrors((prev) => ({ ...prev, avatar: 'Image size should be less than 5MB' }))
+			setErrors((prev) => ({
+				...prev,
+				avatar: 'Image size should be less than 5MB',
+			}))
 			return
 		}
 		setAvatarFile(file)
@@ -73,7 +80,9 @@ export const CreateUserModal = ({ isOpen, onClose, onSuccess }: CreateUserModalP
 	const removeAvatar = () => {
 		setAvatarPreview(null)
 		setAvatarFile(null)
-		const fileInput = document.getElementById('avatar-upload') as HTMLInputElement | null
+		const fileInput = document.getElementById(
+			'avatar-upload',
+		) as HTMLInputElement | null
 		if (fileInput) fileInput.value = ''
 	}
 
@@ -131,7 +140,10 @@ export const CreateUserModal = ({ isOpen, onClose, onSuccess }: CreateUserModalP
 					aria-labelledby="create-user-title"
 				>
 					<div className="flex items-center justify-between px-6 py-4 border-b border-border">
-						<h2 id="create-user-title" className="text-xl font-bold text-foreground">
+						<h2
+							id="create-user-title"
+							className="text-xl font-bold text-foreground"
+						>
 							Create New User
 						</h2>
 						<button
@@ -146,43 +158,60 @@ export const CreateUserModal = ({ isOpen, onClose, onSuccess }: CreateUserModalP
 
 					<form onSubmit={handleSubmit} className="px-6 py-6 space-y-4">
 						<div>
-							<label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+							<label
+								htmlFor="name"
+								className="block text-sm font-medium text-foreground mb-2"
+							>
 								Full Name
 							</label>
 							<input
 								type="text"
 								id="name"
 								value={formData.name}
-								onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+								onChange={(e) =>
+									setFormData({ ...formData, name: e.target.value })
+								}
 								className={`w-full px-4 py-2.5 bg-input border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-background transition-all ${
 									errors.name ? 'border-red-500' : 'border-border'
 								}`}
 								placeholder="Enter full name"
 								disabled={isLoading}
 							/>
-							{errors.name ? <p className="mt-1 text-xs text-red-500">{errors.name}</p> : null}
+							{errors.name ? (
+								<p className="mt-1 text-xs text-red-500">{errors.name}</p>
+							) : null}
 						</div>
 
 						<div>
-							<label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+							<label
+								htmlFor="email"
+								className="block text-sm font-medium text-foreground mb-2"
+							>
 								Email Address
 							</label>
 							<input
 								type="email"
 								id="email"
 								value={formData.email}
-								onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+								onChange={(e) =>
+									setFormData({ ...formData, email: e.target.value })
+								}
 								className={`w-full px-4 py-2.5 bg-input border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-background transition-all ${
 									errors.email ? 'border-red-500' : 'border-border'
 								}`}
 								placeholder="Enter email address"
 								disabled={isLoading}
 							/>
-							{errors.email ? <p className="mt-1 text-xs text-red-500">{errors.email}</p> : null}
+							{errors.email ? (
+								<p className="mt-1 text-xs text-red-500">{errors.email}</p>
+							) : null}
 						</div>
 
 						<div>
-							<label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+							<label
+								htmlFor="password"
+								className="block text-sm font-medium text-foreground mb-2"
+							>
 								Password
 							</label>
 							<div className="relative">
@@ -190,7 +219,9 @@ export const CreateUserModal = ({ isOpen, onClose, onSuccess }: CreateUserModalP
 									type={showPassword ? 'text' : 'password'}
 									id="password"
 									value={formData.password}
-									onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+									onChange={(e) =>
+										setFormData({ ...formData, password: e.target.value })
+									}
 									className={`w-full px-4 py-2.5 pr-12 bg-input border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-background transition-all ${
 										errors.password ? 'border-red-500' : 'border-border'
 									}`}
@@ -223,7 +254,11 @@ export const CreateUserModal = ({ isOpen, onClose, onSuccess }: CreateUserModalP
 							<div className="flex items-center gap-4">
 								<div className="w-20 h-20 rounded-xl bg-input border-2 border-border flex items-center justify-center overflow-hidden shrink-0">
 									{avatarPreview ? (
-										<img src={avatarPreview} alt="" className="w-full h-full object-cover" />
+										<img
+											src={avatarPreview}
+											alt=""
+											className="w-full h-full object-cover"
+										/>
 									) : (
 										<UserIcon className="w-8 h-8 text-muted-foreground" />
 									)}
@@ -254,14 +289,21 @@ export const CreateUserModal = ({ isOpen, onClose, onSuccess }: CreateUserModalP
 											Remove Photo
 										</button>
 									) : null}
-									<p className="text-xs text-muted-foreground">JPG, PNG or GIF (max. 5MB)</p>
+									<p className="text-xs text-muted-foreground">
+										JPG, PNG or GIF (max. 5MB)
+									</p>
 								</div>
 							</div>
-							{errors.avatar ? <p className="mt-2 text-xs text-red-500">{errors.avatar}</p> : null}
+							{errors.avatar ? (
+								<p className="mt-2 text-xs text-red-500">{errors.avatar}</p>
+							) : null}
 						</div>
 
 						<div>
-							<label htmlFor="role" className="block text-sm font-medium text-foreground mb-2">
+							<label
+								htmlFor="role"
+								className="block text-sm font-medium text-foreground mb-2"
+							>
 								Role
 							</label>
 							<select

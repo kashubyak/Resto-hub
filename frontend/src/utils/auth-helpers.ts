@@ -5,6 +5,7 @@ import { getSupabaseClient } from '@/lib/supabase/client'
 import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IUser } from '@/types/user.interface'
+import Cookies from 'js-cookie'
 
 const AUTH_STORAGE_KEY = 'user-storage'
 
@@ -34,9 +35,10 @@ export function initializeAuth(user: IUser, role?: UserRole): void {
 	const { setUser, setIsAuth, setUserRole } = useAuthStore.getState()
 	setUser(user)
 	setIsAuth(true)
-	if (role) {
-		setUserRole(role)
-	}
+	const r = role ?? user.role
+	setUserRole(r)
+	if (typeof window !== 'undefined' && r)
+		Cookies.set(AUTH.USER_ROLE, r, { path: '/', sameSite: 'lax' })
 }
 
 export function clearAuth(): void {
@@ -45,6 +47,7 @@ export function clearAuth(): void {
 	setIsAuth(false)
 	setUserRole(null)
 	if (typeof window !== 'undefined') {
+		Cookies.remove(AUTH.USER_ROLE, { path: '/' })
 		try {
 			window.localStorage.setItem(
 				AUTH_STORAGE_KEY,

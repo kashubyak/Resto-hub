@@ -149,7 +149,9 @@ export const UsersCardGrid = ({
 									)}
 									<div className="min-w-0 flex-1">
 										<div className="flex items-center gap-2 mb-0.5">
-											<h3 className="font-semibold text-foreground truncate">{user.name}</h3>
+											<h3 className="font-semibold text-foreground truncate">
+												{user.name}
+											</h3>
 											{isMe ? (
 												<span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded text-xs font-semibold shrink-0">
 													<Crown className="w-3 h-3" />
@@ -157,7 +159,9 @@ export const UsersCardGrid = ({
 												</span>
 											) : null}
 										</div>
-										<p className="text-xs text-muted-foreground truncate">{user.email}</p>
+										<p className="text-xs text-muted-foreground truncate">
+											{user.email}
+										</p>
 									</div>
 								</div>
 								<div className="relative shrink-0">
@@ -187,13 +191,17 @@ export const UsersCardGrid = ({
 									</span>
 								</div>
 								<div className="flex items-center justify-between">
-									<span className="text-xs text-muted-foreground">Created:</span>
+									<span className="text-xs text-muted-foreground">
+										Created:
+									</span>
 									<span className="text-xs text-foreground">
 										{formatUserDateShort(user.createdAt)}
 									</span>
 								</div>
 								<div className="flex items-center justify-between">
-									<span className="text-xs text-muted-foreground">Updated:</span>
+									<span className="text-xs text-muted-foreground">
+										Updated:
+									</span>
 									<span className="text-xs text-foreground">
 										{formatUserDateShort(user.updatedAt)}
 									</span>

@@ -32,13 +32,19 @@ interface IOrderWaiterDetailViewProps {
 	orderId: number
 }
 
-export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) {
+export function OrderWaiterDetailView({
+	orderId,
+}: IOrderWaiterDetailViewProps) {
 	const router = useRouter()
 	const queryClient = useQueryClient()
 	const { showError, showSuccess } = useAlert()
 	const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
-	const { data: orderRes, isLoading, isError } = useQuery({
+	const {
+		data: orderRes,
+		isLoading,
+		isError,
+	} = useQuery({
 		queryKey: ORDER_QUERY_KEY.DETAIL(orderId),
 		queryFn: () => getOrderByIdService(orderId),
 	})
@@ -46,8 +52,12 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 	const order = orderRes?.data ?? null
 
 	const invalidateLists = () => {
-		void queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY.LIST_ACTIVE] })
-		void queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY.LIST_HISTORY] })
+		void queryClient.invalidateQueries({
+			queryKey: [ORDER_QUERY_KEY.LIST_ACTIVE],
+		})
+		void queryClient.invalidateQueries({
+			queryKey: [ORDER_QUERY_KEY.LIST_HISTORY],
+		})
 	}
 
 	const cancelMutation = useMutation({
@@ -69,9 +79,7 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 			updateOrderStatusService(orderId, { status }),
 		onSuccess: async (_, status) => {
 			showSuccess(
-				status === 'DELIVERED'
-					? 'Marked as delivered'
-					: 'Order finished',
+				status === 'DELIVERED' ? 'Marked as delivered' : 'Order finished',
 			)
 			invalidateLists()
 			await queryClient.invalidateQueries({
@@ -91,7 +99,9 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 			<div className="flex items-center justify-center py-12">
 				<div className="flex flex-col items-center gap-3">
 					<Loader2 className="w-8 h-8 text-primary animate-spin" />
-					<p className="text-sm text-muted-foreground">Loading order details...</p>
+					<p className="text-sm text-muted-foreground">
+						Loading order details...
+					</p>
 				</div>
 			</div>
 		)
@@ -187,7 +197,7 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 																'COMPLETE',
 																'DELIVERED',
 																'FINISHED',
-															].includes(order.status)
+														  ].includes(order.status)
 														? 'bg-success border-success'
 														: 'bg-card border-border'
 											}`}
@@ -201,15 +211,19 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 																	'COMPLETE',
 																	'DELIVERED',
 																	'FINISHED',
-																].includes(order.status)
+															  ].includes(order.status)
 															? 'text-white'
 															: 'text-muted-foreground'
 												}`}
 											/>
 										</div>
 										<div className="flex-1 pt-1.5">
-											<p className="text-sm font-medium text-foreground">Pending</p>
-											<p className="text-xs text-muted-foreground">Order placed</p>
+											<p className="text-sm font-medium text-foreground">
+												Pending
+											</p>
+											<p className="text-xs text-muted-foreground">
+												Order placed
+											</p>
 										</div>
 									</div>
 
@@ -220,7 +234,7 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 													? 'bg-info border-info'
 													: ['COMPLETE', 'DELIVERED', 'FINISHED'].includes(
 																order.status,
-															)
+														  )
 														? 'bg-success border-success'
 														: 'bg-card border-border'
 											}`}
@@ -231,7 +245,7 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 														? 'text-white animate-spin'
 														: ['COMPLETE', 'DELIVERED', 'FINISHED'].includes(
 																	order.status,
-																)
+															  )
 															? 'text-white'
 															: 'text-muted-foreground'
 												}`}
@@ -268,8 +282,12 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 											/>
 										</div>
 										<div className="flex-1 pt-1.5">
-											<p className="text-sm font-medium text-foreground">Complete</p>
-											<p className="text-xs text-muted-foreground">Ready to serve</p>
+											<p className="text-sm font-medium text-foreground">
+												Complete
+											</p>
+											<p className="text-xs text-muted-foreground">
+												Ready to serve
+											</p>
 										</div>
 									</div>
 
@@ -292,7 +310,9 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 											/>
 										</div>
 										<div className="flex-1 pt-1.5">
-											<p className="text-sm font-medium text-foreground">Delivered</p>
+											<p className="text-sm font-medium text-foreground">
+												Delivered
+											</p>
 											<p className="text-xs text-muted-foreground">
 												Served to table
 											</p>
@@ -316,8 +336,12 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 											/>
 										</div>
 										<div className="flex-1 pt-1.5">
-											<p className="text-sm font-medium text-foreground">Finished</p>
-											<p className="text-xs text-muted-foreground">Order complete</p>
+											<p className="text-sm font-medium text-foreground">
+												Finished
+											</p>
+											<p className="text-xs text-muted-foreground">
+												Order complete
+											</p>
 										</div>
 									</div>
 								</div>
@@ -373,12 +397,16 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 										<div className="mt-2 sm:ml-[3.25rem]">
 											<div className="bg-warning/10 border border-border rounded-lg px-3 py-2.5">
 												<div className="flex items-start gap-2">
-													<span className="text-warning text-base shrink-0">⚠</span>
+													<span className="text-warning text-base shrink-0">
+														⚠
+													</span>
 													<div className="flex-1 min-w-0">
 														<p className="text-xs font-semibold text-warning mb-1">
 															Special Instructions:
 														</p>
-														<p className="text-sm text-foreground">{item.notes}</p>
+														<p className="text-sm text-foreground">
+															{item.notes}
+														</p>
 													</div>
 												</div>
 											</div>
@@ -391,10 +419,15 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 						<div className="mt-4 pt-4 border-t-2 border-border">
 							<div className="flex items-center justify-between mb-2">
 								<div>
-									<span className="text-foreground font-semibold">Order Total</span>
+									<span className="text-foreground font-semibold">
+										Order Total
+									</span>
 									<span className="text-xs text-muted-foreground ml-2">
 										(
-										{order.orderItems.reduce((sum, item) => sum + item.quantity, 0)}{' '}
+										{order.orderItems.reduce(
+											(sum, item) => sum + item.quantity,
+											0,
+										)}{' '}
 										items)
 									</span>
 								</div>
@@ -417,7 +450,9 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-primary text-primary-foreground transition-opacity hover:opacity-90 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										<CheckCircle2 className="w-4 h-4" />
-										<span className="text-sm font-medium">Mark as Delivered</span>
+										<span className="text-sm font-medium">
+											Mark as Delivered
+										</span>
 									</button>
 								)}
 								{canFinish && (
@@ -457,7 +492,9 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 								</div>
 								<div className="flex-1 min-w-0">
 									<p className="text-xs text-muted-foreground mb-1">Order ID</p>
-									<p className="text-sm text-foreground font-medium">#{order.id}</p>
+									<p className="text-sm text-foreground font-medium">
+										#{order.id}
+									</p>
 								</div>
 							</div>
 
@@ -519,7 +556,9 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 									<Calendar className="w-5 h-5 text-primary" />
 								</div>
 								<div className="flex-1 min-w-0">
-									<p className="text-xs text-muted-foreground mb-1">Created At</p>
+									<p className="text-xs text-muted-foreground mb-1">
+										Created At
+									</p>
 									<p className="text-sm text-foreground font-medium">
 										{new Date(order.createdAt).toLocaleDateString(undefined, {
 											year: 'numeric',
@@ -541,7 +580,9 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 									<Clock className="w-5 h-5 text-primary" />
 								</div>
 								<div className="flex-1 min-w-0">
-									<p className="text-xs text-muted-foreground mb-1">Last Updated</p>
+									<p className="text-xs text-muted-foreground mb-1">
+										Last Updated
+									</p>
 									<p className="text-sm text-foreground font-medium">
 										{new Date(order.updatedAt).toLocaleDateString(undefined, {
 											year: 'numeric',
@@ -570,9 +611,14 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 								</span>
 							</div>
 							<div className="flex justify-between items-center">
-								<span className="text-sm text-muted-foreground">Total Quantity</span>
+								<span className="text-sm text-muted-foreground">
+									Total Quantity
+								</span>
 								<span className="text-sm text-foreground font-medium">
-									{order.orderItems.reduce((sum, item) => sum + item.quantity, 0)}
+									{order.orderItems.reduce(
+										(sum, item) => sum + item.quantity,
+										0,
+									)}
 								</span>
 							</div>
 							<div className="flex justify-between items-center pt-2 border-t border-border">
@@ -606,10 +652,12 @@ export function OrderWaiterDetailView({ orderId }: IOrderWaiterDetailViewProps) 
 								<AlertCircle className="w-6 h-6 text-destructive" />
 							</div>
 							<div className="flex-1 min-w-0">
-								<h3 className="text-foreground font-semibold mb-1">Cancel Order</h3>
+								<h3 className="text-foreground font-semibold mb-1">
+									Cancel Order
+								</h3>
 								<p className="text-sm text-muted-foreground">
-									Are you sure you want to cancel this order? This action cannot be
-									undone.
+									Are you sure you want to cancel this order? This action cannot
+									be undone.
 								</p>
 							</div>
 						</div>

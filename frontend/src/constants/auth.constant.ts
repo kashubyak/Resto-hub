@@ -1,5 +1,6 @@
 export const AUTH = {
 	TOKEN: 'access_token',
+	USER_ROLE: 'user_role',
 	AUTH_STATUS: 'is_authenticated',
 	SUBDOMAIN: 'subdomain',
 	SESSION_EXPIRED_MESSAGE: 'Your session has expired. Please log in again.',

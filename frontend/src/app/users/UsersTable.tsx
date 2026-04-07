@@ -139,7 +139,9 @@ export const UsersTable = ({
 								<td colSpan={6} className="px-6 py-12 text-center">
 									<div className="text-muted-foreground">
 										<p className="text-lg font-medium">No users found</p>
-										<p className="text-sm mt-1">Try adjusting your search or filters</p>
+										<p className="text-sm mt-1">
+											Try adjusting your search or filters
+										</p>
 									</div>
 								</td>
 							</tr>
@@ -158,11 +160,21 @@ export const UsersTable = ({
 					<table className="w-full">
 						<thead>
 							<tr className="border-b border-border bg-accent/50">
-								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">User</th>
-								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">Role</th>
-								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">Email</th>
-								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">Created</th>
-								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">Updated</th>
+								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
+									User
+								</th>
+								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
+									Role
+								</th>
+								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
+									Email
+								</th>
+								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
+									Created
+								</th>
+								<th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
+									Updated
+								</th>
 								<th className="text-right px-6 py-4 text-sm font-semibold text-foreground">
 									Actions
 								</th>
@@ -193,7 +205,9 @@ export const UsersTable = ({
 													</div>
 												)}
 												<div className="min-w-0 flex items-center gap-2">
-													<p className="font-medium text-foreground truncate">{user.name}</p>
+													<p className="font-medium text-foreground truncate">
+														{user.name}
+													</p>
 													{isMe ? (
 														<span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs font-semibold shrink-0">
 															<Crown className="w-3 h-3" />
@@ -211,7 +225,9 @@ export const UsersTable = ({
 											</span>
 										</td>
 										<td className="px-6 py-4">
-											<p className="text-sm text-muted-foreground">{user.email}</p>
+											<p className="text-sm text-muted-foreground">
+												{user.email}
+											</p>
 										</td>
 										<td className="px-6 py-4">
 											<p className="text-sm text-muted-foreground">

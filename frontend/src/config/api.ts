@@ -37,6 +37,7 @@ export const API_URL = {
 
 	ORDER: {
 		ROOT: BASE_ORDER,
+		LIST: BASE_ORDER,
 		CREATE: `${BASE_ORDER}/create`,
 		ANALYTICS: `${BASE_ORDER}/analytics`,
 		HISTORY: `${BASE_ORDER}/history`,

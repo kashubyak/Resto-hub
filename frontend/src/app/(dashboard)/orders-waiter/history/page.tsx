@@ -5,13 +5,7 @@ import { ROUTES } from '@/constants/pages.constant'
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
 import { getWaiterMyOrdersService } from '@/services/order/get-waiter-my-orders.service'
 import type { IOrderSummary, OrderStatus } from '@/types/order.interface'
-import {
-	ArrowLeft,
-	Clock,
-	Filter,
-	Loader2,
-	Search,
-} from 'lucide-react'
+import { ArrowLeft, Clock, Filter, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
@@ -22,8 +16,7 @@ type HistoryStatusFilter = 'ALL' | 'FINISHED' | 'CANCELED'
 export default function OrdersWaiterHistoryPage() {
 	const router = useRouter()
 	const [searchQuery, setSearchQuery] = useState('')
-	const [statusFilter, setStatusFilter] =
-		useState<HistoryStatusFilter>('ALL')
+	const [statusFilter, setStatusFilter] = useState<HistoryStatusFilter>('ALL')
 	const [showFilters, setShowFilters] = useState(false)
 
 	const statusParam: OrderStatus | undefined =
@@ -48,7 +41,8 @@ export default function OrdersWaiterHistoryPage() {
 		if (!q) return orders
 		return orders.filter((o: IOrderSummary) => {
 			if (String(o.id).includes(q)) return true
-			if (o.table?.number != null && String(o.table.number).includes(q)) return true
+			if (o.table?.number != null && String(o.table.number).includes(q))
+				return true
 			return o.orderItems.some((i) => i.dish.name.toLowerCase().includes(q))
 		})
 	}, [orders, searchQuery])
@@ -330,7 +324,9 @@ export default function OrdersWaiterHistoryPage() {
 											}`}
 										>
 											<StatusIcon className="w-3.5 h-3.5" />
-											<span className="text-xs font-medium">{config.label}</span>
+											<span className="text-xs font-medium">
+												{config.label}
+											</span>
 										</div>
 									</div>
 									<div className="flex items-center justify-between pt-2 border-t border-border">

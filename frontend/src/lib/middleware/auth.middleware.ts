@@ -3,14 +3,21 @@ import { ROUTES } from '@/constants/pages.constant'
 import { getSubdomainFromHost } from '@/utils/api/subdomain'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import {
-	redirectToHome,
-	redirectToLogin,
-	redirectToNotFound,
-} from './redirects'
+import { redirectToHome, redirectToLogin } from './redirects'
+import { getRoleForMiddleware } from './access-token-role'
 import { hasRoleAccess } from './role-guards'
 import { isAuthRoute, isPublicRoute } from './route-guards'
 import { type IRefreshResult, refreshAccessToken } from './token-refresh'
+
+function roleGuardOrNull(
+	request: NextRequest,
+	pathname: string,
+): NextResponse | null {
+	const role = getRoleForMiddleware(request)
+	if (role === null) return null
+	if (!hasRoleAccess(role, pathname)) return redirectToHome(request)
+	return null
+}
 
 const ALERT_COOKIE_OPTIONS = {
 	path: ROUTES.PRIVATE.SHARED.DASHBOARD,
@@ -45,7 +52,11 @@ export async function authMiddleware(
 	if (isAuthRoute(pathname))
 		return isAuthenticated ? redirectToHome(request) : NextResponse.next()
 
-	if (isAuthenticated) return NextResponse.next()
+	if (isAuthenticated) {
+		const denied = roleGuardOrNull(request, pathname)
+		if (denied) return denied
+		return NextResponse.next()
+	}
 
 	return handleTokenRefresh(request, pathname)
 }
@@ -69,7 +80,7 @@ async function handleTokenRefresh(
 	if (refreshResult.success) {
 		if (refreshResult.user) {
 			if (!hasRoleAccess(refreshResult.user.role, pathname))
-				return redirectToNotFound(request)
+				return redirectToHome(request)
 		}
 
 		return forwardCookiesAndContinue(refreshResult)
@@ -98,7 +109,11 @@ function handleSessionExpired(
 	hadAuth: boolean,
 ): NextResponse {
 	const hasAccessToken = !!request.cookies.get(AUTH.TOKEN)?.value
-	if (hasAccessToken) return NextResponse.next()
+	if (hasAccessToken) {
+		const denied = roleGuardOrNull(request, currentPath)
+		if (denied) return denied
+		return NextResponse.next()
+	}
 
 	const response = redirectToLogin(request, currentPath)
 	if (hadAuth) {

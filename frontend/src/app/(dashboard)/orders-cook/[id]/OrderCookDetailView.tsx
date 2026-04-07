@@ -27,7 +27,11 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 	const router = useRouter()
 	const queryClient = useQueryClient()
 
-	const { data: orderRes, isLoading, isError } = useQuery({
+	const {
+		data: orderRes,
+		isLoading,
+		isError,
+	} = useQuery({
 		queryKey: ORDER_QUERY_KEY.DETAIL(orderId),
 		queryFn: () => getOrderByIdService(orderId),
 	})
@@ -35,10 +39,18 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 	const order = orderRes?.data
 
 	const invalidateCook = () => {
-		void queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEY.DETAIL(orderId) })
-		void queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY.LIST_COOK_FREE] })
-		void queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY.LIST_COOK_ACTIVE] })
-		void queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY.LIST_COOK_HISTORY] })
+		void queryClient.invalidateQueries({
+			queryKey: ORDER_QUERY_KEY.DETAIL(orderId),
+		})
+		void queryClient.invalidateQueries({
+			queryKey: [ORDER_QUERY_KEY.LIST_COOK_FREE],
+		})
+		void queryClient.invalidateQueries({
+			queryKey: [ORDER_QUERY_KEY.LIST_COOK_ACTIVE],
+		})
+		void queryClient.invalidateQueries({
+			queryKey: [ORDER_QUERY_KEY.LIST_COOK_HISTORY],
+		})
 	}
 
 	const takeMutation = useMutation({
@@ -61,7 +73,9 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 			<div className="flex items-center justify-center py-12">
 				<div className="flex flex-col items-center gap-3">
 					<Loader2 className="w-8 h-8 text-primary animate-spin" />
-					<p className="text-sm text-muted-foreground">Loading order details...</p>
+					<p className="text-sm text-muted-foreground">
+						Loading order details...
+					</p>
 				</div>
 			</div>
 		)
@@ -76,7 +90,8 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 					</div>
 					<h3 className="text-foreground">Order not found</h3>
 					<p className="text-sm text-muted-foreground">
-						The order you&apos;re looking for doesn&apos;t exist or could not be loaded
+						The order you&apos;re looking for doesn&apos;t exist or could not be
+						loaded
 					</p>
 					<Link
 						href={ROUTES.PRIVATE.COOK.ORDERS_COOK}
@@ -156,7 +171,7 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 																'COMPLETE',
 																'DELIVERED',
 																'FINISHED',
-															].includes(order.status)
+														  ].includes(order.status)
 														? 'bg-success border-success'
 														: 'bg-card border-border'
 											}`}
@@ -176,8 +191,12 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 											/>
 										</div>
 										<div className="flex-1 pt-1.5">
-											<p className="text-sm font-medium text-foreground">Pending</p>
-											<p className="text-xs text-muted-foreground">Order placed</p>
+											<p className="text-sm font-medium text-foreground">
+												Pending
+											</p>
+											<p className="text-xs text-muted-foreground">
+												Order placed
+											</p>
 										</div>
 									</div>
 
@@ -186,7 +205,9 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 											className={`flex-shrink-0 w-10 h-10 rounded-full border-2 flex items-center justify-center z-10 ${
 												order.status === 'IN_PROGRESS'
 													? 'bg-info border-info'
-													: ['COMPLETE', 'DELIVERED', 'FINISHED'].includes(order.status)
+													: ['COMPLETE', 'DELIVERED', 'FINISHED'].includes(
+																order.status,
+														  )
 														? 'bg-success border-success'
 														: 'bg-card border-border'
 											}`}
@@ -195,15 +216,21 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 												className={`w-5 h-5 ${
 													order.status === 'IN_PROGRESS'
 														? 'text-white animate-spin'
-														: ['COMPLETE', 'DELIVERED', 'FINISHED'].includes(order.status)
+														: ['COMPLETE', 'DELIVERED', 'FINISHED'].includes(
+																	order.status,
+															  )
 															? 'text-white'
 															: 'text-muted-foreground'
 												}`}
 											/>
 										</div>
 										<div className="flex-1 pt-1.5">
-											<p className="text-sm font-medium text-foreground">In Progress</p>
-											<p className="text-xs text-muted-foreground">Being prepared</p>
+											<p className="text-sm font-medium text-foreground">
+												In Progress
+											</p>
+											<p className="text-xs text-muted-foreground">
+												Being prepared
+											</p>
 										</div>
 									</div>
 
@@ -219,15 +246,21 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 										>
 											<CheckCircle2
 												className={`w-5 h-5 ${
-													['COMPLETE', 'DELIVERED', 'FINISHED'].includes(order.status)
+													['COMPLETE', 'DELIVERED', 'FINISHED'].includes(
+														order.status,
+													)
 														? 'text-white'
 														: 'text-muted-foreground'
 												}`}
 											/>
 										</div>
 										<div className="flex-1 pt-1.5">
-											<p className="text-sm font-medium text-foreground">Complete</p>
-											<p className="text-xs text-muted-foreground">Ready to serve</p>
+											<p className="text-sm font-medium text-foreground">
+												Complete
+											</p>
+											<p className="text-xs text-muted-foreground">
+												Ready to serve
+											</p>
 										</div>
 									</div>
 
@@ -250,8 +283,12 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 											/>
 										</div>
 										<div className="flex-1 pt-1.5">
-											<p className="text-sm font-medium text-foreground">Delivered</p>
-											<p className="text-xs text-muted-foreground">Served to table</p>
+											<p className="text-sm font-medium text-foreground">
+												Delivered
+											</p>
+											<p className="text-xs text-muted-foreground">
+												Served to table
+											</p>
 										</div>
 									</div>
 
@@ -272,8 +309,12 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 											/>
 										</div>
 										<div className="flex-1 pt-1.5">
-											<p className="text-sm font-medium text-foreground">Finished</p>
-											<p className="text-xs text-muted-foreground">Order complete</p>
+											<p className="text-sm font-medium text-foreground">
+												Finished
+											</p>
+											<p className="text-xs text-muted-foreground">
+												Order complete
+											</p>
 										</div>
 									</div>
 								</div>
@@ -285,7 +326,8 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 						<div className="flex items-center justify-between mb-4">
 							<h2 className="text-foreground">Order Items</h2>
 							<span className="text-xs text-muted-foreground">
-								{order.orderItems.length} item{order.orderItems.length !== 1 ? 's' : ''}
+								{order.orderItems.length} item
+								{order.orderItems.length !== 1 ? 's' : ''}
 							</span>
 						</div>
 						<div className="space-y-4">
@@ -318,7 +360,9 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 											<div className="text-base font-bold text-primary">
 												${item.total.toFixed(2)}
 											</div>
-											<div className="text-[10px] text-muted-foreground">subtotal</div>
+											<div className="text-[10px] text-muted-foreground">
+												subtotal
+											</div>
 										</div>
 									</div>
 
@@ -326,12 +370,16 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 										<div className="pl-0 sm:pl-12 mt-2">
 											<div className="bg-warning/10 border border-border rounded-lg px-3 py-2.5">
 												<div className="flex items-start gap-2">
-													<span className="text-warning text-base flex-shrink-0">⚠</span>
+													<span className="text-warning text-base flex-shrink-0">
+														⚠
+													</span>
 													<div className="flex-1 min-w-0">
 														<p className="text-xs font-semibold text-warning mb-1">
 															Special Instructions:
 														</p>
-														<p className="text-sm text-foreground">{item.notes}</p>
+														<p className="text-sm text-foreground">
+															{item.notes}
+														</p>
 													</div>
 												</div>
 											</div>
@@ -344,10 +392,16 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 						<div className="mt-4 pt-4 border-t-2 border-border">
 							<div className="flex items-center justify-between mb-2">
 								<div>
-									<span className="text-foreground font-semibold">Order Total</span>
+									<span className="text-foreground font-semibold">
+										Order Total
+									</span>
 									<span className="text-xs text-muted-foreground ml-2">
 										(
-										{order.orderItems.reduce((sum, item) => sum + item.quantity, 0)} items)
+										{order.orderItems.reduce(
+											(sum, item) => sum + item.quantity,
+											0,
+										)}{' '}
+										items)
 									</span>
 								</div>
 								<span className="text-2xl font-bold text-primary">
@@ -388,7 +442,9 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 										) : (
 											<CheckCircle2 className="w-4 h-4" />
 										)}
-										<span className="text-sm font-medium">Mark as Complete</span>
+										<span className="text-sm font-medium">
+											Mark as Complete
+										</span>
 									</button>
 								)}
 							</div>
@@ -406,7 +462,9 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 								</div>
 								<div className="flex-1 min-w-0">
 									<p className="text-xs text-muted-foreground mb-1">Order ID</p>
-									<p className="text-sm text-foreground font-medium">#{order.id}</p>
+									<p className="text-sm text-foreground font-medium">
+										#{order.id}
+									</p>
 								</div>
 							</div>
 
@@ -437,7 +495,9 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 										{order.waiter?.name}
 									</p>
 									{order.waiter?.email && (
-										<p className="text-xs text-muted-foreground">{order.waiter.email}</p>
+										<p className="text-xs text-muted-foreground">
+											{order.waiter.email}
+										</p>
 									)}
 								</div>
 							</div>
@@ -449,9 +509,13 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 									</div>
 									<div className="flex-1 min-w-0">
 										<p className="text-xs text-muted-foreground mb-1">Cook</p>
-										<p className="text-sm text-foreground font-medium">{order.cook.name}</p>
+										<p className="text-sm text-foreground font-medium">
+											{order.cook.name}
+										</p>
 										{order.cook.email && (
-											<p className="text-xs text-muted-foreground">{order.cook.email}</p>
+											<p className="text-xs text-muted-foreground">
+												{order.cook.email}
+											</p>
 										)}
 									</div>
 								</div>
@@ -462,7 +526,9 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 									<Calendar className="w-5 h-5 text-primary" />
 								</div>
 								<div className="flex-1 min-w-0">
-									<p className="text-xs text-muted-foreground mb-1">Created At</p>
+									<p className="text-xs text-muted-foreground mb-1">
+										Created At
+									</p>
 									<p className="text-sm text-foreground font-medium">
 										{new Date(order.createdAt).toLocaleDateString(undefined, {
 											year: 'numeric',
@@ -484,7 +550,9 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 									<Clock className="w-5 h-5 text-primary" />
 								</div>
 								<div className="flex-1 min-w-0">
-									<p className="text-xs text-muted-foreground mb-1">Last Updated</p>
+									<p className="text-xs text-muted-foreground mb-1">
+										Last Updated
+									</p>
 									<p className="text-sm text-foreground font-medium">
 										{new Date(order.updatedAt).toLocaleDateString(undefined, {
 											year: 'numeric',
@@ -513,13 +581,20 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 								</span>
 							</div>
 							<div className="flex justify-between items-center">
-								<span className="text-sm text-muted-foreground">Total Quantity</span>
+								<span className="text-sm text-muted-foreground">
+									Total Quantity
+								</span>
 								<span className="text-sm text-foreground font-medium">
-									{order.orderItems.reduce((sum, item) => sum + item.quantity, 0)}
+									{order.orderItems.reduce(
+										(sum, item) => sum + item.quantity,
+										0,
+									)}
 								</span>
 							</div>
 							<div className="flex justify-between items-center pt-2 border-t border-border">
-								<span className="text-sm text-foreground font-semibold">Total Price</span>
+								<span className="text-sm text-foreground font-semibold">
+									Total Price
+								</span>
 								<span className="text-lg font-bold text-primary">
 									${order.total.toFixed(2)}
 								</span>

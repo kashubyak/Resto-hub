@@ -6,13 +6,7 @@ import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
 import { getCookMyOrdersService } from '@/services/order/get-cook-my-orders.service'
 import type { IOrderSummary, OrderStatus } from '@/types/order.interface'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-	ArrowLeft,
-	Clock,
-	Filter,
-	Loader2,
-	Search,
-} from 'lucide-react'
+import { ArrowLeft, Clock, Filter, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
@@ -24,7 +18,8 @@ function filterOrdersBySearch(orders: IOrderSummary[], searchQuery: string) {
 	if (!q) return orders
 	return orders.filter((o) => {
 		if (String(o.id).includes(q)) return true
-		if (o.table?.number != null && String(o.table.number).includes(q)) return true
+		if (o.table?.number != null && String(o.table.number).includes(q))
+			return true
 		return o.orderItems.some(
 			(i) =>
 				i.dish.name.toLowerCase().includes(q) ||
@@ -159,7 +154,9 @@ export default function OrderCookHistoryPage() {
 				<div className="flex items-center justify-center py-12">
 					<div className="flex flex-col items-center gap-3">
 						<Loader2 className="w-8 h-8 text-primary animate-spin" />
-						<p className="text-sm text-muted-foreground">Loading order history...</p>
+						<p className="text-sm text-muted-foreground">
+							Loading order history...
+						</p>
 					</div>
 				</div>
 			) : orders.length === 0 ? (
@@ -214,12 +211,16 @@ export default function OrderCookHistoryPage() {
 											tabIndex={0}
 											className="hover:bg-accent/50 transition-colors cursor-pointer"
 											onClick={() =>
-												router.push(ROUTES.PRIVATE.COOK.ORDERS_COOK_ID(order.id))
+												router.push(
+													ROUTES.PRIVATE.COOK.ORDERS_COOK_ID(order.id),
+												)
 											}
 											onKeyDown={(e) => {
 												if (e.key === 'Enter' || e.key === ' ') {
 													e.preventDefault()
-													router.push(ROUTES.PRIVATE.COOK.ORDERS_COOK_ID(order.id))
+													router.push(
+														ROUTES.PRIVATE.COOK.ORDERS_COOK_ID(order.id),
+													)
 												}
 											}}
 										>
@@ -243,7 +244,11 @@ export default function OrderCookHistoryPage() {
 											<td className="px-4 py-4">
 												<div>
 													<span className="text-sm text-foreground">
-														{order.orderItems.reduce((sum, item) => sum + item.quantity, 0)}x
+														{order.orderItems.reduce(
+															(sum, item) => sum + item.quantity,
+															0,
+														)}
+														x
 													</span>
 													<span className="text-xs text-muted-foreground ml-1">
 														({order.orderItems.length} item
@@ -260,22 +265,30 @@ export default function OrderCookHistoryPage() {
 													}`}
 												>
 													<StatusIcon className="w-3.5 h-3.5" />
-													<span className="text-xs font-medium">{config.label}</span>
+													<span className="text-xs font-medium">
+														{config.label}
+													</span>
 												</div>
 											</td>
 											<td className="px-4 py-4">
 												<div>
 													<div className="text-sm text-foreground">
-														{new Date(order.createdAt).toLocaleDateString(undefined, {
-															month: 'short',
-															day: 'numeric',
-														})}
+														{new Date(order.createdAt).toLocaleDateString(
+															undefined,
+															{
+																month: 'short',
+																day: 'numeric',
+															},
+														)}
 													</div>
 													<div className="text-xs text-muted-foreground">
-														{new Date(order.createdAt).toLocaleTimeString(undefined, {
-															hour: '2-digit',
-															minute: '2-digit',
-														})}
+														{new Date(order.createdAt).toLocaleTimeString(
+															undefined,
+															{
+																hour: '2-digit',
+																minute: '2-digit',
+															},
+														)}
 													</div>
 												</div>
 											</td>
@@ -314,7 +327,8 @@ export default function OrderCookHistoryPage() {
 											<div className="space-y-0.5">
 												<p className="text-xs text-muted-foreground">
 													Table {order.table?.number}
-													{order.table?.seats && ` (${order.table.seats} seats)`}
+													{order.table?.seats &&
+														` (${order.table.seats} seats)`}
 												</p>
 												<p className="text-xs text-muted-foreground">
 													{totalQuantity}x • {order.orderItems.length} item
@@ -330,22 +344,30 @@ export default function OrderCookHistoryPage() {
 											}`}
 										>
 											<StatusIcon className="w-3.5 h-3.5" />
-											<span className="text-xs font-medium">{config.label}</span>
+											<span className="text-xs font-medium">
+												{config.label}
+											</span>
 										</div>
 									</div>
 									<div className="flex items-center justify-between pt-2 border-t border-border">
 										<div>
 											<div className="text-xs text-muted-foreground">
-												{new Date(order.createdAt).toLocaleDateString(undefined, {
-													month: 'short',
-													day: 'numeric',
-												})}
+												{new Date(order.createdAt).toLocaleDateString(
+													undefined,
+													{
+														month: 'short',
+														day: 'numeric',
+													},
+												)}
 											</div>
 											<div className="text-[10px] text-muted-foreground">
-												{new Date(order.createdAt).toLocaleTimeString(undefined, {
-													hour: '2-digit',
-													minute: '2-digit',
-												})}
+												{new Date(order.createdAt).toLocaleTimeString(
+													undefined,
+													{
+														hour: '2-digit',
+														minute: '2-digit',
+													},
+												)}
 											</div>
 										</div>
 										<span className="text-sm font-semibold text-foreground">

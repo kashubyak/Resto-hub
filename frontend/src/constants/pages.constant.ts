@@ -1,5 +1,6 @@
 import BusinessIcon from '@mui/icons-material/Business'
 import {
+	BarChart3,
 	Building2,
 	ChefHat,
 	ClipboardList,
@@ -67,6 +68,7 @@ export const ROUTES = {
 			USERS_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.USERS}/${id}`,
 			COMPANY: '/company',
 			SETTINGS_COMPANY: '/settings/company',
+			ANALYTICS: '/analytics',
 		},
 		COOK: {
 			ORDERS_COOK: '/orders-cook',
@@ -113,11 +115,9 @@ export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
 		ROUTES.PRIVATE.ADMIN.USERS,
 		ROUTES.PRIVATE.ADMIN.COMPANY,
 		ROUTES.PRIVATE.ADMIN.SETTINGS_COMPANY,
+		ROUTES.PRIVATE.ADMIN.ANALYTICS,
 	],
-	[UserRole.COOK]: [
-		...SHARED_ROUTES,
-		ROUTES.PRIVATE.COOK.ORDERS_COOK,
-	],
+	[UserRole.COOK]: [...SHARED_ROUTES, ROUTES.PRIVATE.COOK.ORDERS_COOK],
 	[UserRole.WAITER]: [
 		...SHARED_ROUTES,
 		ROUTES.PRIVATE.WAITER.ORDERS_WAITER,
@@ -139,6 +139,12 @@ export const ALL_ROUTES: IRouteConfig[] = [
 		name: 'Dashboard',
 		icon: LayoutDashboard,
 		roles: ADMIN_COOK_WAITER_ROLES,
+	},
+	{
+		path: ROUTES.PRIVATE.ADMIN.ANALYTICS,
+		name: 'Analytics',
+		icon: BarChart3,
+		roles: ADMIN_ROLES,
 	},
 	{
 		path: ROUTES.PRIVATE.WAITER.ORDERS_WAITER,
