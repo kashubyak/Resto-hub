@@ -34,7 +34,7 @@ function filterOrdersBySearch(orders: IOrderSummary[], searchQuery: string) {
 		return o.orderItems.some(
 			(i) =>
 				i.dish.name.toLowerCase().includes(q) ||
-				(i.notes && i.notes.toLowerCase().includes(q)),
+				i.notes?.toLowerCase().includes(q),
 		)
 	})
 }
@@ -77,17 +77,15 @@ export default function OrdersCookPage() {
 			}),
 	})
 
-	const freeOrdersRaw = freeData?.data?.data ?? []
-	const myOrdersRaw = myData?.data?.data ?? []
+	const freeOrders = useMemo(() => {
+		const freeOrdersRaw = freeData?.data?.data ?? []
+		return filterOrdersBySearch(freeOrdersRaw, searchQuery)
+	}, [freeData, searchQuery])
 
-	const freeOrders = useMemo(
-		() => filterOrdersBySearch(freeOrdersRaw, searchQuery),
-		[freeOrdersRaw, searchQuery],
-	)
-	const myOrders = useMemo(
-		() => filterOrdersBySearch(myOrdersRaw, searchQuery),
-		[myOrdersRaw, searchQuery],
-	)
+	const myOrders = useMemo(() => {
+		const myOrdersRaw = myData?.data?.data ?? []
+		return filterOrdersBySearch(myOrdersRaw, searchQuery)
+	}, [myData, searchQuery])
 
 	const loading = freeLoading || myLoading
 

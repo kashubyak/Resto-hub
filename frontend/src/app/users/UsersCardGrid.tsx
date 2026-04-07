@@ -3,6 +3,7 @@
 import { ROUTES } from '@/constants/pages.constant'
 import type { IUser } from '@/types/user.interface'
 import { Crown, Eye, MoreVertical, Trash2 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -137,9 +138,15 @@ export const UsersCardGrid = ({
 							<div className="flex items-start justify-between mb-4 gap-2">
 								<div className="flex items-center gap-3 flex-1 min-w-0">
 									{user.avatarUrl ? (
-										<img
+										<Image
 											src={user.avatarUrl}
 											alt=""
+											width={48}
+											height={48}
+											unoptimized={
+												user.avatarUrl.startsWith('blob:') ||
+												user.avatarUrl.startsWith('data:')
+											}
 											className="w-12 h-12 rounded-xl object-cover shrink-0 border-2 border-border"
 										/>
 									) : (

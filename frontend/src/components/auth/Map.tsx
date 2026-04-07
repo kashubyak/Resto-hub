@@ -68,7 +68,7 @@ export function Map({ center, marker, onLocationSelect }: MapProps) {
 			map.remove()
 			mapInstanceRef.current = null
 		}
-	}, [])
+	}, []) // eslint-disable-line react-hooks/exhaustive-deps -- theme: sibling effect below
 
 	useEffect(() => {
 		if (!mapInstanceRef.current) return

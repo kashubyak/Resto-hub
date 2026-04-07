@@ -23,7 +23,7 @@ function filterOrdersBySearch(orders: IOrderSummary[], searchQuery: string) {
 		return o.orderItems.some(
 			(i) =>
 				i.dish.name.toLowerCase().includes(q) ||
-				(i.notes && i.notes.toLowerCase().includes(q)),
+				i.notes?.toLowerCase().includes(q),
 		)
 	})
 }
@@ -50,11 +50,10 @@ export default function OrderCookHistoryPage() {
 			}),
 	})
 
-	const ordersRaw = data?.data?.data ?? []
-	const orders = useMemo(
-		() => filterOrdersBySearch(ordersRaw, searchQuery),
-		[ordersRaw, searchQuery],
-	)
+	const orders = useMemo(() => {
+		const ordersRaw = data?.data?.data ?? []
+		return filterOrdersBySearch(ordersRaw, searchQuery)
+	}, [data, searchQuery])
 
 	useEffect(() => {
 		const onVis = () => {

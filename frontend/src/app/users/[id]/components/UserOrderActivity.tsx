@@ -66,8 +66,9 @@ export function UserOrderActivity({ user }: IUserOrderActivityProps) {
 	} = useInfiniteQuery({
 		queryKey: activityQueryKey,
 		queryFn: async ({ pageParam }) => {
+			if (!listParams) throw new Error('Order list params unavailable')
 			const res = await getAdminAllOrdersService({
-				...listParams!,
+				...listParams,
 				page: pageParam,
 			})
 			return res.data

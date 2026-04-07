@@ -34,9 +34,8 @@ export default function OrdersWaiterHistoryPage() {
 			}),
 	})
 
-	const orders = data?.data?.data ?? []
-
 	const filteredOrders = useMemo(() => {
+		const orders = data?.data?.data ?? []
 		const q = searchQuery.trim().toLowerCase()
 		if (!q) return orders
 		return orders.filter((o: IOrderSummary) => {
@@ -45,7 +44,7 @@ export default function OrdersWaiterHistoryPage() {
 				return true
 			return o.orderItems.some((i) => i.dish.name.toLowerCase().includes(q))
 		})
-	}, [orders, searchQuery])
+	}, [data, searchQuery])
 
 	const loading = isLoading
 

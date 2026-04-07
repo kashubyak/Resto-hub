@@ -26,6 +26,7 @@ import {
 	Upload,
 	X,
 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -103,7 +104,7 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 	useEffect(() => {
 		if (!u) return
 		clearAvatarDraft()
-	}, [u?.id, clearAvatarDraft])
+	}, [u, clearAvatarDraft])
 
 	const validateForm = () => {
 		const newErrors: Record<string, string> = {}
@@ -229,6 +230,11 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 	const displayAvatarSrc = isEditing
 		? (avatarPreview ?? u.avatarUrl)
 		: u.avatarUrl
+	const avatarUnoptimized = Boolean(
+		displayAvatarSrc &&
+		(displayAvatarSrc.startsWith('blob:') ||
+			displayAvatarSrc.startsWith('data:')),
+	)
 
 	return (
 		<div className="max-w-7xl mx-auto space-y-6">
@@ -265,9 +271,12 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 							<div className="flex items-center gap-4">
 								<div className="relative shrink-0">
 									{displayAvatarSrc ? (
-										<img
+										<Image
 											src={displayAvatarSrc}
 											alt=""
+											width={80}
+											height={80}
+											unoptimized={avatarUnoptimized}
 											className="w-20 h-20 rounded-2xl object-cover border-2 border-border"
 										/>
 									) : (

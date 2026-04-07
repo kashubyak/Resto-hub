@@ -5,6 +5,7 @@ import { useAlert } from '@/providers/AlertContext'
 import { registerUser } from '@/services/user/register-user.service'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
+import Image from 'next/image'
 import { Eye, EyeOff, Loader2, Upload, User as UserIcon, X } from 'lucide-react'
 import { useCallback, useState } from 'react'
 
@@ -156,7 +157,12 @@ export const CreateUserModal = ({
 						</button>
 					</div>
 
-					<form onSubmit={handleSubmit} className="px-6 py-6 space-y-4">
+					<form
+						onSubmit={(e) => {
+							void handleSubmit(e)
+						}}
+						className="px-6 py-6 space-y-4"
+					>
 						<div>
 							<label
 								htmlFor="name"
@@ -254,9 +260,12 @@ export const CreateUserModal = ({
 							<div className="flex items-center gap-4">
 								<div className="w-20 h-20 rounded-xl bg-input border-2 border-border flex items-center justify-center overflow-hidden shrink-0">
 									{avatarPreview ? (
-										<img
+										<Image
 											src={avatarPreview}
 											alt=""
+											width={80}
+											height={80}
+											unoptimized
 											className="w-full h-full object-cover"
 										/>
 									) : (

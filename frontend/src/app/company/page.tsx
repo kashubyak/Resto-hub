@@ -18,7 +18,6 @@ import {
 	buildUpdateCompanyFormData,
 	updateCompanyService,
 } from '@/services/company/update-company.service'
-import type { ICompanyInfo } from '@/types/company.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { CompanyNameValidation } from '@/validation/register.validation'
@@ -64,7 +63,7 @@ export default function CompanyPage() {
 		queryKey: companyQueryKey,
 		queryFn: async () => {
 			const response = await getCompanyService()
-			return response.data as ICompanyInfo
+			return response.data
 		},
 		enabled: queryEnabled,
 		staleTime: 5 * 60_000,
@@ -127,13 +126,7 @@ export default function CompanyPage() {
 		)
 			return [company.latitude, company.longitude]
 		return undefined
-	}, [
-		location.address,
-		location.lat,
-		location.lng,
-		company?.latitude,
-		company?.longitude,
-	])
+	}, [company, location.address, location.lat, location.lng])
 
 	const hasChanges = useMemo(() => {
 		if (!company) return false
@@ -193,15 +186,15 @@ export default function CompanyPage() {
 
 	const deleteMutation = useMutation({
 		mutationFn: deleteCompanyService,
-		onSuccess: async () => {
-			await logout()
+		onSuccess: () => {
+			void logout()
 		},
 		onError: (err) => {
 			showError(parseBackendError(err as unknown as IAxiosError).join('\n'))
 		},
 	})
 
-	const onSubmit = handleSubmit(async (values) => {
+	const onSubmit = handleSubmit((values) => {
 		if (
 			!location.address?.trim() ||
 			(location.lat === 0 && location.lng === 0)

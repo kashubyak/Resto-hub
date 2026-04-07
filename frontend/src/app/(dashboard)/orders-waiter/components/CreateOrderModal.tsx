@@ -72,7 +72,7 @@ export function CreateOrderModal({
 			setDishes(dishesData)
 			setTables((tablesRes.data ?? []).filter((t) => t.active))
 		} catch (err) {
-			showError(parseBackendError(err as unknown as IAxiosError).join('\n'))
+			showError(parseBackendError(err as IAxiosError).join('\n'))
 		} finally {
 			setLoading(false)
 		}
@@ -154,7 +154,7 @@ export function CreateOrderModal({
 			})
 			onSuccess(res.data.id)
 		} catch (err) {
-			showError(parseBackendError(err as unknown as IAxiosError).join('\n'))
+			showError(parseBackendError(err as IAxiosError).join('\n'))
 		} finally {
 			setSubmitting(false)
 		}
