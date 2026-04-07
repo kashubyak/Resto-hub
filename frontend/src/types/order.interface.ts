@@ -102,3 +102,19 @@ export interface IGetWaiterMyOrdersParams {
 	sortBy?: 'createdAt'
 	order?: 'asc' | 'desc'
 }
+
+export type IGetCookMyOrdersParams = IGetWaiterMyOrdersParams
+
+export interface IGetFreeOrdersParams {
+	page?: number
+	limit?: number
+	status?: OrderStatus
+	sortBy?: 'createdAt'
+	order?: 'asc' | 'desc'
+	from?: string
+	to?: string
+	waiterId?: number
+	cookId?: number
+	tableId?: number
+	search?: string
+}

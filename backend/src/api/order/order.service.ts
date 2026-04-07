@@ -330,6 +330,28 @@ export class OrderService {
 		companyId: number,
 		query: WaiterMyOrdersQueryDto,
 	): Promise<IPaginatedResponse<IOrderSummary>> {
+		return this.getStaffMyOrdersByAssignment(
+			waiterId,
+			companyId,
+			'waiterId',
+			query,
+		)
+	}
+
+	async getCookMyOrders(
+		cookId: number,
+		companyId: number,
+		query: WaiterMyOrdersQueryDto,
+	): Promise<IPaginatedResponse<IOrderSummary>> {
+		return this.getStaffMyOrdersByAssignment(cookId, companyId, 'cookId', query)
+	}
+
+	private async getStaffMyOrdersByAssignment(
+		staffId: number,
+		companyId: number,
+		assignment: 'waiterId' | 'cookId',
+		query: WaiterMyOrdersQueryDto,
+	): Promise<IPaginatedResponse<IOrderSummary>> {
 		const phase = query.phase ?? WaiterOrdersPhase.ACTIVE
 		const {
 			page = 1,
@@ -347,7 +369,7 @@ export class OrderService {
 		]
 		const historyStatuses = [OrderStatus.FINISHED, OrderStatus.CANCELED]
 
-		const where: IOrderWhereInput = { companyId, waiterId }
+		const where: IOrderWhereInput = { companyId, [assignment]: staffId }
 
 		if (phase === WaiterOrdersPhase.ACTIVE) {
 			if (statusFilter) {

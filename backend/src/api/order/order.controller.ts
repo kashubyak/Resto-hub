@@ -137,6 +137,24 @@ export class OrderController {
 		return this.orderService.getWaiterMyOrders(waiterId, companyId, query)
 	}
 
+	@Get('cook/my-orders')
+	@Roles(Role.COOK)
+	@ApiOperation({
+		description:
+			'Paginated orders for the current cook: phase=active (default) or history',
+	})
+	@ApiOkResponse({
+		description: 'Paginated list of cook orders',
+		type: PaginatedOrdersResponseDto,
+	})
+	getCookMyOrders(
+		@CurrentUser('id') cookId: number,
+		@CurrentUser('companyId') companyId: number,
+		@Query() query: WaiterMyOrdersQueryDto,
+	) {
+		return this.orderService.getCookMyOrders(cookId, companyId, query)
+	}
+
 	@Get(':id')
 	@ApiOperation({ description: 'Receive an order by ID' })
 	@ApiParam({ name: 'id', type: Number })
