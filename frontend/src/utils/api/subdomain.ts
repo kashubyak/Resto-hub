@@ -46,7 +46,8 @@ export function getSubdomainFromHostname(): string | null {
 }
 
 export function getRootAppUrl(): string {
-	const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+	const rawRoot = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost'
+	const rootDomain = rawRoot.replace(/\/+$/, '')
 	const isLocalDomain = rootDomain === 'localhost' || rootDomain === 'lvh.me'
 
 	if (typeof window !== 'undefined') {

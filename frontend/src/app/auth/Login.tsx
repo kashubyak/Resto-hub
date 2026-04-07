@@ -15,7 +15,6 @@ import {
 	passwordValidation,
 } from '@/validation/login.validation'
 import { AlertCircle, Building2, Lock, Mail } from 'lucide-react'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { memo, useCallback, useMemo, useState } from 'react'
 
@@ -23,6 +22,10 @@ function LoginSubdomainGate() {
 	const searchParams = useSearchParams()
 	const [subdomain, setSubdomain] = useState('')
 	const [error, setError] = useState<string | null>(null)
+	const registerUrl = useMemo(
+		() => `${getRootAppUrl()}${ROUTES.PUBLIC.AUTH.REGISTER}`,
+		[],
+	)
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
@@ -98,12 +101,12 @@ function LoginSubdomainGate() {
 				</div>
 				<p className="text-center mt-6 text-sm text-muted-foreground">
 					Don&apos;t have an account?{' '}
-					<Link
-						href={ROUTES.PUBLIC.AUTH.REGISTER}
+					<a
+						href={registerUrl}
 						className="text-primary hover:underline"
 					>
 						Sign up
-					</Link>
+					</a>
 				</p>
 			</div>
 		</div>
@@ -123,6 +126,10 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 		() =>
 			`${getRootAppUrl()}${ROUTES.PUBLIC.AUTH.LOGIN}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`,
 		[searchParams],
+	)
+	const registerUrl = useMemo(
+		() => `${getRootAppUrl()}${ROUTES.PUBLIC.AUTH.REGISTER}`,
+		[],
 	)
 
 	const hostSubdomain =
@@ -149,12 +156,12 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 						Company:{' '}
 						<span className="font-medium text-foreground">{hostSubdomain}</span>
 						{' · '}
-						<Link
+						<a
 							href={changeCompanyUrl}
 							className="text-primary hover:underline"
 						>
 							Change
-						</Link>
+						</a>
 					</p>
 				</div>
 
@@ -250,12 +257,12 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 				{/* Sign Up Link */}
 				<p className="text-center mt-6 text-muted-foreground">
 					Don&apos;t have an account?{' '}
-					<Link
-						href={ROUTES.PUBLIC.AUTH.REGISTER}
+					<a
+						href={registerUrl}
 						className="text-primary hover:text-primary-hover font-medium transition-colors"
 					>
 						Sign up
-					</Link>
+					</a>
 				</p>
 			</div>
 		</div>
