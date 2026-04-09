@@ -2,6 +2,7 @@
 
 import { AlertDisplay } from '@/components/container/AlertContainer'
 import { ApiSubdomainInitializer } from '@/components/init/ApiSubdomainInitializer'
+import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt'
 import { AUTH } from '@/constants/auth.constant'
 import { AlertProvider, useAlert } from '@/providers/AlertContext'
 import { AuthProvider } from '@/providers/AuthContext'
@@ -10,6 +11,7 @@ import { useAlertStore } from '@/store/alert.store'
 import { setGlobalAlertFunction } from '@/utils/api'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
+import { AppSerwistProvider } from './serwist-provider'
 
 const AlertInitializer = () => {
 	const { showAlert } = useAlert()
@@ -59,17 +61,20 @@ export function Providers({ children }: { children: React.ReactNode }) {
 	})
 
 	return (
-		<QueryClientProvider client={queryClientRef.current}>
-			<ThemeProvider>
-				<AlertProvider>
-					<AuthProvider>
-						<ApiSubdomainInitializer />
-						<AlertInitializer />
-						{children}
-						<AlertDisplay />
-					</AuthProvider>
-				</AlertProvider>
-			</ThemeProvider>
-		</QueryClientProvider>
+		<AppSerwistProvider>
+			<QueryClientProvider client={queryClientRef.current}>
+				<ThemeProvider>
+					<AlertProvider>
+						<AuthProvider>
+							<ApiSubdomainInitializer />
+							<AlertInitializer />
+							{children}
+							<AlertDisplay />
+							<PWAInstallPrompt />
+						</AuthProvider>
+					</AlertProvider>
+				</ThemeProvider>
+			</QueryClientProvider>
+		</AppSerwistProvider>
 	)
 }

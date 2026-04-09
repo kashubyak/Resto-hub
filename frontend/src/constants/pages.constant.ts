@@ -1,3 +1,4 @@
+import { PWA_ICON_PATHS } from '@/constants/pwa.constant'
 import BusinessIcon from '@mui/icons-material/Business'
 import {
 	BarChart3,
@@ -31,6 +32,9 @@ interface IRouteConfig {
 
 export const ROUTES = {
 	PUBLIC: {
+		OFFLINE: '/offline',
+		/** Serwist service worker route (`/serwist/sw.js`) */
+		SERWIST: '/serwist',
 		AUTH: {
 			ROOT: '/auth',
 			LOGIN: '/auth/login',
@@ -40,11 +44,11 @@ export const ROUTES = {
 		STATIC: {
 			ROOT: '/_next',
 			FAVICON: '/favicon.ico',
-			MANIFEST: '/site.webmanifest',
+			MANIFEST: '/manifest.webmanifest',
 			ICONS: {
-				ANDROID_192: '/android-chrome-192x192.png',
-				ANDROID_512: '/android-chrome-512x512.png',
-				APPLE_TOUCH: '/apple-touch-icon.png',
+				ANDROID_192: PWA_ICON_PATHS.ANDROID_192,
+				ANDROID_512: PWA_ICON_PATHS.ANDROID_512,
+				APPLE_TOUCH: PWA_ICON_PATHS.APPLE_TOUCH,
 			},
 		},
 		API_PUBLIC: '/api/public',
@@ -89,6 +93,8 @@ export const PUBLIC_ROUTES_LIST: string[] = [
 	ROUTES.PUBLIC.AUTH.LOGIN,
 	ROUTES.PUBLIC.AUTH.REGISTER,
 	ROUTES.PUBLIC.AUTH.REGISTER_SUCCESS,
+	ROUTES.PUBLIC.OFFLINE,
+	ROUTES.PUBLIC.SERWIST,
 	ROUTES.PUBLIC.STATIC.ROOT,
 	ROUTES.PUBLIC.API_PUBLIC,
 	ROUTES.PUBLIC.STATIC.FAVICON,

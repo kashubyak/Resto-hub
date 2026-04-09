@@ -178,6 +178,11 @@ yarn-error.log*
 # Local development
 .local/
 
+# Serwist / PWA generated service worker (webpack path; safe if unused)
+frontend/public/sw.js
+frontend/public/sw.js.map
+frontend/public/swe-worker-*.js
+
 # Misc
 *.lcov
 .nyc_output

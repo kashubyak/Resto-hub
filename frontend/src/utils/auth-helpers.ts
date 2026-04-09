@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+
 import { AUTH } from '@/constants/auth.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import type { UserRole } from '@/constants/pages.constant'
