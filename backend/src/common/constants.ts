@@ -6,6 +6,7 @@ export const socket_events = {
 export const socket_rooms = {
 	KITCHEN: 'kitchen',
 	WAITER: (waiterId: number) => `waiter-${waiterId}`,
+	USER: (userId: number) => `user-${userId}`,
 }
 export const size_of_image = 10
 

@@ -65,6 +65,7 @@ export class NotificationsGateway
 			;(client.data as ISocketData).userId = userId
 			;(client.data as ISocketData).role = role
 
+			await client.join(socket_rooms.USER(userId))
 			if (role === Role.COOK) await client.join(socket_rooms.KITCHEN)
 			else if (role === Role.WAITER)
 				await client.join(socket_rooms.WAITER(userId))

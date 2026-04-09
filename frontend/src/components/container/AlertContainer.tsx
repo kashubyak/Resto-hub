@@ -48,6 +48,15 @@ function AlertDisplayComponent() {
 						text={alert.text}
 						retryAfter={alert.retryAfter}
 						onTimerComplete={() => handleTimerComplete(alert.id)}
+						actionLabel={alert.actionLabel}
+						onAction={
+							alert.actionLabel && alert.onAction
+								? () => {
+										alert.onAction?.()
+										removeAlert(alert.id)
+									}
+								: undefined
+						}
 					/>
 					<IconButton
 						size="small"

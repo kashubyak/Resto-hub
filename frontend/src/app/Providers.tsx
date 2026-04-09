@@ -6,6 +6,7 @@ import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt'
 import { AUTH } from '@/constants/auth.constant'
 import { AlertProvider, useAlert } from '@/providers/AlertContext'
 import { AuthProvider } from '@/providers/AuthContext'
+import { SocketProvider } from '@/providers/SocketProvider'
 import { ThemeProvider } from '@/providers/ThemeContext'
 import { useAlertStore } from '@/store/alert.store'
 import { setGlobalAlertFunction } from '@/utils/api'
@@ -66,11 +67,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
 				<ThemeProvider>
 					<AlertProvider>
 						<AuthProvider>
-							<ApiSubdomainInitializer />
-							<AlertInitializer />
-							{children}
-							<AlertDisplay />
-							<PWAInstallPrompt />
+							<SocketProvider>
+								<ApiSubdomainInitializer />
+								<AlertInitializer />
+								{children}
+								<AlertDisplay />
+								<PWAInstallPrompt />
+							</SocketProvider>
 						</AuthProvider>
 					</AlertProvider>
 				</ThemeProvider>

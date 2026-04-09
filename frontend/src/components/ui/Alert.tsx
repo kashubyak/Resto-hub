@@ -2,6 +2,7 @@ import { MAX_LENGTH_ALERT } from '@/constants/alert.constant'
 import { formatRetryTime, useRateLimitTimer } from '@/hooks/useRateLimitTimer'
 import type { AlertSeverity } from '@/types/alert.interface'
 import Alert from '@mui/material/Alert'
+import Button from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -10,6 +11,8 @@ interface IAlertProps {
 	text: string
 	retryAfter?: number
 	onTimerComplete?: () => void
+	actionLabel?: string
+	onAction?: () => void
 }
 
 const CustomAlert = styled(Alert)(({ theme }) => ({
@@ -63,7 +66,14 @@ const CustomAlert = styled(Alert)(({ theme }) => ({
 }))
 
 export const AlertUI = memo<IAlertProps>(
-	({ severity, text, retryAfter, onTimerComplete }) => {
+	({
+		severity,
+		text,
+		retryAfter,
+		onTimerComplete,
+		actionLabel,
+		onAction,
+	}) => {
 		const [expanded, setExpanded] = useState(false)
 		const secondsLeft = useRateLimitTimer(retryAfter)
 
@@ -90,15 +100,35 @@ export const AlertUI = memo<IAlertProps>(
 
 		return (
 			<CustomAlert severity={severity}>
-				<span>{displayText}</span>
-				{isLong && (
-					<span
-						className="ml-1 sm:ml-2 underline cursor-pointer text-[11px] sm:text-xs opacity-80 text-nowrap"
-						onClick={handleToggle}
-					>
-						{expanded ? 'Show less' : 'Show more'}
-					</span>
-				)}
+				<div className="flex min-w-0 flex-col gap-1.5">
+					<div>
+						<span>{displayText}</span>
+						{isLong && (
+							<span
+								className="ml-1 sm:ml-2 cursor-pointer text-nowrap text-[11px] underline opacity-80 sm:text-xs"
+								onClick={handleToggle}
+							>
+								{expanded ? 'Show less' : 'Show more'}
+							</span>
+						)}
+					</div>
+					{actionLabel && onAction ? (
+						<Button
+							type="button"
+							size="small"
+							variant="outlined"
+							onClick={onAction}
+							sx={{
+								alignSelf: 'flex-start',
+								color: 'inherit',
+								borderColor: 'rgba(255, 255, 255, 0.55)',
+								'&:hover': { borderColor: 'rgba(255, 255, 255, 0.85)' },
+							}}
+						>
+							{actionLabel}
+						</Button>
+					) : null}
+				</div>
 			</CustomAlert>
 		)
 	},

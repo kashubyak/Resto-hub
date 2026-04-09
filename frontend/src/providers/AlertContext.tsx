@@ -19,6 +19,8 @@ interface IAlert {
 	text: string
 	duration?: number
 	retryAfter?: number
+	actionLabel?: string
+	onAction?: () => void
 }
 
 interface IAlertContext {
@@ -133,11 +135,17 @@ export const AlertProvider = memo<{ children: React.ReactNode }>(
 						return [...prev, newAlert]
 					}
 
+					const isActionable =
+						alert.actionLabel != null && alert.onAction != null
 					const existing = prev.find(
-						(a) => a.severity === alert.severity && a.retryAfter === undefined,
+						(a) =>
+							a.severity === alert.severity &&
+							a.retryAfter === undefined &&
+							!a.actionLabel &&
+							!a.onAction,
 					)
 
-					if (existing) {
+					if (existing && !isActionable) {
 						const merged: IAlert = {
 							...existing,
 							text: `${existing.text}\n${alert.text}`.trim(),
