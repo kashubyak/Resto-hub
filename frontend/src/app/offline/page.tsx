@@ -21,8 +21,8 @@ export default function OfflinePage() {
 						You are offline
 					</h1>
 					<p className="text-muted-foreground text-sm leading-relaxed">
-						Resto Hub needs a network connection for live orders and data.
-						Check your connection, then try again.
+						Resto Hub needs a network connection for live orders and data. Check
+						your connection, then try again.
 					</p>
 				</div>
 				<div className="flex flex-col gap-3 pt-2">

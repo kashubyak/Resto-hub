@@ -52,10 +52,7 @@ function PWAInstallPromptComponent() {
 						<div className="mx-auto mt-3 h-1 w-10 rounded-full bg-border" />
 						<div className="flex gap-4 p-5 pt-4">
 							<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-								<Download
-									className="h-6 w-6 text-primary"
-									aria-hidden
-								/>
+								<Download className="h-6 w-6 text-primary" aria-hidden />
 							</div>
 							<div className="min-w-0 flex-1 space-y-1">
 								<h2
@@ -88,7 +85,7 @@ function PWAInstallPromptComponent() {
 							<Button
 								type="button"
 								text={isPrompting ? 'Opening…' : 'Install'}
-								onClick={handleInstall}
+								onClick={() => void handleInstall()}
 								disabled={isPrompting}
 								className="order-1 sm:order-2 mt-0 w-full sm:w-auto min-w-[8rem] rounded-xl py-2.5"
 							/>

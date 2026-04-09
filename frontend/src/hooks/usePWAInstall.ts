@@ -10,14 +10,16 @@ type BeforeInstallPromptEvent = Event & {
 
 function readDismissedFromSession(): boolean {
 	if (typeof window === 'undefined') return false
-	return sessionStorage.getItem(PWA_SESSION_KEYS.INSTALL_PROMPT_DISMISSED) === '1'
+	return (
+		sessionStorage.getItem(PWA_SESSION_KEYS.INSTALL_PROMPT_DISMISSED) === '1'
+	)
 }
 
 function getStandaloneInstalled(): boolean {
 	if (typeof window === 'undefined') return false
 	const mq = window.matchMedia('(display-mode: standalone)')
 	if (mq.matches) return true
-	
+
 	return Boolean(
 		// iOS Safari
 		(navigator as Navigator & { standalone?: boolean }).standalone,

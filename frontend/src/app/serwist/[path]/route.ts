@@ -14,4 +14,7 @@ export const { dynamic, dynamicParams, revalidate, generateStaticParams, GET } =
 		additionalPrecacheEntries: [{ url: ROUTES.PUBLIC.OFFLINE, revision }],
 		swSrc: 'src/app/sw.ts',
 		useNativeEsbuild: true,
+		esbuildOptions: {
+			target: 'es2022',
+		},
 	})

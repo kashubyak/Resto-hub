@@ -4,11 +4,7 @@
 
 import { defaultCache } from '@serwist/turbopack/worker'
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist'
-import {
-	ExpirationPlugin,
-	Serwist,
-	StaleWhileRevalidate,
-} from 'serwist'
+import { ExpirationPlugin, Serwist, StaleWhileRevalidate } from 'serwist'
 
 declare global {
 	interface WorkerGlobalScope extends SerwistGlobalConfig {
