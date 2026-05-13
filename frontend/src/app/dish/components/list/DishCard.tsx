@@ -1,5 +1,6 @@
 'use client'
 
+import { dishImageBypassesNextOptimizer } from '@/constants/dish-media.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import type { IDish } from '@/types/dish.interface'
 import { Eye, Flame, Scale } from 'lucide-react'
@@ -18,6 +19,7 @@ const DishCardComponent = ({ dish }: DishCardProps) => (
 				src={dish.imageUrl}
 				alt={dish.name}
 				fill
+				unoptimized={dishImageBypassesNextOptimizer(dish.imageUrl)}
 				className="object-cover group-hover:scale-110 transition-transform duration-500"
 				sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
 			/>

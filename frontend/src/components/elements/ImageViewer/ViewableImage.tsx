@@ -1,5 +1,6 @@
 'use client'
 
+import { dishImageBypassesNextOptimizer } from '@/constants/dish-media.constant'
 import { useViewableImage } from '@/hooks/useViewableImage'
 import { Visibility as VisibilityIcon } from '@mui/icons-material'
 import { Box, IconButton, useMediaQuery, useTheme } from '@mui/material'
@@ -88,6 +89,7 @@ export const ViewableImage = memo(
 						className={className}
 						style={style}
 						{...imageProps}
+						unoptimized={dishImageBypassesNextOptimizer(src)}
 					/>
 
 					{showViewIcon && (

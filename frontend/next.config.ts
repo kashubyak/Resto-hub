@@ -1,3 +1,4 @@
+import { DISH_IMAGE_S3_HOSTNAME } from './src/constants/dish-media.constant'
 import { withSerwist } from '@serwist/turbopack'
 import type { NextConfig } from 'next'
 
@@ -7,7 +8,7 @@ const nextConfig: NextConfig = {
 		remotePatterns: [
 			{
 				protocol: 'https',
-				hostname: 'resto-hub.s3.eu-central-1.amazonaws.com',
+				hostname: DISH_IMAGE_S3_HOSTNAME,
 				port: '',
 				pathname: '/**',
 			},

@@ -1,5 +1,6 @@
 'use client'
 
+import { dishImageBypassesNextOptimizer } from '@/constants/dish-media.constant'
 import { useImageViewer } from '@/hooks/useImageViewer'
 import {
 	Close as CloseIcon,
@@ -272,6 +273,7 @@ export const ImageViewer = memo(
 								alt={alt}
 								width={0}
 								height={0}
+								unoptimized={dishImageBypassesNextOptimizer(src)}
 								sizes="90vw"
 								style={imageStyles}
 								quality={100}

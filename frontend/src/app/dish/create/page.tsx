@@ -1,6 +1,7 @@
 'use client'
 
 import { CategorySelect } from '@/app/dish/components/create/CategorySelect'
+import { dishImageBypassesNextOptimizer } from '@/constants/dish-media.constant'
 import { ROUTES } from '@/constants/pages.constant'
 import { useDishModal } from '@/hooks/useDishModal'
 import type { IDishFormValues } from '@/types/dish.interface'
@@ -601,6 +602,7 @@ function CreateDishForm() {
 									src={previewUrl}
 									alt="Uploaded dish"
 									fill
+									unoptimized={dishImageBypassesNextOptimizer(previewUrl)}
 									className="object-cover rounded-2xl"
 								/>
 								<div className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3">

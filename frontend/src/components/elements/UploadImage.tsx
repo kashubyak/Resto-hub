@@ -1,5 +1,6 @@
 'use client'
 
+import { dishImageBypassesNextOptimizer } from '@/constants/dish-media.constant'
 import { size_of_image } from '@/constants/share.constant'
 import { useUploadImage } from '@/hooks/useUploadImage'
 import { AlertCircle, Upload, X } from 'lucide-react'
@@ -141,6 +142,7 @@ export const UploadImage = memo(
 									src={currentPreview}
 									alt="Preview"
 									fill
+									unoptimized={dishImageBypassesNextOptimizer(currentPreview)}
 									className="object-cover"
 								/>
 							</div>

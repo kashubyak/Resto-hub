@@ -1,6 +1,7 @@
 'use client'
 
 import { UploadImage } from '@/components/elements/UploadImage'
+import { dishImageBypassesNextOptimizer } from '@/constants/dish-media.constant'
 import { size_of_image } from '@/constants/share.constant'
 import type { IDishFormValues } from '@/types/dish.interface'
 import { imageValidation } from '@/validation/dish.validation'
@@ -143,6 +144,7 @@ const ImageUploadUpdateContent = memo(
 						src={previewUrl ?? ''}
 						alt="Dish"
 						fill
+						unoptimized={dishImageBypassesNextOptimizer(previewUrl ?? '')}
 						className="object-cover rounded-xl"
 					/>
 					<div className="absolute inset-0 bg-black/50 rounded-xl opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-3">
