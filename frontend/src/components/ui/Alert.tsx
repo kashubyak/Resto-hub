@@ -66,14 +66,7 @@ const CustomAlert = styled(Alert)(({ theme }) => ({
 }))
 
 export const AlertUI = memo<IAlertProps>(
-	({
-		severity,
-		text,
-		retryAfter,
-		onTimerComplete,
-		actionLabel,
-		onAction,
-	}) => {
+	({ severity, text, retryAfter, onTimerComplete, actionLabel, onAction }) => {
 		const [expanded, setExpanded] = useState(false)
 		const secondsLeft = useRateLimitTimer(retryAfter)
 

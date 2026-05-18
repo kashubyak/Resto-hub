@@ -21,7 +21,9 @@ import type { Socket } from 'socket.io-client'
 
 const ORDER_ALERT_DURATION_MS = 12_000
 
-function isNewOrderPayload(data: unknown): data is INewOrderNotificationPayload {
+function isNewOrderPayload(
+	data: unknown,
+): data is INewOrderNotificationPayload {
 	if (typeof data !== 'object' || data === null) return false
 	const o = data as Record<string, unknown>
 	return typeof o.id === 'number'
@@ -77,13 +79,13 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 					typeof data.itemsCount === 'number'
 						? `${data.itemsCount} items`
 						: 'new items'
-				queryClient.invalidateQueries({
+				void queryClient.invalidateQueries({
 					queryKey: [ORDER_QUERY_KEY.LIST_COOK_FREE],
 				})
-				queryClient.invalidateQueries({
+				void queryClient.invalidateQueries({
 					queryKey: [ORDER_QUERY_KEY.LIST_COOK_ACTIVE],
 				})
-				queryClient.invalidateQueries({
+				void queryClient.invalidateQueries({
 					queryKey: ORDER_QUERY_KEY.DETAIL(data.id),
 				})
 				const path = ROUTES.PRIVATE.COOK.ORDERS_COOK_ID(data.id)
@@ -98,12 +100,11 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 
 			const onOrderCompleted = (data: unknown) => {
 				if (!isOrderCompletedPayload(data)) return
-				const tablePart =
-					data.table != null ? ` Table ${data.table}.` : ''
-				queryClient.invalidateQueries({
+				const tablePart = data.table != null ? ` Table ${data.table}.` : ''
+				void queryClient.invalidateQueries({
 					queryKey: [ORDER_QUERY_KEY.LIST_ACTIVE],
 				})
-				queryClient.invalidateQueries({
+				void queryClient.invalidateQueries({
 					queryKey: ORDER_QUERY_KEY.DETAIL(data.orderId),
 				})
 				const path = ROUTES.PRIVATE.WAITER.ORDERS_WAITER_ID(data.orderId)
