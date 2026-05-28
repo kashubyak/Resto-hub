@@ -1,6 +1,6 @@
 'use client'
 
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { ThemeSelector } from '@/components/ui/ThemeSelector'
 import {
 	DEFAULT_COMPANY_ICON,
 	SIDEBAR_SUBTITLE,
@@ -8,10 +8,13 @@ import {
 import { useCompanySettings } from '@/hooks/useCompanySettings'
 import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { useAuth } from '@/providers/AuthContext'
+import { THEME_PREFERENCE } from '@/constants/theme.constant'
+import { useTheme } from '@/providers/ThemeContext'
 import {
 	ChevronsLeft,
 	ChevronsRight,
 	LogOut,
+	Monitor,
 	Moon,
 	MoreVertical,
 	Search,
@@ -43,6 +46,7 @@ const SidebarComponent = function Sidebar({
 	const { routes } = useUserRoutes()
 	const pathname = usePathname()
 	const { user, logout } = useAuth()
+	const { preference } = useTheme()
 	const { company } = useCompanySettings(!!user)
 
 	const companyName = company?.name ?? ''
@@ -347,20 +351,25 @@ const SidebarComponent = function Sidebar({
 													Settings
 												</span>
 											</button>
-											<div className="flex items-center justify-between px-4 py-2.5 hover:bg-accent transition-colors">
+											<div className="px-4 py-2.5 space-y-2">
 												<div className="flex items-center gap-3">
-													<Sun className="w-4 h-4 text-muted-foreground dark:hidden" />
-													<Moon className="w-4 h-4 text-muted-foreground hidden dark:block" />
+													{preference === THEME_PREFERENCE.DARK ? (
+														<Moon className="w-4 h-4 text-muted-foreground" />
+													) : preference === THEME_PREFERENCE.LIGHT ? (
+														<Sun className="w-4 h-4 text-muted-foreground" />
+													) : (
+														<Monitor className="w-4 h-4 text-muted-foreground" />
+													)}
 													<span className="text-sm text-foreground">Theme</span>
 												</div>
-												<ThemeToggle variant="inline" />
+												<ThemeSelector variant="inline" />
 											</div>
 										</div>
 										<div className="border-t border-border py-1">
 											<button
 												type="button"
 												onClick={handleLogout}
-												className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
+												className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-destructive"
 											>
 												<LogOut className="w-4 h-4" />
 												<span className="text-sm font-medium">Logout</span>
@@ -402,20 +411,25 @@ const SidebarComponent = function Sidebar({
 													Settings
 												</span>
 											</button>
-											<div className="flex items-center justify-between px-4 py-2.5 hover:bg-accent transition-colors">
+											<div className="px-4 py-2.5 space-y-2">
 												<div className="flex items-center gap-3">
-													<Sun className="w-4 h-4 text-muted-foreground dark:hidden" />
-													<Moon className="w-4 h-4 text-muted-foreground hidden dark:block" />
+													{preference === THEME_PREFERENCE.DARK ? (
+														<Moon className="w-4 h-4 text-muted-foreground" />
+													) : preference === THEME_PREFERENCE.LIGHT ? (
+														<Sun className="w-4 h-4 text-muted-foreground" />
+													) : (
+														<Monitor className="w-4 h-4 text-muted-foreground" />
+													)}
 													<span className="text-sm text-foreground">Theme</span>
 												</div>
-												<ThemeToggle variant="inline" />
+												<ThemeSelector variant="inline" />
 											</div>
 										</div>
 										<div className="border-t border-border py-1">
 											<button
 												type="button"
 												onClick={handleLogout}
-												className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
+												className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-destructive"
 											>
 												<LogOut className="w-4 h-4" />
 												<span className="text-sm font-medium">Logout</span>

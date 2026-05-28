@@ -43,7 +43,7 @@ function PWAInstallPromptComponent() {
 					<div
 						className={cn(
 							'pointer-events-auto w-full max-w-md rounded-2xl border border-border bg-card text-card-foreground shadow-2xl',
-							'shadow-[0_-8px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_40px_rgba(0,0,0,0.45)]',
+							'shadow-[0_-8px_40px_var(--shadow)]',
 						)}
 						role="dialog"
 						aria-labelledby="pwa-install-title"

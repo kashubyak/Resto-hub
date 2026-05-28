@@ -19,6 +19,8 @@ import {
 	Trash2,
 	Users,
 } from 'lucide-react'
+import { ENTITY_FOCUS_QUERY_PARAM } from '@/constants/pages.constant'
+import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { TableModal } from './components/TableModal'
@@ -43,6 +45,9 @@ export default function TablesPage() {
 	const [activeMenuId, setActiveMenuId] = useState<number | null>(null)
 	const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false)
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const focusHandledRef = useRef(false)
+	const searchParams = useSearchParams()
+	const focusIdParam = searchParams.get(ENTITY_FOCUS_QUERY_PARAM)
 
 	const { data: tablesResponse, isLoading: isLoadingTables } = useQuery({
 		queryKey: ['tables'],
@@ -50,6 +55,25 @@ export default function TablesPage() {
 	})
 
 	const tables: ITable[] = tablesResponse?.data ?? []
+
+	useEffect(() => {
+		focusHandledRef.current = false
+	}, [focusIdParam])
+
+	useEffect(() => {
+		if (focusHandledRef.current || !focusIdParam || isLoadingTables) return
+
+		const focusId = Number(focusIdParam)
+		if (!Number.isInteger(focusId) || focusId < 1) return
+
+		const table = tables.find((t) => t.id === focusId)
+		if (!table) return
+
+		focusHandledRef.current = true
+		setSelectedTable(table)
+		setModalMode('edit')
+		setIsModalOpen(true)
+	}, [focusIdParam, tables, isLoadingTables])
 
 	const createMutation = useMutation({
 		mutationFn: (data: { number: number; seats: number }) =>
@@ -455,7 +479,7 @@ export default function TablesPage() {
 															<div className="border-t border-border" />
 															<button
 																onClick={() => handleDeleteTable(table)}
-																className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
+																className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors text-left text-destructive"
 															>
 																<Trash2 className="w-4 h-4" />
 																<span className="text-sm font-medium">

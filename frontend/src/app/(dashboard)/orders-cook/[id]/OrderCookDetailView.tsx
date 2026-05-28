@@ -1,11 +1,12 @@
 'use client'
 
 import { orderStatusConfig } from '@/app/(dashboard)/orders-waiter/orderStatusConfig'
-import { ROUTES } from '@/constants/pages.constant'
+import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
 import { assignOrderService } from '@/services/order/assign-order.service'
 import { getOrderByIdService } from '@/services/order/get-order-by-id.service'
 import { updateOrderStatusService } from '@/services/order/update-order-status.service'
+import { useAuthStore } from '@/store/auth.store'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
 	AlertCircle,
@@ -26,6 +27,7 @@ import { useRouter } from 'next/navigation'
 export function OrderCookDetailView({ orderId }: { orderId: number }) {
 	const router = useRouter()
 	const queryClient = useQueryClient()
+	const userRole = useAuthStore((s) => s.userRole)
 
 	const {
 		data: orderRes,
@@ -109,6 +111,9 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 	const StatusIcon = config.icon
 	const canTakeOrder = order.status === 'PENDING' && !order.cook
 	const canComplete = order.status === 'IN_PROGRESS'
+	const showActions = canTakeOrder || canComplete
+	const canPerformActions = userRole === UserRole.COOK
+	const actionsDisabled = actionLoading || !canPerformActions
 
 	return (
 		<div className="space-y-4 sm:space-y-6">
@@ -411,15 +416,25 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 						</div>
 					</div>
 
-					{(canTakeOrder || canComplete) && (
-						<div className="bg-card border border-border rounded-xl p-4 sm:p-6">
-							<h2 className="text-foreground mb-4">Actions</h2>
+					{showActions && (
+						<div className="bg-card border border-border rounded-xl p-4 sm:p-6 space-y-4">
+							<div>
+								<h2 className="text-foreground">Actions</h2>
+								{!canPerformActions && (
+									<p className="text-xs text-muted-foreground mt-1">
+										View only — only kitchen staff can perform these actions.
+									</p>
+								)}
+							</div>
 							<div className="flex flex-wrap gap-3">
 								{canTakeOrder && (
 									<button
 										type="button"
 										onClick={() => takeMutation.mutate()}
-										disabled={actionLoading}
+										disabled={actionsDisabled}
+										title={
+											canPerformActions ? undefined : 'Cook role required'
+										}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										{takeMutation.isPending ? (
@@ -434,8 +449,11 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 									<button
 										type="button"
 										onClick={() => completeMutation.mutate()}
-										disabled={actionLoading}
-										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-[#10b981] text-white hover:bg-[#059669] transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+										disabled={actionsDisabled}
+										title={
+											canPerformActions ? undefined : 'Cook role required'
+										}
+										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-success text-white hover:bg-success-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										{completeMutation.isPending ? (
 											<Loader2 className="w-4 h-4 animate-spin" />

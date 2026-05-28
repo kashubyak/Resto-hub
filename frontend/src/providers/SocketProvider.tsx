@@ -2,7 +2,6 @@
 
 import { API_URL } from '@/config/api'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
-import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
 import { SOCKET_EVENTS } from '@/constants/socket-events.constant'
 import {
 	createNotificationsSocket,
@@ -13,13 +12,21 @@ import { useAuthStore } from '@/store/auth.store'
 import type {
 	INewOrderNotificationPayload,
 	IOrderCompletedNotificationPayload,
+	IOrderUpdatedNotificationPayload,
 } from '@/types/socket-notification.interface'
+import { invalidateOrderQueries } from '@/utils/invalidateOrderQueries'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { memo, useEffect, useRef, type ReactNode } from 'react'
 import type { Socket } from 'socket.io-client'
 
 const ORDER_ALERT_DURATION_MS = 12_000
+
+const SOCKET_ROLES: UserRole[] = [
+	UserRole.COOK,
+	UserRole.WAITER,
+	UserRole.ADMIN,
+]
 
 function isNewOrderPayload(
 	data: unknown,
@@ -37,6 +44,14 @@ function isOrderCompletedPayload(
 	return typeof o.orderId === 'number'
 }
 
+function isOrderUpdatedPayload(
+	data: unknown,
+): data is IOrderUpdatedNotificationPayload {
+	if (typeof data !== 'object' || data === null) return false
+	const o = data as Record<string, unknown>
+	return typeof o.orderId === 'number' && typeof o.status === 'string'
+}
+
 export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 	const router = useRouter()
 	const queryClient = useQueryClient()
@@ -51,7 +66,8 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 
 		const shouldConnect =
 			isAuth &&
-			(userRole === UserRole.COOK || userRole === UserRole.WAITER) &&
+			userRole != null &&
+			SOCKET_ROLES.includes(userRole) &&
 			Boolean(API_URL.BASE_SOCKET)
 
 		if (!shouldConnect) {
@@ -73,21 +89,19 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 			const socket = createNotificationsSocket(token)
 			if (cancelled || !socket) return
 
+			const onOrderUpdated = (data: unknown) => {
+				if (!isOrderUpdatedPayload(data)) return
+				invalidateOrderQueries(queryClient, data.orderId)
+			}
+
 			const onNewOrder = (data: unknown) => {
 				if (!isNewOrderPayload(data)) return
 				const itemsPart =
 					typeof data.itemsCount === 'number'
 						? `${data.itemsCount} items`
 						: 'new items'
-				void queryClient.invalidateQueries({
-					queryKey: [ORDER_QUERY_KEY.LIST_COOK_FREE],
-				})
-				void queryClient.invalidateQueries({
-					queryKey: [ORDER_QUERY_KEY.LIST_COOK_ACTIVE],
-				})
-				void queryClient.invalidateQueries({
-					queryKey: ORDER_QUERY_KEY.DETAIL(data.id),
-				})
+				invalidateOrderQueries(queryClient, data.id)
+				if (userRole !== UserRole.COOK) return
 				const path = ROUTES.PRIVATE.COOK.ORDERS_COOK_ID(data.id)
 				showAlert({
 					severity: 'info',
@@ -101,12 +115,8 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 			const onOrderCompleted = (data: unknown) => {
 				if (!isOrderCompletedPayload(data)) return
 				const tablePart = data.table != null ? ` Table ${data.table}.` : ''
-				void queryClient.invalidateQueries({
-					queryKey: [ORDER_QUERY_KEY.LIST_ACTIVE],
-				})
-				void queryClient.invalidateQueries({
-					queryKey: ORDER_QUERY_KEY.DETAIL(data.orderId),
-				})
+				invalidateOrderQueries(queryClient, data.orderId)
+				if (userRole !== UserRole.WAITER) return
 				const path = ROUTES.PRIVATE.WAITER.ORDERS_WAITER_ID(data.orderId)
 				showAlert({
 					severity: 'success',
@@ -117,15 +127,17 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 				})
 			}
 
+			socket.on(SOCKET_EVENTS.ORDER_UPDATED, onOrderUpdated)
 			if (userRole === UserRole.COOK)
 				socket.on(SOCKET_EVENTS.NEW_ORDER, onNewOrder)
-			else if (userRole === UserRole.WAITER)
+			if (userRole === UserRole.WAITER)
 				socket.on(SOCKET_EVENTS.ORDER_COMPLETED, onOrderCompleted)
 
 			if (cancelled) {
+				socket.off(SOCKET_EVENTS.ORDER_UPDATED, onOrderUpdated)
 				if (userRole === UserRole.COOK)
 					socket.off(SOCKET_EVENTS.NEW_ORDER, onNewOrder)
-				else if (userRole === UserRole.WAITER)
+				if (userRole === UserRole.WAITER)
 					socket.off(SOCKET_EVENTS.ORDER_COMPLETED, onOrderCompleted)
 				socket.disconnect()
 				return

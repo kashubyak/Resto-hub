@@ -1,4 +1,5 @@
 import { PWA_ICON_PATHS, SITE_DESCRIPTION } from '@/constants/pwa.constant'
+import { THEME_SCRIPT } from '@/constants/theme.constant'
 import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
@@ -68,6 +69,9 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
+			<head>
+				<script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+			</head>
 			<body className={`${geistSans.variable} antialiased`}>
 				<Providers>{children}</Providers>
 			</body>

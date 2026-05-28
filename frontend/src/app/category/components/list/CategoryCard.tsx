@@ -131,7 +131,7 @@ const CategoryCardComponent = ({
 										<button
 											type="button"
 											onClick={handleDelete}
-											className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-red-600 dark:text-red-400"
+											className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-left text-destructive"
 										>
 											<Trash2 className="w-4 h-4" />
 											<span className="text-sm font-medium">

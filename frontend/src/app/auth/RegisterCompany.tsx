@@ -6,6 +6,7 @@ import {
 	AuthTextField,
 } from '@/components/auth/AuthFields'
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
+import { ThemeSelector } from '@/components/ui/ThemeSelector'
 import { LocationSearch } from '@/components/auth/LocationSearch'
 import { MapPanel } from '@/components/auth/MapPanel'
 import { UploadImage } from '@/components/elements/UploadImage'
@@ -98,6 +99,7 @@ const RegisterCompanyComponent = () => {
 
 	return (
 		<div className="h-screen w-full flex flex-col bg-background relative overflow-hidden">
+			<ThemeSelector variant="fixed" />
 			<BackgroundDecorations />
 			<div className="flex-1 w-full max-w-[1600px] mx-auto relative z-10 flex min-h-0 px-2 sm:px-4 py-4 sm:py-6">
 				<div className="grid md:grid-cols-2 gap-4 lg:gap-6 items-stretch min-h-0 flex-1 w-full">

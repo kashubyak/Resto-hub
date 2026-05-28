@@ -23,6 +23,9 @@ export enum UserRole {
 	WAITER = 'WAITER',
 }
 
+/** Query param to open a list page focused on one entity (category, table). */
+export const ENTITY_FOCUS_QUERY_PARAM = 'id' as const
+
 interface IRouteConfig {
 	path: string
 	name: string
@@ -65,9 +68,10 @@ export const ROUTES = {
 			DISH_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.DISH}/${id}`,
 			CATEGORY: '/category',
 			CATEGORY_ID: (id: number | string) =>
-				`${ROUTES.PRIVATE.ADMIN.CATEGORY}/${id}`,
+				`${ROUTES.PRIVATE.ADMIN.CATEGORY}?${ENTITY_FOCUS_QUERY_PARAM}=${id}`,
 			TABLE: '/table',
-			TABLE_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.TABLE}/${id}`,
+			TABLE_ID: (id: number | string) =>
+				`${ROUTES.PRIVATE.ADMIN.TABLE}?${ENTITY_FOCUS_QUERY_PARAM}=${id}`,
 			USERS: '/users',
 			USERS_ID: (id: number | string) => `${ROUTES.PRIVATE.ADMIN.USERS}/${id}`,
 			COMPANY: '/company',

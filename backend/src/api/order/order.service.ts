@@ -30,6 +30,7 @@ import {
 import {
 	type INewOrderNotification,
 	type IOrderCompletedNotification,
+	type IOrderUpdatedNotification,
 } from './interfaces/notification.interface'
 import {
 	type IOrderItemSummary,
@@ -48,6 +49,20 @@ export class OrderService {
 		private readonly notificationsGateway: NotificationsGateway,
 		private readonly tableService: TableService,
 	) {}
+
+	private emitOrderUpdated(
+		orderId: number,
+		status: OrderStatus,
+		companyId: number,
+	): void {
+		const notification: IOrderUpdatedNotification = { orderId, status }
+		this.notificationsGateway.notifyCompany(
+			companyId,
+			socket_events.ORDER_UPDATED,
+			notification,
+		)
+	}
+
 	private mapSummary = (
 		order: IOrderWithRelations | IOrderWithFullDetails,
 	): IOrderSummary => {
@@ -233,6 +248,7 @@ export class OrderService {
 			socket_events.NEW_ORDER,
 			notification,
 		)
+		this.emitOrderUpdated(createdOrder.id, createdOrder.status, companyId)
 
 		return createdOrder
 	}
@@ -467,6 +483,7 @@ export class OrderService {
 			cookId,
 			companyId,
 		)
+		this.emitOrderUpdated(orderId, updatedOrder.status, companyId)
 		return updatedOrder
 	}
 
@@ -483,6 +500,7 @@ export class OrderService {
 				'Only the waiter who created the order can cancel it',
 			)
 		const updatedOrder = await this.orderRepo.cancelOrder(orderId, companyId)
+		this.emitOrderUpdated(orderId, updatedOrder.status, companyId)
 		return updatedOrder
 	}
 
@@ -516,6 +534,7 @@ export class OrderService {
 				notification,
 				order.waiter.id,
 			)
+			this.emitOrderUpdated(orderId, newStatus, companyId)
 			return update
 		}
 		if (role === Role.WAITER) {
@@ -527,7 +546,13 @@ export class OrderService {
 					throw new BadRequestException(
 						'Order must be COMPLETE before delivering',
 					)
-				return this.orderRepo.updateStatus(orderId, newStatus, companyId)
+				const updated = await this.orderRepo.updateStatus(
+					orderId,
+					newStatus,
+					companyId,
+				)
+				this.emitOrderUpdated(orderId, newStatus, companyId)
+				return updated
 			}
 
 			if (newStatus === OrderStatus.FINISHED) {
@@ -543,7 +568,13 @@ export class OrderService {
 					companyId,
 				)
 
-				return this.orderRepo.updateStatus(orderId, newStatus, companyId)
+				const updated = await this.orderRepo.updateStatus(
+					orderId,
+					newStatus,
+					companyId,
+				)
+				this.emitOrderUpdated(orderId, newStatus, companyId)
+				return updated
 			}
 
 			throw new BadRequestException(

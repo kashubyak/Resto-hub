@@ -26,16 +26,16 @@ import {
 	TrendingUp,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
 	Bar,
-	BarChart as RechartsBarChart,
 	CartesianGrid,
 	Cell,
 	Legend,
 	Line,
-	LineChart as RechartsLine,
 	Pie,
+	BarChart as RechartsBarChart,
+	LineChart as RechartsLine,
 	PieChart as RechartsPie,
 	ResponsiveContainer,
 	Sector,
@@ -91,22 +91,44 @@ function escapeCsvCell(value: string) {
 const analyticsNameLinkClass =
 	'text-foreground cursor-pointer text-sm font-medium hover:underline'
 
+function sortBySelectedMetric(rows: IOrderAnalyticsRow[]): IOrderAnalyticsRow[] {
+	return [...rows].sort((a, b) => b.value - a.value)
+}
+
+function sortForTimeSeriesChart(
+	rows: IOrderAnalyticsRow[],
+	groupBy: OrderGroupBy,
+): IOrderAnalyticsRow[] {
+	if (groupBy !== 'day' && groupBy !== 'month') return sortBySelectedMetric(rows)
+	return [...rows].sort((a, b) => a.group.localeCompare(b.group))
+}
+
+function getMetricSharePercent(
+	row: IOrderAnalyticsRow,
+	totalMetricValue: number,
+): number {
+	if (totalMetricValue <= 0) return 0
+	return (row.value / totalMetricValue) * 100
+}
+
 function getAnalyticsRowEntityHref(
 	groupBy: OrderGroupBy,
 	groupInfo: IOrderAnalyticsGroupInfo,
 ): string | null {
 	const id = groupInfo.id
 	if (id === undefined || id === null) return null
+	const numericId = Number(id)
+	if (!Number.isInteger(numericId) || numericId < 1) return null
 	switch (groupBy) {
 		case 'waiter':
 		case 'cook':
-			return ROUTES.PRIVATE.ADMIN.USERS_ID(id)
+			return ROUTES.PRIVATE.ADMIN.USERS_ID(numericId)
 		case 'dish':
-			return ROUTES.PRIVATE.ADMIN.DISH_ID(id)
+			return ROUTES.PRIVATE.ADMIN.DISH_ID(numericId)
 		case 'category':
-			return ROUTES.PRIVATE.ADMIN.CATEGORY_ID(id)
+			return ROUTES.PRIVATE.ADMIN.CATEGORY_ID(numericId)
 		case 'table':
-			return ROUTES.PRIVATE.ADMIN.TABLE_ID(id)
+			return ROUTES.PRIVATE.ADMIN.TABLE_ID(numericId)
 		default:
 			return null
 	}
@@ -182,6 +204,7 @@ export function AnalyticsView() {
 	useEffect(() => {
 		setActiveIndex(null)
 		setHoveredLegendItem(null)
+		setShowAllPerformers(false)
 	}, [groupBy, metric, from, to])
 
 	useEffect(() => {
@@ -199,7 +222,20 @@ export function AnalyticsView() {
 	const currentMetricOption = metricOptions.find((m) => m.value === metric)
 
 	const chartHeight = Math.max(400, Math.min(800, data.length * 40))
-	const topData = data.slice(0, 10)
+
+	const sortedByMetric = useMemo(() => sortBySelectedMetric(data), [data])
+
+	const chartData = useMemo(
+		() => sortForTimeSeriesChart(data, groupBy),
+		[data, groupBy],
+	)
+
+	const topData = useMemo(() => sortedByMetric.slice(0, 10), [sortedByMetric])
+
+	const totalMetricValue = useMemo(
+		() => data.reduce((sum, item) => sum + item.value, 0),
+		[data],
+	)
 
 	const formatCurrency = (value: number) => `$${value.toFixed(2)}`
 	const formatNumber = (value: number) => value.toLocaleString()
@@ -235,31 +271,46 @@ export function AnalyticsView() {
 		return value
 	}
 
-	const displayedPerformers = showAllPerformers ? data : topData
+	const displayedPerformers = showAllPerformers ? sortedByMetric : topData
+
+	const chartSeriesData =
+		groupBy === 'day' || groupBy === 'month' ? chartData : sortedByMetric
+
+	const formatMetricValue = useCallback(
+		(value: number) =>
+			metric === 'revenue' ? formatCurrency(value) : formatNumber(value),
+		[metric],
+	)
 
 	const handleExportCsv = useCallback(() => {
-		if (!data.length) {
+		if (!sortedByMetric.length) {
 			showError('No analytics data to export for the selected filters.')
 			return
 		}
+		const metricLabel =
+			metricOptions.find((m) => m.value === metric)?.label ?? 'Metric'
 		const headers = [
+			'Rank',
 			'Group',
+			metricLabel,
 			'Revenue',
 			'Orders',
 			'Items',
 			'Avg order',
-			'% of total revenue',
+			`% of total ${metricLabel.toLowerCase()}`,
 		]
 		const lines = [
 			headers.join(','),
-			...data.map((row: IOrderAnalyticsRow) =>
+			...sortedByMetric.map((row: IOrderAnalyticsRow, index) =>
 				[
+					index + 1,
 					escapeCsvCell(row.group),
+					row.value,
 					row.revenue,
 					row.count,
 					row.quantity,
 					row.avgRevenuePerOrder,
-					row.percentageOfTotalRevenue,
+					getMetricSharePercent(row, totalMetricValue),
 				].join(','),
 			),
 		]
@@ -273,7 +324,7 @@ export function AnalyticsView() {
 		a.click()
 		URL.revokeObjectURL(url)
 		showSuccess('Analytics exported.')
-	}, [data, from, to, showError, showSuccess])
+	}, [sortedByMetric, metric, totalMetricValue, from, to, showError, showSuccess])
 
 	const renderPieLabel = (entry: IPieLabelProps) => {
 		const RADIAN = Math.PI / 180
@@ -495,7 +546,7 @@ export function AnalyticsView() {
 								<ResponsiveContainer width="100%" height="100%">
 									{chartType === 'bar' ? (
 										<RechartsBarChart
-											data={data}
+											data={chartSeriesData}
 											margin={{ bottom: 60, left: 10, right: 10 }}
 										>
 											<CartesianGrid
@@ -510,7 +561,7 @@ export function AnalyticsView() {
 												angle={-45}
 												textAnchor="end"
 												height={80}
-												interval={getTickInterval(data.length)}
+												interval={getTickInterval(chartSeriesData.length)}
 												tickFormatter={formatXAxisLabel}
 												tickLine={false}
 												axisLine={false}
@@ -554,9 +605,7 @@ export function AnalyticsView() {
 													return String(label)
 												}}
 												formatter={(value: number) => [
-													metric === 'revenue'
-														? formatCurrency(value)
-														: formatNumber(value),
+													formatMetricValue(value),
 												]}
 												separator=""
 												cursor={{ fill: 'rgba(124, 58, 237, 0.1)' }}
@@ -577,20 +626,22 @@ export function AnalyticsView() {
 									) : chartType === 'pie' ? (
 										<RechartsPie>
 											<Pie
-												data={data}
+												data={sortedByMetric}
 												dataKey="value"
 												nameKey="group"
 												cx="50%"
 												cy="50%"
-												outerRadius={data.length > 15 ? 140 : 120}
+												outerRadius={
+													sortedByMetric.length > 15 ? 140 : 120
+												}
 												label={
-													data.length <= 15
+													sortedByMetric.length <= 15
 														? (props: unknown) =>
 																renderPieLabel(props as IPieLabelProps)
 														: false
 												}
 												labelLine={
-													data.length <= 15
+													sortedByMetric.length <= 15
 														? { stroke: '#64748b', strokeWidth: 1 }
 														: false
 												}
@@ -598,7 +649,9 @@ export function AnalyticsView() {
 												activeShape={(sectorProps: PieSectorDataItem) => (
 													<Sector
 														{...sectorProps}
-														outerRadius={data.length > 15 ? 148 : 128}
+														outerRadius={
+															sortedByMetric.length > 15 ? 148 : 128
+														}
 														stroke="#ffffff"
 														strokeWidth={2}
 													/>
@@ -606,14 +659,14 @@ export function AnalyticsView() {
 												onMouseEnter={(_, i) => setActiveIndex(i)}
 												onMouseLeave={() => setActiveIndex(null)}
 											>
-												{data.map((_, index) => (
+												{sortedByMetric.map((_, index) => (
 													<Cell
 														key={`cell-${index}`}
 														fill={COLORS[index % COLORS.length]}
 													/>
 												))}
 											</Pie>
-											{data.length > 15 && (
+											{sortedByMetric.length > 15 && (
 												<Legend
 													wrapperStyle={{
 														paddingTop: '20px',
@@ -641,7 +694,7 @@ export function AnalyticsView() {
 																	}}
 																>
 																	{payload.map((entry, index: number) => {
-																		const item = data[index]
+																		const item = sortedByMetric[index]
 																		if (!item) return null
 																		const isActive = activeIndex === index
 																		return (
@@ -670,7 +723,10 @@ export function AnalyticsView() {
 																							value: item.value,
 																							name: item.group,
 																							percentage:
-																								item.percentageOfTotalRevenue,
+																								getMetricSharePercent(
+																									item,
+																									totalMetricValue,
+																								),
 																							x: rect.left + rect.width / 2,
 																							y: rect.top,
 																						})
@@ -739,21 +795,21 @@ export function AnalyticsView() {
 													_name: string,
 													itemProps: { payload?: IOrderAnalyticsRow },
 												) => {
-													const formattedValue =
-														metric === 'revenue'
-															? formatCurrency(value)
-															: formatNumber(value)
-													const pct =
-														itemProps.payload?.percentageOfTotalRevenue
-													const percentage = pct ? ` (${pct.toFixed(1)}%)` : ''
-													return [formattedValue + percentage]
+													const row = itemProps.payload
+													const formattedValue = formatMetricValue(value)
+													if (!row) return [formattedValue]
+													const pct = getMetricSharePercent(
+														row,
+														totalMetricValue,
+													)
+													return [`${formattedValue} (${pct.toFixed(1)}%)`]
 												}}
 												separator=""
 											/>
 										</RechartsPie>
 									) : (
 										<RechartsLine
-											data={data}
+											data={chartData}
 											margin={{ bottom: 60, left: 10, right: 10 }}
 										>
 											<CartesianGrid
@@ -768,7 +824,7 @@ export function AnalyticsView() {
 												angle={-45}
 												textAnchor="end"
 												height={80}
-												interval={getTickInterval(data.length)}
+												interval={getTickInterval(chartData.length)}
 												tickFormatter={formatXAxisLabel}
 												tickLine={false}
 												axisLine={false}
@@ -812,9 +868,7 @@ export function AnalyticsView() {
 													return String(label)
 												}}
 												formatter={(value: number) => [
-													metric === 'revenue'
-														? formatCurrency(value)
-														: formatNumber(value),
+													formatMetricValue(value),
 												]}
 												separator=""
 												cursor={{ fill: 'rgba(124, 58, 237, 0.1)' }}
@@ -853,11 +907,12 @@ export function AnalyticsView() {
 									Top Performers
 								</h3>
 								<p className="text-muted-foreground mt-1 text-xs">
-									Showing {showAllPerformers ? data.length : topData.length} of{' '}
-									{data.length} results
+									Ranked by {currentMetricOption?.label ?? 'metric'} · showing{' '}
+									{showAllPerformers ? sortedByMetric.length : topData.length}{' '}
+									of {sortedByMetric.length} results
 								</p>
 							</div>
-							{data.length > 10 && (
+							{sortedByMetric.length > 10 && (
 								<button
 									type="button"
 									onClick={() => setShowAllPerformers(!showAllPerformers)}
@@ -869,8 +924,8 @@ export function AnalyticsView() {
 						</div>
 
 						<div className="overflow-x-auto">
-							<table className="w-full">
-								<thead className="bg-muted/50 border-border border-b">
+							<table className="table-row-dividers w-full">
+									<thead className="bg-muted/50">
 									<tr>
 										<th className="text-muted-foreground px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">
 											Rank
@@ -895,11 +950,15 @@ export function AnalyticsView() {
 										</th>
 									</tr>
 								</thead>
-								<tbody className="divide-border divide-y">
+								<tbody>
 									{displayedPerformers.map((item, index) => {
 										const nameHref = getAnalyticsRowEntityHref(
 											groupBy,
 											item.groupInfo,
+										)
+										const metricShare = getMetricSharePercent(
+											item,
+											totalMetricValue,
 										)
 										return (
 											<tr
@@ -938,17 +997,35 @@ export function AnalyticsView() {
 													)}
 												</td>
 												<td className="px-4 py-4 text-right">
-													<span className="text-foreground text-sm font-semibold">
+													<span
+														className={`text-sm ${
+															metric === 'revenue'
+																? 'text-primary font-semibold'
+																: 'text-foreground'
+														}`}
+													>
 														{formatCurrency(item.revenue)}
 													</span>
 												</td>
 												<td className="px-4 py-4 text-right">
-													<span className="text-foreground text-sm">
+													<span
+														className={`text-sm ${
+															metric === 'count'
+																? 'text-primary font-semibold'
+																: 'text-foreground'
+														}`}
+													>
 														{formatNumber(item.count)}
 													</span>
 												</td>
 												<td className="px-4 py-4 text-right">
-													<span className="text-foreground text-sm">
+													<span
+														className={`text-sm ${
+															metric === 'quantity'
+																? 'text-primary font-semibold'
+																: 'text-foreground'
+														}`}
+													>
 														{formatNumber(item.quantity)}
 													</span>
 												</td>
@@ -963,12 +1040,12 @@ export function AnalyticsView() {
 															<div
 																className="bg-primary h-full rounded-full"
 																style={{
-																	width: `${item.percentageOfTotalRevenue}%`,
+																	width: `${metricShare}%`,
 																}}
 															/>
 														</div>
 														<span className="text-muted-foreground w-12 text-right text-sm">
-															{item.percentageOfTotalRevenue.toFixed(1)}%
+															{metricShare.toFixed(1)}%
 														</span>
 													</div>
 												</td>

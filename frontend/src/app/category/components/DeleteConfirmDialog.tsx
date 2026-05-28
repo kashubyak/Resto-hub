@@ -90,7 +90,7 @@ const DeleteConfirmDialogComponent = ({
 						<div className="flex items-start gap-3 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
 							<AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
 							<div className="space-y-1">
-								<p className="text-sm font-semibold text-red-600 dark:text-red-400">
+								<p className="text-sm font-semibold text-destructive">
 									This category contains {dishCount}{' '}
 									{dishCount === 1 ? 'dish' : 'dishes'}
 								</p>

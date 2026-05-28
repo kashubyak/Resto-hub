@@ -1,6 +1,6 @@
 'use client'
 
-import { usePrefersColorScheme } from '@/hooks/usePrefersColorScheme'
+import { useTheme } from '@/providers/ThemeContext'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useRef } from 'react'
@@ -23,7 +23,7 @@ export function Map({ center, marker, onLocationSelect }: MapProps) {
 	const mapRef = useRef<HTMLDivElement>(null)
 	const mapInstanceRef = useRef<L.Map | null>(null)
 	const markerInstanceRef = useRef<L.Marker | null>(null)
-	const theme = usePrefersColorScheme()
+	const { theme } = useTheme()
 
 	const centerLat = center?.[0]
 	const centerLng = center?.[1]

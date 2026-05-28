@@ -10,6 +10,12 @@ export interface IOrderCompletedNotification {
 	table: number | null
 }
 
+export interface IOrderUpdatedNotification {
+	orderId: number
+	status: string
+}
+
 export type INotificationData =
 	| INewOrderNotification
 	| IOrderCompletedNotification
+	| IOrderUpdatedNotification

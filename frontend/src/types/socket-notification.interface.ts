@@ -9,3 +9,8 @@ export interface IOrderCompletedNotificationPayload {
 	status: string
 	table: number | null
 }
+
+export interface IOrderUpdatedNotificationPayload {
+	orderId: number
+	status: string
+}

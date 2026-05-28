@@ -35,9 +35,9 @@ export function userRoleBadgeClass(role: UserRole): string {
 		case UserRole.ADMIN:
 			return 'bg-primary/10 text-primary border-primary/20'
 		case UserRole.WAITER:
-			return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
+			return 'bg-info/10 text-info border-info/20'
 		case UserRole.COOK:
-			return 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20'
+			return 'bg-success/10 text-success border-success/20'
 		default:
 			return 'bg-muted text-muted-foreground border-border'
 	}

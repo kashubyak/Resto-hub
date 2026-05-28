@@ -40,10 +40,8 @@ import {
 
 const roleColors: Record<UserRole, string> = {
 	[UserRole.ADMIN]: 'bg-primary/10 text-primary border-primary/20',
-	[UserRole.WAITER]:
-		'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
-	[UserRole.COOK]:
-		'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20',
+	[UserRole.WAITER]: 'bg-info/10 text-info border-info/20',
+	[UserRole.COOK]: 'bg-success/10 text-success border-success/20',
 }
 
 type EditableRole = UserRole.WAITER | UserRole.COOK | UserRole.ADMIN
@@ -521,7 +519,7 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 								<button
 									type="button"
 									onClick={handleDeleteClick}
-									className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-500/20 transition-colors font-medium border border-red-500/20"
+									className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-destructive/10 text-destructive rounded-xl hover:bg-destructive/20 transition-colors font-medium border border-destructive/20"
 								>
 									<Trash2 className="w-4 h-4" />
 									Delete User

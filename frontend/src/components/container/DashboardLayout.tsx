@@ -42,7 +42,7 @@ const DashboardLayoutComponent = function DashboardLayout({
 
 			{/* Grid pattern overlay */}
 			<div
-				className="fixed inset-0 pointer-events-none z-0 opacity-[0.02] dark:opacity-[0.05]"
+				className="fixed inset-0 pointer-events-none z-0 auth-grid-overlay"
 				style={{
 					backgroundImage: `linear-gradient(var(--foreground) 1px, transparent 1px),
                            linear-gradient(90deg, var(--foreground) 1px, transparent 1px)`,

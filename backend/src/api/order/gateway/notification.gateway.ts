@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { PrismaService } from 'prisma/prisma.service'
 import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
@@ -31,6 +32,8 @@ export class NotificationsGateway
 	@WebSocketServer()
 	server!: Server
 	private logger = new Logger(NotificationsGateway.name)
+
+	constructor(private readonly prisma: PrismaService) {}
 
 	async handleConnection(client: Socket) {
 		try {
@@ -65,7 +68,14 @@ export class NotificationsGateway
 			;(client.data as ISocketData).userId = userId
 			;(client.data as ISocketData).role = role
 
+			const user = await this.prisma.user.findUnique({
+				where: { id: userId },
+				select: { companyId: true },
+			})
+			if (!user) throw new Error('User not found')
+
 			await client.join(socket_rooms.USER(userId))
+			await client.join(socket_rooms.COMPANY(user.companyId))
 			if (role === Role.COOK) await client.join(socket_rooms.KITCHEN)
 			else if (role === Role.WAITER)
 				await client.join(socket_rooms.WAITER(userId))
@@ -85,5 +95,8 @@ export class NotificationsGateway
 	}
 	notifyWaiter(event: string, data: INotificationData, waiterId: number): void {
 		this.server.to(socket_rooms.WAITER(waiterId)).emit(event, data)
+	}
+	notifyCompany(companyId: number, event: string, data: INotificationData): void {
+		this.server.to(socket_rooms.COMPANY(companyId)).emit(event, data)
 	}
 }

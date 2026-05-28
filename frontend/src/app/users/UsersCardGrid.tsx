@@ -97,7 +97,7 @@ export const UsersCardGrid = ({
 									onDeleteClick(menuUser)
 									closeMenu()
 								}}
-								className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-sm text-red-600 dark:text-red-400"
+								className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-sm text-destructive"
 							>
 								<Trash2 className="w-4 h-4" />
 								Delete User

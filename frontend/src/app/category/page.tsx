@@ -10,7 +10,9 @@ import type { ICategoryWithDishes } from '@/types/category.interface'
 import type { FilterValues } from '@/types/filter.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
+import { ENTITY_FOCUS_QUERY_PARAM } from '@/constants/pages.constant'
 import { Folder, Plus, Search, SlidersHorizontal } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CategoryListItem } from './CategoryListItem'
 import { CategoryModal } from './CategoryModal'
@@ -30,6 +32,9 @@ export default function CategoryPage() {
 	const [filters, setFilters] = useState<FilterValues>({})
 	const [isFilterOpen, setIsFilterOpen] = useState(false)
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const focusHandledRef = useRef(false)
+	const searchParams = useSearchParams()
+	const focusIdParam = searchParams.get(ENTITY_FOCUS_QUERY_PARAM)
 
 	const {
 		allCategories,
@@ -37,6 +42,24 @@ export default function CategoryPage() {
 		refetchCategories,
 	} = useCategories(searchQuery, filters)
 	const { showError, showSuccess } = useAlert()
+
+	useEffect(() => {
+		focusHandledRef.current = false
+	}, [focusIdParam])
+
+	useEffect(() => {
+		if (focusHandledRef.current || !focusIdParam || isLoadingCategories) return
+
+		const focusId = Number(focusIdParam)
+		if (!Number.isInteger(focusId) || focusId < 1) return
+
+		const category = allCategories.find((c) => c.id === focusId)
+		if (!category) return
+
+		focusHandledRef.current = true
+		setSelectedCategory(category)
+		setIsEditModalOpen(true)
+	}, [focusIdParam, allCategories, isLoadingCategories])
 
 	const handleCreateModalOpen = useCallback(
 		() => setIsCreateModalOpen(true),

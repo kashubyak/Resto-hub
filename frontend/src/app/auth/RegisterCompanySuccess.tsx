@@ -1,6 +1,7 @@
 'use client'
 
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
+import { ThemeSelector } from '@/components/ui/ThemeSelector'
 import { ROUTES } from '@/constants/pages.constant'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { useAlert } from '@/providers/AlertContext'
@@ -31,6 +32,7 @@ export function RegisterCompanySuccess({
 
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-background px-2 sm:px-4 py-4 sm:py-8 relative overflow-x-hidden">
+			<ThemeSelector variant="fixed" />
 			<BackgroundDecorations />
 
 			<div className="w-full max-w-lg relative z-10">

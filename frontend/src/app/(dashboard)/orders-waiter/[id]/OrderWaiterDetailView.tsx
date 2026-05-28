@@ -1,7 +1,7 @@
 'use client'
 
 import { orderStatusConfig } from '@/app/(dashboard)/orders-waiter/orderStatusConfig'
-import { ROUTES } from '@/constants/pages.constant'
+import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
 import { cancelOrderService } from '@/services/order/cancel-order.service'
 import { getOrderByIdService } from '@/services/order/get-order-by-id.service'
@@ -10,6 +10,7 @@ import type { OrderStatus } from '@/types/order.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useAlert } from '@/providers/AlertContext'
+import { useAuthStore } from '@/store/auth.store'
 import {
 	AlertCircle,
 	ArrowLeft,
@@ -38,6 +39,7 @@ export function OrderWaiterDetailView({
 	const router = useRouter()
 	const queryClient = useQueryClient()
 	const { showError, showSuccess } = useAlert()
+	const userRole = useAuthStore((s) => s.userRole)
 	const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
 	const {
@@ -135,6 +137,9 @@ export function OrderWaiterDetailView({
 	const canCancel = order.status === 'PENDING'
 	const canDeliver = order.status === 'COMPLETE'
 	const canFinish = order.status === 'DELIVERED'
+	const showActions = canCancel || canDeliver || canFinish
+	const canPerformActions = userRole === UserRole.WAITER
+	const actionsDisabled = actionLoading || !canPerformActions
 
 	return (
 		<div className="space-y-4 sm:space-y-6">
@@ -438,15 +443,28 @@ export function OrderWaiterDetailView({
 						</div>
 					</div>
 
-					{(canCancel || canDeliver || canFinish) && (
-						<div className="bg-card border border-border rounded-xl p-4 sm:p-6">
-							<h2 className="text-foreground mb-4">Actions</h2>
+					{showActions && (
+						<div className="bg-card border border-border rounded-xl p-4 sm:p-6 space-y-4">
+							<div>
+								<h2 className="text-foreground">Actions</h2>
+								{!canPerformActions && (
+									<p className="text-xs text-muted-foreground mt-1">
+										View only — only the assigned waiter can perform these
+										actions.
+									</p>
+								)}
+							</div>
 							<div className="flex flex-wrap gap-3">
 								{canDeliver && (
 									<button
 										type="button"
 										onClick={() => statusMutation.mutate('DELIVERED')}
-										disabled={actionLoading}
+										disabled={actionsDisabled}
+										title={
+											canPerformActions
+												? undefined
+												: 'Waiter role required'
+										}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-primary text-primary-foreground transition-opacity hover:opacity-90 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										<CheckCircle2 className="w-4 h-4" />
@@ -459,7 +477,12 @@ export function OrderWaiterDetailView({
 									<button
 										type="button"
 										onClick={() => statusMutation.mutate('FINISHED')}
-										disabled={actionLoading}
+										disabled={actionsDisabled}
+										title={
+											canPerformActions
+												? undefined
+												: 'Waiter role required'
+										}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-success text-white hover:bg-success-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										<CheckCircle2 className="w-4 h-4" />
@@ -470,7 +493,12 @@ export function OrderWaiterDetailView({
 									<button
 										type="button"
 										onClick={() => setShowCancelConfirm(true)}
-										disabled={actionLoading}
+										disabled={actionsDisabled}
+										title={
+											canPerformActions
+												? undefined
+												: 'Waiter role required'
+										}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										<XCircle className="w-4 h-4" />

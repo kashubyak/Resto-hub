@@ -2,6 +2,7 @@
 
 import { AuthPasswordField, AuthTextField } from '@/components/auth/AuthFields'
 import { BackgroundDecorations } from '@/components/auth/BackgroundDecorations'
+import { ThemeSelector } from '@/components/ui/ThemeSelector'
 import { ROUTES } from '@/constants/pages.constant'
 import { useLogin } from '@/hooks/useLogin'
 import {
@@ -50,6 +51,7 @@ function LoginSubdomainGate() {
 
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-background px-2 sm:px-4 py-4 sm:py-8 relative overflow-hidden">
+			<ThemeSelector variant="fixed" />
 			<BackgroundDecorations />
 			<div className="w-full max-w-md relative z-10">
 				<div className="text-center mb-6">
@@ -85,7 +87,7 @@ function LoginSubdomainGate() {
 								className="w-full pl-4 pr-4 py-3 bg-input rounded-xl border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
 							/>
 							{error && (
-								<div className="flex items-center gap-1.5 text-red-500 mt-1">
+								<div className="flex items-center gap-1.5 text-destructive mt-1">
 									<AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
 									<p className="text-xs">{error}</p>
 								</div>
@@ -136,6 +138,7 @@ const LoginComponent = ({ host = '' }: { host?: string }) => {
 
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-background px-2 sm:px-4 py-4 sm:py-8 relative overflow-hidden">
+			<ThemeSelector variant="fixed" />
 			<BackgroundDecorations />
 			<div className="w-full max-w-md relative z-10">
 				{/* Logo/Brand Area */}
