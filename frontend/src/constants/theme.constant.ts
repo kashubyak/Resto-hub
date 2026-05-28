@@ -11,10 +11,11 @@ export type ThemePreference =
 
 export type ResolvedTheme = 'light' | 'dark'
 
-export const DEFAULT_THEME_PREFERENCE: ThemePreference =
-	THEME_PREFERENCE.SYSTEM
+export const DEFAULT_THEME_PREFERENCE: ThemePreference = THEME_PREFERENCE.SYSTEM
 
-export function isThemePreference(value: string | null): value is ThemePreference {
+export function isThemePreference(
+	value: string | null,
+): value is ThemePreference {
 	return (
 		value === THEME_PREFERENCE.LIGHT ||
 		value === THEME_PREFERENCE.DARK ||

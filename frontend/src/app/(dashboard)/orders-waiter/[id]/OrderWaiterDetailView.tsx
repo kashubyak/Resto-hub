@@ -461,9 +461,7 @@ export function OrderWaiterDetailView({
 										onClick={() => statusMutation.mutate('DELIVERED')}
 										disabled={actionsDisabled}
 										title={
-											canPerformActions
-												? undefined
-												: 'Waiter role required'
+											canPerformActions ? undefined : 'Waiter role required'
 										}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-primary text-primary-foreground transition-opacity hover:opacity-90 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
@@ -479,9 +477,7 @@ export function OrderWaiterDetailView({
 										onClick={() => statusMutation.mutate('FINISHED')}
 										disabled={actionsDisabled}
 										title={
-											canPerformActions
-												? undefined
-												: 'Waiter role required'
+											canPerformActions ? undefined : 'Waiter role required'
 										}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-success text-white hover:bg-success-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
@@ -495,9 +491,7 @@ export function OrderWaiterDetailView({
 										onClick={() => setShowCancelConfirm(true)}
 										disabled={actionsDisabled}
 										title={
-											canPerformActions
-												? undefined
-												: 'Waiter role required'
+											canPerformActions ? undefined : 'Waiter role required'
 										}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>

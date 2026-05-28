@@ -69,9 +69,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		applyPreference(readPreference())
 
-		const darkModeMediaQuery = window.matchMedia(
-			'(prefers-color-scheme: dark)',
-		)
+		const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
 		const handler = () => {
 			if (readPreference() !== 'system') return

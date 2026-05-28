@@ -91,7 +91,9 @@ function escapeCsvCell(value: string) {
 const analyticsNameLinkClass =
 	'text-foreground cursor-pointer text-sm font-medium hover:underline'
 
-function sortBySelectedMetric(rows: IOrderAnalyticsRow[]): IOrderAnalyticsRow[] {
+function sortBySelectedMetric(
+	rows: IOrderAnalyticsRow[],
+): IOrderAnalyticsRow[] {
 	return [...rows].sort((a, b) => b.value - a.value)
 }
 
@@ -99,7 +101,8 @@ function sortForTimeSeriesChart(
 	rows: IOrderAnalyticsRow[],
 	groupBy: OrderGroupBy,
 ): IOrderAnalyticsRow[] {
-	if (groupBy !== 'day' && groupBy !== 'month') return sortBySelectedMetric(rows)
+	if (groupBy !== 'day' && groupBy !== 'month')
+		return sortBySelectedMetric(rows)
 	return [...rows].sort((a, b) => a.group.localeCompare(b.group))
 }
 
@@ -324,7 +327,15 @@ export function AnalyticsView() {
 		a.click()
 		URL.revokeObjectURL(url)
 		showSuccess('Analytics exported.')
-	}, [sortedByMetric, metric, totalMetricValue, from, to, showError, showSuccess])
+	}, [
+		sortedByMetric,
+		metric,
+		totalMetricValue,
+		from,
+		to,
+		showError,
+		showSuccess,
+	])
 
 	const renderPieLabel = (entry: IPieLabelProps) => {
 		const RADIAN = Math.PI / 180
@@ -631,9 +642,7 @@ export function AnalyticsView() {
 												nameKey="group"
 												cx="50%"
 												cy="50%"
-												outerRadius={
-													sortedByMetric.length > 15 ? 140 : 120
-												}
+												outerRadius={sortedByMetric.length > 15 ? 140 : 120}
 												label={
 													sortedByMetric.length <= 15
 														? (props: unknown) =>
@@ -649,9 +658,7 @@ export function AnalyticsView() {
 												activeShape={(sectorProps: PieSectorDataItem) => (
 													<Sector
 														{...sectorProps}
-														outerRadius={
-															sortedByMetric.length > 15 ? 148 : 128
-														}
+														outerRadius={sortedByMetric.length > 15 ? 148 : 128}
 														stroke="#ffffff"
 														strokeWidth={2}
 													/>
@@ -722,11 +729,10 @@ export function AnalyticsView() {
 																							index,
 																							value: item.value,
 																							name: item.group,
-																							percentage:
-																								getMetricSharePercent(
-																									item,
-																									totalMetricValue,
-																								),
+																							percentage: getMetricSharePercent(
+																								item,
+																								totalMetricValue,
+																							),
 																							x: rect.left + rect.width / 2,
 																							y: rect.top,
 																						})
@@ -925,7 +931,7 @@ export function AnalyticsView() {
 
 						<div className="overflow-x-auto">
 							<table className="table-row-dividers w-full">
-									<thead className="bg-muted/50">
+								<thead className="bg-muted/50">
 									<tr>
 										<th className="text-muted-foreground px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">
 											Rank

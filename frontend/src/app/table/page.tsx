@@ -21,7 +21,14 @@ import {
 } from 'lucide-react'
 import { ENTITY_FOCUS_QUERY_PARAM } from '@/constants/pages.constant'
 import { useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+	Suspense,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { TableModal } from './components/TableModal'
 import { TableEmptyState } from './components/TableEmptyState'
@@ -31,7 +38,17 @@ import { DeleteConfirmDialog } from '@/app/category/components/DeleteConfirmDial
 type FilterType = 'all' | 'available' | 'occupied'
 type SortType = 'number' | 'seats' | 'status'
 
-export default function TablesPage() {
+function TablesPageFallback() {
+	return (
+		<div className="max-w-7xl mx-auto space-y-6 animate-pulse">
+			<div className="h-10 w-64 bg-muted rounded-lg" />
+			<div className="h-12 bg-muted rounded-xl" />
+			<div className="h-48 bg-muted rounded-2xl" />
+		</div>
+	)
+}
+
+function TablesPageContent() {
 	const queryClient = useQueryClient()
 	const { showError, showSuccess } = useAlert()
 	const [searchQuery, setSearchQuery] = useState('')
@@ -54,7 +71,10 @@ export default function TablesPage() {
 		queryFn: () => getTablesService(),
 	})
 
-	const tables: ITable[] = tablesResponse?.data ?? []
+	const tables = useMemo(
+		(): ITable[] => tablesResponse?.data ?? [],
+		[tablesResponse?.data],
+	)
 
 	useEffect(() => {
 		focusHandledRef.current = false
@@ -545,5 +565,13 @@ export default function TablesPage() {
 				isLoading={deleteMutation.isPending}
 			/>
 		</>
+	)
+}
+
+export default function TablesPage() {
+	return (
+		<Suspense fallback={<TablesPageFallback />}>
+			<TablesPageContent />
+		</Suspense>
 	)
 }

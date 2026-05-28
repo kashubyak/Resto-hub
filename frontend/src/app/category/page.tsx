@@ -13,14 +13,24 @@ import { parseBackendError } from '@/utils/errorHandler'
 import { ENTITY_FOCUS_QUERY_PARAM } from '@/constants/pages.constant'
 import { Folder, Plus, Search, SlidersHorizontal } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { CategoryListItem } from './CategoryListItem'
 import { CategoryModal } from './CategoryModal'
 import { DeleteConfirmDialog } from './components/DeleteConfirmDialog'
 
 const DEBOUNCE_MS = 500
 
-export default function CategoryPage() {
+function CategoryPageFallback() {
+	return (
+		<div className="max-w-7xl mx-auto space-y-6 animate-pulse">
+			<div className="h-10 w-64 bg-muted rounded-lg" />
+			<div className="h-12 bg-muted rounded-xl" />
+			<div className="h-48 bg-muted rounded-2xl" />
+		</div>
+	)
+}
+
+function CategoryPageContent() {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -406,5 +416,13 @@ export default function CategoryPage() {
 				onClearSearch={handleClearSearch}
 			/>
 		</div>
+	)
+}
+
+export default function CategoryPage() {
+	return (
+		<Suspense fallback={<CategoryPageFallback />}>
+			<CategoryPageContent />
+		</Suspense>
 	)
 }

@@ -61,9 +61,7 @@ function ThemeSelectorComponent({ variant = 'fixed' }: ThemeSelectorProps) {
 
 	if (variant === 'inline') return group
 
-	return (
-		<div className="fixed top-6 right-6 z-50">{group}</div>
-	)
+	return <div className="fixed top-6 right-6 z-50">{group}</div>
 }
 
 export const ThemeSelector = memo(ThemeSelectorComponent)

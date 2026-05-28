@@ -432,9 +432,7 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 										type="button"
 										onClick={() => takeMutation.mutate()}
 										disabled={actionsDisabled}
-										title={
-											canPerformActions ? undefined : 'Cook role required'
-										}
+										title={canPerformActions ? undefined : 'Cook role required'}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										{takeMutation.isPending ? (
@@ -450,9 +448,7 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 										type="button"
 										onClick={() => completeMutation.mutate()}
 										disabled={actionsDisabled}
-										title={
-											canPerformActions ? undefined : 'Cook role required'
-										}
+										title={canPerformActions ? undefined : 'Cook role required'}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-success text-white hover:bg-success-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										{completeMutation.isPending ? (
