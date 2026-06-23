@@ -49,9 +49,7 @@ function patchOrderInListCaches(
 				const items = old.data.data
 				const hasOrder = items.some((o) => o.id === orderId)
 				if (!hasOrder) return old
-				const next = items.map((o) =>
-					o.id === orderId ? { ...o, status } : o,
-				)
+				const next = items.map((o) => (o.id === orderId ? { ...o, status } : o))
 				return { ...old, data: { ...old.data, data: next } }
 			},
 		)

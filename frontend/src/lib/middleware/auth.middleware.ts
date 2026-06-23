@@ -94,7 +94,8 @@ async function handleTokenRefresh(
 	if (refreshResult.success) {
 		if (refreshResult.user) {
 			const role = refreshResult.user.role as UserRole
-			if (!hasRoleAccess(role, pathname)) return redirectToRoleHome(request, role)
+			if (!hasRoleAccess(role, pathname))
+				return redirectToRoleHome(request, role)
 		}
 
 		return forwardCookiesAndContinue(refreshResult)
