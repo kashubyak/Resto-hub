@@ -43,6 +43,7 @@ export function OrderWaiterDetailView({
 	const router = useRouter()
 	const { showError, showSuccess } = useAlert()
 	const userRole = useAuthStore((s) => s.userRole)
+	const isReadOnlyViewer = userRole === UserRole.ADMIN
 	const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
 	const {
@@ -110,13 +111,24 @@ export function OrderWaiterDetailView({
 					<p className="text-sm text-muted-foreground">
 						The order you&apos;re looking for doesn&apos;t exist
 					</p>
-					<Link
-						href={ROUTES.PRIVATE.WAITER.ORDERS_WAITER}
-						className="mt-2 flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-primary text-primary-foreground transition-opacity hover:opacity-90"
-					>
-						<ArrowLeft className="w-4 h-4" />
-						<span className="text-sm font-medium">Back to Orders</span>
-					</Link>
+					{isReadOnlyViewer ? (
+						<button
+							type="button"
+							onClick={() => router.back()}
+							className="mt-2 flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-primary text-primary-foreground transition-opacity hover:opacity-90"
+						>
+							<ArrowLeft className="w-4 h-4" />
+							<span className="text-sm font-medium">Go back</span>
+						</button>
+					) : (
+						<Link
+							href={ROUTES.PRIVATE.WAITER.ORDERS_WAITER}
+							className="mt-2 flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-primary text-primary-foreground transition-opacity hover:opacity-90"
+						>
+							<ArrowLeft className="w-4 h-4" />
+							<span className="text-sm font-medium">Back to Orders</span>
+						</Link>
+					)}
 				</div>
 			</div>
 		)
@@ -135,16 +147,28 @@ export function OrderWaiterDetailView({
 		<div className="space-y-4 sm:space-y-6">
 			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 				<div className="flex items-center gap-3">
-					<Link
-						href={ROUTES.PRIVATE.WAITER.ORDERS_WAITER}
-						className="flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-border hover:bg-input transition-colors"
-					>
-						<ArrowLeft className="w-5 h-5 text-foreground" />
-					</Link>
+					{isReadOnlyViewer ? (
+						<button
+							type="button"
+							onClick={() => router.back()}
+							className="flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-border hover:bg-input transition-colors"
+						>
+							<ArrowLeft className="w-5 h-5 text-foreground" />
+						</button>
+					) : (
+						<Link
+							href={ROUTES.PRIVATE.WAITER.ORDERS_WAITER}
+							className="flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-border hover:bg-input transition-colors"
+						>
+							<ArrowLeft className="w-5 h-5 text-foreground" />
+						</Link>
+					)}
 					<div>
 						<h1 className="text-foreground mb-1">Order #{order.id}</h1>
 						<p className="text-sm text-muted-foreground">
-							View and manage order details
+							{isReadOnlyViewer
+								? 'View order details'
+								: 'View and manage order details'}
 						</p>
 					</div>
 				</div>
@@ -433,16 +457,10 @@ export function OrderWaiterDetailView({
 						</div>
 					</div>
 
-					{showActions && (
+					{showActions && canPerformActions && (
 						<div className="bg-card border border-border rounded-xl p-4 sm:p-6 space-y-4">
 							<div>
 								<h2 className="text-foreground">Actions</h2>
-								{!canPerformActions && (
-									<p className="text-xs text-muted-foreground mt-1">
-										View only — only the assigned waiter can perform these
-										actions.
-									</p>
-								)}
 							</div>
 							<div className="flex flex-wrap gap-3">
 								{canDeliver && (
