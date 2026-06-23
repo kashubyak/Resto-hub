@@ -3,7 +3,7 @@ import { ROUTES } from '@/constants/pages.constant'
 import { getSubdomainFromHost } from '@/utils/api/subdomain'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { redirectToHome, redirectToLogin } from './redirects'
+import { redirectToHome, redirectToLogin, redirectToRoleHome } from './redirects'
 import { getRoleForMiddleware } from './access-token-role'
 import { hasRoleAccess } from './role-guards'
 import { isAuthRoute, isPublicRoute } from './route-guards'
@@ -14,9 +14,19 @@ function roleGuardOrNull(
 	pathname: string,
 ): NextResponse | null {
 	const role = getRoleForMiddleware(request)
-	if (role === null) return null
-	if (!hasRoleAccess(role, pathname)) return redirectToHome(request)
+	if (role === null) {
+		const hasToken = !!request.cookies.get(AUTH.TOKEN)?.value
+		if (!hasToken) return redirectToLogin(request, pathname)
+		return null
+	}
+	if (!hasRoleAccess(role, pathname)) return redirectToRoleHome(request, role)
 	return null
+}
+
+function roleHomeOrLogin(request: NextRequest): NextResponse {
+	const role = getRoleForMiddleware(request)
+	if (role === null) return redirectToHome(request)
+	return redirectToRoleHome(request, role)
 }
 
 const ALERT_COOKIE_OPTIONS = {
@@ -50,7 +60,7 @@ export async function authMiddleware(
 		request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true' ||
 		!!request.cookies.get(AUTH.TOKEN)?.value
 	if (isAuthRoute(pathname))
-		return isAuthenticated ? redirectToHome(request) : NextResponse.next()
+		return isAuthenticated ? roleHomeOrLogin(request) : NextResponse.next()
 
 	if (isAuthenticated) {
 		const denied = roleGuardOrNull(request, pathname)
@@ -80,7 +90,7 @@ async function handleTokenRefresh(
 	if (refreshResult.success) {
 		if (refreshResult.user) {
 			if (!hasRoleAccess(refreshResult.user.role, pathname))
-				return redirectToHome(request)
+				return redirectToRoleHome(request, refreshResult.user.role)
 		}
 
 		return forwardCookiesAndContinue(refreshResult)

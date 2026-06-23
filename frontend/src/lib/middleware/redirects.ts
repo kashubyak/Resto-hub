@@ -1,4 +1,8 @@
-import { ROUTES } from '@/constants/pages.constant'
+import {
+	ROLE_DEFAULT_ROUTE,
+	ROUTES,
+	type UserRole,
+} from '@/constants/pages.constant'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
@@ -15,6 +19,14 @@ export function redirectToHome(request: NextRequest): NextResponse {
 	return NextResponse.redirect(
 		new URL(ROUTES.PRIVATE.SHARED.DASHBOARD, request.url),
 	)
+}
+
+export function redirectToRoleHome(
+	request: NextRequest,
+	role: UserRole,
+): NextResponse {
+	const destination = ROLE_DEFAULT_ROUTE[role] ?? ROUTES.PRIVATE.SHARED.DASHBOARD
+	return NextResponse.redirect(new URL(destination, request.url))
 }
 
 export function redirectToNotFound(request: NextRequest): NextResponse {

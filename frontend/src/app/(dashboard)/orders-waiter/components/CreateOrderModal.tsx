@@ -20,7 +20,6 @@ import {
 	X,
 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { createPortal } from 'react-dom'
 
 interface ICreateOrderModalProps {
 	onClose: () => void
@@ -172,14 +171,12 @@ export function CreateOrderModal({
 
 	const selectedTableNumber = tables.find((t) => t.id === selectedTable)?.number
 
-	const modal = (
+	return (
 		<Modal
 			isOpen
 			onClose={onClose}
-			align="end"
-			className="p-0 sm:p-4"
 			maxWidth="max-w-5xl"
-			panelClassName="rounded-t-2xl sm:rounded-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden"
+			panelClassName="flex flex-col md:h-[80vh] md:min-h-[80vh] md:max-h-[calc(100dvh-2rem)]"
 			aria-labelledby="create-order-modal-title"
 		>
 			<div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border shrink-0">
@@ -204,15 +201,15 @@ export function CreateOrderModal({
 			</div>
 
 			{loading ? (
-				<div className="flex items-center justify-center py-12">
+				<div className="flex flex-1 items-center justify-center min-h-0 py-12">
 					<div className="flex flex-col items-center gap-3">
 						<Loader2 className="w-8 h-8 text-primary animate-spin" />
 						<p className="text-sm text-muted-foreground">Loading menu...</p>
 					</div>
 				</div>
 			) : (
-				<div className="flex-1 overflow-hidden flex flex-col lg:flex-row min-h-0">
-					<div className="flex-1 flex flex-col overflow-hidden border-b lg:border-b-0 lg:border-r border-border min-h-0">
+				<div className="flex flex-1 min-h-0 overflow-y-auto flex-col md:h-full md:overflow-hidden md:flex-row">
+					<div className="flex flex-col flex-none md:h-full md:flex-1 md:min-h-0 md:overflow-hidden border-b border-border md:border-b-0 md:border-r md:border-border">
 						<div className="px-4 sm:px-6 py-4 border-b border-border shrink-0">
 							<div className="flex items-center justify-between mb-2">
 								<label className="text-sm text-foreground">
@@ -272,7 +269,7 @@ export function CreateOrderModal({
 							</div>
 						</div>
 
-						<div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 min-h-0">
+						<div className="flex-none px-4 sm:px-6 py-4 md:flex-1 md:overflow-y-auto md:min-h-0">
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								{filteredDishes.map((dish) => {
 									const inCart = orderItems.find(
@@ -311,7 +308,7 @@ export function CreateOrderModal({
 						</div>
 					</div>
 
-					<div className="w-full lg:w-96 flex flex-col bg-muted/30 min-h-0 max-h-[50vh] lg:max-h-none">
+					<div className="w-full flex flex-col flex-none mt-6 border-border bg-muted/30 md:mt-0 md:h-full md:w-96 md:min-h-0 md:overflow-hidden">
 						<div className="px-4 sm:px-6 py-4 border-b border-border shrink-0">
 							<div className="flex items-center justify-between gap-2">
 								<div className="flex items-center gap-2">
@@ -335,7 +332,7 @@ export function CreateOrderModal({
 							</div>
 						</div>
 
-						<div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 min-h-0">
+						<div className="flex-none px-4 sm:px-6 py-4 md:flex-1 md:overflow-y-auto md:min-h-0">
 							{orderItems.length === 0 ? (
 								<div className="flex flex-col items-center justify-center h-full text-center py-8">
 									<div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
@@ -443,7 +440,7 @@ export function CreateOrderModal({
 							)}
 						</div>
 
-						<div className="px-4 sm:px-6 py-4 border-t border-border space-y-3 shrink-0">
+						<div className="sticky bottom-0 bg-card z-10 border-t border-border px-4 py-4 sm:px-6 space-y-3 shrink-0 md:static">
 							<div className="flex items-center justify-between">
 								<div>
 									<span className="text-foreground font-semibold">Total</span>
@@ -485,8 +482,4 @@ export function CreateOrderModal({
 			)}
 		</Modal>
 	)
-
-	if (typeof document === 'undefined') return null
-
-	return createPortal(modal, document.body)
 }

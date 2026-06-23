@@ -1,5 +1,8 @@
-import { ROLE_ROUTES_MAP } from '@/constants/pages.constant'
-import type { UserRole } from '@/constants/pages.constant'
+import {
+	ROLE_DEFAULT_ROUTE,
+	ROLE_ROUTES_MAP,
+	type UserRole,
+} from '@/constants/pages.constant'
 
 export const hasRoleAccess = (
 	userRole: UserRole | string,
@@ -11,6 +14,9 @@ export const hasRoleAccess = (
 	if (allowedRoutes.includes(pathname)) return true
 	return allowedRoutes.some((route) => pathname.startsWith(route + '/'))
 }
+
+export const getDefaultRouteForRole = (userRole: UserRole): string =>
+	ROLE_DEFAULT_ROUTE[userRole]
 
 export const getUserAccessibleRoutes = (
 	userRole: UserRole | string,

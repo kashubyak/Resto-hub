@@ -1,5 +1,6 @@
 'use client'
 
+import { RouteAccessGuard } from '@/components/auth/RouteAccessGuard'
 import { AlertDisplay } from '@/components/container/AlertContainer'
 import { ApiSubdomainInitializer } from '@/components/init/ApiSubdomainInitializer'
 import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt'
@@ -104,13 +105,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
 				<ThemeProvider>
 					<AlertProvider>
 						<AuthProvider>
-							<SocketProvider>
-								<ApiSubdomainInitializer />
-								<AlertInitializer />
-								{children}
-								<AlertDisplay />
-								<PWAInstallPrompt />
-							</SocketProvider>
+							<RouteAccessGuard>
+								<SocketProvider>
+									<ApiSubdomainInitializer />
+									<AlertInitializer />
+									{children}
+									<AlertDisplay />
+									<PWAInstallPrompt />
+								</SocketProvider>
+							</RouteAccessGuard>
 						</AuthProvider>
 					</AlertProvider>
 				</ThemeProvider>
