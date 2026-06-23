@@ -41,8 +41,7 @@ export function isOrderDetailQueryKey(
 ): boolean {
 	const id = normalizeOrderId(orderId)
 	return (
-		queryKey[0] === ORDER_QUERY_KEY.DETAIL_PREFIX &&
-		Number(queryKey[1]) === id
+		queryKey[0] === ORDER_QUERY_KEY.DETAIL_PREFIX && Number(queryKey[1]) === id
 	)
 }
 
@@ -73,7 +72,7 @@ export function patchDetailCacheShape(
 	if (isOrderSummary(record.data))
 		return {
 			...record,
-			data: { ...(record.data as IOrderSummary), status },
+			data: { ...record.data, status },
 		}
 
 	if (isOrderSummary(old)) return { ...old, status }
@@ -85,7 +84,7 @@ export function patchDetailCacheShape(
 				...record,
 				data: {
 					...inner,
-					data: { ...(inner.data as IOrderSummary), status },
+					data: { ...inner.data, status },
 				},
 			}
 		}
@@ -149,10 +148,9 @@ function patchDetailOrderInCache(
 	if (!hasDetail) {
 		const fromList = findOrderInListCaches(queryClient, orderId)
 		if (fromList) {
-			queryClient.setQueryData(
-				ORDER_QUERY_KEY.DETAIL(orderId),
-				{ data: { ...fromList, status } } as ApiResponse<IOrderSummary>,
-			)
+			queryClient.setQueryData(ORDER_QUERY_KEY.DETAIL(orderId), {
+				data: { ...fromList, status },
+			} as ApiResponse<IOrderSummary>)
 		}
 	}
 }

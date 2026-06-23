@@ -3,7 +3,10 @@
 import { orderStatusConfig } from '@/app/(dashboard)/orders-waiter/orderStatusConfig'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
-import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
+import {
+	ORDER_DETAIL_QUERY_OPTIONS,
+	ORDER_QUERY_KEY,
+} from '@/constants/query-keys.constant'
 import { getOrderByIdService } from '@/services/order/get-order-by-id.service'
 import { useAuthStore } from '@/store/auth.store'
 import type { OrderUpdateStatusVariables } from '@/types/mutation.interface'
@@ -36,6 +39,7 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 	} = useQuery({
 		queryKey: ORDER_QUERY_KEY.DETAIL(orderId),
 		queryFn: () => getOrderByIdService(orderId),
+		...ORDER_DETAIL_QUERY_OPTIONS,
 	})
 
 	const order = orderRes?.data

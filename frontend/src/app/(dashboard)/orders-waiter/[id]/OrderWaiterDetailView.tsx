@@ -4,7 +4,10 @@ import { orderStatusConfig } from '@/app/(dashboard)/orders-waiter/orderStatusCo
 import { Modal } from '@/components/ui/Modal'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
-import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
+import {
+	ORDER_DETAIL_QUERY_OPTIONS,
+	ORDER_QUERY_KEY,
+} from '@/constants/query-keys.constant'
 import { getOrderByIdService } from '@/services/order/get-order-by-id.service'
 import type { IAxiosError } from '@/types/error.interface'
 import type { OrderUpdateStatusVariables } from '@/types/mutation.interface'
@@ -49,6 +52,7 @@ export function OrderWaiterDetailView({
 	} = useQuery({
 		queryKey: ORDER_QUERY_KEY.DETAIL(orderId),
 		queryFn: () => getOrderByIdService(orderId),
+		...ORDER_DETAIL_QUERY_OPTIONS,
 	})
 
 	const order = orderRes?.data ?? null

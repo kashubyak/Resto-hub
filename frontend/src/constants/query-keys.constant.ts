@@ -22,6 +22,11 @@ const ORDER_DETAIL_KEY = 'order' as const
 const ORDER_ANALYTICS_KEY = 'order-analytics' as const
 const ORDER_ADMIN_LIST_KEY = 'order-admin-list' as const
 
+export const ORDER_DETAIL_QUERY_OPTIONS = {
+	staleTime: 0,
+	refetchOnMount: 'always' as const,
+}
+
 export const ORDER_QUERY_KEY = {
 	LIST_ACTIVE: 'orders-waiter-active',
 	LIST_HISTORY: 'orders-waiter-history',

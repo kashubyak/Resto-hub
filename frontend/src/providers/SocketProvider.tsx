@@ -1,12 +1,12 @@
 'use client'
 
-import { API_URL } from '@/config/api'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { SOCKET_EVENTS } from '@/constants/socket-events.constant'
 import {
 	createNotificationsSocket,
-	getSocketAuthToken,
+	getSocketAuthTokenWithRetry,
 } from '@/lib/socket/createNotificationsSocket'
+import { getSocketServerUrl } from '@/lib/socket/getSocketServerUrl'
 import { useAlert } from '@/providers/AlertContext'
 import { useAuthStore } from '@/store/auth.store'
 import type {
@@ -56,42 +56,57 @@ function isOrderUpdatedPayload(
 	return typeof o.orderId === 'number' && typeof o.status === 'string'
 }
 
+function disconnectSocket(socket: Socket | null): void {
+	if (!socket) return
+	socket.removeAllListeners()
+	socket.disconnect()
+}
+
 export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 	const router = useRouter()
 	const queryClient = useQueryClient()
 	const { showAlert } = useAlert()
 	const socketRef = useRef<Socket | null>(null)
+	const pendingSocketRef = useRef<Socket | null>(null)
+	const showAlertRef = useRef(showAlert)
+	const routerRef = useRef(router)
 	const hydrated = useAuthStore((s) => s.hydrated)
 	const isAuth = useAuthStore((s) => s.isAuth)
 	const userRole = useAuthStore((s) => s.userRole)
 
+	showAlertRef.current = showAlert
+	routerRef.current = router
+
 	useEffect(() => {
 		if (!hydrated) return
 
+		const socketUrl = getSocketServerUrl()
 		const shouldConnect =
 			isAuth &&
 			userRole != null &&
 			SOCKET_ROLES.includes(userRole) &&
-			Boolean(API_URL.BASE_SOCKET)
+			socketUrl != null
 
 		if (!shouldConnect) {
-			const existing = socketRef.current
-			if (existing) {
-				existing.removeAllListeners()
-				existing.disconnect()
-				socketRef.current = null
-			}
+			disconnectSocket(socketRef.current)
+			socketRef.current = null
+			disconnectSocket(pendingSocketRef.current)
+			pendingSocketRef.current = null
 			return
 		}
 
 		let cancelled = false
+		const role = userRole
 
 		void (async () => {
-			const token = await getSocketAuthToken()
+			const token = await getSocketAuthTokenWithRetry()
 			if (cancelled || !token) return
 
-			const socket = createNotificationsSocket(token)
+			const socket = createNotificationsSocket(token, socketUrl)
 			if (cancelled || !socket) return
+
+			pendingSocketRef.current = socket
+			socketRef.current = socket
 
 			const onOrderUpdated = (data: unknown) => {
 				if (!isOrderUpdatedPayload(data)) return
@@ -108,14 +123,14 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 						? `${data.itemsCount} items`
 						: 'new items'
 				invalidateOrderQueries(queryClient, data.id)
-				if (userRole !== UserRole.COOK) return
+				if (role !== UserRole.COOK) return
 				const path = ROUTES.PRIVATE.COOK.ORDERS_COOK_ID(data.id)
-				showAlert({
+				showAlertRef.current({
 					severity: 'info',
 					text: `New order #${data.id} (${itemsPart}).`,
 					duration: ORDER_ALERT_DURATION_MS,
 					actionLabel: 'View order',
-					onAction: () => router.push(path),
+					onAction: () => routerRef.current.push(path),
 				})
 			}
 
@@ -123,46 +138,45 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 				if (!isOrderCompletedPayload(data)) return
 				const tablePart = data.table != null ? ` Table ${data.table}.` : ''
 				invalidateOrderQueries(queryClient, data.orderId)
-				if (userRole !== UserRole.WAITER) return
+				if (role !== UserRole.WAITER) return
 				const path = ROUTES.PRIVATE.WAITER.ORDERS_WAITER_ID(data.orderId)
-				showAlert({
+				showAlertRef.current({
 					severity: 'success',
 					text: `Order #${data.orderId} is ready.${tablePart}`,
 					duration: ORDER_ALERT_DURATION_MS,
 					actionLabel: 'View order',
-					onAction: () => router.push(path),
+					onAction: () => routerRef.current.push(path),
 				})
 			}
 
 			socket.on(SOCKET_EVENTS.ORDER_UPDATED, onOrderUpdated)
-			if (userRole === UserRole.COOK)
-				socket.on(SOCKET_EVENTS.NEW_ORDER, onNewOrder)
-			if (userRole === UserRole.WAITER)
+			if (role === UserRole.COOK) socket.on(SOCKET_EVENTS.NEW_ORDER, onNewOrder)
+			if (role === UserRole.WAITER)
 				socket.on(SOCKET_EVENTS.ORDER_COMPLETED, onOrderCompleted)
 
 			if (cancelled) {
 				socket.off(SOCKET_EVENTS.ORDER_UPDATED, onOrderUpdated)
-				if (userRole === UserRole.COOK)
+				if (role === UserRole.COOK)
 					socket.off(SOCKET_EVENTS.NEW_ORDER, onNewOrder)
-				if (userRole === UserRole.WAITER)
+				if (role === UserRole.WAITER)
 					socket.off(SOCKET_EVENTS.ORDER_COMPLETED, onOrderCompleted)
-				socket.disconnect()
+				disconnectSocket(socket)
+				if (socketRef.current === socket) socketRef.current = null
+				if (pendingSocketRef.current === socket) pendingSocketRef.current = null
 				return
 			}
 
-			socketRef.current = socket
+			pendingSocketRef.current = null
 		})()
 
 		return () => {
 			cancelled = true
-			const s = socketRef.current
-			if (s) {
-				s.removeAllListeners()
-				s.disconnect()
-				socketRef.current = null
-			}
+			disconnectSocket(socketRef.current)
+			socketRef.current = null
+			disconnectSocket(pendingSocketRef.current)
+			pendingSocketRef.current = null
 		}
-	}, [hydrated, isAuth, userRole, queryClient, router, showAlert])
+	}, [hydrated, isAuth, userRole, queryClient])
 
 	return children
 })
