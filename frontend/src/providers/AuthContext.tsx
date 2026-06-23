@@ -11,7 +11,7 @@ import { useAlertStore } from '@/store/alert.store'
 import { useAuthStore } from '@/store/auth.store'
 import type { IAuthContext, ILoginRequest } from '@/types/auth.interface'
 import { initApiSubdomain } from '@/utils/api'
-import { initializeAuth } from '@/utils/auth-helpers'
+import { hasBackendSession, initializeAuth } from '@/utils/auth-helpers'
 import Cookies from 'js-cookie'
 import { usePathname } from 'next/navigation'
 import {
@@ -162,14 +162,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 			}
 		}
 
-		const checkBackendAuth = () => {
-			return (
-				typeof window !== 'undefined' &&
-				(Cookies.get(AUTH.AUTH_STATUS) === 'true' || !!Cookies.get(AUTH.TOKEN))
-			)
-		}
-
-		const hasBackendAuth = checkBackendAuth()
+		const hasBackendAuth = hasBackendSession()
 		const isPublicAuthRoute =
 			pathname === ROUTES.PUBLIC.AUTH.REGISTER ||
 			pathname === ROUTES.PUBLIC.AUTH.LOGIN ||
@@ -182,10 +175,7 @@ export const AuthProvider = memo<{ children: ReactNode }>(({ children }) => {
 
 		if (!hasBackendAuth && user && !isFetchingUser) {
 			clearAuthTimeoutRef.current = setTimeout(() => {
-				const stillNoAuth = !checkBackendAuth()
-				if (stillNoAuth && user) {
-					clearAuth()
-				}
+				if (!hasBackendSession() && user) clearAuth()
 				clearAuthTimeoutRef.current = null
 			}, CLEAR_AUTH_DEBOUNCE_MS)
 		}

@@ -148,10 +148,7 @@ export const ROLE_ROUTES_MAP: Record<UserRole, string[]> = {
 }
 
 export const ROLE_ROUTE_PATTERNS: Partial<Record<UserRole, RegExp[]>> = {
-	[UserRole.ADMIN]: [
-		/^\/orders-waiter\/\d+$/,
-		/^\/orders-cook\/\d+$/,
-	],
+	[UserRole.ADMIN]: [/^\/orders-waiter\/\d+$/, /^\/orders-cook\/\d+$/],
 }
 
 const ADMIN_COOK_WAITER_ROLES: UserRole[] = [

@@ -13,14 +13,24 @@ import { hasRoleAccess } from './role-guards'
 import { isAuthRoute, isPublicRoute } from './route-guards'
 import { type IRefreshResult, refreshAccessToken } from './token-refresh'
 
+function hasAccessToken(request: NextRequest): boolean {
+	return !!request.cookies.get(AUTH.TOKEN)?.value
+}
+
+function canRefreshSession(request: NextRequest): boolean {
+	return (
+		request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true' ||
+		request.cookies.has('jid')
+	)
+}
+
 function roleGuardOrNull(
 	request: NextRequest,
 	pathname: string,
 ): NextResponse | null {
 	const role = getRoleForMiddleware(request)
 	if (role === null) {
-		const hasToken = !!request.cookies.get(AUTH.TOKEN)?.value
-		if (!hasToken) return redirectToLogin(request, pathname)
+		if (!hasAccessToken(request)) return redirectToLogin(request, pathname)
 		return null
 	}
 	if (!hasRoleAccess(role, pathname)) return redirectToRoleHome(request, role)
@@ -60,19 +70,20 @@ export async function authMiddleware(
 
 	if (isPublicRoute(pathname)) return NextResponse.next()
 
-	const isAuthenticated =
-		request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true' ||
-		!!request.cookies.get(AUTH.TOKEN)?.value
+	const accessToken = hasAccessToken(request)
+	const canRefresh = canRefreshSession(request)
+	const hasSession = accessToken || canRefresh
+
 	if (isAuthRoute(pathname))
-		return isAuthenticated ? roleHomeOrLogin(request) : NextResponse.next()
+		return hasSession ? roleHomeOrLogin(request) : NextResponse.next()
 
-	if (isAuthenticated) {
-		const denied = roleGuardOrNull(request, pathname)
-		if (denied) return denied
-		return NextResponse.next()
-	}
+	if (!accessToken && !canRefresh) return redirectToLogin(request, pathname)
 
-	return handleTokenRefresh(request, pathname)
+	if (!accessToken && canRefresh) return handleTokenRefresh(request, pathname)
+
+	const denied = roleGuardOrNull(request, pathname)
+	if (denied) return denied
+	return NextResponse.next()
 }
 
 const REFRESH_RETRY_DELAY_MS = 400
@@ -81,9 +92,7 @@ async function handleTokenRefresh(
 	request: NextRequest,
 	pathname: string,
 ): Promise<NextResponse> {
-	const hadAuth =
-		request.cookies.get(AUTH.AUTH_STATUS)?.value === 'true' ||
-		request.cookies.has('jid')
+	const hadAuth = canRefreshSession(request)
 	let refreshResult = await refreshAccessToken(request)
 
 	if (!refreshResult.success) {
@@ -123,8 +132,7 @@ function handleSessionExpired(
 	currentPath: string,
 	hadAuth: boolean,
 ): NextResponse {
-	const hasAccessToken = !!request.cookies.get(AUTH.TOKEN)?.value
-	if (hasAccessToken) {
+	if (hasAccessToken(request)) {
 		const denied = roleGuardOrNull(request, currentPath)
 		if (denied) return denied
 		return NextResponse.next()

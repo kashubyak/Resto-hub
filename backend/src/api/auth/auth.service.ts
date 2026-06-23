@@ -236,9 +236,9 @@ export class AuthService {
 		const forwardedHost = req.headers['x-forwarded-host']
 		const hostHeader = req.headers.host
 		const host =
-			(typeof forwardedHost === 'string' ? forwardedHost : '') ||
-			req.hostname ||
-			(typeof hostHeader === 'string' ? hostHeader.split(':')[0] : '') ||
+			((typeof forwardedHost === 'string' ? forwardedHost : '') ||
+				req.hostname ||
+				(typeof hostHeader === 'string' ? hostHeader.split(':')[0] : '')) ??
 			''
 		const hostPart = host.split(':')[0] ?? ''
 		const sub = hostPart.split('.')[0] ?? ''

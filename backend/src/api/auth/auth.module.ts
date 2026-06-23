@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config'
 import { PassportModule } from '@nestjs/passport'
 import { ThrottlerModule } from '@nestjs/throttler'
 import { PrismaService } from 'prisma/prisma.service'
+import { SupabaseTokenVerifierService } from 'src/common/auth/supabase-token-verifier.service'
 import { SupabaseService } from 'src/common/supabase/supabase.service'
 import { S3Service } from 'src/common/s3/s3.service'
 import { AuthController } from './auth.controller'
@@ -19,10 +20,11 @@ import { SupabaseJwtStrategy } from './strategies/supabase-jwt.strategy'
 	providers: [
 		AuthService,
 		SupabaseJwtStrategy,
+		SupabaseTokenVerifierService,
 		PrismaService,
 		SupabaseService,
 		S3Service,
 	],
-	exports: [SupabaseJwtStrategy],
+	exports: [SupabaseJwtStrategy, SupabaseTokenVerifierService],
 })
 export class AuthModule {}

@@ -7,24 +7,23 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets'
 import { Role } from '@prisma/client'
-import * as jwt from 'jsonwebtoken'
 import { Server, Socket } from 'socket.io'
+import { SupabaseTokenVerifierService } from 'src/common/auth/supabase-token-verifier.service'
 import { socket_rooms } from 'src/common/constants'
+import { WEBSOCKET_CORS_OPTIONS } from 'src/common/utils/cors-origin.util'
+import { parseAccessTokenFromCookieHeader } from 'src/common/utils/cookie.util'
+import { getSubdomainFromHost } from 'src/common/utils/subdomain.util'
 import { type INotificationData } from '../interfaces/notification.interface'
-
-interface ICustomJwtPayload {
-	sub: number
-	role: Role
-	iat?: number
-	exp?: number
-}
 
 interface ISocketData {
 	userId: number
 	role: Role
 }
 
-@WebSocketGateway({ cors: true, transports: ['websocket'] })
+@WebSocketGateway({
+	cors: WEBSOCKET_CORS_OPTIONS,
+	transports: ['websocket'],
+})
 @Injectable()
 export class NotificationsGateway
 	implements OnGatewayConnection, OnGatewayDisconnect
@@ -33,46 +32,48 @@ export class NotificationsGateway
 	server!: Server
 	private logger = new Logger(NotificationsGateway.name)
 
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly tokenVerifier: SupabaseTokenVerifierService,
+	) {}
 
 	async handleConnection(client: Socket) {
 		try {
-			const authToken =
-				typeof client.handshake.auth.token === 'string'
-					? client.handshake.auth.token
-					: undefined
-			const queryToken =
-				typeof client.handshake.query.token === 'string'
-					? client.handshake.query.token
-					: undefined
-			const headerToken =
-				typeof client.handshake.headers.authorization === 'string'
-					? client.handshake.headers.authorization.split(' ')[1]
-					: undefined
-
-			const token: string | undefined = authToken ?? queryToken ?? headerToken
-
+			const token = this.extractToken(client)
 			if (!token) throw new Error('Token is missing')
-			const secret = process.env.JWT_TOKEN_SECRET
-			if (!secret) throw new Error('JWT_TOKEN_SECRET is not defined')
-			const decoded = jwt.verify(token, secret)
 
-			if (typeof decoded === 'string') throw new Error('Invalid token format')
-			const payload = decoded as unknown as ICustomJwtPayload
-			if (typeof payload.sub !== 'number' || typeof payload.role !== 'string')
-				throw new Error('Invalid token payload')
+			const { sub } = await this.tokenVerifier.verifyAccessToken(token)
 
-			const userId: number = payload.sub
-			const role: Role = payload.role
+			const host =
+				(typeof client.handshake.headers.host === 'string'
+					? client.handshake.headers.host
+					: '') ||
+				(typeof client.handshake.headers['x-forwarded-host'] === 'string'
+					? client.handshake.headers['x-forwarded-host']
+					: '')
+			const subdomain = getSubdomainFromHost(host)
+			if (!subdomain) throw new Error('Subdomain is required')
+
+			const company = await this.prisma.company.findUnique({
+				where: { subdomain },
+				select: { id: true },
+			})
+			if (!company) throw new Error('Company not found')
+
+			const user = await this.prisma.user.findFirst({
+				where: {
+					supabaseUserId: sub,
+					companyId: company.id,
+				} as { supabaseUserId: string; companyId: number },
+				select: { id: true, role: true, companyId: true },
+			})
+			if (!user) throw new Error('User not found in company')
+
+			const userId = user.id
+			const role = user.role
 
 			;(client.data as ISocketData).userId = userId
 			;(client.data as ISocketData).role = role
-
-			const user = await this.prisma.user.findUnique({
-				where: { id: userId },
-				select: { companyId: true },
-			})
-			if (!user) throw new Error('User not found')
 
 			await client.join(socket_rooms.USER(userId))
 			await client.join(socket_rooms.COMPANY(user.companyId))
@@ -85,6 +86,43 @@ export class NotificationsGateway
 			this.logger.error('Error during connection', err)
 			client.disconnect()
 		}
+	}
+
+	private getCookieHeader(client: Socket): string | undefined {
+		const fromHandshake = client.handshake.headers.cookie
+		if (typeof fromHandshake === 'string' && fromHandshake.length > 0)
+			return fromHandshake
+
+		const fromRequest = client.request.headers.cookie
+		if (typeof fromRequest === 'string' && fromRequest.length > 0)
+			return fromRequest
+
+		return undefined
+	}
+
+	private extractToken(client: Socket): string | undefined {
+		const cookieToken = parseAccessTokenFromCookieHeader(
+			this.getCookieHeader(client),
+		)
+		if (cookieToken) return cookieToken
+
+		const authToken =
+			typeof client.handshake.auth.token === 'string'
+				? client.handshake.auth.token
+				: undefined
+		if (authToken) return authToken
+
+		const queryToken =
+			typeof client.handshake.query.token === 'string'
+				? client.handshake.query.token
+				: undefined
+		if (queryToken) return queryToken
+
+		const authHeader = client.handshake.headers.authorization
+		if (typeof authHeader === 'string' && authHeader.startsWith('Bearer '))
+			return authHeader.slice(7)
+
+		return undefined
 	}
 
 	handleDisconnect(client: Socket) {

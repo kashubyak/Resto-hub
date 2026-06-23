@@ -2,10 +2,7 @@
 
 import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { SOCKET_EVENTS } from '@/constants/socket-events.constant'
-import {
-	createNotificationsSocket,
-	getSocketAuthTokenWithRetry,
-} from '@/lib/socket/createNotificationsSocket'
+import { createNotificationsSocket } from '@/lib/socket/createNotificationsSocket'
 import { getSocketServerUrl } from '@/lib/socket/getSocketServerUrl'
 import { useAlert } from '@/providers/AlertContext'
 import { useAuthStore } from '@/store/auth.store'
@@ -95,86 +92,71 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 			return
 		}
 
-		let cancelled = false
 		const role = userRole
 
-		void (async () => {
-			const token = await getSocketAuthTokenWithRetry()
-			if (cancelled || !token) return
+		const socket = createNotificationsSocket(socketUrl)
+		if (!socket) return
 
-			const socket = createNotificationsSocket(token, socketUrl)
-			if (cancelled || !socket) return
+		pendingSocketRef.current = socket
+		socketRef.current = socket
 
-			pendingSocketRef.current = socket
-			socketRef.current = socket
+		const onOrderUpdated = (data: unknown) => {
+			if (!isOrderUpdatedPayload(data)) return
+			const orderId = Number(data.orderId)
+			if (isOrderStatus(data.status))
+				patchOrderStatusInCache(queryClient, orderId, data.status)
+			invalidateOrderQueries(queryClient, orderId)
+		}
 
-			const onOrderUpdated = (data: unknown) => {
-				if (!isOrderUpdatedPayload(data)) return
-				const orderId = Number(data.orderId)
-				if (isOrderStatus(data.status))
-					patchOrderStatusInCache(queryClient, orderId, data.status)
-				invalidateOrderQueries(queryClient, orderId)
-			}
+		const onNewOrder = (data: unknown) => {
+			if (!isNewOrderPayload(data)) return
+			const itemsPart =
+				typeof data.itemsCount === 'number'
+					? `${data.itemsCount} items`
+					: 'new items'
+			invalidateOrderQueries(queryClient, data.id)
+			if (role !== UserRole.COOK) return
+			const path = ROUTES.PRIVATE.COOK.ORDERS_COOK_ID(data.id)
+			showAlertRef.current({
+				severity: 'info',
+				text: `New order #${data.id} (${itemsPart}).`,
+				duration: ORDER_ALERT_DURATION_MS,
+				actionLabel: 'View order',
+				onAction: () => routerRef.current.push(path),
+			})
+		}
 
-			const onNewOrder = (data: unknown) => {
-				if (!isNewOrderPayload(data)) return
-				const itemsPart =
-					typeof data.itemsCount === 'number'
-						? `${data.itemsCount} items`
-						: 'new items'
-				invalidateOrderQueries(queryClient, data.id)
-				if (role !== UserRole.COOK) return
-				const path = ROUTES.PRIVATE.COOK.ORDERS_COOK_ID(data.id)
-				showAlertRef.current({
-					severity: 'info',
-					text: `New order #${data.id} (${itemsPart}).`,
-					duration: ORDER_ALERT_DURATION_MS,
-					actionLabel: 'View order',
-					onAction: () => routerRef.current.push(path),
-				})
-			}
+		const onOrderCompleted = (data: unknown) => {
+			if (!isOrderCompletedPayload(data)) return
+			const tablePart = data.table != null ? ` Table ${data.table}.` : ''
+			invalidateOrderQueries(queryClient, data.orderId)
+			if (role !== UserRole.WAITER) return
+			const path = ROUTES.PRIVATE.WAITER.ORDERS_WAITER_ID(data.orderId)
+			showAlertRef.current({
+				severity: 'success',
+				text: `Order #${data.orderId} is ready.${tablePart}`,
+				duration: ORDER_ALERT_DURATION_MS,
+				actionLabel: 'View order',
+				onAction: () => routerRef.current.push(path),
+			})
+		}
 
-			const onOrderCompleted = (data: unknown) => {
-				if (!isOrderCompletedPayload(data)) return
-				const tablePart = data.table != null ? ` Table ${data.table}.` : ''
-				invalidateOrderQueries(queryClient, data.orderId)
-				if (role !== UserRole.WAITER) return
-				const path = ROUTES.PRIVATE.WAITER.ORDERS_WAITER_ID(data.orderId)
-				showAlertRef.current({
-					severity: 'success',
-					text: `Order #${data.orderId} is ready.${tablePart}`,
-					duration: ORDER_ALERT_DURATION_MS,
-					actionLabel: 'View order',
-					onAction: () => routerRef.current.push(path),
-				})
-			}
+		socket.on(SOCKET_EVENTS.ORDER_UPDATED, onOrderUpdated)
+		if (role === UserRole.COOK) socket.on(SOCKET_EVENTS.NEW_ORDER, onNewOrder)
+		if (role === UserRole.WAITER)
+			socket.on(SOCKET_EVENTS.ORDER_COMPLETED, onOrderCompleted)
 
-			socket.on(SOCKET_EVENTS.ORDER_UPDATED, onOrderUpdated)
-			if (role === UserRole.COOK) socket.on(SOCKET_EVENTS.NEW_ORDER, onNewOrder)
-			if (role === UserRole.WAITER)
-				socket.on(SOCKET_EVENTS.ORDER_COMPLETED, onOrderCompleted)
-
-			if (cancelled) {
-				socket.off(SOCKET_EVENTS.ORDER_UPDATED, onOrderUpdated)
-				if (role === UserRole.COOK)
-					socket.off(SOCKET_EVENTS.NEW_ORDER, onNewOrder)
-				if (role === UserRole.WAITER)
-					socket.off(SOCKET_EVENTS.ORDER_COMPLETED, onOrderCompleted)
-				disconnectSocket(socket)
-				if (socketRef.current === socket) socketRef.current = null
-				if (pendingSocketRef.current === socket) pendingSocketRef.current = null
-				return
-			}
-
-			pendingSocketRef.current = null
-		})()
+		pendingSocketRef.current = null
 
 		return () => {
-			cancelled = true
-			disconnectSocket(socketRef.current)
-			socketRef.current = null
-			disconnectSocket(pendingSocketRef.current)
-			pendingSocketRef.current = null
+			socket.off(SOCKET_EVENTS.ORDER_UPDATED, onOrderUpdated)
+			if (role === UserRole.COOK)
+				socket.off(SOCKET_EVENTS.NEW_ORDER, onNewOrder)
+			if (role === UserRole.WAITER)
+				socket.off(SOCKET_EVENTS.ORDER_COMPLETED, onOrderCompleted)
+			disconnectSocket(socket)
+			if (socketRef.current === socket) socketRef.current = null
+			if (pendingSocketRef.current === socket) pendingSocketRef.current = null
 		}
 	}, [hydrated, isAuth, userRole, queryClient])
 

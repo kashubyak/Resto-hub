@@ -6,14 +6,12 @@ import {
 	startNetworkRequest,
 	updateNetworkProgress,
 } from '@/hooks/useNetworkProgress'
-import { getSupabaseClient } from '@/lib/supabase/client'
 import { useAlertStore } from '@/store/alert.store'
 import type { CustomAxiosRequestConfig } from '@/types/axios.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import type { AxiosProgressEvent } from 'axios'
 import { handleSessionInvalid } from '../auth-helpers'
 import { getRetryAfter, parseBackendError } from '../errorHandler'
-import Cookies from 'js-cookie'
 import {
 	getIsRefreshing,
 	processQueue,
@@ -26,7 +24,7 @@ import { getGlobalShowAlert } from './globalAlert'
 const MAX_REFRESH_ATTEMPTS = 3
 const REFRESH_RETRY_DELAY_MS = 500
 
-api.interceptors.request.use(async (config) => {
+api.interceptors.request.use((config) => {
 	const requestId = startNetworkRequest(config.url ?? 'unknown')
 	config.headers['X-Request-ID'] = requestId
 
@@ -39,21 +37,6 @@ api.interceptors.request.use(async (config) => {
 	}
 
 	config.withCredentials = true
-
-	if (typeof window !== 'undefined') {
-		try {
-			const token = Cookies.get(AUTH.TOKEN)
-			if (token) {
-				config.headers.Authorization = `Bearer ${token}`
-			} else {
-				const {
-					data: { session },
-				} = await getSupabaseClient().auth.getSession()
-				if (session?.access_token)
-					config.headers.Authorization = `Bearer ${session.access_token}`
-			}
-		} catch {}
-	}
 
 	return config
 })

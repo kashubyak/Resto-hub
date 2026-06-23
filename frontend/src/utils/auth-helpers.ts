@@ -11,6 +11,12 @@ import Cookies from 'js-cookie'
 
 const AUTH_STORAGE_KEY = 'user-storage'
 
+export function hasBackendSession(): boolean {
+	return (
+		typeof window !== 'undefined' && Cookies.get(AUTH.AUTH_STATUS) === 'true'
+	)
+}
+
 export function handleSessionInvalid(options?: {
 	showExpiredAlert?: boolean
 }): void {

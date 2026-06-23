@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { PrismaService } from 'prisma/prisma.service'
+import { AuthModule } from '../auth/auth.module'
 import { TableModule } from '../table/table.module'
 import { NotificationsGateway } from './gateway/notification.gateway'
 import { OrderController } from './order.controller'
@@ -14,6 +15,6 @@ import { OrderRepository } from './repository/order.repository'
 		PrismaService,
 		NotificationsGateway,
 	],
-	imports: [TableModule],
+	imports: [TableModule, AuthModule],
 })
 export class OrderModule {}

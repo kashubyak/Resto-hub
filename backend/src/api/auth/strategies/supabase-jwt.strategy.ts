@@ -5,11 +5,10 @@ import {
 	Logger,
 	UnauthorizedException,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { Reflector } from '@nestjs/core'
 import { Request } from 'express'
-import { createRemoteJWKSet, jwtVerify } from 'jose'
 import { PrismaService } from 'prisma/prisma.service'
+import { SupabaseTokenVerifierService } from 'src/common/auth/supabase-token-verifier.service'
 import { companyIdFromSubdomain, IS_PUBLIC_KEY } from 'src/common/constants'
 import { IRequestWithCompanyId } from 'src/common/interface/request.interface'
 import { IAuthenticatedUser } from '../interfaces/user.interface'
@@ -17,18 +16,12 @@ import { IAuthenticatedUser } from '../interfaces/user.interface'
 @Injectable()
 export class SupabaseJwtStrategy implements CanActivate {
 	private readonly logger = new Logger(SupabaseJwtStrategy.name)
-	private readonly jwks: ReturnType<typeof createRemoteJWKSet>
 
 	constructor(
-		configService: ConfigService,
+		private readonly tokenVerifier: SupabaseTokenVerifierService,
 		private readonly prisma: PrismaService,
 		private readonly reflector: Reflector,
-	) {
-		const supabaseUrl = configService.getOrThrow<string>('SUPABASE_URL')
-		this.jwks = createRemoteJWKSet(
-			new URL(`${supabaseUrl}/auth/v1/.well-known/jwks.json`),
-		)
-	}
+	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -50,9 +43,7 @@ export class SupabaseJwtStrategy implements CanActivate {
 
 		let sub: string
 		try {
-			const { payload } = await jwtVerify(token, this.jwks)
-			sub = payload.sub as string
-			if (!sub) throw new Error('Missing sub')
+			;({ sub } = await this.tokenVerifier.verifyAccessToken(token))
 		} catch {
 			this.logger.warn('AUTH_INVALID_TOKEN')
 			throw new UnauthorizedException('AUTH_INVALID_TOKEN')

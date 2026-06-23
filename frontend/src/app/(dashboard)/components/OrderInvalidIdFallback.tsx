@@ -35,7 +35,10 @@ export function OrderInvalidIdFallback({
 						Go back
 					</button>
 				) : (
-					<Link href={listHref} className="text-sm text-primary hover:underline">
+					<Link
+						href={listHref}
+						className="text-sm text-primary hover:underline"
+					>
 						{listLabel}
 					</Link>
 				)}
