@@ -1,14 +1,20 @@
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
+import {
+	isOrderDetailQueryKey,
+	normalizeOrderId,
+} from '@/utils/patchOrderStatusInCache'
 import type { QueryClient } from '@tanstack/react-query'
 
 export function invalidateOrderQueries(
 	queryClient: QueryClient,
-	orderId?: number,
+	orderId?: number | string,
 ) {
-	if (orderId != null)
+	if (orderId != null) {
+		const id = normalizeOrderId(orderId)
 		void queryClient.invalidateQueries({
-			queryKey: ORDER_QUERY_KEY.DETAIL(orderId),
+			predicate: (q) => isOrderDetailQueryKey(q.queryKey, id),
 		})
+	}
 
 	void queryClient.invalidateQueries({
 		queryKey: [ORDER_QUERY_KEY.LIST_ACTIVE],

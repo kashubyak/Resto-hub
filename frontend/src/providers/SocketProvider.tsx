@@ -95,9 +95,10 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 
 			const onOrderUpdated = (data: unknown) => {
 				if (!isOrderUpdatedPayload(data)) return
+				const orderId = Number(data.orderId)
 				if (isOrderStatus(data.status))
-					patchOrderStatusInCache(queryClient, data.orderId, data.status)
-				invalidateOrderQueries(queryClient, data.orderId)
+					patchOrderStatusInCache(queryClient, orderId, data.status)
+				invalidateOrderQueries(queryClient, orderId)
 			}
 
 			const onNewOrder = (data: unknown) => {
