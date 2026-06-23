@@ -2,15 +2,16 @@
 
 import { orderStatusConfig } from '@/app/(dashboard)/orders-waiter/orderStatusConfig'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
+import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
-import { cancelOrderService } from '@/services/order/cancel-order.service'
 import { getOrderByIdService } from '@/services/order/get-order-by-id.service'
-import { updateOrderStatusService } from '@/services/order/update-order-status.service'
-import type { OrderStatus } from '@/types/order.interface'
 import type { IAxiosError } from '@/types/error.interface'
+import type { OrderUpdateStatusVariables } from '@/types/mutation.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { useAlert } from '@/providers/AlertContext'
 import { useAuthStore } from '@/store/auth.store'
+import { useRegisteredMutation } from '@/hooks/useRegisteredMutation'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
 	AlertCircle,
 	ArrowLeft,
@@ -27,7 +28,6 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 interface IOrderWaiterDetailViewProps {
 	orderId: number
@@ -62,8 +62,8 @@ export function OrderWaiterDetailView({
 		})
 	}
 
-	const cancelMutation = useMutation({
-		mutationFn: () => cancelOrderService(orderId),
+	const cancelMutation = useRegisteredMutation<unknown, Error, number>({
+		mutationKey: MUTATION_KEY.ORDER.CANCEL,
 		onSuccess: async () => {
 			showSuccess('Order canceled')
 			setShowCancelConfirm(false)
@@ -76,10 +76,13 @@ export function OrderWaiterDetailView({
 			showError(parseBackendError(err as unknown as IAxiosError).join('\n')),
 	})
 
-	const statusMutation = useMutation({
-		mutationFn: (status: OrderStatus) =>
-			updateOrderStatusService(orderId, { status }),
-		onSuccess: async (_, status) => {
+	const statusMutation = useRegisteredMutation<
+		unknown,
+		Error,
+		OrderUpdateStatusVariables
+	>({
+		mutationKey: MUTATION_KEY.ORDER.UPDATE_STATUS,
+		onSuccess: async (_, { status }) => {
 			showSuccess(
 				status === 'DELIVERED' ? 'Marked as delivered' : 'Order finished',
 			)
@@ -458,7 +461,12 @@ export function OrderWaiterDetailView({
 								{canDeliver && (
 									<button
 										type="button"
-										onClick={() => statusMutation.mutate('DELIVERED')}
+										onClick={() =>
+											statusMutation.mutate({
+												orderId,
+												status: 'DELIVERED',
+											})
+										}
 										disabled={actionsDisabled}
 										title={
 											canPerformActions ? undefined : 'Waiter role required'
@@ -474,7 +482,12 @@ export function OrderWaiterDetailView({
 								{canFinish && (
 									<button
 										type="button"
-										onClick={() => statusMutation.mutate('FINISHED')}
+										onClick={() =>
+											statusMutation.mutate({
+												orderId,
+												status: 'FINISHED',
+											})
+										}
 										disabled={actionsDisabled}
 										title={
 											canPerformActions ? undefined : 'Waiter role required'
@@ -695,7 +708,7 @@ export function OrderWaiterDetailView({
 							</button>
 							<button
 								type="button"
-								onClick={() => cancelMutation.mutate()}
+								onClick={() => cancelMutation.mutate(orderId)}
 								disabled={actionLoading}
 								className="flex-1 flex items-center justify-center gap-2 px-4 h-10 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
 							>

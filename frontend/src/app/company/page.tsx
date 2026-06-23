@@ -7,21 +7,20 @@ import { UploadImage } from '@/components/elements/UploadImage'
 import { Button } from '@/components/ui/Button'
 import { RoleGuard } from '@/components/ui/RoleGuard'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
+import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
 import { COMPANY_QUERY_KEY } from '@/constants/query-keys.constant'
 import { companyQueryKey, useCompanySettings } from '@/hooks/useCompanySettings'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { useAlert } from '@/providers/AlertContext'
 import { useAuth } from '@/providers/AuthContext'
-import { deleteCompanyService } from '@/services/company/delete-company.service'
 import { getCompanyService } from '@/services/company/get-company.service'
-import {
-	buildUpdateCompanyFormData,
-	updateCompanyService,
-} from '@/services/company/update-company.service'
+import type { IUpdateCompanyFormPayload } from '@/services/company/update-company.service'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import { CompanyNameValidation } from '@/validation/register.validation'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { CompanyUpdateVariables } from '@/types/mutation.interface'
+import { useRegisteredMutation } from '@/hooks/useRegisteredMutation'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Building2, Loader2, MapPin, Save, Trash2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -169,8 +168,12 @@ export default function CompanyPage() {
 		[setValue],
 	)
 
-	const updateMutation = useMutation({
-		mutationFn: (formData: FormData) => updateCompanyService(formData),
+	const updateMutation = useRegisteredMutation<
+		unknown,
+		Error,
+		CompanyUpdateVariables
+	>({
+		mutationKey: MUTATION_KEY.COMPANY.UPDATE,
 		onSuccess: () => {
 			void queryClient.invalidateQueries({
 				queryKey: [COMPANY_QUERY_KEY.CURRENT],
@@ -184,8 +187,8 @@ export default function CompanyPage() {
 		},
 	})
 
-	const deleteMutation = useMutation({
-		mutationFn: deleteCompanyService,
+	const deleteMutation = useRegisteredMutation({
+		mutationKey: MUTATION_KEY.COMPANY.DELETE,
 		onSuccess: () => {
 			void logout()
 		},
@@ -203,14 +206,14 @@ export default function CompanyPage() {
 			return
 		}
 		setLocationError(null)
-		const formData = buildUpdateCompanyFormData({
+		const payload: IUpdateCompanyFormPayload = {
 			name: values.name.trim(),
 			address: (values.address.trim() || location.address).trim(),
 			latitude: location.lat,
 			longitude: location.lng,
 			logoFile: logoFile ?? undefined,
-		})
-		updateMutation.mutate(formData)
+		}
+		updateMutation.mutate(payload)
 	})
 
 	const logoDisplaySource = logoPreview ?? company?.logoUrl ?? null

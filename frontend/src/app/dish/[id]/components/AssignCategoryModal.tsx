@@ -1,14 +1,17 @@
 'use client'
 
 import { DISHES_QUERY_KEY } from '@/constants/query-keys.constant'
+import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
 import { useAlert } from '@/providers/AlertContext'
 import { getCategoriesService } from '@/services/category/get-categories.service'
-import { updateDishService } from '@/services/dish/update-dish.service'
 import type { ICategoryWithDishes } from '@/types/category.interface'
 import type { IDish } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import { parseBackendError } from '@/utils/errorHandler'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { ApiResponse } from '@/types/api.interface'
+import type { DishAssignCategoryVariables } from '@/types/mutation.interface'
+import { useRegisteredMutation } from '@/hooks/useRegisteredMutation'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, Search, Tag, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -71,9 +74,12 @@ export function AssignCategoryModal({
 		},
 	)
 
-	const assignMutation = useMutation({
-		mutationFn: (categoryId: number) =>
-			updateDishService({ id: dishId, categoryId }),
+	const assignMutation = useRegisteredMutation<
+		ApiResponse<IDish>,
+		Error,
+		DishAssignCategoryVariables
+	>({
+		mutationKey: MUTATION_KEY.DISH.ASSIGN_CATEGORY,
 		onSuccess: (response) => {
 			const updatedDish = response.data
 			onAssigned(updatedDish)
@@ -91,9 +97,9 @@ export function AssignCategoryModal({
 
 	const handleSelect = useCallback(
 		(category: ICategoryWithDishes) => {
-			assignMutation.mutate(category.id)
+			assignMutation.mutate({ id: dishId, categoryId: category.id })
 		},
-		[assignMutation],
+		[assignMutation, dishId],
 	)
 
 	if (!open) return null

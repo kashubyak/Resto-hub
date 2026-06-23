@@ -1,12 +1,14 @@
 'use client'
 
 import { useAlert } from '@/providers/AlertContext'
-import { createTableService } from '@/services/table/create-table.service'
-import { deleteTableService } from '@/services/table/delete-table.service'
 import { getTablesService } from '@/services/table/get-tables.service'
-import { updateTableService } from '@/services/table/update-table.service'
 import type { ITable } from '@/types/table.interface'
 import type { IAxiosError } from '@/types/error.interface'
+import type {
+	TableCreateVariables,
+	TableToggleActiveVariables,
+	TableUpdateVariables,
+} from '@/types/mutation.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import {
 	ArrowUpDown,
@@ -20,6 +22,7 @@ import {
 	Users,
 } from 'lucide-react'
 import { ENTITY_FOCUS_QUERY_PARAM } from '@/constants/pages.constant'
+import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
 import { useSearchParams } from 'next/navigation'
 import {
 	Suspense,
@@ -29,7 +32,8 @@ import {
 	useRef,
 	useState,
 } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRegisteredMutation } from '@/hooks/useRegisteredMutation'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { TableModal } from './components/TableModal'
 import { TableEmptyState } from './components/TableEmptyState'
 import { TableNoResults } from './components/TableNoResults'
@@ -95,9 +99,12 @@ function TablesPageContent() {
 		setIsModalOpen(true)
 	}, [focusIdParam, tables, isLoadingTables])
 
-	const createMutation = useMutation({
-		mutationFn: (data: { number: number; seats: number }) =>
-			createTableService(data),
+	const createMutation = useRegisteredMutation<
+		unknown,
+		Error,
+		TableCreateVariables
+	>({
+		mutationKey: MUTATION_KEY.TABLE.CREATE,
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: ['tables'] })
 			showSuccess('Table created successfully')
@@ -108,9 +115,12 @@ function TablesPageContent() {
 			showError(parseBackendError(err as unknown as IAxiosError).join('\n')),
 	})
 
-	const updateMutation = useMutation({
-		mutationFn: (data: { id: number; number: number; seats: number }) =>
-			updateTableService(data.id, { number: data.number, seats: data.seats }),
+	const updateMutation = useRegisteredMutation<
+		unknown,
+		Error,
+		TableUpdateVariables
+	>({
+		mutationKey: MUTATION_KEY.TABLE.UPDATE,
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: ['tables'] })
 			showSuccess('Table updated successfully')
@@ -121,9 +131,12 @@ function TablesPageContent() {
 			showError(parseBackendError(err as unknown as IAxiosError).join('\n')),
 	})
 
-	const toggleActiveMutation = useMutation({
-		mutationFn: (data: { id: number; active: boolean }) =>
-			updateTableService(data.id, { active: data.active }),
+	const toggleActiveMutation = useRegisteredMutation<
+		unknown,
+		Error,
+		TableToggleActiveVariables
+	>({
+		mutationKey: MUTATION_KEY.TABLE.TOGGLE_ACTIVE,
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: ['tables'] })
 			setActiveMenuId(null)
@@ -132,8 +145,8 @@ function TablesPageContent() {
 			showError(parseBackendError(err as unknown as IAxiosError).join('\n')),
 	})
 
-	const deleteMutation = useMutation({
-		mutationFn: (id: number) => deleteTableService(id),
+	const deleteMutation = useRegisteredMutation<unknown, Error, number>({
+		mutationKey: MUTATION_KEY.TABLE.DELETE,
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: ['tables'] })
 			showSuccess('Table deleted successfully')

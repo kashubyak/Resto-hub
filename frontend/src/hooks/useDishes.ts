@@ -1,24 +1,23 @@
 'use client'
 
 import { ROUTES } from '@/constants/pages.constant'
+import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
 import { DISHES_QUERY_KEY, LIMIT } from '@/constants/query-keys.constant'
 import { useAlert } from '@/providers/AlertContext'
-import { deleteDishFromCategory } from '@/services/dish/delete-dish-category.service'
-import { deleteDish } from '@/services/dish/delete-dish.service'
 import { getDish } from '@/services/dish/get-dish.service'
 import { getAllDishes } from '@/services/dish/get-dishes.service'
-import type { IDish, IDishListResponse } from '@/types/dish.interface'
+import type { IDish, IDishListResponse, IDeleteDishResponse } from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import type { FilterValues } from '@/types/filter.interface'
 import { parseBackendError } from '@/utils/errorHandler'
 import {
 	useInfiniteQuery,
-	useMutation,
 	useQuery,
 	useQueryClient,
 	type InfiniteData,
 	type QueryClient,
 } from '@tanstack/react-query'
+import { useRegisteredMutation } from '@/hooks/useRegisteredMutation'
 import { useRouter } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
 
@@ -109,11 +108,12 @@ export const useDishes = (
 		[showError],
 	)
 
-	const deleteDishMutation = useMutation({
-		mutationFn: async (id: number) => {
-			const response = await deleteDish(id)
-			return response.data
-		},
+	const deleteDishMutation = useRegisteredMutation<
+		IDeleteDishResponse,
+		Error,
+		number
+	>({
+		mutationKey: MUTATION_KEY.DISH.DELETE,
 		onSuccess: handleDeleteDishSuccess,
 		onError: handleDeleteDishError,
 	})
@@ -143,11 +143,12 @@ export const useDishes = (
 		[showError],
 	)
 
-	const deleteCategoryFromDishMutation = useMutation({
-		mutationFn: async (id: number) => {
-			const response = await deleteDishFromCategory(id)
-			return response.data
-		},
+	const deleteCategoryFromDishMutation = useRegisteredMutation<
+		IDish,
+		Error,
+		number
+	>({
+		mutationKey: MUTATION_KEY.DISH.DELETE_FROM_CATEGORY,
 		onSuccess: handleDeleteDishFromCategorySuccess,
 		onError: handleDeleteDishFromCategoryError,
 	})

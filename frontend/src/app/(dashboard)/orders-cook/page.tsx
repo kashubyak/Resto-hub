@@ -2,13 +2,14 @@
 
 import { orderStatusConfig } from '@/app/(dashboard)/orders-waiter/orderStatusConfig'
 import { ROUTES } from '@/constants/pages.constant'
+import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
-import { assignOrderService } from '@/services/order/assign-order.service'
 import { getCookMyOrdersService } from '@/services/order/get-cook-my-orders.service'
 import { getFreeOrdersService } from '@/services/order/get-free-orders.service'
-import { updateOrderStatusService } from '@/services/order/update-order-status.service'
 import type { IOrderSummary, OrderStatus } from '@/types/order.interface'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { OrderUpdateStatusVariables } from '@/types/mutation.interface'
+import { useRegisteredMutation } from '@/hooks/useRegisteredMutation'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
 	AlertCircle,
 	CheckCircle2,
@@ -104,8 +105,8 @@ export default function OrdersCookPage() {
 		})
 	}
 
-	const takeMutation = useMutation({
-		mutationFn: (orderId: number) => assignOrderService(orderId),
+	const takeMutation = useRegisteredMutation<unknown, Error, number>({
+		mutationKey: MUTATION_KEY.ORDER.ASSIGN,
 		onSettled: () => {
 			setAssigningOrderId(null)
 			setShowConfirmModal(false)
@@ -114,9 +115,12 @@ export default function OrdersCookPage() {
 		},
 	})
 
-	const completeMutation = useMutation({
-		mutationFn: (orderId: number) =>
-			updateOrderStatusService(orderId, { status: 'COMPLETE' }),
+	const completeMutation = useRegisteredMutation<
+		unknown,
+		Error,
+		OrderUpdateStatusVariables
+	>({
+		mutationKey: MUTATION_KEY.ORDER.UPDATE_STATUS,
 		onSettled: () => {
 			setAssigningOrderId(null)
 			setShowConfirmModal(false)
@@ -181,7 +185,11 @@ export default function OrdersCookPage() {
 		setAssigningOrderId(confirmAction.orderId)
 		if (confirmAction.type === 'take')
 			takeMutation.mutate(confirmAction.orderId)
-		else completeMutation.mutate(confirmAction.orderId)
+		else
+			completeMutation.mutate({
+				orderId: confirmAction.orderId,
+				status: 'COMPLETE',
+			})
 	}
 
 	const renderOrderCard = (order: IOrderSummary, isFree: boolean) => {

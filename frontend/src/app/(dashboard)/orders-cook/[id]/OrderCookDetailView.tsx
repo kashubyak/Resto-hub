@@ -2,12 +2,13 @@
 
 import { orderStatusConfig } from '@/app/(dashboard)/orders-waiter/orderStatusConfig'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
+import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
-import { assignOrderService } from '@/services/order/assign-order.service'
 import { getOrderByIdService } from '@/services/order/get-order-by-id.service'
-import { updateOrderStatusService } from '@/services/order/update-order-status.service'
 import { useAuthStore } from '@/store/auth.store'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { OrderUpdateStatusVariables } from '@/types/mutation.interface'
+import { useRegisteredMutation } from '@/hooks/useRegisteredMutation'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
 	AlertCircle,
 	ArrowLeft,
@@ -55,13 +56,17 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 		})
 	}
 
-	const takeMutation = useMutation({
-		mutationFn: () => assignOrderService(orderId),
+	const takeMutation = useRegisteredMutation<unknown, Error, number>({
+		mutationKey: MUTATION_KEY.ORDER.ASSIGN,
 		onSuccess: invalidateCook,
 	})
 
-	const completeMutation = useMutation({
-		mutationFn: () => updateOrderStatusService(orderId, { status: 'COMPLETE' }),
+	const completeMutation = useRegisteredMutation<
+		unknown,
+		Error,
+		OrderUpdateStatusVariables
+	>({
+		mutationKey: MUTATION_KEY.ORDER.UPDATE_STATUS,
 		onSuccess: () => {
 			invalidateCook()
 			router.push(ROUTES.PRIVATE.COOK.ORDERS_COOK)
@@ -430,7 +435,7 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 								{canTakeOrder && (
 									<button
 										type="button"
-										onClick={() => takeMutation.mutate()}
+										onClick={() => takeMutation.mutate(orderId)}
 										disabled={actionsDisabled}
 										title={canPerformActions ? undefined : 'Cook role required'}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
@@ -446,7 +451,12 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 								{canComplete && (
 									<button
 										type="button"
-										onClick={() => completeMutation.mutate()}
+										onClick={() =>
+											completeMutation.mutate({
+												orderId,
+												status: 'COMPLETE',
+											})
+										}
 										disabled={actionsDisabled}
 										title={canPerformActions ? undefined : 'Cook role required'}
 										className="flex items-center gap-2 px-4 h-10 rounded-xl bg-success text-white hover:bg-success-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
