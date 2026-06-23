@@ -95,10 +95,11 @@ export const IngredientsSection = ({
 	const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
 		e.stopPropagation()
 		setDraggedIndex(index)
+		const target = e.currentTarget as HTMLElement
 		e.dataTransfer.effectAllowed = 'move'
 		e.dataTransfer.setData('application/ingredient-drag', 'true')
 		setTimeout(() => {
-			;(e.currentTarget as HTMLElement).style.opacity = '0.5'
+			if (target) target.style.opacity = '0.5'
 		}, 0)
 	}, [])
 

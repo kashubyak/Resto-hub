@@ -92,8 +92,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 					persister: queryPersister,
 					maxAge: 24 * 60 * 60 * 1000,
 					dehydrateOptions: {
-						shouldDehydrateMutation: (mutation) =>
-							mutation.state.isPaused,
+						shouldDehydrateMutation: (mutation) => mutation.state.isPaused,
 					},
 				}}
 				onSuccess={() => {

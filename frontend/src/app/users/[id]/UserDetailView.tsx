@@ -1,6 +1,7 @@
 'use client'
 
 import { NotFound } from '@/components/ui/NotFound'
+import { FormSelect } from '@/components/ui/FormSelect'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { USERS_QUERY_KEY } from '@/constants/query-keys.constant'
 import { useUsers } from '@/hooks/useUsers'
@@ -332,20 +333,23 @@ export const UserDetailView = ({ idParam }: UserDetailViewProps) => {
 													{u.role}
 												</span>
 											) : (
-												<select
+												<FormSelect
+													label="Role"
 													value={formData.role}
-													onChange={(e) =>
+													options={[
+														{ value: UserRole.WAITER, label: 'WAITER' },
+														{ value: UserRole.COOK, label: 'COOK' },
+														{ value: UserRole.ADMIN, label: 'ADMIN' },
+													]}
+													onChange={(value) =>
 														setFormData({
 															...formData,
-															role: e.target.value as EditableRole,
+															role: value as EditableRole,
 														})
 													}
-													className="px-3 py-1 bg-input border border-border rounded-lg text-sm font-semibold focus:outline-none focus:border-primary/50"
-												>
-													<option value={UserRole.WAITER}>WAITER</option>
-													<option value={UserRole.COOK}>COOK</option>
-													<option value={UserRole.ADMIN}>ADMIN</option>
-												</select>
+													size="small"
+													showLabel={false}
+												/>
 											)
 										) : (
 											<span

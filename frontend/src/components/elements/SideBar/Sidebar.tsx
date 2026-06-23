@@ -3,11 +3,13 @@
 import { ThemeSelector } from '@/components/ui/ThemeSelector'
 import {
 	DEFAULT_COMPANY_ICON,
+	ROLE_PANEL_LABELS,
 	SIDEBAR_SUBTITLE,
 } from '@/constants/pages.constant'
 import { useCompanySettings } from '@/hooks/useCompanySettings'
 import { useUserRoutes } from '@/hooks/useUserRoutes'
 import { useAuth } from '@/providers/AuthContext'
+import { useAuthStore } from '@/store/auth.store'
 import { THEME_PREFERENCE } from '@/constants/theme.constant'
 import { useTheme } from '@/providers/ThemeContext'
 import {
@@ -46,6 +48,8 @@ const SidebarComponent = function Sidebar({
 	const { routes } = useUserRoutes()
 	const pathname = usePathname()
 	const { user, logout } = useAuth()
+	const userRole = useAuthStore((s) => s.userRole)
+	const panelLabel = userRole ? ROLE_PANEL_LABELS[userRole] : SIDEBAR_SUBTITLE
 	const { preference } = useTheme()
 	const { company } = useCompanySettings(!!user)
 
@@ -141,7 +145,7 @@ const SidebarComponent = function Sidebar({
 											{companyName || ' '}
 										</h1>
 										<p className="text-xs text-muted-foreground">
-											{SIDEBAR_SUBTITLE}
+											{panelLabel}
 										</p>
 									</div>
 								</div>

@@ -6,7 +6,11 @@ import { DISHES_QUERY_KEY, LIMIT } from '@/constants/query-keys.constant'
 import { useAlert } from '@/providers/AlertContext'
 import { getDish } from '@/services/dish/get-dish.service'
 import { getAllDishes } from '@/services/dish/get-dishes.service'
-import type { IDish, IDishListResponse, IDeleteDishResponse } from '@/types/dish.interface'
+import type {
+	IDish,
+	IDishListResponse,
+	IDeleteDishResponse,
+} from '@/types/dish.interface'
 import type { IAxiosError } from '@/types/error.interface'
 import type { FilterValues } from '@/types/filter.interface'
 import { parseBackendError } from '@/utils/errorHandler'

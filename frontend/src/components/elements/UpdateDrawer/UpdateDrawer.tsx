@@ -1,5 +1,7 @@
 'use client'
 
+import { Z_INDEX } from '@/constants/ui.constant'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { BasicInformationSection } from '@/app/dish/components/modal/BasicInformationSection'
 import { ImageUploadSection } from '@/app/dish/components/modal/ImageUploadSection'
 import { IngredientsSection } from '@/app/dish/components/modal/IngredientsSection'
@@ -9,7 +11,7 @@ import { useUpdateDish } from '@/hooks/useUpdateDish'
 import type { IDish } from '@/types/dish.interface'
 import type { UpdateSectionConfig } from '@/types/update-field.interface'
 import { Edit, RotateCcw, X } from 'lucide-react'
-import { memo, useCallback, useEffect } from 'react'
+import { memo, useCallback } from 'react'
 
 interface UpdateDrawerProps {
 	open: boolean
@@ -41,13 +43,7 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 		trigger,
 	} = useUpdateDish(dishData, onClose)
 
-	useEffect(() => {
-		if (open) document.body.style.overflow = 'hidden'
-		else document.body.style.overflow = ''
-		return () => {
-			document.body.style.overflow = ''
-		}
-	}, [open])
+	useBodyScrollLock(open)
 
 	const handleReset = useCallback(() => {
 		if (dishData) {
@@ -142,7 +138,10 @@ const UpdateDrawerComponent: React.FC<UpdateDrawerProps> = ({
 	if (!open) return null
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-start justify-end">
+		<div
+			className="fixed inset-0 flex items-start justify-end"
+			style={{ zIndex: Z_INDEX.modal }}
+		>
 			<button
 				type="button"
 				aria-label="Close drawer"

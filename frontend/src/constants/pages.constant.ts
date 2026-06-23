@@ -23,6 +23,12 @@ export enum UserRole {
 	WAITER = 'WAITER',
 }
 
+export const ROLE_PANEL_LABELS: Record<UserRole, string> = {
+	[UserRole.ADMIN]: 'Admin Panel',
+	[UserRole.COOK]: 'Cook Panel',
+	[UserRole.WAITER]: 'Waiter Panel',
+}
+
 /** Query param to open a list page focused on one entity (category, table). */
 export const ENTITY_FOCUS_QUERY_PARAM = 'id' as const
 

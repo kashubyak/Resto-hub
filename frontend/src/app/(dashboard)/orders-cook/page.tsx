@@ -1,6 +1,7 @@
 'use client'
 
 import { orderStatusConfig } from '@/app/(dashboard)/orders-waiter/orderStatusConfig'
+import { Modal } from '@/components/ui/Modal'
 import { ROUTES } from '@/constants/pages.constant'
 import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
@@ -492,23 +493,18 @@ export default function OrdersCookPage() {
 				</div>
 			)}
 
-			{showConfirmModal && confirmAction && (
-				<div
-					role="presentation"
-					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-					onClick={() => {
-						if (assigningOrderId === null) {
-							setShowConfirmModal(false)
-							setConfirmAction(null)
-						}
-					}}
-				>
-					<div
-						role="dialog"
-						className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl"
-						onClick={(e) => e.stopPropagation()}
-						onKeyDown={(e) => e.stopPropagation()}
-					>
+			<Modal
+				isOpen={showConfirmModal && confirmAction !== null}
+				onClose={() => {
+					if (assigningOrderId === null) {
+						setShowConfirmModal(false)
+						setConfirmAction(null)
+					}
+				}}
+				disableClose={assigningOrderId !== null}
+			>
+				{confirmAction && (
+					<div className="p-6">
 						<div className="flex items-start gap-4 mb-6">
 							<div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
 								<AlertCircle className="w-6 h-6 text-primary" />
@@ -565,8 +561,8 @@ export default function OrdersCookPage() {
 							</button>
 						</div>
 					</div>
-				</div>
-			)}
+				)}
+			</Modal>
 		</div>
 	)
 }

@@ -1,7 +1,8 @@
 'use client'
 
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { Loader2, Trash2 } from 'lucide-react'
-import { memo, useEffect } from 'react'
+import { memo } from 'react'
 
 interface DeleteCompanyDialogProps {
 	isOpen: boolean
@@ -22,14 +23,7 @@ const DeleteCompanyDialogComponent = ({
 		if (!isLoading) onClose()
 	}
 
-	useEffect(() => {
-		if (!isOpen) return
-		const prev = document.body.style.overflow
-		document.body.style.overflow = 'hidden'
-		return () => {
-			document.body.style.overflow = prev
-		}
-	}, [isOpen])
+	useBodyScrollLock(isOpen)
 
 	if (!isOpen) return null
 

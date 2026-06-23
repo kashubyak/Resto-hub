@@ -1,6 +1,7 @@
 'use client'
 
 import { orderStatusConfig } from '@/app/(dashboard)/orders-waiter/orderStatusConfig'
+import { Modal } from '@/components/ui/Modal'
 import { ROUTES, UserRole } from '@/constants/pages.constant'
 import { MUTATION_KEY } from '@/constants/mutation-keys.constant'
 import { ORDER_QUERY_KEY } from '@/constants/query-keys.constant'
@@ -679,52 +680,54 @@ export function OrderWaiterDetailView({
 				</div>
 			</div>
 
-			{showCancelConfirm && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-					<div className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
-						<div className="flex items-start gap-4 mb-6">
-							<div className="shrink-0 w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center">
-								<AlertCircle className="w-6 h-6 text-destructive" />
-							</div>
-							<div className="flex-1 min-w-0">
-								<h3 className="text-foreground font-semibold mb-1">
-									Cancel Order
-								</h3>
-								<p className="text-sm text-muted-foreground">
-									Are you sure you want to cancel this order? This action cannot
-									be undone.
-								</p>
-							</div>
+			<Modal
+				isOpen={showCancelConfirm}
+				onClose={() => setShowCancelConfirm(false)}
+				disableClose={actionLoading}
+			>
+				<div className="p-6">
+					<div className="flex items-start gap-4 mb-6">
+						<div className="shrink-0 w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center">
+							<AlertCircle className="w-6 h-6 text-destructive" />
 						</div>
-
-						<div className="flex gap-3">
-							<button
-								type="button"
-								onClick={() => setShowCancelConfirm(false)}
-								disabled={actionLoading}
-								className="flex-1 px-4 h-10 rounded-xl bg-input hover:bg-input/80 text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-							>
-								<span className="text-sm font-medium">Keep Order</span>
-							</button>
-							<button
-								type="button"
-								onClick={() => cancelMutation.mutate(orderId)}
-								disabled={actionLoading}
-								className="flex-1 flex items-center justify-center gap-2 px-4 h-10 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-							>
-								{actionLoading ? (
-									<Loader2 className="w-4 h-4 animate-spin" />
-								) : (
-									<>
-										<XCircle className="w-4 h-4" />
-										<span className="text-sm font-medium">Cancel Order</span>
-									</>
-								)}
-							</button>
+						<div className="flex-1 min-w-0">
+							<h3 className="text-foreground font-semibold mb-1">
+								Cancel Order
+							</h3>
+							<p className="text-sm text-muted-foreground">
+								Are you sure you want to cancel this order? This action cannot
+								be undone.
+							</p>
 						</div>
 					</div>
+
+					<div className="flex gap-3">
+						<button
+							type="button"
+							onClick={() => setShowCancelConfirm(false)}
+							disabled={actionLoading}
+							className="flex-1 px-4 h-10 rounded-xl bg-input hover:bg-input/80 text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							<span className="text-sm font-medium">Keep Order</span>
+						</button>
+						<button
+							type="button"
+							onClick={() => cancelMutation.mutate(orderId)}
+							disabled={actionLoading}
+							className="flex-1 flex items-center justify-center gap-2 px-4 h-10 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive-hover transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							{actionLoading ? (
+								<Loader2 className="w-4 h-4 animate-spin" />
+							) : (
+								<>
+									<XCircle className="w-4 h-4" />
+									<span className="text-sm font-medium">Cancel Order</span>
+								</>
+							)}
+						</button>
+					</div>
 				</div>
-			)}
+			</Modal>
 		</div>
 	)
 }
