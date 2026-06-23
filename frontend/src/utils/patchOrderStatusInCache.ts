@@ -47,10 +47,11 @@ function patchOrderInListCaches(
 			(old) => {
 				if (!old?.data?.data) return old
 				const items = old.data.data
-				const idx = items.findIndex((o) => o.id === orderId)
-				if (idx === -1) return old
-				const next = [...items]
-				next[idx] = { ...next[idx], status }
+				const hasOrder = items.some((o) => o.id === orderId)
+				if (!hasOrder) return old
+				const next = items.map((o) =>
+					o.id === orderId ? { ...o, status } : o,
+				)
 				return { ...old, data: { ...old.data, data: next } }
 			},
 		)
@@ -64,10 +65,7 @@ export function patchOrderStatusInCache(
 ): void {
 	queryClient.setQueryData<ApiResponse<IOrderSummary>>(
 		ORDER_QUERY_KEY.DETAIL(orderId),
-		(old) =>
-			old?.data
-				? { ...old, data: { ...old.data, status } }
-				: old,
+		(old) => (old?.data ? { ...old, data: { ...old.data, status } } : old),
 	)
 
 	patchOrderInListCaches(queryClient, orderId, status)
@@ -78,12 +76,15 @@ export function removeOrderFromListCache(
 	orderId: number,
 	listPrefix: string,
 ): void {
-	queryClient.setQueriesData<OrderListCache>({ queryKey: [listPrefix] }, (old) => {
-		if (!old?.data?.data) return old
-		const next = old.data.data.filter((o) => o.id !== orderId)
-		if (next.length === old.data.data.length) return old
-		return { ...old, data: { ...old.data, data: next } }
-	})
+	queryClient.setQueriesData<OrderListCache>(
+		{ queryKey: [listPrefix] },
+		(old) => {
+			if (!old?.data?.data) return old
+			const next = old.data.data.filter((o) => o.id !== orderId)
+			if (next.length === old.data.data.length) return old
+			return { ...old, data: { ...old.data, data: next } }
+		},
+	)
 }
 
 export function syncOrderFromServer(

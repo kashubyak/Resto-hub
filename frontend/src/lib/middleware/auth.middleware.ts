@@ -1,9 +1,13 @@
 import { AUTH } from '@/constants/auth.constant'
-import { ROUTES } from '@/constants/pages.constant'
+import { ROUTES, type UserRole } from '@/constants/pages.constant'
 import { getSubdomainFromHost } from '@/utils/api/subdomain'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { redirectToHome, redirectToLogin, redirectToRoleHome } from './redirects'
+import {
+	redirectToHome,
+	redirectToLogin,
+	redirectToRoleHome,
+} from './redirects'
 import { getRoleForMiddleware } from './access-token-role'
 import { hasRoleAccess } from './role-guards'
 import { isAuthRoute, isPublicRoute } from './route-guards'
@@ -89,8 +93,8 @@ async function handleTokenRefresh(
 
 	if (refreshResult.success) {
 		if (refreshResult.user) {
-			if (!hasRoleAccess(refreshResult.user.role, pathname))
-				return redirectToRoleHome(request, refreshResult.user.role)
+			const role = refreshResult.user.role as UserRole
+			if (!hasRoleAccess(role, pathname)) return redirectToRoleHome(request, role)
 		}
 
 		return forwardCookiesAndContinue(refreshResult)

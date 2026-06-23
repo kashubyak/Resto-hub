@@ -56,11 +56,7 @@ const createOrderStatusOnError =
 
 const createOrderStatusOnSettled =
 	(queryClient: QueryClient) =>
-	(
-		_data: unknown,
-		_error: Error | null,
-		variables: unknown,
-	) => {
+	(_data: unknown, _error: Error | null, variables: unknown) => {
 		const orderId =
 			typeof variables === 'number'
 				? variables

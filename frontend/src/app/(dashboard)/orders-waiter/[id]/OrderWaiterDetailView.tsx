@@ -69,7 +69,7 @@ export function OrderWaiterDetailView({
 		OrderUpdateStatusVariables
 	>({
 		mutationKey: MUTATION_KEY.ORDER.UPDATE_STATUS,
-		onSuccess: async (_, { status }) => {
+		onSuccess: (_, { status }) => {
 			showSuccess(
 				status === 'DELIVERED' ? 'Marked as delivered' : 'Order finished',
 			)

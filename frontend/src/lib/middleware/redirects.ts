@@ -25,7 +25,8 @@ export function redirectToRoleHome(
 	request: NextRequest,
 	role: UserRole,
 ): NextResponse {
-	const destination = ROLE_DEFAULT_ROUTE[role] ?? ROUTES.PRIVATE.SHARED.DASHBOARD
+	const destination =
+		ROLE_DEFAULT_ROUTE[role] ?? ROUTES.PRIVATE.SHARED.DASHBOARD
 	return NextResponse.redirect(new URL(destination, request.url))
 }
 

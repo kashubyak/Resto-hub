@@ -35,7 +35,10 @@ const DeleteCompanyDialogComponent = ({
 					<Trash2 className="w-6 h-6 text-red-500" />
 				</div>
 				<div className="flex-1 min-w-0">
-					<h2 id="delete-company-title" className="text-xl font-bold text-foreground">
+					<h2
+						id="delete-company-title"
+						className="text-xl font-bold text-foreground"
+					>
 						Delete Company
 					</h2>
 					<p className="text-sm text-muted-foreground mt-1">

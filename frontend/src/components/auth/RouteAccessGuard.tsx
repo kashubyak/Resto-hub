@@ -40,7 +40,12 @@ const RouteAccessGuardComponent = ({ children }: RouteAccessGuardProps) => {
 
 	if (protectedRoute && isAuth && isFetchingUser && !userRole) return null
 
-	if (protectedRoute && isAuth && userRole && !hasRoleAccess(userRole, pathname))
+	if (
+		protectedRoute &&
+		isAuth &&
+		userRole &&
+		!hasRoleAccess(userRole, pathname)
+	)
 		return null
 
 	return children
