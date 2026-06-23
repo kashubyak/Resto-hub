@@ -15,6 +15,10 @@ import type {
 	IOrderUpdatedNotificationPayload,
 } from '@/types/socket-notification.interface'
 import { invalidateOrderQueries } from '@/utils/invalidateOrderQueries'
+import {
+	isOrderStatus,
+	patchOrderStatusInCache,
+} from '@/utils/patchOrderStatusInCache'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { memo, useEffect, useRef, type ReactNode } from 'react'
@@ -91,6 +95,8 @@ export const SocketProvider = memo<{ children: ReactNode }>(({ children }) => {
 
 			const onOrderUpdated = (data: unknown) => {
 				if (!isOrderUpdatedPayload(data)) return
+				if (isOrderStatus(data.status))
+					patchOrderStatusInCache(queryClient, data.orderId, data.status)
 				invalidateOrderQueries(queryClient, data.orderId)
 			}
 

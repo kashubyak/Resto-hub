@@ -8,7 +8,7 @@ import { getOrderByIdService } from '@/services/order/get-order-by-id.service'
 import { useAuthStore } from '@/store/auth.store'
 import type { OrderUpdateStatusVariables } from '@/types/mutation.interface'
 import { useRegisteredMutation } from '@/hooks/useRegisteredMutation'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
 	AlertCircle,
 	ArrowLeft,
@@ -27,7 +27,6 @@ import { useRouter } from 'next/navigation'
 
 export function OrderCookDetailView({ orderId }: { orderId: number }) {
 	const router = useRouter()
-	const queryClient = useQueryClient()
 	const userRole = useAuthStore((s) => s.userRole)
 
 	const {
@@ -41,24 +40,8 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 
 	const order = orderRes?.data
 
-	const invalidateCook = () => {
-		void queryClient.invalidateQueries({
-			queryKey: ORDER_QUERY_KEY.DETAIL(orderId),
-		})
-		void queryClient.invalidateQueries({
-			queryKey: [ORDER_QUERY_KEY.LIST_COOK_FREE],
-		})
-		void queryClient.invalidateQueries({
-			queryKey: [ORDER_QUERY_KEY.LIST_COOK_ACTIVE],
-		})
-		void queryClient.invalidateQueries({
-			queryKey: [ORDER_QUERY_KEY.LIST_COOK_HISTORY],
-		})
-	}
-
 	const takeMutation = useRegisteredMutation<unknown, Error, number>({
 		mutationKey: MUTATION_KEY.ORDER.ASSIGN,
-		onSuccess: invalidateCook,
 	})
 
 	const completeMutation = useRegisteredMutation<
@@ -68,7 +51,6 @@ export function OrderCookDetailView({ orderId }: { orderId: number }) {
 	>({
 		mutationKey: MUTATION_KEY.ORDER.UPDATE_STATUS,
 		onSuccess: () => {
-			invalidateCook()
 			router.push(ROUTES.PRIVATE.COOK.ORDERS_COOK)
 		},
 	})

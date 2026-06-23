@@ -12,7 +12,7 @@ import { parseBackendError } from '@/utils/errorHandler'
 import { useAlert } from '@/providers/AlertContext'
 import { useAuthStore } from '@/store/auth.store'
 import { useRegisteredMutation } from '@/hooks/useRegisteredMutation'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
 	AlertCircle,
 	ArrowLeft,
@@ -38,7 +38,6 @@ export function OrderWaiterDetailView({
 	orderId,
 }: IOrderWaiterDetailViewProps) {
 	const router = useRouter()
-	const queryClient = useQueryClient()
 	const { showError, showSuccess } = useAlert()
 	const userRole = useAuthStore((s) => s.userRole)
 	const [showCancelConfirm, setShowCancelConfirm] = useState(false)
@@ -54,24 +53,11 @@ export function OrderWaiterDetailView({
 
 	const order = orderRes?.data ?? null
 
-	const invalidateLists = () => {
-		void queryClient.invalidateQueries({
-			queryKey: [ORDER_QUERY_KEY.LIST_ACTIVE],
-		})
-		void queryClient.invalidateQueries({
-			queryKey: [ORDER_QUERY_KEY.LIST_HISTORY],
-		})
-	}
-
 	const cancelMutation = useRegisteredMutation<unknown, Error, number>({
 		mutationKey: MUTATION_KEY.ORDER.CANCEL,
-		onSuccess: async () => {
+		onSuccess: () => {
 			showSuccess('Order canceled')
 			setShowCancelConfirm(false)
-			invalidateLists()
-			await queryClient.invalidateQueries({
-				queryKey: ORDER_QUERY_KEY.DETAIL(orderId),
-			})
 		},
 		onError: (err) =>
 			showError(parseBackendError(err as unknown as IAxiosError).join('\n')),
@@ -87,10 +73,6 @@ export function OrderWaiterDetailView({
 			showSuccess(
 				status === 'DELIVERED' ? 'Marked as delivered' : 'Order finished',
 			)
-			invalidateLists()
-			await queryClient.invalidateQueries({
-				queryKey: ORDER_QUERY_KEY.DETAIL(orderId),
-			})
 			if (status === 'FINISHED')
 				router.push(ROUTES.PRIVATE.WAITER.ORDERS_WAITER)
 		},

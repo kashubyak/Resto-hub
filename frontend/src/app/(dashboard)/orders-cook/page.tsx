@@ -91,28 +91,12 @@ export default function OrdersCookPage() {
 
 	const loading = freeLoading || myLoading
 
-	const invalidateCookLists = () => {
-		void queryClient.invalidateQueries({
-			queryKey: [ORDER_QUERY_KEY.LIST_COOK_FREE],
-		})
-		void queryClient.invalidateQueries({
-			queryKey: [ORDER_QUERY_KEY.LIST_COOK_ACTIVE],
-		})
-		void queryClient.invalidateQueries({
-			queryKey: [ORDER_QUERY_KEY.LIST_COOK_HISTORY],
-		})
-		void queryClient.invalidateQueries({
-			queryKey: [ORDER_QUERY_KEY.DETAIL_PREFIX],
-		})
-	}
-
 	const takeMutation = useRegisteredMutation<unknown, Error, number>({
 		mutationKey: MUTATION_KEY.ORDER.ASSIGN,
 		onSettled: () => {
 			setAssigningOrderId(null)
 			setShowConfirmModal(false)
 			setConfirmAction(null)
-			invalidateCookLists()
 		},
 	})
 
@@ -126,7 +110,6 @@ export default function OrdersCookPage() {
 			setAssigningOrderId(null)
 			setShowConfirmModal(false)
 			setConfirmAction(null)
-			invalidateCookLists()
 		},
 	})
 
