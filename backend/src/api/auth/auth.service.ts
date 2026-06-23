@@ -25,7 +25,7 @@ const USER_ROLE_COOKIE = 'user_role'
 function parseExpiryToSeconds(value: string | undefined): number {
 	if (!value || typeof value !== 'string') return 0
 	const match = value.trim().match(/^(\d+)(s|m|h|d)$/i)
-	if (!match || match[1] == null || match[2] == null) return 0
+	if (match?.[1] == null || match[2] == null) return 0
 	const num = parseInt(match[1], 10)
 	const unit = match[2].toLowerCase()
 	switch (unit) {
@@ -159,7 +159,7 @@ export class AuthService {
 			})
 
 		if (error) throw new UnauthorizedException('Invalid credentials')
-		if (!data.session?.user?.id) throw new UnauthorizedException('Login failed')
+		if (!data.session.user.id) throw new UnauthorizedException('Login failed')
 
 		const user = await this.prisma.user.findFirst({
 			where: {
@@ -172,7 +172,7 @@ export class AuthService {
 
 		this.setAuthCookies(res, {
 			accessToken: data.session.access_token,
-			refreshToken: data.session.refresh_token ?? undefined,
+			refreshToken: data.session.refresh_token,
 			userRole: user.role,
 		})
 
@@ -198,7 +198,7 @@ export class AuthService {
 			.getClient()
 			.auth.refreshSession({ refresh_token: jid })
 
-		if (error || !data.session?.user?.id)
+		if (error || !data.session.user.id)
 			throw new UnauthorizedException('Invalid or expired refresh token')
 
 		const user = await this.prisma.user.findFirst({
@@ -209,7 +209,7 @@ export class AuthService {
 
 		this.setAuthCookies(res, {
 			accessToken: data.session.access_token,
-			refreshToken: data.session.refresh_token ?? undefined,
+			refreshToken: data.session.refresh_token,
 			userRole: user.role,
 		})
 
@@ -230,12 +230,13 @@ export class AuthService {
 	}
 
 	private getSubdomainFromRequest(req: Request): string | null {
+		const forwardedHost = req.headers['x-forwarded-host']
+		const hostHeader = req.headers.host
 		const host =
-			(req.headers['x-forwarded-host'] as string) ??
-			req.hostname ??
-			req.headers.host?.split(':')[0] ??
-			''
-		const hostPart = host.split(':')[0] ?? ''
+			(typeof forwardedHost === 'string' ? forwardedHost : '') ||
+			req.hostname ||
+			(typeof hostHeader === 'string' ? hostHeader.split(':')[0] : '')
+		const hostPart = host.split(':')[0]
 		const sub = hostPart.split('.')[0]
 		if (!sub || ['www', 'api', 'localhost'].includes(sub)) return null
 		return sub

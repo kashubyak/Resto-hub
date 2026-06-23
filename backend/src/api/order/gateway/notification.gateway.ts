@@ -96,7 +96,11 @@ export class NotificationsGateway
 	notifyWaiter(event: string, data: INotificationData, waiterId: number): void {
 		this.server.to(socket_rooms.WAITER(waiterId)).emit(event, data)
 	}
-	notifyCompany(companyId: number, event: string, data: INotificationData): void {
+	notifyCompany(
+		companyId: number,
+		event: string,
+		data: INotificationData,
+	): void {
 		this.server.to(socket_rooms.COMPANY(companyId)).emit(event, data)
 	}
 }
