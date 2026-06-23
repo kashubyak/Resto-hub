@@ -198,25 +198,28 @@ export class AuthService {
 			.getClient()
 			.auth.refreshSession({ refresh_token: jid })
 
-		if (error || !data.session.user.id)
+		const session = data.session
+		if (error || !session)
+			throw new UnauthorizedException('Invalid or expired refresh token')
+		if (!session.user.id)
 			throw new UnauthorizedException('Invalid or expired refresh token')
 
 		const user = await this.prisma.user.findFirst({
-			where: { supabaseUserId: data.session.user.id },
+			where: { supabaseUserId: session.user.id },
 			select: { id: true, role: true },
 		})
 		if (!user) throw new UnauthorizedException('User not found')
 
 		this.setAuthCookies(res, {
-			accessToken: data.session.access_token,
-			refreshToken: data.session.refresh_token,
+			accessToken: session.access_token,
+			refreshToken: session.refresh_token,
 			userRole: user.role,
 		})
 
 		return {
 			success: true,
 			user: { id: user.id, role: user.role },
-			token: data.session.access_token,
+			token: session.access_token,
 		}
 	}
 
@@ -235,9 +238,10 @@ export class AuthService {
 		const host =
 			(typeof forwardedHost === 'string' ? forwardedHost : '') ||
 			req.hostname ||
-			(typeof hostHeader === 'string' ? hostHeader.split(':')[0] : '')
-		const hostPart = host.split(':')[0]
-		const sub = hostPart.split('.')[0]
+			(typeof hostHeader === 'string' ? hostHeader.split(':')[0] : '') ||
+			''
+		const hostPart = host.split(':')[0] ?? ''
+		const sub = hostPart.split('.')[0] ?? ''
 		if (!sub || ['www', 'api', 'localhost'].includes(sub)) return null
 		return sub
 	}

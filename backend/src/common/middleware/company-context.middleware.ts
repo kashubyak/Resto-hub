@@ -33,8 +33,8 @@ export class CompanyContextMiddleware implements NestMiddleware {
 
 		const forwardedHost = req.headers['x-forwarded-host']
 		const host = typeof forwardedHost === 'string' ? forwardedHost : ''
-		const hostPart = host.split(':')[0]
-		const subdomain = hostPart.split('.')[0]
+		const hostPart = host.split(':')[0] ?? ''
+		const subdomain = hostPart.split('.')[0] ?? ''
 
 		if (!subdomain || ['www', 'api', 'localhost', 'lvh'].includes(subdomain))
 			return next()
